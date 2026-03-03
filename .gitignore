@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+*.whl
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+
+# Environment / Secrets
+.env
+*.env.local
+.env.production
+
+# Data (large binary files -- use Git LFS or keep in data/)
+data/
+*.tif
+*.tiff
+*.shp
+*.dbf
+*.shx
+*.prj
+*.gpkg
+*.geojson.gz
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Type checking
+.mypy_cache/
+
+# Linting
+.ruff_cache/
+
+# Docker
+docker-compose.override.yml
+
+# Resources (cloned reference repos -- not part of GeoSpark)
+resources/
+
+# Claude Code (session data, not project config)
+# NOTE: .claude/commands/ and .claude/agents/ ARE committed (project dev tools)
+.claude/settings*
+.claude/todos*
+.claude/teams*
+.claude/tasks*

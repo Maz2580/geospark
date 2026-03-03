@@ -1,0 +1,57 @@
+services:
+  geospark:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - GEOSPARK_DB_BACKEND=postgis
+      - GEOSPARK_DB_HOST=postgis
+      - GEOSPARK_DB_PORT=5432
+      - GEOSPARK_DB_NAME=geospark
+      - GEOSPARK_DB_USER=geospark
+      - GEOSPARK_DB_PASSWORD=${DB_PASSWORD:-geospark_dev}
+      - GEOSPARK_CACHE_BACKEND=redis
+      - GEOSPARK_CACHE_HOST=redis
+      - GEOSPARK_LOG_LEVEL=info
+    depends_on:
+      postgis:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  postgis:
+    image: postgis/postgis:16-3.4
+    environment:
+      - POSTGRES_DB=geospark
+      - POSTGRES_USER=geospark
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-geospark_dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U geospark -d geospark"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:

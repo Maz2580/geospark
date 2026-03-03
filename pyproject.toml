@@ -95,10 +95,10 @@ dev = [
 geospark = "geospark.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/geospark/geospark"
-Documentation = "https://geospark.dev"
-Repository = "https://github.com/geospark/geospark"
-Issues = "https://github.com/geospark/geospark/issues"
+Homepage = "https://github.com/Maz2580/geospark"
+Documentation = "https://github.com/Maz2580/geospark#readme"
+Repository = "https://github.com/Maz2580/geospark"
+Issues = "https://github.com/Maz2580/geospark/issues"
 
 [tool.ruff]
 target-version = "py310"

@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/geospark/geospark/actions"><img src="https://img.shields.io/github/actions/workflow/status/geospark/geospark/ci.yml?branch=main&label=tests" alt="CI"></a>
+  <a href="https://github.com/Maz2580/geospark/actions"><img src="https://img.shields.io/github/actions/workflow/status/geospark/geospark/ci.yml?branch=main&label=tests" alt="CI"></a>
   <a href="https://pypi.org/project/geospark/"><img src="https://img.shields.io/pypi/v/geospark?color=blue" alt="PyPI"></a>
   <a href="https://pypi.org/project/geospark/"><img src="https://img.shields.io/pypi/pyversions/geospark" alt="Python"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
@@ -174,7 +174,7 @@ See [docs/ROADMAP.md](docs/ROADMAP.md) for the detailed roadmap.
 
 ```bash
 # Clone and setup
-git clone https://github.com/geospark/geospark.git
+git clone https://github.com/Maz2580/geospark.git
 cd geospark
 python -m venv .venv
 source .venv/bin/activate  # or .venv\Scripts\activate on Windows

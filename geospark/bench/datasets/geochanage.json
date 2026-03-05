@@ -1,0 +1,976 @@
+{
+  "name": "GeoChange",
+  "description": "Temporal change detection (text-based v0.1)",
+  "version": "0.1.0",
+  "total_questions": 36,
+  "questions": [
+    {
+      "id": "geochanage_001",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "easy",
+      "prompt_natural": "Did the area around Amazon Rainforest, Brazil experience significant land use or land cover change between 2015-2023? Answer True or False.",
+      "prompt_structured": "Did the area around Amazon Rainforest, Brazil experience significant land use or land cover change between 2015-2023?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [-60.0, -3.0]}\n```\n\nTime period: 2015-2023\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "deforestation",
+        "description": "Significant deforestation detected in the Amazon basin between 2015 and 2023."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -60.0,
+          -3.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_002",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Amazon Rainforest, Brazil between 2015-2023? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Amazon Rainforest, Brazil between 2015-2023?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [-60.0, -3.0]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "deforestation",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -60.0,
+          -3.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_003",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "easy",
+      "prompt_natural": "Did the area around Dubai Marina, UAE experience significant land use or land cover change between 2010-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Dubai Marina, UAE experience significant land use or land cover change between 2010-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [55.14, 25.08]}\n```\n\nTime period: 2010-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "urban_expansion",
+        "description": "Rapid urban development and land reclamation in Dubai Marina area."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          55.14,
+          25.08
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_004",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Dubai Marina, UAE between 2010-2024? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Dubai Marina, UAE between 2010-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [55.14, 25.08]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "urban_expansion",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          55.14,
+          25.08
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_005",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "easy",
+      "prompt_natural": "Did the area around Sahara Desert, Libya experience significant land use or land cover change between 2018-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Sahara Desert, Libya experience significant land use or land cover change between 2018-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [20.0, 25.0]}\n```\n\nTime period: 2018-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "change_type": "no_change",
+        "description": "The central Sahara shows minimal land use change over this period."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          20.0,
+          25.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_006",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "medium",
+      "prompt_natural": "Did the area around Chernobyl Exclusion Zone, Ukraine experience significant land use or land cover change between 2000-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Chernobyl Exclusion Zone, Ukraine experience significant land use or land cover change between 2000-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [30.06, 51.27]}\n```\n\nTime period: 2000-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "vegetation_recovery",
+        "description": "Vegetation recovery and rewilding in the exclusion zone after human abandonment."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          30.06,
+          51.27
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_007",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Chernobyl Exclusion Zone, Ukraine between 2000-2024? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Chernobyl Exclusion Zone, Ukraine between 2000-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [30.06, 51.27]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "vegetation_recovery",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          30.06,
+          51.27
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_008",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "medium",
+      "prompt_natural": "Did the area around Lake Urmia, Iran experience significant land use or land cover change between 2000-2023? Answer True or False.",
+      "prompt_structured": "Did the area around Lake Urmia, Iran experience significant land use or land cover change between 2000-2023?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [45.5, 37.5]}\n```\n\nTime period: 2000-2023\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "water_loss",
+        "description": "Lake Urmia has shrunk dramatically, losing over 80% of its surface area."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          45.5,
+          37.5
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_009",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Lake Urmia, Iran between 2000-2023? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Lake Urmia, Iran between 2000-2023?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [45.5, 37.5]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "water_loss",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          45.5,
+          37.5
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_010",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "easy",
+      "prompt_natural": "Did the area around Aral Sea, Kazakhstan experience significant land use or land cover change between 1990-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Aral Sea, Kazakhstan experience significant land use or land cover change between 1990-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [59.0, 45.0]}\n```\n\nTime period: 1990-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "water_loss",
+        "description": "The Aral Sea has nearly disappeared due to irrigation diversion."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          59.0,
+          45.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_011",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Aral Sea, Kazakhstan between 1990-2024? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Aral Sea, Kazakhstan between 1990-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [59.0, 45.0]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "water_loss",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          59.0,
+          45.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_012",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "easy",
+      "prompt_natural": "Did the area around Beijing, China (urban area) experience significant land use or land cover change between 2005-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Beijing, China (urban area) experience significant land use or land cover change between 2005-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [116.4, 39.9]}\n```\n\nTime period: 2005-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "urban_expansion",
+        "description": "Massive urban expansion in Beijing's periphery with new ring roads and satellite cities."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          116.4,
+          39.9
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_013",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Beijing, China (urban area) between 2005-2024? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Beijing, China (urban area) between 2005-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [116.4, 39.9]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "urban_expansion",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          116.4,
+          39.9
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_014",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "medium",
+      "prompt_natural": "Did the area around Swiss Alps, Aletsch Glacier experience significant land use or land cover change between 2000-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Swiss Alps, Aletsch Glacier experience significant land use or land cover change between 2000-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [8.0, 46.5]}\n```\n\nTime period: 2000-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "glacier_retreat",
+        "description": "The Aletsch Glacier has retreated significantly due to climate change."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          8.0,
+          46.5
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_015",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Swiss Alps, Aletsch Glacier between 2000-2024? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Swiss Alps, Aletsch Glacier between 2000-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [8.0, 46.5]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "glacier_retreat",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          8.0,
+          46.5
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_016",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "easy",
+      "prompt_natural": "Did the area around Central Park, New York experience significant land use or land cover change between 2015-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Central Park, New York experience significant land use or land cover change between 2015-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.97, 40.78]}\n```\n\nTime period: 2015-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "change_type": "no_change",
+        "description": "Central Park's footprint has remained stable as a protected urban green space."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.97,
+          40.78
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_017",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "medium",
+      "prompt_natural": "Did the area around Sundarbans Mangrove, Bangladesh experience significant land use or land cover change between 2010-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Sundarbans Mangrove, Bangladesh experience significant land use or land cover change between 2010-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [89.5, 22.0]}\n```\n\nTime period: 2010-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "coastal_erosion",
+        "description": "Ongoing coastal erosion and mangrove loss due to sea level rise and cyclones."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          89.5,
+          22.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_018",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Sundarbans Mangrove, Bangladesh between 2010-2024? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Sundarbans Mangrove, Bangladesh between 2010-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [89.5, 22.0]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "coastal_erosion",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          89.5,
+          22.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_019",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "easy",
+      "prompt_natural": "Did the area around Palm Jumeirah, Dubai experience significant land use or land cover change between 2001-2010? Answer True or False.",
+      "prompt_structured": "Did the area around Palm Jumeirah, Dubai experience significant land use or land cover change between 2001-2010?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [55.13, 25.11]}\n```\n\nTime period: 2001-2010\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "land_reclamation",
+        "description": "Construction of the Palm Jumeirah artificial island, a major land reclamation project."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          55.13,
+          25.11
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_020",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Palm Jumeirah, Dubai between 2001-2010? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Palm Jumeirah, Dubai between 2001-2010?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [55.13, 25.11]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "land_reclamation",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          55.13,
+          25.11
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_021",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "medium",
+      "prompt_natural": "Did the area around Antarctic Peninsula experience significant land use or land cover change between 2000-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Antarctic Peninsula experience significant land use or land cover change between 2000-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [-60.0, -65.0]}\n```\n\nTime period: 2000-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "ice_loss",
+        "description": "Accelerated ice shelf collapse along the Antarctic Peninsula."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -60.0,
+          -65.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_022",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Antarctic Peninsula between 2000-2024? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Antarctic Peninsula between 2000-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [-60.0, -65.0]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "ice_loss",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -60.0,
+          -65.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_023",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "medium",
+      "prompt_natural": "Did the area around Yellowstone National Park, USA experience significant land use or land cover change between 2018-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Yellowstone National Park, USA experience significant land use or land cover change between 2018-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [-110.5, 44.6]}\n```\n\nTime period: 2018-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "change_type": "no_change",
+        "description": "Yellowstone's landscape has remained largely unchanged as a protected wilderness area."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -110.5,
+          44.6
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_024",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "easy",
+      "prompt_natural": "Did the area around Australian Bushfire Zone (NSW) experience significant land use or land cover change between 2019-2020? Answer True or False.",
+      "prompt_structured": "Did the area around Australian Bushfire Zone (NSW) experience significant land use or land cover change between 2019-2020?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [150.0, -33.0]}\n```\n\nTime period: 2019-2020\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "wildfire",
+        "description": "Massive bushfires in 2019-2020 caused widespread vegetation loss in New South Wales."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          150.0,
+          -33.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_025",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Australian Bushfire Zone (NSW) between 2019-2020? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Australian Bushfire Zone (NSW) between 2019-2020?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [150.0, -33.0]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "wildfire",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          150.0,
+          -33.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_026",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "medium",
+      "prompt_natural": "Did the area around Three Gorges Dam, China experience significant land use or land cover change between 1995-2010? Answer True or False.",
+      "prompt_structured": "Did the area around Three Gorges Dam, China experience significant land use or land cover change between 1995-2010?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [111.0, 30.8]}\n```\n\nTime period: 1995-2010\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "dam_construction",
+        "description": "Construction and filling of the Three Gorges Reservoir, flooding a vast area."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          111.0,
+          30.8
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_027",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Three Gorges Dam, China between 1995-2010? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Three Gorges Dam, China between 1995-2010?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [111.0, 30.8]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "dam_construction",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          111.0,
+          30.8
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_028",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "hard",
+      "prompt_natural": "Did the area around Mount Pinatubo, Philippines experience significant land use or land cover change between 1990-2000? Answer True or False.",
+      "prompt_structured": "Did the area around Mount Pinatubo, Philippines experience significant land use or land cover change between 1990-2000?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [120.35, 15.13]}\n```\n\nTime period: 1990-2000\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "volcanic",
+        "description": "The 1991 eruption dramatically altered the landscape, creating a crater lake."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          120.35,
+          15.13
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_029",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Mount Pinatubo, Philippines between 1990-2000? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Mount Pinatubo, Philippines between 1990-2000?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [120.35, 15.13]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "volcanic",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          120.35,
+          15.13
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_030",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "hard",
+      "prompt_natural": "Did the area around Venice, Italy experience significant land use or land cover change between 2015-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Venice, Italy experience significant land use or land cover change between 2015-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [12.34, 45.44]}\n```\n\nTime period: 2015-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "change_type": "no_change",
+        "description": "Venice's urban footprint has not significantly changed, though flooding frequency increased."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.34,
+          45.44
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_031",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "easy",
+      "prompt_natural": "Did the area around Borneo Rainforest, Indonesia experience significant land use or land cover change between 2000-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Borneo Rainforest, Indonesia experience significant land use or land cover change between 2000-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [115.0, 0.0]}\n```\n\nTime period: 2000-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "deforestation",
+        "description": "Large-scale deforestation for palm oil plantations in Borneo."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          115.0,
+          0.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_032",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Borneo Rainforest, Indonesia between 2000-2024? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Borneo Rainforest, Indonesia between 2000-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [115.0, 0.0]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "deforestation",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          115.0,
+          0.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_033",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "medium",
+      "prompt_natural": "Did the area around Fukushima, Japan (exclusion zone) experience significant land use or land cover change between 2011-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Fukushima, Japan (exclusion zone) experience significant land use or land cover change between 2011-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [141.0, 37.4]}\n```\n\nTime period: 2011-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "vegetation_recovery",
+        "description": "Vegetation recovery in abandoned areas following the 2011 nuclear disaster."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          141.0,
+          37.4
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_034",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Fukushima, Japan (exclusion zone) between 2011-2024? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Fukushima, Japan (exclusion zone) between 2011-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [141.0, 37.4]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "vegetation_recovery",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          141.0,
+          37.4
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_035",
+      "benchmark": "geochanage",
+      "category": "change_detection",
+      "difficulty": "medium",
+      "prompt_natural": "Did the area around Greenland Ice Sheet experience significant land use or land cover change between 2000-2024? Answer True or False.",
+      "prompt_structured": "Did the area around Greenland Ice Sheet experience significant land use or land cover change between 2000-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [-42.0, 72.0]}\n```\n\nTime period: 2000-2024\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "change_type": "ice_loss",
+        "description": "Accelerated melting and ice loss across the Greenland ice sheet."
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -42.0,
+          72.0
+        ]
+      },
+      "source": "curated_v0.1"
+    },
+    {
+      "id": "geochanage_036",
+      "benchmark": "geochanage",
+      "category": "change_type",
+      "difficulty": "hard",
+      "prompt_natural": "What type of land change occurred at Greenland Ice Sheet between 2000-2024? Choose from: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery.",
+      "prompt_structured": "What type of land change occurred at Greenland Ice Sheet between 2000-2024?\n\nLocation:\n```json\n{\"type\": \"Point\", \"coordinates\": [-42.0, 72.0]}\n```\n\nOptions: deforestation, urban_expansion, water_loss, glacier_retreat, coastal_erosion, land_reclamation, ice_loss, wildfire, dam_construction, volcanic, vegetation_recovery\nAnswer with one of the options above.",
+      "answer_type": "category",
+      "ground_truth": "ice_loss",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "deforestation",
+          "urban_expansion",
+          "water_loss",
+          "glacier_retreat",
+          "coastal_erosion",
+          "land_reclamation",
+          "ice_loss",
+          "wildfire",
+          "dam_construction",
+          "volcanic",
+          "vegetation_recovery"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -42.0,
+          72.0
+        ]
+      },
+      "source": "curated_v0.1"
+    }
+  ]
+}

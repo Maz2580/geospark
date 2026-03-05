@@ -1,0 +1,6028 @@
+{
+  "name": "GeoTopo",
+  "description": "Topological reasoning: contains, intersects, within, disjoint, touches",
+  "version": "0.1.0",
+  "total_questions": 100,
+  "questions": [
+    {
+      "id": "geotopo_001",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Paris contain the Eiffel Tower? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Paris contain the Eiffel Tower?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the Eiffel Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.2945, 48.8584]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.2945,
+          48.8584
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_002",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Paris contain the Louvre Museum? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Paris contain the Louvre Museum?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the Louvre Museum):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.3376, 48.8606]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.3376,
+          48.8606
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_003",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Paris contain the point at coordinates (49.0448N, 2.2250E)? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Paris contain the point at coordinates (49.0448N, 2.2250E)?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the given point):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.225002, 49.044764]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.225002,
+          49.044764
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_004",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Paris contain the point at coordinates (48.7598N, 2.2479E)? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Paris contain the point at coordinates (48.7598N, 2.2479E)?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the given point):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.247908, 48.759777]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.247908,
+          48.759777
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_005",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of London contain the Big Ben? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of London contain the Big Ben?\n\nGeometry A (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the Big Ben):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -0.1246,
+          51.5007
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_006",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of London contain the Tower of London? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of London contain the Tower of London?\n\nGeometry A (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the Tower of London):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.0761, 51.5081]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -0.0761,
+          51.5081
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_007",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of London contain the point at coordinates (51.6256N, -0.0638E)? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of London contain the point at coordinates (51.6256N, -0.0638E)?\n\nGeometry A (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the given point):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.063803, 51.625574]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -0.063803,
+          51.625574
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_008",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of London contain the point at coordinates (51.8576N, -0.2125E)? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of London contain the point at coordinates (51.8576N, -0.2125E)?\n\nGeometry A (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the given point):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.212545, 51.857624]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -0.212545,
+          51.857624
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_009",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of New York contain the Statue of Liberty? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of New York contain the Statue of Liberty?\n\nGeometry A (the bounding box of New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nGeometry B (the Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_010",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of New York contain the Empire State Building? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of New York contain the Empire State Building?\n\nGeometry A (the bounding box of New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nGeometry B (the Empire State Building):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9857, 40.7484]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -73.9857,
+          40.7484
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_011",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of New York contain the point at coordinates (41.2109N, -73.9658E)? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of New York contain the point at coordinates (41.2109N, -73.9658E)?\n\nGeometry A (the bounding box of New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nGeometry B (the given point):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.965813, 41.21085]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -73.965813,
+          41.21085
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_012",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of New York contain the point at coordinates (40.7679N, -74.1680E)? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of New York contain the point at coordinates (40.7679N, -74.1680E)?\n\nGeometry A (the bounding box of New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nGeometry B (the given point):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.168016, 40.767853]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -74.168016,
+          40.767853
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_013",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Rome contain the Colosseum? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Rome contain the Colosseum?\n\nGeometry A (the bounding box of Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nGeometry B (the Colosseum):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4922, 41.8902]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          12.4922,
+          41.8902
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_014",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Rome contain the Vatican City? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Rome contain the Vatican City?\n\nGeometry A (the bounding box of Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nGeometry B (the Vatican City):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4534, 41.9029]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          12.4534,
+          41.9029
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_015",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Rome contain the point at coordinates (42.0382N, 12.5138E)? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Rome contain the point at coordinates (42.0382N, 12.5138E)?\n\nGeometry A (the bounding box of Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nGeometry B (the given point):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.513821, 42.038233]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          12.513821,
+          42.038233
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_016",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Rome contain the point at coordinates (41.8655N, 12.2233E)? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Rome contain the point at coordinates (41.8655N, 12.2233E)?\n\nGeometry A (the bounding box of Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nGeometry B (the given point):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.223277, 41.865548]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          12.223277,
+          41.865548
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_017",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Tokyo contain the Tokyo Tower? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Tokyo contain the Tokyo Tower?\n\nGeometry A (the bounding box of Tokyo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nGeometry B (the Tokyo Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [139.7454, 35.6586]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          139.7454,
+          35.6586
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_018",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Tokyo contain the point at coordinates (35.6570N, 139.9101E)? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Tokyo contain the point at coordinates (35.6570N, 139.9101E)?\n\nGeometry A (the bounding box of Tokyo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nGeometry B (the given point):\n```json\n{\"type\": \"Point\", \"coordinates\": [139.910083, 35.656989]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          139.910083,
+          35.656989
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_019",
+      "benchmark": "geotopo",
+      "category": "contains",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Tokyo contain the point at coordinates (35.6906N, 140.2753E)? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Tokyo contain the point at coordinates (35.6906N, 140.2753E)?\n\nGeometry A (the bounding box of Tokyo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nGeometry B (the given point):\n```json\n{\"type\": \"Point\", \"coordinates\": [140.275272, 35.690559]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          140.275272,
+          35.690559
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_020",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Paris intersect with the bounding box of London? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Paris intersect with the bounding box of London?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_021",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "medium",
+      "prompt_natural": "Do these two overlapping rectangles in Paris intersect? Answer with True or False.",
+      "prompt_structured": "Do these two overlapping rectangles in Paris intersect?\n\nGeometry A (Rectangle A):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (Rectangle B (shifted 0.05 degrees east)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.4699999999999998, 48.84], [2.4699999999999998, 48.92], [2.27, 48.92], [2.27, 48.84], [2.4699999999999998, 48.84]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.4699999999999998,
+              48.84
+            ],
+            [
+              2.4699999999999998,
+              48.92
+            ],
+            [
+              2.27,
+              48.92
+            ],
+            [
+              2.27,
+              48.84
+            ],
+            [
+              2.4699999999999998,
+              48.84
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_022",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of London intersect with the bounding box of New York? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of London intersect with the bounding box of New York?\n\nGeometry A (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the bounding box of New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_023",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "medium",
+      "prompt_natural": "Do these two overlapping rectangles in London intersect? Answer with True or False.",
+      "prompt_structured": "Do these two overlapping rectangles in London intersect?\n\nGeometry A (Rectangle A):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (Rectangle B (shifted 0.05 degrees east)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.15000000000000002, 51.42], [0.15000000000000002, 51.620000000000005], [-0.25, 51.620000000000005], [-0.25, 51.42], [0.15000000000000002, 51.42]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.15000000000000002,
+              51.42
+            ],
+            [
+              0.15000000000000002,
+              51.620000000000005
+            ],
+            [
+              -0.25,
+              51.620000000000005
+            ],
+            [
+              -0.25,
+              51.42
+            ],
+            [
+              0.15000000000000002,
+              51.42
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_024",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of New York intersect with the bounding box of Rome? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of New York intersect with the bounding box of Rome?\n\nGeometry A (the bounding box of New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nGeometry B (the bounding box of Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_025",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "medium",
+      "prompt_natural": "Do these two overlapping rectangles in New York intersect? Answer with True or False.",
+      "prompt_structured": "Do these two overlapping rectangles in New York intersect?\n\nGeometry A (Rectangle A):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nGeometry B (Rectangle B (shifted 0.05 degrees east)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.85000000000001, 40.67], [-73.85000000000001, 40.870000000000005], [-74.0, 40.870000000000005], [-74.0, 40.67], [-73.85000000000001, 40.67]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.85000000000001,
+              40.67
+            ],
+            [
+              -73.85000000000001,
+              40.870000000000005
+            ],
+            [
+              -74.0,
+              40.870000000000005
+            ],
+            [
+              -74.0,
+              40.67
+            ],
+            [
+              -73.85000000000001,
+              40.67
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_026",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Rome intersect with the bounding box of Tokyo? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Rome intersect with the bounding box of Tokyo?\n\nGeometry A (the bounding box of Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nGeometry B (the bounding box of Tokyo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_027",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "medium",
+      "prompt_natural": "Do these two overlapping rectangles in Rome intersect? Answer with True or False.",
+      "prompt_structured": "Do these two overlapping rectangles in Rome intersect?\n\nGeometry A (Rectangle A):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nGeometry B (Rectangle B (shifted 0.05 degrees east)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.600000000000001, 41.870000000000005], [12.600000000000001, 41.970000000000006], [12.450000000000001, 41.970000000000006], [12.450000000000001, 41.870000000000005], [12.600000000000001, 41.870000000000005]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.600000000000001,
+              41.870000000000005
+            ],
+            [
+              12.600000000000001,
+              41.970000000000006
+            ],
+            [
+              12.450000000000001,
+              41.970000000000006
+            ],
+            [
+              12.450000000000001,
+              41.870000000000005
+            ],
+            [
+              12.600000000000001,
+              41.870000000000005
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_028",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Tokyo intersect with the bounding box of Sydney? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Tokyo intersect with the bounding box of Sydney?\n\nGeometry A (the bounding box of Tokyo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nGeometry B (the bounding box of Sydney):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.3, -33.9], [151.3, -33.8], [151.15, -33.8], [151.15, -33.9], [151.3, -33.9]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.3,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.9
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_029",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "medium",
+      "prompt_natural": "Do these two overlapping rectangles in Tokyo intersect? Answer with True or False.",
+      "prompt_structured": "Do these two overlapping rectangles in Tokyo intersect?\n\nGeometry A (Rectangle A):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nGeometry B (Rectangle B (shifted 0.05 degrees east)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.9, 35.620000000000005], [139.9, 35.77], [139.70000000000002, 35.77], [139.70000000000002, 35.620000000000005], [139.9, 35.620000000000005]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.9,
+              35.620000000000005
+            ],
+            [
+              139.9,
+              35.77
+            ],
+            [
+              139.70000000000002,
+              35.77
+            ],
+            [
+              139.70000000000002,
+              35.620000000000005
+            ],
+            [
+              139.9,
+              35.620000000000005
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_030",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Sydney intersect with the bounding box of Dubai? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Sydney intersect with the bounding box of Dubai?\n\nGeometry A (the bounding box of Sydney):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.3, -33.9], [151.3, -33.8], [151.15, -33.8], [151.15, -33.9], [151.3, -33.9]]]}\n```\n\nGeometry B (the bounding box of Dubai):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.15], [55.35, 25.3], [55.2, 25.3], [55.2, 25.15], [55.35, 25.15]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.3,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.9
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.35,
+              25.15
+            ],
+            [
+              55.35,
+              25.3
+            ],
+            [
+              55.2,
+              25.3
+            ],
+            [
+              55.2,
+              25.15
+            ],
+            [
+              55.35,
+              25.15
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_031",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "medium",
+      "prompt_natural": "Do these two overlapping rectangles in Sydney intersect? Answer with True or False.",
+      "prompt_structured": "Do these two overlapping rectangles in Sydney intersect?\n\nGeometry A (Rectangle A):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.3, -33.9], [151.3, -33.8], [151.15, -33.8], [151.15, -33.9], [151.3, -33.9]]]}\n```\n\nGeometry B (Rectangle B (shifted 0.05 degrees east)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.35000000000002, -33.879999999999995], [151.35000000000002, -33.779999999999994], [151.20000000000002, -33.779999999999994], [151.20000000000002, -33.879999999999995], [151.35000000000002, -33.879999999999995]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.3,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.9
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.35000000000002,
+              -33.879999999999995
+            ],
+            [
+              151.35000000000002,
+              -33.779999999999994
+            ],
+            [
+              151.20000000000002,
+              -33.779999999999994
+            ],
+            [
+              151.20000000000002,
+              -33.879999999999995
+            ],
+            [
+              151.35000000000002,
+              -33.879999999999995
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_032",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Dubai intersect with the bounding box of Cairo? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Dubai intersect with the bounding box of Cairo?\n\nGeometry A (the bounding box of Dubai):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.15], [55.35, 25.3], [55.2, 25.3], [55.2, 25.15], [55.35, 25.15]]]}\n```\n\nGeometry B (the bounding box of Cairo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.35, 29.95], [31.35, 30.1], [31.1, 30.1], [31.1, 29.95], [31.35, 29.95]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.35,
+              25.15
+            ],
+            [
+              55.35,
+              25.3
+            ],
+            [
+              55.2,
+              25.3
+            ],
+            [
+              55.2,
+              25.15
+            ],
+            [
+              55.35,
+              25.15
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.35,
+              29.95
+            ],
+            [
+              31.35,
+              30.1
+            ],
+            [
+              31.1,
+              30.1
+            ],
+            [
+              31.1,
+              29.95
+            ],
+            [
+              31.35,
+              29.95
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_033",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "medium",
+      "prompt_natural": "Do these two overlapping rectangles in Dubai intersect? Answer with True or False.",
+      "prompt_structured": "Do these two overlapping rectangles in Dubai intersect?\n\nGeometry A (Rectangle A):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.15], [55.35, 25.3], [55.2, 25.3], [55.2, 25.15], [55.35, 25.15]]]}\n```\n\nGeometry B (Rectangle B (shifted 0.05 degrees east)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.4, 25.169999999999998], [55.4, 25.32], [55.25, 25.32], [55.25, 25.169999999999998], [55.4, 25.169999999999998]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.35,
+              25.15
+            ],
+            [
+              55.35,
+              25.3
+            ],
+            [
+              55.2,
+              25.3
+            ],
+            [
+              55.2,
+              25.15
+            ],
+            [
+              55.35,
+              25.15
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.4,
+              25.169999999999998
+            ],
+            [
+              55.4,
+              25.32
+            ],
+            [
+              55.25,
+              25.32
+            ],
+            [
+              55.25,
+              25.169999999999998
+            ],
+            [
+              55.4,
+              25.169999999999998
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_034",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Cairo intersect with the bounding box of Cape Town? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Cairo intersect with the bounding box of Cape Town?\n\nGeometry A (the bounding box of Cairo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.35, 29.95], [31.35, 30.1], [31.1, 30.1], [31.1, 29.95], [31.35, 29.95]]]}\n```\n\nGeometry B (the bounding box of Cape Town):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[18.55, -34.0], [18.55, -33.9], [18.35, -33.9], [18.35, -34.0], [18.55, -34.0]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.35,
+              29.95
+            ],
+            [
+              31.35,
+              30.1
+            ],
+            [
+              31.1,
+              30.1
+            ],
+            [
+              31.1,
+              29.95
+            ],
+            [
+              31.35,
+              29.95
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              18.55,
+              -34.0
+            ],
+            [
+              18.55,
+              -33.9
+            ],
+            [
+              18.35,
+              -33.9
+            ],
+            [
+              18.35,
+              -34.0
+            ],
+            [
+              18.55,
+              -34.0
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_035",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "medium",
+      "prompt_natural": "Do these two overlapping rectangles in Cairo intersect? Answer with True or False.",
+      "prompt_structured": "Do these two overlapping rectangles in Cairo intersect?\n\nGeometry A (Rectangle A):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.35, 29.95], [31.35, 30.1], [31.1, 30.1], [31.1, 29.95], [31.35, 29.95]]]}\n```\n\nGeometry B (Rectangle B (shifted 0.05 degrees east)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.400000000000002, 29.97], [31.400000000000002, 30.12], [31.150000000000002, 30.12], [31.150000000000002, 29.97], [31.400000000000002, 29.97]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.35,
+              29.95
+            ],
+            [
+              31.35,
+              30.1
+            ],
+            [
+              31.1,
+              30.1
+            ],
+            [
+              31.1,
+              29.95
+            ],
+            [
+              31.35,
+              29.95
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.400000000000002,
+              29.97
+            ],
+            [
+              31.400000000000002,
+              30.12
+            ],
+            [
+              31.150000000000002,
+              30.12
+            ],
+            [
+              31.150000000000002,
+              29.97
+            ],
+            [
+              31.400000000000002,
+              29.97
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_036",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Cape Town intersect with the bounding box of Paris? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Cape Town intersect with the bounding box of Paris?\n\nGeometry A (the bounding box of Cape Town):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[18.55, -34.0], [18.55, -33.9], [18.35, -33.9], [18.35, -34.0], [18.55, -34.0]]]}\n```\n\nGeometry B (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              18.55,
+              -34.0
+            ],
+            [
+              18.55,
+              -33.9
+            ],
+            [
+              18.35,
+              -33.9
+            ],
+            [
+              18.35,
+              -34.0
+            ],
+            [
+              18.55,
+              -34.0
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_037",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "medium",
+      "prompt_natural": "Do these two overlapping rectangles in Cape Town intersect? Answer with True or False.",
+      "prompt_structured": "Do these two overlapping rectangles in Cape Town intersect?\n\nGeometry A (Rectangle A):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[18.55, -34.0], [18.55, -33.9], [18.35, -33.9], [18.35, -34.0], [18.55, -34.0]]]}\n```\n\nGeometry B (Rectangle B (shifted 0.05 degrees east)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[18.6, -33.98], [18.6, -33.879999999999995], [18.400000000000002, -33.879999999999995], [18.400000000000002, -33.98], [18.6, -33.98]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              18.55,
+              -34.0
+            ],
+            [
+              18.55,
+              -33.9
+            ],
+            [
+              18.35,
+              -33.9
+            ],
+            [
+              18.35,
+              -34.0
+            ],
+            [
+              18.55,
+              -34.0
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              18.6,
+              -33.98
+            ],
+            [
+              18.6,
+              -33.879999999999995
+            ],
+            [
+              18.400000000000002,
+              -33.879999999999995
+            ],
+            [
+              18.400000000000002,
+              -33.98
+            ],
+            [
+              18.6,
+              -33.98
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_038",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "easy",
+      "prompt_natural": "Does the bounding box of Paris intersect with the bounding box of London? Answer with True or False.",
+      "prompt_structured": "Does the bounding box of Paris intersect with the bounding box of London?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_039",
+      "benchmark": "geotopo",
+      "category": "intersects",
+      "difficulty": "medium",
+      "prompt_natural": "Do these two overlapping rectangles in Paris intersect? Answer with True or False.",
+      "prompt_structured": "Do these two overlapping rectangles in Paris intersect?\n\nGeometry A (Rectangle A):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (Rectangle B (shifted 0.05 degrees east)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.4699999999999998, 48.84], [2.4699999999999998, 48.92], [2.27, 48.92], [2.27, 48.84], [2.4699999999999998, 48.84]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.4699999999999998,
+              48.84
+            ],
+            [
+              2.4699999999999998,
+              48.92
+            ],
+            [
+              2.27,
+              48.92
+            ],
+            [
+              2.27,
+              48.84
+            ],
+            [
+              2.4699999999999998,
+              48.84
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_040",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of Paris and London disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of Paris and London disjoint (non-overlapping)?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_041",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of Paris and New York disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of Paris and New York disjoint (non-overlapping)?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the bounding box of New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_042",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of Paris and Rome disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of Paris and Rome disjoint (non-overlapping)?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the bounding box of Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_043",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of Paris and Tokyo disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of Paris and Tokyo disjoint (non-overlapping)?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the bounding box of Tokyo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_044",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of Paris and Sydney disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of Paris and Sydney disjoint (non-overlapping)?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the bounding box of Sydney):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.3, -33.9], [151.3, -33.8], [151.15, -33.8], [151.15, -33.9], [151.3, -33.9]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.3,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.9
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_045",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of Paris and Dubai disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of Paris and Dubai disjoint (non-overlapping)?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the bounding box of Dubai):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.15], [55.35, 25.3], [55.2, 25.3], [55.2, 25.15], [55.35, 25.15]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.35,
+              25.15
+            ],
+            [
+              55.35,
+              25.3
+            ],
+            [
+              55.2,
+              25.3
+            ],
+            [
+              55.2,
+              25.15
+            ],
+            [
+              55.35,
+              25.15
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_046",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of Paris and Cairo disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of Paris and Cairo disjoint (non-overlapping)?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the bounding box of Cairo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.35, 29.95], [31.35, 30.1], [31.1, 30.1], [31.1, 29.95], [31.35, 29.95]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.35,
+              29.95
+            ],
+            [
+              31.35,
+              30.1
+            ],
+            [
+              31.1,
+              30.1
+            ],
+            [
+              31.1,
+              29.95
+            ],
+            [
+              31.35,
+              29.95
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_047",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of Paris and Cape Town disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of Paris and Cape Town disjoint (non-overlapping)?\n\nGeometry A (the bounding box of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the bounding box of Cape Town):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[18.55, -34.0], [18.55, -33.9], [18.35, -33.9], [18.35, -34.0], [18.55, -34.0]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              18.55,
+              -34.0
+            ],
+            [
+              18.55,
+              -33.9
+            ],
+            [
+              18.35,
+              -33.9
+            ],
+            [
+              18.35,
+              -34.0
+            ],
+            [
+              18.55,
+              -34.0
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_048",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of London and New York disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of London and New York disjoint (non-overlapping)?\n\nGeometry A (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the bounding box of New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_049",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of London and Rome disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of London and Rome disjoint (non-overlapping)?\n\nGeometry A (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the bounding box of Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_050",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of London and Tokyo disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of London and Tokyo disjoint (non-overlapping)?\n\nGeometry A (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the bounding box of Tokyo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_051",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of London and Sydney disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of London and Sydney disjoint (non-overlapping)?\n\nGeometry A (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the bounding box of Sydney):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.3, -33.9], [151.3, -33.8], [151.15, -33.8], [151.15, -33.9], [151.3, -33.9]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.3,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.9
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_052",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of London and Dubai disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of London and Dubai disjoint (non-overlapping)?\n\nGeometry A (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the bounding box of Dubai):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.15], [55.35, 25.3], [55.2, 25.3], [55.2, 25.15], [55.35, 25.15]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.35,
+              25.15
+            ],
+            [
+              55.35,
+              25.3
+            ],
+            [
+              55.2,
+              25.3
+            ],
+            [
+              55.2,
+              25.15
+            ],
+            [
+              55.35,
+              25.15
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_053",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of London and Cairo disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of London and Cairo disjoint (non-overlapping)?\n\nGeometry A (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the bounding box of Cairo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.35, 29.95], [31.35, 30.1], [31.1, 30.1], [31.1, 29.95], [31.35, 29.95]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.35,
+              29.95
+            ],
+            [
+              31.35,
+              30.1
+            ],
+            [
+              31.1,
+              30.1
+            ],
+            [
+              31.1,
+              29.95
+            ],
+            [
+              31.35,
+              29.95
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_054",
+      "benchmark": "geotopo",
+      "category": "disjoint",
+      "difficulty": "easy",
+      "prompt_natural": "Are the bounding boxes of London and Cape Town disjoint (non-overlapping)? Answer with True or False.",
+      "prompt_structured": "Are the bounding boxes of London and Cape Town disjoint (non-overlapping)?\n\nGeometry A (the bounding box of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the bounding box of Cape Town):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[18.55, -34.0], [18.55, -33.9], [18.35, -33.9], [18.35, -34.0], [18.55, -34.0]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              18.55,
+              -34.0
+            ],
+            [
+              18.55,
+              -33.9
+            ],
+            [
+              18.35,
+              -33.9
+            ],
+            [
+              18.35,
+              -34.0
+            ],
+            [
+              18.55,
+              -34.0
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_055",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "medium",
+      "prompt_natural": "Is the inner district of Paris entirely within the city boundary? Answer with True or False.",
+      "prompt_structured": "Is the inner district of Paris entirely within the city boundary?\n\nGeometry A (the inner district of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.36, 48.844], [2.36, 48.876], [2.2800000000000002, 48.876], [2.2800000000000002, 48.844], [2.36, 48.844]]]}\n```\n\nGeometry B (the boundary of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.36,
+              48.844
+            ],
+            [
+              2.36,
+              48.876
+            ],
+            [
+              2.2800000000000002,
+              48.876
+            ],
+            [
+              2.2800000000000002,
+              48.844
+            ],
+            [
+              2.36,
+              48.844
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_056",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "medium",
+      "prompt_natural": "Is this extended area entirely within the boundary of Paris? Answer with True or False.",
+      "prompt_structured": "Is this extended area entirely within the boundary of Paris?\n\nGeometry A (the extended area):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.37, 48.72], [2.37, 48.85], [2.12, 48.85], [2.12, 48.72], [2.37, 48.72]]]}\n```\n\nGeometry B (the boundary of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.37,
+              48.72
+            ],
+            [
+              2.37,
+              48.85
+            ],
+            [
+              2.12,
+              48.85
+            ],
+            [
+              2.12,
+              48.72
+            ],
+            [
+              2.37,
+              48.72
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_057",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "easy",
+      "prompt_natural": "Is the point at (48.8674N, 2.3446E) within the boundary of Paris? Answer with True or False.",
+      "prompt_structured": "Is the point at (48.8674N, 2.3446E) within the boundary of Paris?\n\nGeometry A (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.34457, 48.867351]}\n```\n\nGeometry B (the boundary of Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.34457,
+          48.867351
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_058",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "medium",
+      "prompt_natural": "Is the inner district of London entirely within the city boundary? Answer with True or False.",
+      "prompt_structured": "Is the inner district of London entirely within the city boundary?\n\nGeometry A (the inner district of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-0.01999999999999999, 51.46], [-0.01999999999999999, 51.54], [-0.18, 51.54], [-0.18, 51.46], [-0.01999999999999999, 51.46]]]}\n```\n\nGeometry B (the boundary of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -0.01999999999999999,
+              51.46
+            ],
+            [
+              -0.01999999999999999,
+              51.54
+            ],
+            [
+              -0.18,
+              51.54
+            ],
+            [
+              -0.18,
+              51.46
+            ],
+            [
+              -0.01999999999999999,
+              51.46
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_059",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "medium",
+      "prompt_natural": "Is this extended area entirely within the boundary of London? Answer with True or False.",
+      "prompt_structured": "Is this extended area entirely within the boundary of London?\n\nGeometry A (the extended area):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.05, 51.3], [0.05, 51.550000000000004], [-0.4, 51.550000000000004], [-0.4, 51.3], [0.05, 51.3]]]}\n```\n\nGeometry B (the boundary of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.05,
+              51.3
+            ],
+            [
+              0.05,
+              51.550000000000004
+            ],
+            [
+              -0.4,
+              51.550000000000004
+            ],
+            [
+              -0.4,
+              51.3
+            ],
+            [
+              0.05,
+              51.3
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_060",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "easy",
+      "prompt_natural": "Is the point at (51.5378N, -0.0942E) within the boundary of London? Answer with True or False.",
+      "prompt_structured": "Is the point at (51.5378N, -0.0942E) within the boundary of London?\n\nGeometry A (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.094204, 51.537849]}\n```\n\nGeometry B (the boundary of London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.094204,
+          51.537849
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_061",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "medium",
+      "prompt_natural": "Is the inner district of New York entirely within the city boundary? Answer with True or False.",
+      "prompt_structured": "Is the inner district of New York entirely within the city boundary?\n\nGeometry A (the inner district of New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.94500000000001, 40.71], [-73.94500000000001, 40.79], [-74.005, 40.79], [-74.005, 40.71], [-73.94500000000001, 40.71]]]}\n```\n\nGeometry B (the boundary of New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.94500000000001,
+              40.71
+            ],
+            [
+              -73.94500000000001,
+              40.79
+            ],
+            [
+              -74.005,
+              40.79
+            ],
+            [
+              -74.005,
+              40.71
+            ],
+            [
+              -73.94500000000001,
+              40.71
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_062",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "medium",
+      "prompt_natural": "Is this extended area entirely within the boundary of New York? Answer with True or False.",
+      "prompt_structured": "Is this extended area entirely within the boundary of New York?\n\nGeometry A (the extended area):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.95, 40.55], [-73.95, 40.800000000000004], [-74.14999999999999, 40.800000000000004], [-74.14999999999999, 40.55], [-73.95, 40.55]]]}\n```\n\nGeometry B (the boundary of New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.95,
+              40.55
+            ],
+            [
+              -73.95,
+              40.800000000000004
+            ],
+            [
+              -74.14999999999999,
+              40.800000000000004
+            ],
+            [
+              -74.14999999999999,
+              40.55
+            ],
+            [
+              -73.95,
+              40.55
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_063",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "easy",
+      "prompt_natural": "Is the point at (40.7542N, -73.9823E) within the boundary of New York? Answer with True or False.",
+      "prompt_structured": "Is the point at (40.7542N, -73.9823E) within the boundary of New York?\n\nGeometry A (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.982288, 40.754163]}\n```\n\nGeometry B (the boundary of New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.982288,
+          40.754163
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_064",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "medium",
+      "prompt_natural": "Is the inner district of Rome entirely within the city boundary? Answer with True or False.",
+      "prompt_structured": "Is the inner district of Rome entirely within the city boundary?\n\nGeometry A (the inner district of Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.505, 41.88], [12.505, 41.92], [12.445, 41.92], [12.445, 41.88], [12.505, 41.88]]]}\n```\n\nGeometry B (the boundary of Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.505,
+              41.88
+            ],
+            [
+              12.505,
+              41.92
+            ],
+            [
+              12.445,
+              41.92
+            ],
+            [
+              12.445,
+              41.88
+            ],
+            [
+              12.505,
+              41.88
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_065",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "medium",
+      "prompt_natural": "Is this extended area entirely within the boundary of Rome? Answer with True or False.",
+      "prompt_structured": "Is this extended area entirely within the boundary of Rome?\n\nGeometry A (the extended area):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.5, 41.75], [12.5, 41.900000000000006], [12.3, 41.900000000000006], [12.3, 41.75], [12.5, 41.75]]]}\n```\n\nGeometry B (the boundary of Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.5,
+              41.75
+            ],
+            [
+              12.5,
+              41.900000000000006
+            ],
+            [
+              12.3,
+              41.900000000000006
+            ],
+            [
+              12.3,
+              41.75
+            ],
+            [
+              12.5,
+              41.75
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_066",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "easy",
+      "prompt_natural": "Is the point at (41.9047N, 12.4948E) within the boundary of Rome? Answer with True or False.",
+      "prompt_structured": "Is the point at (41.9047N, 12.4948E) within the boundary of Rome?\n\nGeometry A (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.494764, 41.904741]}\n```\n\nGeometry B (the boundary of Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.494764,
+          41.904741
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_067",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "medium",
+      "prompt_natural": "Is the inner district of Tokyo entirely within the city boundary? Answer with True or False.",
+      "prompt_structured": "Is the inner district of Tokyo entirely within the city boundary?\n\nGeometry A (the inner district of Tokyo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.79, 35.645], [139.79, 35.705], [139.71, 35.705], [139.71, 35.645], [139.79, 35.645]]]}\n```\n\nGeometry B (the boundary of Tokyo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.79,
+              35.645
+            ],
+            [
+              139.79,
+              35.705
+            ],
+            [
+              139.71,
+              35.705
+            ],
+            [
+              139.71,
+              35.645
+            ],
+            [
+              139.79,
+              35.645
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_068",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "medium",
+      "prompt_natural": "Is this extended area entirely within the boundary of Tokyo? Answer with True or False.",
+      "prompt_structured": "Is this extended area entirely within the boundary of Tokyo?\n\nGeometry A (the extended area):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.79999999999998, 35.5], [139.79999999999998, 35.7], [139.55, 35.7], [139.55, 35.5], [139.79999999999998, 35.5]]]}\n```\n\nGeometry B (the boundary of Tokyo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.79999999999998,
+              35.5
+            ],
+            [
+              139.79999999999998,
+              35.7
+            ],
+            [
+              139.55,
+              35.7
+            ],
+            [
+              139.55,
+              35.5
+            ],
+            [
+              139.79999999999998,
+              35.5
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_069",
+      "benchmark": "geotopo",
+      "category": "within",
+      "difficulty": "easy",
+      "prompt_natural": "Is the point at (35.6796N, 139.7789E) within the boundary of Tokyo? Answer with True or False.",
+      "prompt_structured": "Is the point at (35.6796N, 139.7789E) within the boundary of Tokyo?\n\nGeometry A (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [139.778937, 35.679641]}\n```\n\nGeometry B (the boundary of Tokyo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          139.778937,
+          35.679641
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_070",
+      "benchmark": "geotopo",
+      "category": "contains_with_hole",
+      "difficulty": "hard",
+      "prompt_natural": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8552N, 2.3541E)? Answer with True or False.",
+      "prompt_structured": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8552N, 2.3541E)?\n\nGeometry A (Paris boundary (with exclusion zone)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.22, 48.82], [2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82]], [[2.34, 48.855], [2.36, 48.855], [2.36, 48.86], [2.34, 48.86], [2.34, 48.855]]]}\n```\n\nGeometry B (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.354091, 48.855229]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ]
+          ],
+          [
+            [
+              2.34,
+              48.855
+            ],
+            [
+              2.36,
+              48.855
+            ],
+            [
+              2.36,
+              48.86
+            ],
+            [
+              2.34,
+              48.86
+            ],
+            [
+              2.34,
+              48.855
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.354091,
+          48.855229
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_071",
+      "benchmark": "geotopo",
+      "category": "contains_with_hole",
+      "difficulty": "hard",
+      "prompt_natural": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8358N, 2.2682E)? Answer with True or False.",
+      "prompt_structured": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8358N, 2.2682E)?\n\nGeometry A (Paris boundary (with exclusion zone)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.22, 48.82], [2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82]], [[2.34, 48.855], [2.36, 48.855], [2.36, 48.86], [2.34, 48.86], [2.34, 48.855]]]}\n```\n\nGeometry B (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.268232, 48.835788]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ]
+          ],
+          [
+            [
+              2.34,
+              48.855
+            ],
+            [
+              2.36,
+              48.855
+            ],
+            [
+              2.36,
+              48.86
+            ],
+            [
+              2.34,
+              48.86
+            ],
+            [
+              2.34,
+              48.855
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.268232,
+          48.835788
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_072",
+      "benchmark": "geotopo",
+      "category": "contains_with_hole",
+      "difficulty": "hard",
+      "prompt_natural": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8562N, 2.3416E)? Answer with True or False.",
+      "prompt_structured": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8562N, 2.3416E)?\n\nGeometry A (Paris boundary (with exclusion zone)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.22, 48.82], [2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82]], [[2.34, 48.855], [2.36, 48.855], [2.36, 48.86], [2.34, 48.86], [2.34, 48.855]]]}\n```\n\nGeometry B (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.341596, 48.856164]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ]
+          ],
+          [
+            [
+              2.34,
+              48.855
+            ],
+            [
+              2.36,
+              48.855
+            ],
+            [
+              2.36,
+              48.86
+            ],
+            [
+              2.34,
+              48.86
+            ],
+            [
+              2.34,
+              48.855
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.341596,
+          48.856164
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_073",
+      "benchmark": "geotopo",
+      "category": "contains_with_hole",
+      "difficulty": "hard",
+      "prompt_natural": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8356N, 2.2581E)? Answer with True or False.",
+      "prompt_structured": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8356N, 2.2581E)?\n\nGeometry A (Paris boundary (with exclusion zone)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.22, 48.82], [2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82]], [[2.34, 48.855], [2.36, 48.855], [2.36, 48.86], [2.34, 48.86], [2.34, 48.855]]]}\n```\n\nGeometry B (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.25808, 48.835559]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ]
+          ],
+          [
+            [
+              2.34,
+              48.855
+            ],
+            [
+              2.36,
+              48.855
+            ],
+            [
+              2.36,
+              48.86
+            ],
+            [
+              2.34,
+              48.86
+            ],
+            [
+              2.34,
+              48.855
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.25808,
+          48.835559
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_074",
+      "benchmark": "geotopo",
+      "category": "contains_with_hole",
+      "difficulty": "hard",
+      "prompt_natural": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8568N, 2.3527E)? Answer with True or False.",
+      "prompt_structured": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8568N, 2.3527E)?\n\nGeometry A (Paris boundary (with exclusion zone)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.22, 48.82], [2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82]], [[2.34, 48.855], [2.36, 48.855], [2.36, 48.86], [2.34, 48.86], [2.34, 48.855]]]}\n```\n\nGeometry B (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.352714, 48.856824]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ]
+          ],
+          [
+            [
+              2.34,
+              48.855
+            ],
+            [
+              2.36,
+              48.855
+            ],
+            [
+              2.36,
+              48.86
+            ],
+            [
+              2.34,
+              48.86
+            ],
+            [
+              2.34,
+              48.855
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.352714,
+          48.856824
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_075",
+      "benchmark": "geotopo",
+      "category": "contains_with_hole",
+      "difficulty": "hard",
+      "prompt_natural": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8342N, 2.2796E)? Answer with True or False.",
+      "prompt_structured": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8342N, 2.2796E)?\n\nGeometry A (Paris boundary (with exclusion zone)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.22, 48.82], [2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82]], [[2.34, 48.855], [2.36, 48.855], [2.36, 48.86], [2.34, 48.86], [2.34, 48.855]]]}\n```\n\nGeometry B (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.279614, 48.83419]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ]
+          ],
+          [
+            [
+              2.34,
+              48.855
+            ],
+            [
+              2.36,
+              48.855
+            ],
+            [
+              2.36,
+              48.86
+            ],
+            [
+              2.34,
+              48.86
+            ],
+            [
+              2.34,
+              48.855
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.279614,
+          48.83419
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_076",
+      "benchmark": "geotopo",
+      "category": "contains_with_hole",
+      "difficulty": "hard",
+      "prompt_natural": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8597N, 2.3453E)? Answer with True or False.",
+      "prompt_structured": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8597N, 2.3453E)?\n\nGeometry A (Paris boundary (with exclusion zone)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.22, 48.82], [2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82]], [[2.34, 48.855], [2.36, 48.855], [2.36, 48.86], [2.34, 48.86], [2.34, 48.855]]]}\n```\n\nGeometry B (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.34534, 48.859683]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ]
+          ],
+          [
+            [
+              2.34,
+              48.855
+            ],
+            [
+              2.36,
+              48.855
+            ],
+            [
+              2.36,
+              48.86
+            ],
+            [
+              2.34,
+              48.86
+            ],
+            [
+              2.34,
+              48.855
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.34534,
+          48.859683
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_077",
+      "benchmark": "geotopo",
+      "category": "contains_with_hole",
+      "difficulty": "hard",
+      "prompt_natural": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8422N, 2.3018E)? Answer with True or False.",
+      "prompt_structured": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8422N, 2.3018E)?\n\nGeometry A (Paris boundary (with exclusion zone)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.22, 48.82], [2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82]], [[2.34, 48.855], [2.36, 48.855], [2.36, 48.86], [2.34, 48.86], [2.34, 48.855]]]}\n```\n\nGeometry B (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.301843, 48.842183]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ]
+          ],
+          [
+            [
+              2.34,
+              48.855
+            ],
+            [
+              2.36,
+              48.855
+            ],
+            [
+              2.36,
+              48.86
+            ],
+            [
+              2.34,
+              48.86
+            ],
+            [
+              2.34,
+              48.855
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.301843,
+          48.842183
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_078",
+      "benchmark": "geotopo",
+      "category": "contains_with_hole",
+      "difficulty": "hard",
+      "prompt_natural": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8586N, 2.3434E)? Answer with True or False.",
+      "prompt_structured": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8586N, 2.3434E)?\n\nGeometry A (Paris boundary (with exclusion zone)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.22, 48.82], [2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82]], [[2.34, 48.855], [2.36, 48.855], [2.36, 48.86], [2.34, 48.86], [2.34, 48.855]]]}\n```\n\nGeometry B (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.343423, 48.858646]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ]
+          ],
+          [
+            [
+              2.34,
+              48.855
+            ],
+            [
+              2.36,
+              48.855
+            ],
+            [
+              2.36,
+              48.86
+            ],
+            [
+              2.34,
+              48.86
+            ],
+            [
+              2.34,
+              48.855
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.343423,
+          48.858646
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_079",
+      "benchmark": "geotopo",
+      "category": "contains_with_hole",
+      "difficulty": "hard",
+      "prompt_natural": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8376N, 2.2631E)? Answer with True or False.",
+      "prompt_structured": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8376N, 2.2631E)?\n\nGeometry A (Paris boundary (with exclusion zone)):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.22, 48.82], [2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82]], [[2.34, 48.855], [2.36, 48.855], [2.36, 48.86], [2.34, 48.86], [2.34, 48.855]]]}\n```\n\nGeometry B (the point):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.263072, 48.837589]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ]
+          ],
+          [
+            [
+              2.34,
+              48.855
+            ],
+            [
+              2.36,
+              48.855
+            ],
+            [
+              2.36,
+              48.86
+            ],
+            [
+              2.34,
+              48.86
+            ],
+            [
+              2.34,
+              48.855
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.263072,
+          48.837589
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_080",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (-33.9780N, 18.3500E) touch (lie exactly on the boundary of) the Cape Town bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (-33.9780N, 18.3500E) touch (lie exactly on the boundary of) the Cape Town bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[18.55, -34.0], [18.55, -33.9], [18.35, -33.9], [18.35, -34.0], [18.55, -34.0]]]}\n```\n\nGeometry B (the Cape Town boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.35, -33.978038]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              18.55,
+              -34.0
+            ],
+            [
+              18.55,
+              -33.9
+            ],
+            [
+              18.35,
+              -33.9
+            ],
+            [
+              18.35,
+              -34.0
+            ],
+            [
+              18.55,
+              -34.0
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          18.35,
+          -33.978038
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_081",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (-33.8157N, 151.1500E) touch (lie exactly on the boundary of) the Sydney bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (-33.8157N, 151.1500E) touch (lie exactly on the boundary of) the Sydney bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.3, -33.9], [151.3, -33.8], [151.15, -33.8], [151.15, -33.9], [151.3, -33.9]]]}\n```\n\nGeometry B (the Sydney boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [151.15, -33.815715]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.3,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.9
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          151.15,
+          -33.815715
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_082",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (48.8383N, 2.2200E) touch (lie exactly on the boundary of) the Paris bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (48.8383N, 2.2200E) touch (lie exactly on the boundary of) the Paris bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the Paris boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.22, 48.838324]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.22,
+          48.838324
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_083",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (48.8844N, 2.2200E) touch (lie exactly on the boundary of) the Paris bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (48.8844N, 2.2200E) touch (lie exactly on the boundary of) the Paris bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nGeometry B (the Paris boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.22, 48.884404]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.22,
+          48.884404
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_084",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (25.1902N, 55.2000E) touch (lie exactly on the boundary of) the Dubai bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (25.1902N, 55.2000E) touch (lie exactly on the boundary of) the Dubai bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.15], [55.35, 25.3], [55.2, 25.3], [55.2, 25.15], [55.35, 25.15]]]}\n```\n\nGeometry B (the Dubai boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2, 25.190161]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.35,
+              25.15
+            ],
+            [
+              55.35,
+              25.3
+            ],
+            [
+              55.2,
+              25.3
+            ],
+            [
+              55.2,
+              25.15
+            ],
+            [
+              55.35,
+              25.15
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          55.2,
+          25.190161
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_085",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (41.9413N, 12.4000E) touch (lie exactly on the boundary of) the Rome bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (41.9413N, 12.4000E) touch (lie exactly on the boundary of) the Rome bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nGeometry B (the Rome boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4, 41.941314]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          12.4,
+          41.941314
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_086",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (-33.8787N, 151.1500E) touch (lie exactly on the boundary of) the Sydney bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (-33.8787N, 151.1500E) touch (lie exactly on the boundary of) the Sydney bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.3, -33.9], [151.3, -33.8], [151.15, -33.8], [151.15, -33.9], [151.3, -33.9]]]}\n```\n\nGeometry B (the Sydney boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [151.15, -33.878737]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.3,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.9
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          151.15,
+          -33.878737
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_087",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (30.0093N, 31.1000E) touch (lie exactly on the boundary of) the Cairo bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (30.0093N, 31.1000E) touch (lie exactly on the boundary of) the Cairo bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.35, 29.95], [31.35, 30.1], [31.1, 30.1], [31.1, 29.95], [31.35, 29.95]]]}\n```\n\nGeometry B (the Cairo boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1, 30.009345]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.35,
+              29.95
+            ],
+            [
+              31.35,
+              30.1
+            ],
+            [
+              31.1,
+              30.1
+            ],
+            [
+              31.1,
+              29.95
+            ],
+            [
+              31.35,
+              29.95
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          31.1,
+          30.009345
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_088",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (29.9714N, 31.1000E) touch (lie exactly on the boundary of) the Cairo bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (29.9714N, 31.1000E) touch (lie exactly on the boundary of) the Cairo bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.35, 29.95], [31.35, 30.1], [31.1, 30.1], [31.1, 29.95], [31.35, 29.95]]]}\n```\n\nGeometry B (the Cairo boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1, 29.971431]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.35,
+              29.95
+            ],
+            [
+              31.35,
+              30.1
+            ],
+            [
+              31.1,
+              30.1
+            ],
+            [
+              31.1,
+              29.95
+            ],
+            [
+              31.35,
+              29.95
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          31.1,
+          29.971431
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_089",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (40.6993N, -74.0500E) touch (lie exactly on the boundary of) the New York bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (40.6993N, -74.0500E) touch (lie exactly on the boundary of) the New York bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nGeometry B (the New York boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.05, 40.699326]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -74.05,
+          40.699326
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_090",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (-33.9461N, 18.3500E) touch (lie exactly on the boundary of) the Cape Town bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (-33.9461N, 18.3500E) touch (lie exactly on the boundary of) the Cape Town bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[18.55, -34.0], [18.55, -33.9], [18.35, -33.9], [18.35, -34.0], [18.55, -34.0]]]}\n```\n\nGeometry B (the Cape Town boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.35, -33.946102]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              18.55,
+              -34.0
+            ],
+            [
+              18.55,
+              -33.9
+            ],
+            [
+              18.35,
+              -33.9
+            ],
+            [
+              18.35,
+              -34.0
+            ],
+            [
+              18.55,
+              -34.0
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          18.35,
+          -33.946102
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_091",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (25.2847N, 55.2000E) touch (lie exactly on the boundary of) the Dubai bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (25.2847N, 55.2000E) touch (lie exactly on the boundary of) the Dubai bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.15], [55.35, 25.3], [55.2, 25.3], [55.2, 25.15], [55.35, 25.15]]]}\n```\n\nGeometry B (the Dubai boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2, 25.284673]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.35,
+              25.15
+            ],
+            [
+              55.35,
+              25.3
+            ],
+            [
+              55.2,
+              25.3
+            ],
+            [
+              55.2,
+              25.15
+            ],
+            [
+              55.35,
+              25.15
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          55.2,
+          25.284673
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_092",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (25.2043N, 55.2000E) touch (lie exactly on the boundary of) the Dubai bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (25.2043N, 55.2000E) touch (lie exactly on the boundary of) the Dubai bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.15], [55.35, 25.3], [55.2, 25.3], [55.2, 25.15], [55.35, 25.15]]]}\n```\n\nGeometry B (the Dubai boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2, 25.204299]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.35,
+              25.15
+            ],
+            [
+              55.35,
+              25.3
+            ],
+            [
+              55.2,
+              25.3
+            ],
+            [
+              55.2,
+              25.15
+            ],
+            [
+              55.35,
+              25.15
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          55.2,
+          25.204299
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_093",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (40.7519N, -74.0500E) touch (lie exactly on the boundary of) the New York bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (40.7519N, -74.0500E) touch (lie exactly on the boundary of) the New York bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nGeometry B (the New York boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.05, 40.751905]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -74.05,
+          40.751905
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_094",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (51.5512N, -0.3000E) touch (lie exactly on the boundary of) the London bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (51.5512N, -0.3000E) touch (lie exactly on the boundary of) the London bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the London boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.3, 51.551156]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -0.3,
+          51.551156
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_095",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (51.4306N, -0.3000E) touch (lie exactly on the boundary of) the London bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (51.4306N, -0.3000E) touch (lie exactly on the boundary of) the London bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nGeometry B (the London boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.3, 51.430568]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -0.3,
+          51.430568
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_096",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (40.8084N, -74.0500E) touch (lie exactly on the boundary of) the New York bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (40.8084N, -74.0500E) touch (lie exactly on the boundary of) the New York bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nGeometry B (the New York boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.05, 40.808416]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -74.05,
+          40.808416
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_097",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (25.2395N, 55.2000E) touch (lie exactly on the boundary of) the Dubai bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (25.2395N, 55.2000E) touch (lie exactly on the boundary of) the Dubai bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.15], [55.35, 25.3], [55.2, 25.3], [55.2, 25.15], [55.35, 25.15]]]}\n```\n\nGeometry B (the Dubai boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2, 25.239461]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.35,
+              25.15
+            ],
+            [
+              55.35,
+              25.3
+            ],
+            [
+              55.2,
+              25.3
+            ],
+            [
+              55.2,
+              25.15
+            ],
+            [
+              55.35,
+              25.15
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          55.2,
+          25.239461
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_098",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (25.2072N, 55.2000E) touch (lie exactly on the boundary of) the Dubai bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (25.2072N, 55.2000E) touch (lie exactly on the boundary of) the Dubai bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.15], [55.35, 25.3], [55.2, 25.3], [55.2, 25.15], [55.35, 25.15]]]}\n```\n\nGeometry B (the Dubai boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2, 25.207243]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.35,
+              25.15
+            ],
+            [
+              55.35,
+              25.3
+            ],
+            [
+              55.2,
+              25.3
+            ],
+            [
+              55.2,
+              25.15
+            ],
+            [
+              55.35,
+              25.15
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          55.2,
+          25.207243
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_099",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (30.0294N, 31.1000E) touch (lie exactly on the boundary of) the Cairo bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (30.0294N, 31.1000E) touch (lie exactly on the boundary of) the Cairo bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.35, 29.95], [31.35, 30.1], [31.1, 30.1], [31.1, 29.95], [31.35, 29.95]]]}\n```\n\nGeometry B (the Cairo boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1, 30.029367]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.35,
+              29.95
+            ],
+            [
+              31.35,
+              30.1
+            ],
+            [
+              31.1,
+              30.1
+            ],
+            [
+              31.1,
+              29.95
+            ],
+            [
+              31.35,
+              29.95
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          31.1,
+          30.029367
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geotopo_100",
+      "benchmark": "geotopo",
+      "category": "touches",
+      "difficulty": "hard",
+      "prompt_natural": "Does the point at (-33.9139N, 18.3500E) touch (lie exactly on the boundary of) the Cape Town bounding box? Answer with True or False.",
+      "prompt_structured": "Does the point at (-33.9139N, 18.3500E) touch (lie exactly on the boundary of) the Cape Town bounding box?\n\nGeometry A (the point):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[18.55, -34.0], [18.55, -33.9], [18.35, -33.9], [18.35, -34.0], [18.55, -34.0]]]}\n```\n\nGeometry B (the Cape Town boundary):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.35, -33.913922]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "engine": "shapely",
+        "verified": true
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              18.55,
+              -34.0
+            ],
+            [
+              18.55,
+              -33.9
+            ],
+            [
+              18.35,
+              -33.9
+            ],
+            [
+              18.35,
+              -34.0
+            ],
+            [
+              18.55,
+              -34.0
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          18.35,
+          -33.913922
+        ]
+      },
+      "source": "generated_v0.1"
+    }
+  ]
+}

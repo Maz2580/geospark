@@ -13,6 +13,7 @@ from typing import Any
 import shapely
 from shapely.geometry import shape, mapping
 from shapely import ops
+from pyproj import Geod
 
 from geospark.protocol.schema import (
     SpatialQuery,
@@ -93,23 +94,36 @@ class SpatialReasoner:
         )
 
     def _distance(self, query: SpatialQuery) -> SpatialResult:
-        """Calculate distance between geometries."""
+        """Calculate geodesic distance between two geometries."""
         if query.geometry is None:
             return SpatialResult(errors=["Distance requires a geometry"])
 
-        geom = shape(query.geometry.model_dump())
+        geom_b_raw = (query.metadata or {}).get("geometry_b")
+        if geom_b_raw is None:
+            return SpatialResult(errors=[
+                "Distance requires two geometries. Pass the second via metadata.geometry_b"
+            ])
 
-        # TODO: Accept second geometry from query metadata
-        # For now, return the geometry with distance placeholder
+        geom_a = shape(query.geometry.model_dump())
+        geom_b = shape(geom_b_raw)
+
+        distance_m = self.calculate_distance(
+            mapping(geom_a), mapping(geom_b)
+        )
+
         return SpatialResult(
             features=[
                 SpatialFeature(
-                    geometry=mapping(geom),
-                    properties={"operation": "distance"},
+                    geometry=mapping(geom_a),
+                    properties={
+                        "operation": "distance",
+                        "distance_m": distance_m,
+                        "distance_km": distance_m / 1000,
+                    },
                 )
             ],
             spatial_context=SpatialContext(
-                summary="Distance calculation (provide two geometries for comparison)",
+                summary=f"Geodesic distance: {distance_m:,.1f} m ({distance_m / 1000:,.2f} km)",
             ),
         )
 
@@ -220,6 +234,41 @@ class SpatialReasoner:
                 summary=f"Geometric operation: {query.operation.value} (requires two geometries)",
             ),
         )
+
+    @staticmethod
+    def calculate_distance(
+        geom_a: dict[str, Any],
+        geom_b: dict[str, Any],
+    ) -> float:
+        """
+        Calculate geodesic distance between two geometries in meters.
+
+        Uses pyproj Geod (WGS84 ellipsoid) for accurate great-circle distance.
+        For non-point geometries, uses nearest points on the geometry boundaries.
+
+        Args:
+            geom_a: GeoJSON geometry dict
+            geom_b: GeoJSON geometry dict
+
+        Returns:
+            Distance in meters (geodesic, not planar)
+        """
+        a = shape(geom_a)
+        b = shape(geom_b)
+
+        # Get representative points for distance calculation
+        # For points, use directly; for polygons/lines, use nearest points
+        if a.geom_type == "Point" and b.geom_type == "Point":
+            lon1, lat1 = a.x, a.y
+            lon2, lat2 = b.x, b.y
+        else:
+            nearest = ops.nearest_points(a, b)
+            lon1, lat1 = nearest[0].x, nearest[0].y
+            lon2, lat2 = nearest[1].x, nearest[1].y
+
+        geod = Geod(ellps="WGS84")
+        _, _, distance_m = geod.inv(lon1, lat1, lon2, lat2)
+        return abs(distance_m)
 
     @staticmethod
     def check_relationship(

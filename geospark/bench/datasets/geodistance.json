@@ -1,0 +1,2911 @@
+{
+  "name": "GeoDistance",
+  "description": "Distance and proximity reasoning with real-world coordinates",
+  "version": "0.1.0",
+  "total_questions": 100,
+  "questions": [
+    {
+      "id": "geodistance_001",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Louvre Museum to the Burj Khalifa? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Louvre Museum to the Burj Khalifa?\n\nPoint A (Louvre Museum):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.3376, 48.8606]}\n```\n\nPoint B (Burj Khalifa):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2744, 25.1972]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 5255270.8,
+      "ground_truth_meta": {
+        "tolerance_m": 262763.5,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.3376,
+          48.8606
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          55.2744,
+          25.1972
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_002",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Louvre Museum to the Machu Picchu? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Louvre Museum to the Machu Picchu?\n\nPoint A (Louvre Museum):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.3376, 48.8606]}\n```\n\nPoint B (Machu Picchu):\n```json\n{\"type\": \"Point\", \"coordinates\": [-72.545, -13.1631]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 10025758.1,
+      "ground_truth_meta": {
+        "tolerance_m": 501287.9,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.3376,
+          48.8606
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -72.545,
+          -13.1631
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_003",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Burj Khalifa to the Table Mountain? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Burj Khalifa to the Table Mountain?\n\nPoint A (Burj Khalifa):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2744, 25.1972]}\n```\n\nPoint B (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 7620190.0,
+      "ground_truth_meta": {
+        "tolerance_m": 381009.5,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          55.2744,
+          25.1972
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          18.4041,
+          -33.9628
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_004",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Vatican City to the Taj Mahal? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Vatican City to the Taj Mahal?\n\nPoint A (Vatican City):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4534, 41.9029]}\n```\n\nPoint B (Taj Mahal):\n```json\n{\"type\": \"Point\", \"coordinates\": [78.0421, 27.1751]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 6087314.3,
+      "ground_truth_meta": {
+        "tolerance_m": 304365.7,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.4534,
+          41.9029
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          78.0421,
+          27.1751
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_005",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Taj Mahal to the Pyramids of Giza? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Taj Mahal to the Pyramids of Giza?\n\nPoint A (Taj Mahal):\n```json\n{\"type\": \"Point\", \"coordinates\": [78.0421, 27.1751]}\n```\n\nPoint B (Pyramids of Giza):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1342, 29.9792]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 4567974.1,
+      "ground_truth_meta": {
+        "tolerance_m": 228398.7,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          78.0421,
+          27.1751
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          31.1342,
+          29.9792
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_006",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Sydney Opera House to the Taj Mahal? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Sydney Opera House to the Taj Mahal?\n\nPoint A (Sydney Opera House):\n```json\n{\"type\": \"Point\", \"coordinates\": [151.2153, -33.8568]}\n```\n\nPoint B (Taj Mahal):\n```json\n{\"type\": \"Point\", \"coordinates\": [78.0421, 27.1751]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 10253490.0,
+      "ground_truth_meta": {
+        "tolerance_m": 512674.5,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          151.2153,
+          -33.8568
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          78.0421,
+          27.1751
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_007",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Colosseum to the Great Wall (Badaling)? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Colosseum to the Great Wall (Badaling)?\n\nPoint A (Colosseum):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4922, 41.8902]}\n```\n\nPoint B (Great Wall (Badaling)):\n```json\n{\"type\": \"Point\", \"coordinates\": [116.0046, 40.3588]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 8087765.2,
+      "ground_truth_meta": {
+        "tolerance_m": 404388.3,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.4922,
+          41.8902
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          116.0046,
+          40.3588
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_008",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Eiffel Tower to the Statue of Liberty? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Eiffel Tower to the Statue of Liberty?\n\nPoint A (Eiffel Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.2945, 48.8584]}\n```\n\nPoint B (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 5853103.7,
+      "ground_truth_meta": {
+        "tolerance_m": 292655.2,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.2945,
+          48.8584
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_009",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Big Ben to the Space Needle? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Big Ben to the Space Needle?\n\nPoint A (Big Ben):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\n\nPoint B (Space Needle):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.3493, 47.6205]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 7722863.3,
+      "ground_truth_meta": {
+        "tolerance_m": 386143.2,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1246,
+          51.5007
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.3493,
+          47.6205
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_010",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Tower of London to the Taj Mahal? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Tower of London to the Taj Mahal?\n\nPoint A (Tower of London):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.0761, 51.5081]}\n```\n\nPoint B (Taj Mahal):\n```json\n{\"type\": \"Point\", \"coordinates\": [78.0421, 27.1751]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 6892105.7,
+      "ground_truth_meta": {
+        "tolerance_m": 344605.3,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.0761,
+          51.5081
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          78.0421,
+          27.1751
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_011",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Buckingham Palace to the CN Tower? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Buckingham Palace to the CN Tower?\n\nPoint A (Buckingham Palace):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1419, 51.5014]}\n```\n\nPoint B (CN Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [-79.3871, 43.6426]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 5729195.1,
+      "ground_truth_meta": {
+        "tolerance_m": 286459.8,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1419,
+          51.5014
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -79.3871,
+          43.6426
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_012",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "medium",
+      "prompt_natural": "What is the distance in meters from the Times Square to the Space Needle? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Times Square to the Space Needle?\n\nPoint A (Times Square):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\n\nPoint B (Space Needle):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.3493, 47.6205]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 3875886.3,
+      "ground_truth_meta": {
+        "tolerance_m": 193794.3,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9855,
+          40.758
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.3493,
+          47.6205
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_013",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Empire State Building to the Pyramids of Giza? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Empire State Building to the Pyramids of Giza?\n\nPoint A (Empire State Building):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9857, 40.7484]}\n```\n\nPoint B (Pyramids of Giza):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1342, 29.9792]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 9035043.5,
+      "ground_truth_meta": {
+        "tolerance_m": 451752.2,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9857,
+          40.7484
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          31.1342,
+          29.9792
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_014",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Vatican City to the Golden Gate Bridge? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Vatican City to the Golden Gate Bridge?\n\nPoint A (Vatican City):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4534, 41.9029]}\n```\n\nPoint B (Golden Gate Bridge):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.4783, 37.8199]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 10067674.5,
+      "ground_truth_meta": {
+        "tolerance_m": 503383.7,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.4534,
+          41.9029
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.4783,
+          37.8199
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_015",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Christ the Redeemer to the Golden Gate Bridge? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Christ the Redeemer to the Golden Gate Bridge?\n\nPoint A (Christ the Redeemer):\n```json\n{\"type\": \"Point\", \"coordinates\": [-43.2105, -22.9519]}\n```\n\nPoint B (Golden Gate Bridge):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.4783, 37.8199]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 10658839.5,
+      "ground_truth_meta": {
+        "tolerance_m": 532942.0,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -43.2105,
+          -22.9519
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.4783,
+          37.8199
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_016",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "medium",
+      "prompt_natural": "What is the distance in meters from the Statue of Liberty to the Space Needle? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Statue of Liberty to the Space Needle?\n\nPoint A (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nPoint B (Space Needle):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.3493, 47.6205]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 3875063.1,
+      "ground_truth_meta": {
+        "tolerance_m": 193753.2,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.3493,
+          47.6205
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_017",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Times Square to the Burj Khalifa? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Times Square to the Burj Khalifa?\n\nPoint A (Times Square):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\n\nPoint B (Burj Khalifa):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2744, 25.1972]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 11024508.7,
+      "ground_truth_meta": {
+        "tolerance_m": 551225.4,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9855,
+          40.758
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          55.2744,
+          25.1972
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_018",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Statue of Liberty to the CN Tower? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Statue of Liberty to the CN Tower?\n\nPoint A (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nPoint B (CN Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [-79.3871, 43.6426]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 549833.1,
+      "ground_truth_meta": {
+        "tolerance_m": 27491.7,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -79.3871,
+          43.6426
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_019",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Times Square to the Tokyo Tower? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Times Square to the Tokyo Tower?\n\nPoint A (Times Square):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\n\nPoint B (Tokyo Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [139.7454, 35.6586]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 10870159.3,
+      "ground_truth_meta": {
+        "tolerance_m": 543508.0,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9855,
+          40.758
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          139.7454,
+          35.6586
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_020",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Buckingham Palace to the Golden Gate Bridge? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Buckingham Palace to the Golden Gate Bridge?\n\nPoint A (Buckingham Palace):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1419, 51.5014]}\n```\n\nPoint B (Golden Gate Bridge):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.4783, 37.8199]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 8637135.8,
+      "ground_truth_meta": {
+        "tolerance_m": 431856.8,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1419,
+          51.5014
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.4783,
+          37.8199
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_021",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Tower of London to the Statue of Liberty? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Tower of London to the Statue of Liberty?\n\nPoint A (Tower of London):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.0761, 51.5081]}\n```\n\nPoint B (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 5592793.2,
+      "ground_truth_meta": {
+        "tolerance_m": 279639.7,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.0761,
+          51.5081
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_022",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Louvre Museum to the Vatican City? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Louvre Museum to the Vatican City?\n\nPoint A (Louvre Museum):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.3376, 48.8606]}\n```\n\nPoint B (Vatican City):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4534, 41.9029]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 1105298.3,
+      "ground_truth_meta": {
+        "tolerance_m": 55264.9,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.3376,
+          48.8606
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          12.4534,
+          41.9029
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_023",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Statue of Liberty to the Table Mountain? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Statue of Liberty to the Table Mountain?\n\nPoint A (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nPoint B (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 12555029.1,
+      "ground_truth_meta": {
+        "tolerance_m": 627751.5,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          18.4041,
+          -33.9628
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_024",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Notre-Dame to the Space Needle? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Notre-Dame to the Space Needle?\n\nPoint A (Notre-Dame):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.35, 48.853]}\n```\n\nPoint B (Space Needle):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.3493, 47.6205]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 8064677.9,
+      "ground_truth_meta": {
+        "tolerance_m": 403233.9,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.35,
+          48.853
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.3493,
+          47.6205
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_025",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Eiffel Tower to the Vatican City? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Eiffel Tower to the Vatican City?\n\nPoint A (Eiffel Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.2945, 48.8584]}\n```\n\nPoint B (Vatican City):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4534, 41.9029]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 1107543.2,
+      "ground_truth_meta": {
+        "tolerance_m": 55377.2,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.2945,
+          48.8584
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          12.4534,
+          41.9029
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_026",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Notre-Dame to the Golden Gate Bridge? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Notre-Dame to the Golden Gate Bridge?\n\nPoint A (Notre-Dame):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.35, 48.853]}\n```\n\nPoint B (Golden Gate Bridge):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.4783, 37.8199]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 8975033.6,
+      "ground_truth_meta": {
+        "tolerance_m": 448751.7,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.35,
+          48.853
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.4783,
+          37.8199
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_027",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Statue of Liberty to the Burj Khalifa? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Statue of Liberty to the Burj Khalifa?\n\nPoint A (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nPoint B (Burj Khalifa):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2744, 25.1972]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 11033433.1,
+      "ground_truth_meta": {
+        "tolerance_m": 551671.7,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          55.2744,
+          25.1972
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_028",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Buckingham Palace to the Table Mountain? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Buckingham Palace to the Table Mountain?\n\nPoint A (Buckingham Palace):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1419, 51.5014]}\n```\n\nPoint B (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 9639796.2,
+      "ground_truth_meta": {
+        "tolerance_m": 481989.8,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1419,
+          51.5014
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          18.4041,
+          -33.9628
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_029",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Eiffel Tower to the CN Tower? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Eiffel Tower to the CN Tower?\n\nPoint A (Eiffel Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.2945, 48.8584]}\n```\n\nPoint B (CN Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [-79.3871, 43.6426]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 6014834.7,
+      "ground_truth_meta": {
+        "tolerance_m": 300741.7,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.2945,
+          48.8584
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -79.3871,
+          43.6426
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_030",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Arc de Triomphe to the Great Wall (Badaling)? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Arc de Triomphe to the Great Wall (Badaling)?\n\nPoint A (Arc de Triomphe):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.295, 48.8738]}\n```\n\nPoint B (Great Wall (Badaling)):\n```json\n{\"type\": \"Point\", \"coordinates\": [116.0046, 40.3588]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 8179675.2,
+      "ground_truth_meta": {
+        "tolerance_m": 408983.8,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.295,
+          48.8738
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          116.0046,
+          40.3588
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_031",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Big Ben to the Burj Khalifa? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Big Ben to the Burj Khalifa?\n\nPoint A (Big Ben):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\n\nPoint B (Burj Khalifa):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2744, 25.1972]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 5480603.3,
+      "ground_truth_meta": {
+        "tolerance_m": 274030.2,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1246,
+          51.5007
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          55.2744,
+          25.1972
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_032",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Eiffel Tower to the Tower of London? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Eiffel Tower to the Tower of London?\n\nPoint A (Eiffel Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.2945, 48.8584]}\n```\n\nPoint B (Tower of London):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.0761, 51.5081]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 339860.9,
+      "ground_truth_meta": {
+        "tolerance_m": 16993.0,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.2945,
+          48.8584
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -0.0761,
+          51.5081
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_033",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Eiffel Tower to the Empire State Building? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Eiffel Tower to the Empire State Building?\n\nPoint A (Eiffel Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.2945, 48.8584]}\n```\n\nPoint B (Empire State Building):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9857, 40.7484]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 5845209.5,
+      "ground_truth_meta": {
+        "tolerance_m": 292260.5,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.2945,
+          48.8584
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -73.9857,
+          40.7484
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_034",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Notre-Dame to the CN Tower? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Notre-Dame to the CN Tower?\n\nPoint A (Notre-Dame):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.35, 48.853]}\n```\n\nPoint B (CN Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [-79.3871, 43.6426]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 6018720.0,
+      "ground_truth_meta": {
+        "tolerance_m": 300936.0,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.35,
+          48.853
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -79.3871,
+          43.6426
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_035",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Arc de Triomphe to the Empire State Building? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Arc de Triomphe to the Empire State Building?\n\nPoint A (Arc de Triomphe):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.295, 48.8738]}\n```\n\nPoint B (Empire State Building):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9857, 40.7484]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 5844607.2,
+      "ground_truth_meta": {
+        "tolerance_m": 292230.4,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.295,
+          48.8738
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -73.9857,
+          40.7484
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_036",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Louvre Museum to the Buckingham Palace? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Louvre Museum to the Buckingham Palace?\n\nPoint A (Louvre Museum):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.3376, 48.8606]}\n```\n\nPoint B (Buckingham Palace):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1419, 51.5014]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 342953.7,
+      "ground_truth_meta": {
+        "tolerance_m": 17147.7,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.3376,
+          48.8606
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -0.1419,
+          51.5014
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_037",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Sydney Opera House to the Golden Gate Bridge? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Sydney Opera House to the Golden Gate Bridge?\n\nPoint A (Sydney Opera House):\n```json\n{\"type\": \"Point\", \"coordinates\": [151.2153, -33.8568]}\n```\n\nPoint B (Golden Gate Bridge):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.4783, 37.8199]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 11931212.5,
+      "ground_truth_meta": {
+        "tolerance_m": 596560.6,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          151.2153,
+          -33.8568
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.4783,
+          37.8199
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_038",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Times Square to the Table Mountain? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Times Square to the Table Mountain?\n\nPoint A (Times Square):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\n\nPoint B (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 12553838.3,
+      "ground_truth_meta": {
+        "tolerance_m": 627691.9,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9855,
+          40.758
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          18.4041,
+          -33.9628
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_039",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Christ the Redeemer to the Pyramids of Giza? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Christ the Redeemer to the Pyramids of Giza?\n\nPoint A (Christ the Redeemer):\n```json\n{\"type\": \"Point\", \"coordinates\": [-43.2105, -22.9519]}\n```\n\nPoint B (Pyramids of Giza):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1342, 29.9792]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 9869237.6,
+      "ground_truth_meta": {
+        "tolerance_m": 493461.9,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -43.2105,
+          -22.9519
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          31.1342,
+          29.9792
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_040",
+      "benchmark": "geodistance",
+      "category": "distance_absolute",
+      "difficulty": "hard",
+      "prompt_natural": "What is the distance in meters from the Taj Mahal to the Golden Gate Bridge? Give your answer as a number in meters.",
+      "prompt_structured": "What is the distance in meters from the Taj Mahal to the Golden Gate Bridge?\n\nPoint A (Taj Mahal):\n```json\n{\"type\": \"Point\", \"coordinates\": [78.0421, 27.1751]}\n```\n\nPoint B (Golden Gate Bridge):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.4783, 37.8199]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 12499468.7,
+      "ground_truth_meta": {
+        "tolerance_m": 624973.4,
+        "tolerance_pct": 0.05
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          78.0421,
+          27.1751
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.4783,
+          37.8199
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_041",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Christ the Redeemer within 1000 km of the CN Tower? Answer True or False.",
+      "prompt_structured": "Is the Christ the Redeemer within 1000 km of the CN Tower?\n\nPoint A (Christ the Redeemer):\n```json\n{\"type\": \"Point\", \"coordinates\": [-43.2105, -22.9519]}\n```\n\nPoint B (CN Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [-79.3871, 43.6426]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 8248144.8,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -43.2105,
+          -22.9519
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -79.3871,
+          43.6426
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_042",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "easy",
+      "prompt_natural": "Is the Eiffel Tower within 5 km of the Notre-Dame? Answer True or False.",
+      "prompt_structured": "Is the Eiffel Tower within 5 km of the Notre-Dame?\n\nPoint A (Eiffel Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.2945, 48.8584]}\n```\n\nPoint B (Notre-Dame):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.35, 48.853]}\n```\n\nThreshold: 5 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "actual_distance_m": 4116.8,
+        "threshold_m": 5000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.2945,
+          48.8584
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.35,
+          48.853
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_043",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Arc de Triomphe within 500 km of the Burj Khalifa? Answer True or False.",
+      "prompt_structured": "Is the Arc de Triomphe within 500 km of the Burj Khalifa?\n\nPoint A (Arc de Triomphe):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.295, 48.8738]}\n```\n\nPoint B (Burj Khalifa):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2744, 25.1972]}\n```\n\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 5258605.8,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.295,
+          48.8738
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          55.2744,
+          25.1972
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_044",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Notre-Dame within 5000 km of the Christ the Redeemer? Answer True or False.",
+      "prompt_structured": "Is the Notre-Dame within 5000 km of the Christ the Redeemer?\n\nPoint A (Notre-Dame):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.35, 48.853]}\n```\n\nPoint B (Christ the Redeemer):\n```json\n{\"type\": \"Point\", \"coordinates\": [-43.2105, -22.9519]}\n```\n\nThreshold: 5000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 9149066.6,
+        "threshold_m": 5000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.35,
+          48.853
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -43.2105,
+          -22.9519
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_045",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Times Square within 1000 km of the Machu Picchu? Answer True or False.",
+      "prompt_structured": "Is the Times Square within 1000 km of the Machu Picchu?\n\nPoint A (Times Square):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\n\nPoint B (Machu Picchu):\n```json\n{\"type\": \"Point\", \"coordinates\": [-72.545, -13.1631]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 5971304.4,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9855,
+          40.758
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -72.545,
+          -13.1631
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_046",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Empire State Building within 1000 km of the CN Tower? Answer True or False.",
+      "prompt_structured": "Is the Empire State Building within 1000 km of the CN Tower?\n\nPoint A (Empire State Building):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9857, 40.7484]}\n```\n\nPoint B (CN Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [-79.3871, 43.6426]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "actual_distance_m": 549703.9,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9857,
+          40.7484
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -79.3871,
+          43.6426
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_047",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "easy",
+      "prompt_natural": "Is the Empire State Building within 15 km of the Central Park? Answer True or False.",
+      "prompt_structured": "Is the Empire State Building within 15 km of the Central Park?\n\nPoint A (Empire State Building):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9857, 40.7484]}\n```\n\nPoint B (Central Park):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9654, 40.7829]}\n```\n\nThreshold: 15 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "actual_distance_m": 4197.1,
+        "threshold_m": 15000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9857,
+          40.7484
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -73.9654,
+          40.7829
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_048",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Big Ben within 5000 km of the Sydney Opera House? Answer True or False.",
+      "prompt_structured": "Is the Big Ben within 5000 km of the Sydney Opera House?\n\nPoint A (Big Ben):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\n\nPoint B (Sydney Opera House):\n```json\n{\"type\": \"Point\", \"coordinates\": [151.2153, -33.8568]}\n```\n\nThreshold: 5000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 16988824.4,
+        "threshold_m": 5000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1246,
+          51.5007
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          151.2153,
+          -33.8568
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_049",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Notre-Dame within 500 km of the Vatican City? Answer True or False.",
+      "prompt_structured": "Is the Notre-Dame within 500 km of the Vatican City?\n\nPoint A (Notre-Dame):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.35, 48.853]}\n```\n\nPoint B (Vatican City):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4534, 41.9029]}\n```\n\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 1104057.4,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.35,
+          48.853
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          12.4534,
+          41.9029
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_050",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Louvre Museum within 1000 km of the Times Square? Answer True or False.",
+      "prompt_structured": "Is the Louvre Museum within 1000 km of the Times Square?\n\nPoint A (Louvre Museum):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.3376, 48.8606]}\n```\n\nPoint B (Times Square):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 5847410.4,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.3376,
+          48.8606
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -73.9855,
+          40.758
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_051",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Empire State Building within 500 km of the Space Needle? Answer True or False.",
+      "prompt_structured": "Is the Empire State Building within 500 km of the Space Needle?\n\nPoint A (Empire State Building):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9857, 40.7484]}\n```\n\nPoint B (Space Needle):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.3493, 47.6205]}\n```\n\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 3876370.4,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9857,
+          40.7484
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.3493,
+          47.6205
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_052",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Big Ben within 5000 km of the Statue of Liberty? Answer True or False.",
+      "prompt_structured": "Is the Big Ben within 5000 km of the Statue of Liberty?\n\nPoint A (Big Ben):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\n\nPoint B (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nThreshold: 5000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 5589857.4,
+        "threshold_m": 5000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1246,
+          51.5007
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_053",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Taj Mahal within 500 km of the Great Wall (Badaling)? Answer True or False.",
+      "prompt_structured": "Is the Taj Mahal within 500 km of the Great Wall (Badaling)?\n\nPoint A (Taj Mahal):\n```json\n{\"type\": \"Point\", \"coordinates\": [78.0421, 27.1751]}\n```\n\nPoint B (Great Wall (Badaling)):\n```json\n{\"type\": \"Point\", \"coordinates\": [116.0046, 40.3588]}\n```\n\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 3772708.6,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          78.0421,
+          27.1751
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          116.0046,
+          40.3588
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_054",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Statue of Liberty within 100 km of the Central Park? Answer True or False.",
+      "prompt_structured": "Is the Statue of Liberty within 100 km of the Central Park?\n\nPoint A (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nPoint B (Central Park):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9654, 40.7829]}\n```\n\nThreshold: 100 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "actual_distance_m": 12365.8,
+        "threshold_m": 100000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -73.9654,
+          40.7829
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_055",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Eiffel Tower within 500 km of the Golden Gate Bridge? Answer True or False.",
+      "prompt_structured": "Is the Eiffel Tower within 500 km of the Golden Gate Bridge?\n\nPoint A (Eiffel Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.2945, 48.8584]}\n```\n\nPoint B (Golden Gate Bridge):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.4783, 37.8199]}\n```\n\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 8971904.4,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.2945,
+          48.8584
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.4783,
+          37.8199
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_056",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Louvre Museum within 1000 km of the CN Tower? Answer True or False.",
+      "prompt_structured": "Is the Louvre Museum within 1000 km of the CN Tower?\n\nPoint A (Louvre Museum):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.3376, 48.8606]}\n```\n\nPoint B (CN Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [-79.3871, 43.6426]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 6017521.4,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.3376,
+          48.8606
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -79.3871,
+          43.6426
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_057",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Central Park within 500 km of the Pyramids of Giza? Answer True or False.",
+      "prompt_structured": "Is the Central Park within 500 km of the Pyramids of Giza?\n\nPoint A (Central Park):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9654, 40.7829]}\n```\n\nPoint B (Pyramids of Giza):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1342, 29.9792]}\n```\n\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 9031550.8,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9654,
+          40.7829
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          31.1342,
+          29.9792
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_058",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Statue of Liberty within 500 km of the Machu Picchu? Answer True or False.",
+      "prompt_structured": "Is the Statue of Liberty within 500 km of the Machu Picchu?\n\nPoint A (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nPoint B (Machu Picchu):\n```json\n{\"type\": \"Point\", \"coordinates\": [-72.545, -13.1631]}\n```\n\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 5963822.8,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -72.545,
+          -13.1631
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_059",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Colosseum within 1000 km of the Table Mountain? Answer True or False.",
+      "prompt_structured": "Is the Colosseum within 1000 km of the Table Mountain?\n\nPoint A (Colosseum):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4922, 41.8902]}\n```\n\nPoint B (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 8420700.6,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.4922,
+          41.8902
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          18.4041,
+          -33.9628
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_060",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Big Ben within 1000 km of the Golden Gate Bridge? Answer True or False.",
+      "prompt_structured": "Is the Big Ben within 1000 km of the Golden Gate Bridge?\n\nPoint A (Big Ben):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\n\nPoint B (Golden Gate Bridge):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.4783, 37.8199]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 8638013.4,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1246,
+          51.5007
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.4783,
+          37.8199
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_061",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Big Ben within 1000 km of the Colosseum? Answer True or False.",
+      "prompt_structured": "Is the Big Ben within 1000 km of the Colosseum?\n\nPoint A (Big Ben):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\n\nPoint B (Colosseum):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4922, 41.8902]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 1435637.7,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1246,
+          51.5007
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          12.4922,
+          41.8902
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_062",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Empire State Building within 500 km of the Golden Gate Bridge? Answer True or False.",
+      "prompt_structured": "Is the Empire State Building within 500 km of the Golden Gate Bridge?\n\nPoint A (Empire State Building):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9857, 40.7484]}\n```\n\nPoint B (Golden Gate Bridge):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.4783, 37.8199]}\n```\n\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 4143178.1,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9857,
+          40.7484
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -122.4783,
+          37.8199
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_063",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Sydney Opera House within 500 km of the Machu Picchu? Answer True or False.",
+      "prompt_structured": "Is the Sydney Opera House within 500 km of the Machu Picchu?\n\nPoint A (Sydney Opera House):\n```json\n{\"type\": \"Point\", \"coordinates\": [151.2153, -33.8568]}\n```\n\nPoint B (Machu Picchu):\n```json\n{\"type\": \"Point\", \"coordinates\": [-72.545, -13.1631]}\n```\n\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 13048857.6,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          151.2153,
+          -33.8568
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -72.545,
+          -13.1631
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_064",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Notre-Dame within 500 km of the Tower of London? Answer True or False.",
+      "prompt_structured": "Is the Notre-Dame within 500 km of the Tower of London?\n\nPoint A (Notre-Dame):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.35, 48.853]}\n```\n\nPoint B (Tower of London):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.0761, 51.5081]}\n```\n\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "actual_distance_m": 342373.4,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.35,
+          48.853
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -0.0761,
+          51.5081
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_065",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Colosseum within 5000 km of the Pyramids of Giza? Answer True or False.",
+      "prompt_structured": "Is the Colosseum within 5000 km of the Pyramids of Giza?\n\nPoint A (Colosseum):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4922, 41.8902]}\n```\n\nPoint B (Pyramids of Giza):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1342, 29.9792]}\n```\n\nThreshold: 5000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "actual_distance_m": 2131091.3,
+        "threshold_m": 5000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.4922,
+          41.8902
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          31.1342,
+          29.9792
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_066",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Notre-Dame within 500 km of the Taj Mahal? Answer True or False.",
+      "prompt_structured": "Is the Notre-Dame within 500 km of the Taj Mahal?\n\nPoint A (Notre-Dame):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.35, 48.853]}\n```\n\nPoint B (Taj Mahal):\n```json\n{\"type\": \"Point\", \"coordinates\": [78.0421, 27.1751]}\n```\n\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 6767799.7,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.35,
+          48.853
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          78.0421,
+          27.1751
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_067",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Tower of London within 1000 km of the CN Tower? Answer True or False.",
+      "prompt_structured": "Is the Tower of London within 1000 km of the CN Tower?\n\nPoint A (Tower of London):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.0761, 51.5081]}\n```\n\nPoint B (CN Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [-79.3871, 43.6426]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 5733041.5,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.0761,
+          51.5081
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -79.3871,
+          43.6426
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_068",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Christ the Redeemer within 1000 km of the Machu Picchu? Answer True or False.",
+      "prompt_structured": "Is the Christ the Redeemer within 1000 km of the Machu Picchu?\n\nPoint A (Christ the Redeemer):\n```json\n{\"type\": \"Point\", \"coordinates\": [-43.2105, -22.9519]}\n```\n\nPoint B (Machu Picchu):\n```json\n{\"type\": \"Point\", \"coordinates\": [-72.545, -13.1631]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 3281346.7,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -43.2105,
+          -22.9519
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -72.545,
+          -13.1631
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_069",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Table Mountain within 1000 km of the CN Tower? Answer True or False.",
+      "prompt_structured": "Is the Table Mountain within 1000 km of the CN Tower?\n\nPoint A (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\n\nPoint B (CN Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [-79.3871, 43.6426]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 13090722.2,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          18.4041,
+          -33.9628
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -79.3871,
+          43.6426
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_070",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Times Square within 500 km of the Vatican City? Answer True or False.",
+      "prompt_structured": "Is the Times Square within 500 km of the Vatican City?\n\nPoint A (Times Square):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\n\nPoint B (Vatican City):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4534, 41.9029]}\n```\n\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 6900346.6,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9855,
+          40.758
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          12.4534,
+          41.9029
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_071",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Vatican City within 1000 km of the Pyramids of Giza? Answer True or False.",
+      "prompt_structured": "Is the Vatican City within 1000 km of the Pyramids of Giza?\n\nPoint A (Vatican City):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4534, 41.9029]}\n```\n\nPoint B (Pyramids of Giza):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1342, 29.9792]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 2134566.6,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.4534,
+          41.9029
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          31.1342,
+          29.9792
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_072",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Big Ben within 1000 km of the Central Park? Answer True or False.",
+      "prompt_structured": "Is the Big Ben within 1000 km of the Central Park?\n\nPoint A (Big Ben):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\n\nPoint B (Central Park):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9654, 40.7829]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 5578134.6,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1246,
+          51.5007
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -73.9654,
+          40.7829
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_073",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Notre-Dame within 5000 km of the Big Ben? Answer True or False.",
+      "prompt_structured": "Is the Notre-Dame within 5000 km of the Big Ben?\n\nPoint A (Notre-Dame):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.35, 48.853]}\n```\n\nPoint B (Big Ben):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\n\nThreshold: 5000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "actual_distance_m": 343438.8,
+        "threshold_m": 5000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.35,
+          48.853
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -0.1246,
+          51.5007
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_074",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Vatican City within 5000 km of the Machu Picchu? Answer True or False.",
+      "prompt_structured": "Is the Vatican City within 5000 km of the Machu Picchu?\n\nPoint A (Vatican City):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4534, 41.9029]}\n```\n\nPoint B (Machu Picchu):\n```json\n{\"type\": \"Point\", \"coordinates\": [-72.545, -13.1631]}\n```\n\nThreshold: 5000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 10569817.8,
+        "threshold_m": 5000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.4534,
+          41.9029
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -72.545,
+          -13.1631
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_075",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Buckingham Palace within 1000 km of the Statue of Liberty? Answer True or False.",
+      "prompt_structured": "Is the Buckingham Palace within 1000 km of the Statue of Liberty?\n\nPoint A (Buckingham Palace):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1419, 51.5014]}\n```\n\nPoint B (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 5588692.7,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1419,
+          51.5014
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_076",
+      "benchmark": "geodistance",
+      "category": "nearest_neighbor",
+      "difficulty": "medium",
+      "prompt_natural": "Which of these landmarks is closest to the Arc de Triomphe: Eiffel Tower, Louvre Museum, Notre-Dame?",
+      "prompt_structured": "Which of these landmarks is closest to the Arc de Triomphe?\n\nReference point (Arc de Triomphe):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.295, 48.8738]}\n```\n\nOption: Eiffel Tower\n```json\n{\"type\": \"Point\", \"coordinates\": [2.2945, 48.8584]}\n```\nOption: Louvre Museum\n```json\n{\"type\": \"Point\", \"coordinates\": [2.3376, 48.8606]}\n```\nOption: Notre-Dame\n```json\n{\"type\": \"Point\", \"coordinates\": [2.35, 48.853]}\n```\n\nAnswer with the name of the nearest landmark.",
+      "answer_type": "category",
+      "ground_truth": "Eiffel Tower",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Eiffel Tower",
+          "Louvre Museum",
+          "Notre-Dame"
+        ],
+        "distances_m": {
+          "Eiffel Tower": 1713.0,
+          "Louvre Museum": 3453.0,
+          "Notre-Dame": 4651.4
+        }
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.295,
+          48.8738
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_077",
+      "benchmark": "geodistance",
+      "category": "nearest_neighbor",
+      "difficulty": "medium",
+      "prompt_natural": "Which of these landmarks is closest to the Eiffel Tower: Louvre Museum, Arc de Triomphe, Notre-Dame?",
+      "prompt_structured": "Which of these landmarks is closest to the Eiffel Tower?\n\nReference point (Eiffel Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.2945, 48.8584]}\n```\n\nOption: Louvre Museum\n```json\n{\"type\": \"Point\", \"coordinates\": [2.3376, 48.8606]}\n```\nOption: Arc de Triomphe\n```json\n{\"type\": \"Point\", \"coordinates\": [2.295, 48.8738]}\n```\nOption: Notre-Dame\n```json\n{\"type\": \"Point\", \"coordinates\": [2.35, 48.853]}\n```\n\nAnswer with the name of the nearest landmark.",
+      "answer_type": "category",
+      "ground_truth": "Arc de Triomphe",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Louvre Museum",
+          "Arc de Triomphe",
+          "Notre-Dame"
+        ],
+        "distances_m": {
+          "Arc de Triomphe": 1713.0,
+          "Louvre Museum": 3172.0,
+          "Notre-Dame": 4116.8
+        }
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.2945,
+          48.8584
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_078",
+      "benchmark": "geodistance",
+      "category": "nearest_neighbor",
+      "difficulty": "medium",
+      "prompt_natural": "Which of these landmarks is closest to the Eiffel Tower: Louvre Museum, Arc de Triomphe, Notre-Dame?",
+      "prompt_structured": "Which of these landmarks is closest to the Eiffel Tower?\n\nReference point (Eiffel Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.2945, 48.8584]}\n```\n\nOption: Louvre Museum\n```json\n{\"type\": \"Point\", \"coordinates\": [2.3376, 48.8606]}\n```\nOption: Arc de Triomphe\n```json\n{\"type\": \"Point\", \"coordinates\": [2.295, 48.8738]}\n```\nOption: Notre-Dame\n```json\n{\"type\": \"Point\", \"coordinates\": [2.35, 48.853]}\n```\n\nAnswer with the name of the nearest landmark.",
+      "answer_type": "category",
+      "ground_truth": "Arc de Triomphe",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Louvre Museum",
+          "Arc de Triomphe",
+          "Notre-Dame"
+        ],
+        "distances_m": {
+          "Arc de Triomphe": 1713.0,
+          "Louvre Museum": 3172.0,
+          "Notre-Dame": 4116.8
+        }
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.2945,
+          48.8584
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_079",
+      "benchmark": "geodistance",
+      "category": "nearest_neighbor",
+      "difficulty": "medium",
+      "prompt_natural": "Which of these landmarks is closest to the Tower of London: Big Ben, Buckingham Palace?",
+      "prompt_structured": "Which of these landmarks is closest to the Tower of London?\n\nReference point (Tower of London):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.0761, 51.5081]}\n```\n\nOption: Big Ben\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\nOption: Buckingham Palace\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1419, 51.5014]}\n```\n\nAnswer with the name of the nearest landmark.",
+      "answer_type": "category",
+      "ground_truth": "Big Ben",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Big Ben",
+          "Buckingham Palace"
+        ],
+        "distances_m": {
+          "Big Ben": 3466.7,
+          "Buckingham Palace": 4629.1
+        }
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.0761,
+          51.5081
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_080",
+      "benchmark": "geodistance",
+      "category": "nearest_neighbor",
+      "difficulty": "medium",
+      "prompt_natural": "Which of these landmarks is closest to the Big Ben: Tower of London, Buckingham Palace?",
+      "prompt_structured": "Which of these landmarks is closest to the Big Ben?\n\nReference point (Big Ben):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\n\nOption: Tower of London\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.0761, 51.5081]}\n```\nOption: Buckingham Palace\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1419, 51.5014]}\n```\n\nAnswer with the name of the nearest landmark.",
+      "answer_type": "category",
+      "ground_truth": "Buckingham Palace",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Tower of London",
+          "Buckingham Palace"
+        ],
+        "distances_m": {
+          "Buckingham Palace": 1203.8,
+          "Tower of London": 3466.7
+        }
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1246,
+          51.5007
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_081",
+      "benchmark": "geodistance",
+      "category": "nearest_neighbor",
+      "difficulty": "medium",
+      "prompt_natural": "Which of these landmarks is closest to the Buckingham Palace: Big Ben, Tower of London?",
+      "prompt_structured": "Which of these landmarks is closest to the Buckingham Palace?\n\nReference point (Buckingham Palace):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1419, 51.5014]}\n```\n\nOption: Big Ben\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\nOption: Tower of London\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.0761, 51.5081]}\n```\n\nAnswer with the name of the nearest landmark.",
+      "answer_type": "category",
+      "ground_truth": "Big Ben",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Big Ben",
+          "Tower of London"
+        ],
+        "distances_m": {
+          "Big Ben": 1203.8,
+          "Tower of London": 4629.1
+        }
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1419,
+          51.5014
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_082",
+      "benchmark": "geodistance",
+      "category": "nearest_neighbor",
+      "difficulty": "medium",
+      "prompt_natural": "Which of these landmarks is closest to the Central Park: Statue of Liberty, Empire State Building, Times Square?",
+      "prompt_structured": "Which of these landmarks is closest to the Central Park?\n\nReference point (Central Park):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9654, 40.7829]}\n```\n\nOption: Statue of Liberty\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\nOption: Empire State Building\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9857, 40.7484]}\n```\nOption: Times Square\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\n\nAnswer with the name of the nearest landmark.",
+      "answer_type": "category",
+      "ground_truth": "Times Square",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Statue of Liberty",
+          "Empire State Building",
+          "Times Square"
+        ],
+        "distances_m": {
+          "Times Square": 3244.3,
+          "Empire State Building": 4197.1,
+          "Statue of Liberty": 12365.8
+        }
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9654,
+          40.7829
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_083",
+      "benchmark": "geodistance",
+      "category": "nearest_neighbor",
+      "difficulty": "medium",
+      "prompt_natural": "Which of these landmarks is closest to the Statue of Liberty: Empire State Building, Central Park, Times Square?",
+      "prompt_structured": "Which of these landmarks is closest to the Statue of Liberty?\n\nReference point (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nOption: Empire State Building\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9857, 40.7484]}\n```\nOption: Central Park\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9654, 40.7829]}\n```\nOption: Times Square\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\n\nAnswer with the name of the nearest landmark.",
+      "answer_type": "category",
+      "ground_truth": "Empire State Building",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Empire State Building",
+          "Central Park",
+          "Times Square"
+        ],
+        "distances_m": {
+          "Empire State Building": 8240.2,
+          "Times Square": 9122.4,
+          "Central Park": 12365.8
+        }
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_084",
+      "benchmark": "geodistance",
+      "category": "nearest_neighbor",
+      "difficulty": "medium",
+      "prompt_natural": "Which of these landmarks is closest to the Statue of Liberty: Empire State Building, Central Park, Times Square?",
+      "prompt_structured": "Which of these landmarks is closest to the Statue of Liberty?\n\nReference point (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nOption: Empire State Building\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9857, 40.7484]}\n```\nOption: Central Park\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9654, 40.7829]}\n```\nOption: Times Square\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\n\nAnswer with the name of the nearest landmark.",
+      "answer_type": "category",
+      "ground_truth": "Empire State Building",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Empire State Building",
+          "Central Park",
+          "Times Square"
+        ],
+        "distances_m": {
+          "Empire State Building": 8240.2,
+          "Times Square": 9122.4,
+          "Central Park": 12365.8
+        }
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_085",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Machu Picchu within 100 km of the Sydney Opera House? Answer True or False.",
+      "prompt_structured": "Is the Machu Picchu within 100 km of the Sydney Opera House?\n\nPoint A (Machu Picchu):\n```json\n{\"type\": \"Point\", \"coordinates\": [-72.545, -13.1631]}\n```\nPoint B (Sydney Opera House):\n```json\n{\"type\": \"Point\", \"coordinates\": [151.2153, -33.8568]}\n```\nThreshold: 100 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 13048857.6,
+        "threshold_m": 100000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -72.545,
+          -13.1631
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          151.2153,
+          -33.8568
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_086",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the CN Tower within 500 km of the Times Square? Answer True or False.",
+      "prompt_structured": "Is the CN Tower within 500 km of the Times Square?\n\nPoint A (CN Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [-79.3871, 43.6426]}\n```\nPoint B (Times Square):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 549068.0,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -79.3871,
+          43.6426
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -73.9855,
+          40.758
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_087",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Machu Picchu within 10 km of the Taj Mahal? Answer True or False.",
+      "prompt_structured": "Is the Machu Picchu within 10 km of the Taj Mahal?\n\nPoint A (Machu Picchu):\n```json\n{\"type\": \"Point\", \"coordinates\": [-72.545, -13.1631]}\n```\nPoint B (Taj Mahal):\n```json\n{\"type\": \"Point\", \"coordinates\": [78.0421, 27.1751]}\n```\nThreshold: 10 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 16596551.4,
+        "threshold_m": 10000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -72.545,
+          -13.1631
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          78.0421,
+          27.1751
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_088",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Vatican City within 50 km of the Christ the Redeemer? Answer True or False.",
+      "prompt_structured": "Is the Vatican City within 50 km of the Christ the Redeemer?\n\nPoint A (Vatican City):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4534, 41.9029]}\n```\nPoint B (Christ the Redeemer):\n```json\n{\"type\": \"Point\", \"coordinates\": [-43.2105, -22.9519]}\n```\nThreshold: 50 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 9182485.3,
+        "threshold_m": 50000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.4534,
+          41.9029
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -43.2105,
+          -22.9519
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_089",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Empire State Building within 500 km of the Louvre Museum? Answer True or False.",
+      "prompt_structured": "Is the Empire State Building within 500 km of the Louvre Museum?\n\nPoint A (Empire State Building):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9857, 40.7484]}\n```\nPoint B (Louvre Museum):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.3376, 48.8606]}\n```\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 5848054.3,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9857,
+          40.7484
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.3376,
+          48.8606
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_090",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Eiffel Tower within 1000 km of the Taj Mahal? Answer True or False.",
+      "prompt_structured": "Is the Eiffel Tower within 1000 km of the Taj Mahal?\n\nPoint A (Eiffel Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.2945, 48.8584]}\n```\nPoint B (Taj Mahal):\n```json\n{\"type\": \"Point\", \"coordinates\": [78.0421, 27.1751]}\n```\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 6771728.5,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.2945,
+          48.8584
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          78.0421,
+          27.1751
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_091",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Table Mountain within 50 km of the CN Tower? Answer True or False.",
+      "prompt_structured": "Is the Table Mountain within 50 km of the CN Tower?\n\nPoint A (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\nPoint B (CN Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [-79.3871, 43.6426]}\n```\nThreshold: 50 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 13090722.2,
+        "threshold_m": 50000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          18.4041,
+          -33.9628
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -79.3871,
+          43.6426
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_092",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Colosseum within 10 km of the Sydney Opera House? Answer True or False.",
+      "prompt_structured": "Is the Colosseum within 10 km of the Sydney Opera House?\n\nPoint A (Colosseum):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4922, 41.8902]}\n```\nPoint B (Sydney Opera House):\n```json\n{\"type\": \"Point\", \"coordinates\": [151.2153, -33.8568]}\n```\nThreshold: 10 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 16320925.1,
+        "threshold_m": 10000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.4922,
+          41.8902
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          151.2153,
+          -33.8568
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_093",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Table Mountain within 1000 km of the Times Square? Answer True or False.",
+      "prompt_structured": "Is the Table Mountain within 1000 km of the Times Square?\n\nPoint A (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\nPoint B (Times Square):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 12553838.3,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          18.4041,
+          -33.9628
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -73.9855,
+          40.758
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_094",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Times Square within 10 km of the Table Mountain? Answer True or False.",
+      "prompt_structured": "Is the Times Square within 10 km of the Table Mountain?\n\nPoint A (Times Square):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\nPoint B (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\nThreshold: 10 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 12553838.3,
+        "threshold_m": 10000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9855,
+          40.758
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          18.4041,
+          -33.9628
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_095",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the CN Tower within 1000 km of the Central Park? Answer True or False.",
+      "prompt_structured": "Is the CN Tower within 1000 km of the Central Park?\n\nPoint A (CN Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [-79.3871, 43.6426]}\n```\nPoint B (Central Park):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9654, 40.7829]}\n```\nThreshold: 1000 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "actual_distance_m": 548741.2,
+        "threshold_m": 1000000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -79.3871,
+          43.6426
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -73.9654,
+          40.7829
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_096",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Central Park within 500 km of the Table Mountain? Answer True or False.",
+      "prompt_structured": "Is the Central Park within 500 km of the Table Mountain?\n\nPoint A (Central Park):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9654, 40.7829]}\n```\nPoint B (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 12553504.1,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9654,
+          40.7829
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          18.4041,
+          -33.9628
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_097",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Times Square within 100 km of the Vatican City? Answer True or False.",
+      "prompt_structured": "Is the Times Square within 100 km of the Vatican City?\n\nPoint A (Times Square):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9855, 40.758]}\n```\nPoint B (Vatican City):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4534, 41.9029]}\n```\nThreshold: 100 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 6900346.6,
+        "threshold_m": 100000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9855,
+          40.758
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          12.4534,
+          41.9029
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_098",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Great Wall (Badaling) within 50 km of the Big Ben? Answer True or False.",
+      "prompt_structured": "Is the Great Wall (Badaling) within 50 km of the Big Ben?\n\nPoint A (Great Wall (Badaling)):\n```json\n{\"type\": \"Point\", \"coordinates\": [116.0046, 40.3588]}\n```\nPoint B (Big Ben):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\nThreshold: 50 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 8102315.2,
+        "threshold_m": 50000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          116.0046,
+          40.3588
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -0.1246,
+          51.5007
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_099",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Sydney Opera House within 500 km of the Table Mountain? Answer True or False.",
+      "prompt_structured": "Is the Sydney Opera House within 500 km of the Table Mountain?\n\nPoint A (Sydney Opera House):\n```json\n{\"type\": \"Point\", \"coordinates\": [151.2153, -33.8568]}\n```\nPoint B (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\nThreshold: 500 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 11032947.8,
+        "threshold_m": 500000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          151.2153,
+          -33.8568
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          18.4041,
+          -33.9628
+        ]
+      },
+      "source": "generated_v0.1"
+    },
+    {
+      "id": "geodistance_100",
+      "benchmark": "geodistance",
+      "category": "proximity_threshold",
+      "difficulty": "medium",
+      "prompt_natural": "Is the Table Mountain within 50 km of the CN Tower? Answer True or False.",
+      "prompt_structured": "Is the Table Mountain within 50 km of the CN Tower?\n\nPoint A (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\nPoint B (CN Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [-79.3871, 43.6426]}\n```\nThreshold: 50 km\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "actual_distance_m": 13090722.2,
+        "threshold_m": 50000
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          18.4041,
+          -33.9628
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -79.3871,
+          43.6426
+        ]
+      },
+      "source": "generated_v0.1"
+    }
+  ]
+}

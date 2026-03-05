@@ -1,7 +1,7 @@
 # GeoSpark Roadmap
 
 **Last updated**: March 2026
-**Current phase**: Phase 1A (Git & Launch Prep)
+**Current phase**: Phase 1C (Demo Notebook)
 
 This is the **working roadmap** -- the concrete, ordered steps we follow session by session.
 For the full strategic vision, see PRD.md, ARCHITECTURE.md, and BUSINESS_PLAN.md.
@@ -42,12 +42,12 @@ The goal of Phase 1 is to get GeoSpark from "working on my machine" to
 
 No code changes -- just make the project a proper open-source repo.
 
-- [ ] `git init` + first commit (everything except .env, .venv, resources/)
-- [ ] Create .gitignore (verify .env and secrets are excluded)
-- [ ] Write README.md (tagline, 3-line quickstart, architecture diagram, badges)
-- [ ] Write CONTRIBUTING.md (how to add tools, run tests, code style)
-- [ ] Create LICENSE file (Apache 2.0)
-- [ ] Create GitHub repo + push
+- [x] `git init` + first commit (everything except .env, .venv, resources/)
+- [x] Create .gitignore (verify .env and secrets are excluded)
+- [x] Write README.md (tagline, 3-line quickstart, architecture diagram, badges)
+- [x] Write CONTRIBUTING.md (how to add tools, run tests, code style)
+- [x] Create LICENSE file (Apache 2.0)
+- [x] Create GitHub repo + push (github.com/Maz2580/geospark)
 - [ ] Verify CI/CD runs on GitHub
 
 **Exit criteria**: `pip install -e .` works from a fresh clone, tests pass in CI.
@@ -57,18 +57,17 @@ No code changes -- just make the project a proper open-source repo.
 The benchmark is what makes GeoSpark citeable and shareable. Without it,
 GeoSpark is "just another geo library." With it, every spatial AI paper must reference us.
 
-- [ ] Bench runner (`geospark/bench/runner.py`) -- loads datasets, runs model, scores
-- [ ] Bench scorer (`geospark/bench/scorer.py`) -- accuracy, F1, per-category breakdown
-- [ ] **GeoTopo** benchmark -- 100 topological reasoning questions with ground truth
-  - "Does polygon A contain point B?" / "Do these two polygons intersect?"
-  - Generate from real-world geometries (OSM city boundaries, landmarks)
-  - Each question has: geometry_a, geometry_b, relationship, ground_truth (bool)
-- [ ] **GeoDistance** benchmark -- 100 distance/proximity questions with ground truth
-  - "What is the distance from X to Y?" / "Is X within 5km of Y?"
-  - Use real coordinates (major cities, landmarks)
-- [ ] **GeoChange** benchmark -- 50 change detection questions (text-based for v0.1)
-  - "Did this area change between 2020 and 2024?"
-  - Can start with synthetic/curated cases, expand to satellite later
+- [x] Bench runner (`geospark/bench/runner.py`) -- loads datasets, runs model, scores
+- [x] Bench scorer (`geospark/bench/scorer.py`) -- accuracy, F1, 95% CIs, per-category breakdown
+- [x] Bench models (`geospark/bench/models.py`) -- ModelAdapter protocol, BenchQuestion, enums
+- [x] Bench report (`geospark/bench/report.py`) -- console, markdown, JSON, diff mode
+- [x] Bench CLI (`geospark/bench/__main__.py`) -- `python -m geospark.bench run/list`
+- [x] **GeoTopo** benchmark -- 100 questions (contains, intersects, within, disjoint, touches, polygon-with-hole)
+- [x] **GeoDistance** benchmark -- 100 questions (absolute distance, proximity threshold, nearest neighbor)
+- [x] **GeoChange** benchmark -- 36 questions (curated real-world scenarios, text-based v0.1)
+- [x] Dual-prompt design (natural + structured) on every question
+- [x] Fixed geodesic distance (SpatialReasoner.calculate_distance via pyproj)
+- [x] 46 bench tests passing (96 total)
 - [ ] Baseline evaluation script -- run GPT-4/Claude/Llama against benchmarks
 - [ ] Results table in README showing GeoSpark accuracy vs bare LLM
 

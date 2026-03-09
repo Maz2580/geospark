@@ -68,8 +68,9 @@ GeoSpark is "just another geo library." With it, every spatial AI paper must ref
 - [x] Dual-prompt design (natural + structured) on every question
 - [x] Fixed geodesic distance (SpatialReasoner.calculate_distance via pyproj)
 - [x] 46 bench tests passing (96 total)
-- [ ] Baseline evaluation script -- run GPT-4/Claude/Llama against benchmarks
-- [ ] Results table in README showing GeoSpark accuracy vs bare LLM
+- [x] Baseline evaluation script (`bench/baselines/run_baselines.py`)
+- [x] Results: Gemma 12B baseline -- GeoTopo 30%, GeoDistance 43% (LLM alone)
+- [x] Results table in README showing GeoSpark accuracy vs bare LLM
 
 **Exit criteria**: `python -m geospark.bench run --benchmark geotopo --model llama-3.3-70b` works.
 Results show clear accuracy gap (LLM alone ~40% vs LLM+GeoSpark ~95%+).

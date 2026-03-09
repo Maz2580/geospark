@@ -1,0 +1,222 @@
+{
+  "benchmark": "geotopo",
+  "model_id": "gemma-12b(no-tools)",
+  "prompt_mode": "structured",
+  "tool_augmented": false,
+  "total": 20,
+  "correct": 13,
+  "accuracy": 0.65,
+  "f1": 0.787878787878788,
+  "by_difficulty": {
+    "easy": {
+      "category": "easy",
+      "total": 10,
+      "correct": 8,
+      "accuracy": 0.8,
+      "ci_lower": 0.49015684672072335,
+      "ci_upper": 0.9433190520193067
+    },
+    "medium": {
+      "category": "medium",
+      "total": 3,
+      "correct": 1,
+      "accuracy": 0.3333333333333333,
+      "ci_lower": 0.0614903152761605,
+      "ci_upper": 0.7923450448735121
+    },
+    "hard": {
+      "category": "hard",
+      "total": 7,
+      "correct": 4,
+      "accuracy": 0.5714285714285714,
+      "ci_lower": 0.2504542304090258,
+      "ci_upper": 0.8417830777373732
+    }
+  },
+  "by_category": {
+    "contains": {
+      "category": "contains",
+      "total": 6,
+      "correct": 4,
+      "accuracy": 0.6666666666666666,
+      "ci_lower": 0.29998832134152864,
+      "ci_upper": 0.9032306674407831
+    },
+    "contains_with_hole": {
+      "category": "contains_with_hole",
+      "total": 4,
+      "correct": 4,
+      "accuracy": 1.0,
+      "ci_lower": 0.5100999795960008,
+      "ci_upper": 1.0
+    },
+    "intersects": {
+      "category": "intersects",
+      "total": 5,
+      "correct": 4,
+      "accuracy": 0.8,
+      "ci_lower": 0.3755282641185388,
+      "ci_upper": 0.9637768390302125
+    },
+    "touches": {
+      "category": "touches",
+      "total": 3,
+      "correct": 0,
+      "accuracy": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.5615060804490177
+    },
+    "within": {
+      "category": "within",
+      "total": 2,
+      "correct": 1,
+      "accuracy": 0.5,
+      "ci_lower": 0.09452865480086614,
+      "ci_upper": 0.9054713451991339
+    }
+  },
+  "scores": [
+    {
+      "question_id": "geotopo_082",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_015",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_004",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_095",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_036",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_032",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_029",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_018",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_014",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_087",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_070",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_012",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_076",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_055",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_005",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_028",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_030",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_065",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_078",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_072",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    }
+  ],
+  "total_latency_ms": 281461,
+  "avg_latency_ms": 14073.05
+}

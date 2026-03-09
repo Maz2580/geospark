@@ -1,0 +1,790 @@
+{
+  "benchmark": "geotopo",
+  "model_id": "gemma-12b(no-tools)",
+  "prompt_mode": "natural",
+  "tool_augmented": false,
+  "total": 100,
+  "correct": 30,
+  "accuracy": 0.3,
+  "f1": 0.4615384615384615,
+  "by_difficulty": {
+    "easy": {
+      "category": "easy",
+      "total": 49,
+      "correct": 20,
+      "accuracy": 0.40816326530612246,
+      "ci_lower": 0.2821503460597105,
+      "ci_upper": 0.5475293002795374
+    },
+    "medium": {
+      "category": "medium",
+      "total": 20,
+      "correct": 5,
+      "accuracy": 0.25,
+      "ci_lower": 0.11186005278940309,
+      "ci_upper": 0.4687050099580636
+    },
+    "hard": {
+      "category": "hard",
+      "total": 31,
+      "correct": 5,
+      "accuracy": 0.16129032258064516,
+      "ci_lower": 0.07092519905439934,
+      "ci_upper": 0.3263470272497887
+    }
+  },
+  "by_category": {
+    "contains": {
+      "category": "contains",
+      "total": 19,
+      "correct": 10,
+      "accuracy": 0.5263157894736842,
+      "ci_lower": 0.31707482511825114,
+      "ci_upper": 0.7267049451255145
+    },
+    "contains_with_hole": {
+      "category": "contains_with_hole",
+      "total": 10,
+      "correct": 5,
+      "accuracy": 0.5,
+      "ci_lower": 0.23658959361548731,
+      "ci_upper": 0.7634104063845126
+    },
+    "disjoint": {
+      "category": "disjoint",
+      "total": 15,
+      "correct": 0,
+      "accuracy": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.20388926630434784
+    },
+    "intersects": {
+      "category": "intersects",
+      "total": 20,
+      "correct": 10,
+      "accuracy": 0.5,
+      "ci_lower": 0.2992949144298199,
+      "ci_upper": 0.7007050855701801
+    },
+    "touches": {
+      "category": "touches",
+      "total": 21,
+      "correct": 0,
+      "accuracy": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.15464382326420195
+    },
+    "within": {
+      "category": "within",
+      "total": 15,
+      "correct": 5,
+      "accuracy": 0.3333333333333333,
+      "ci_lower": 0.15176100694691236,
+      "ci_upper": 0.5828687484878701
+    }
+  },
+  "scores": [
+    {
+      "question_id": "geotopo_001",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_002",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_003",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_004",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_005",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_006",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_007",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_008",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_009",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_010",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_011",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_012",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_013",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_014",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_015",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_016",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_017",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_018",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_019",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_020",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_021",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_022",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_023",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_024",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_025",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_026",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_027",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_028",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_029",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_030",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_031",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_032",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_033",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_034",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_035",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_036",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_037",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_038",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_039",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_040",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_041",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_042",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_043",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_044",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_045",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_046",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_047",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_048",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_049",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_050",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_051",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_052",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_053",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_054",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_055",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_056",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_057",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_058",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_059",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_060",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_061",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_062",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_063",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_064",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_065",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_066",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_067",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_068",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_069",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_070",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_071",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_072",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_073",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_074",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_075",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_076",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_077",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_078",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geotopo_079",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_080",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_081",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_082",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_083",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_084",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_085",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_086",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_087",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_088",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_089",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_090",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_091",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_092",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_093",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_094",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_095",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_096",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_097",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_098",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_099",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geotopo_100",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    }
+  ],
+  "total_latency_ms": 973317,
+  "avg_latency_ms": 9733.17
+}

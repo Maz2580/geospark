@@ -1,0 +1,766 @@
+{
+  "benchmark": "geodistance",
+  "model_id": "gemma-12b(no-tools)",
+  "prompt_mode": "natural",
+  "tool_augmented": false,
+  "total": 100,
+  "correct": 43,
+  "accuracy": 0.43,
+  "f1": 0.6013986013986015,
+  "by_difficulty": {
+    "easy": {
+      "category": "easy",
+      "total": 2,
+      "correct": 0,
+      "accuracy": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.6576280471103807
+    },
+    "medium": {
+      "category": "medium",
+      "total": 28,
+      "correct": 15,
+      "accuracy": 0.5357142857142857,
+      "ci_lower": 0.3581239514210167,
+      "ci_upper": 0.7046869626034041
+    },
+    "hard": {
+      "category": "hard",
+      "total": 70,
+      "correct": 28,
+      "accuracy": 0.4,
+      "ci_lower": 0.2933408057355693,
+      "ci_upper": 0.5170641692378874
+    }
+  },
+  "by_category": {
+    "distance_absolute": {
+      "category": "distance_absolute",
+      "total": 40,
+      "correct": 0,
+      "accuracy": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.08762453925039232
+    },
+    "nearest_neighbor": {
+      "category": "nearest_neighbor",
+      "total": 9,
+      "correct": 0,
+      "accuracy": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.2991527535509594
+    },
+    "proximity_threshold": {
+      "category": "proximity_threshold",
+      "total": 51,
+      "correct": 43,
+      "accuracy": 0.8431372549019608,
+      "ci_lower": 0.7198929160164018,
+      "ci_upper": 0.9183087411197868
+    }
+  },
+  "scores": [
+    {
+      "question_id": "geodistance_001",
+      "correct": false,
+      "expected": 5255270.8,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_002",
+      "correct": false,
+      "expected": 10025758.1,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_003",
+      "correct": false,
+      "expected": 7620190.0,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_004",
+      "correct": false,
+      "expected": 6087314.3,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_005",
+      "correct": false,
+      "expected": 4567974.1,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_006",
+      "correct": false,
+      "expected": 10253490.0,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_007",
+      "correct": false,
+      "expected": 8087765.2,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_008",
+      "correct": false,
+      "expected": 5853103.7,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_009",
+      "correct": false,
+      "expected": 7722863.3,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_010",
+      "correct": false,
+      "expected": 6892105.7,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_011",
+      "correct": false,
+      "expected": 5729195.1,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_012",
+      "correct": false,
+      "expected": 3875886.3,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_013",
+      "correct": false,
+      "expected": 9035043.5,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_014",
+      "correct": false,
+      "expected": 10067674.5,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_015",
+      "correct": false,
+      "expected": 10658839.5,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_016",
+      "correct": false,
+      "expected": 3875063.1,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_017",
+      "correct": false,
+      "expected": 11024508.7,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_018",
+      "correct": false,
+      "expected": 549833.1,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_019",
+      "correct": false,
+      "expected": 10870159.3,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_020",
+      "correct": false,
+      "expected": 8637135.8,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_021",
+      "correct": false,
+      "expected": 5592793.2,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_022",
+      "correct": false,
+      "expected": 1105298.3,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_023",
+      "correct": false,
+      "expected": 12555029.1,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_024",
+      "correct": false,
+      "expected": 8064677.9,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_025",
+      "correct": false,
+      "expected": 1107543.2,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_026",
+      "correct": false,
+      "expected": 8975033.6,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_027",
+      "correct": false,
+      "expected": 11033433.1,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_028",
+      "correct": false,
+      "expected": 9639796.2,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_029",
+      "correct": false,
+      "expected": 6014834.7,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_030",
+      "correct": false,
+      "expected": 8179675.2,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_031",
+      "correct": false,
+      "expected": 5480603.3,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_032",
+      "correct": false,
+      "expected": 339860.9,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_033",
+      "correct": false,
+      "expected": 5845209.5,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_034",
+      "correct": false,
+      "expected": 6018720.0,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_035",
+      "correct": false,
+      "expected": 5844607.2,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_036",
+      "correct": false,
+      "expected": 342953.7,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_037",
+      "correct": false,
+      "expected": 11931212.5,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_038",
+      "correct": false,
+      "expected": 12553838.3,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_039",
+      "correct": false,
+      "expected": 9869237.6,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_040",
+      "correct": false,
+      "expected": 12499468.7,
+      "got": 400.0,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_041",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_042",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_043",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_044",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_045",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_046",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_047",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_048",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_049",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_050",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_051",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_052",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_053",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_054",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_055",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_056",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_057",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_058",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_059",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_060",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_061",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_062",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_063",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_064",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_065",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_066",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_067",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_068",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_069",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_070",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_071",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_072",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_073",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_074",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_075",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_076",
+      "correct": false,
+      "expected": "Eiffel Tower",
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_077",
+      "correct": false,
+      "expected": "Arc de Triomphe",
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_078",
+      "correct": false,
+      "expected": "Arc de Triomphe",
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_079",
+      "correct": false,
+      "expected": "Big Ben",
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_080",
+      "correct": false,
+      "expected": "Buckingham Palace",
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_081",
+      "correct": false,
+      "expected": "Big Ben",
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_082",
+      "correct": false,
+      "expected": "Times Square",
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_083",
+      "correct": false,
+      "expected": "Empire State Building",
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_084",
+      "correct": false,
+      "expected": "Empire State Building",
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_085",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_086",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_087",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_088",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_089",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_090",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_091",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_092",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_093",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_094",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_095",
+      "correct": false,
+      "expected": true,
+      "got": null,
+      "within_tolerance": false
+    },
+    {
+      "question_id": "geodistance_096",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_097",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_098",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_099",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    },
+    {
+      "question_id": "geodistance_100",
+      "correct": true,
+      "expected": false,
+      "got": null,
+      "within_tolerance": true
+    }
+  ],
+  "total_latency_ms": 969381,
+  "avg_latency_ms": 9693.81
+}

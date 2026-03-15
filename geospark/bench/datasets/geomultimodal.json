@@ -1,0 +1,642 @@
+{
+  "name": "GeoMultimodal",
+  "description": "Multimodal spatial questions combining imagery metadata, elevation, climate, and vector data",
+  "version": "1.0.0",
+  "total_questions": 24,
+  "questions": [
+    {
+      "id": "geomultimodal_001",
+      "benchmark": "geomultimodal",
+      "category": "vegetation_health",
+      "difficulty": "easy",
+      "prompt_natural": "Given satellite scene metadata (cloud cover 5%, NDVI 0.85) and the polygon boundary, is vegetation healthy? Answer with True or False.",
+      "prompt_structured": "Given satellite scene metadata (cloud cover 5%, NDVI 0.85) and the polygon boundary, is vegetation healthy?\n\nLocation: Amazon Basin, Brazil\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [-60.0, -3.0]}\n```\n\nSatellite metadata:\n- NDVI: 0.85\n- Cloud cover: 5%\n\nPolygon boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-60.5, -3.5], [-59.5, -3.5], [-59.5, -2.5], [-60.5, -2.5], [-60.5, -3.5]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "explanation": "NDVI > 0.6 indicates healthy/dense vegetation. Low cloud cover means reliable data.",
+        "data_types": [
+          "satellite_imagery",
+          "ndvi",
+          "cloud_cover",
+          "vector_boundary"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -60.0,
+          -3.0
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_002",
+      "benchmark": "geomultimodal",
+      "category": "vegetation_health",
+      "difficulty": "easy",
+      "prompt_natural": "Given satellite scene metadata (cloud cover 2%, NDVI 0.05) and the polygon boundary, is vegetation healthy? Answer with True or False.",
+      "prompt_structured": "Given satellite scene metadata (cloud cover 2%, NDVI 0.05) and the polygon boundary, is vegetation healthy?\n\nLocation: Sahara Desert, Libya\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [20.0, 25.0]}\n```\n\nSatellite metadata:\n- NDVI: 0.05\n- Cloud cover: 2%\n\nPolygon boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[19.5, 24.5], [20.5, 24.5], [20.5, 25.5], [19.5, 25.5], [19.5, 24.5]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "explanation": "NDVI < 0.2 indicates barren land or desert. No significant vegetation.",
+        "data_types": [
+          "satellite_imagery",
+          "ndvi",
+          "cloud_cover",
+          "vector_boundary"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          20.0,
+          25.0
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_003",
+      "benchmark": "geomultimodal",
+      "category": "vegetation_health",
+      "difficulty": "medium",
+      "prompt_natural": "Given satellite scene metadata (cloud cover 40%, NDVI 0.55) and the polygon boundary, is vegetation healthy? Answer with True or False.",
+      "prompt_structured": "Given satellite scene metadata (cloud cover 40%, NDVI 0.55) and the polygon boundary, is vegetation healthy?\n\nLocation: Central Park, New York\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.97, 40.78]}\n```\n\nSatellite metadata:\n- NDVI: 0.55\n- Cloud cover: 40%\n\nPolygon boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.98, 40.77], [-73.95, 40.77], [-73.95, 40.8], [-73.98, 40.8], [-73.98, 40.77]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "explanation": "NDVI 0.4-0.6 indicates moderate vegetation (urban park). Cloud cover is high but data is still usable.",
+        "data_types": [
+          "satellite_imagery",
+          "ndvi",
+          "cloud_cover",
+          "vector_boundary"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.97,
+          40.78
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_004",
+      "benchmark": "geomultimodal",
+      "category": "vegetation_health",
+      "difficulty": "easy",
+      "prompt_natural": "Given satellite scene metadata (cloud cover 3%, NDVI 0.15) and the polygon boundary, is vegetation healthy? Answer with True or False.",
+      "prompt_structured": "Given satellite scene metadata (cloud cover 3%, NDVI 0.15) and the polygon boundary, is vegetation healthy?\n\nLocation: Australian Outback\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [134.0, -25.0]}\n```\n\nSatellite metadata:\n- NDVI: 0.15\n- Cloud cover: 3%\n\nPolygon boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[133.5, -25.5], [134.5, -25.5], [134.5, -24.5], [133.5, -24.5], [133.5, -25.5]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "explanation": "NDVI 0.1-0.2 indicates sparse vegetation typical of arid/semi-arid regions.",
+        "data_types": [
+          "satellite_imagery",
+          "ndvi",
+          "cloud_cover",
+          "vector_boundary"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          134.0,
+          -25.0
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_005",
+      "benchmark": "geomultimodal",
+      "category": "vegetation_health",
+      "difficulty": "medium",
+      "prompt_natural": "Given satellite scene metadata (cloud cover 60%, NDVI 0.72) and the polygon boundary, is vegetation healthy? Note: high cloud cover may affect data reliability. Answer with True or False.",
+      "prompt_structured": "Given satellite scene metadata (cloud cover 60%, NDVI 0.72) and the polygon boundary, is vegetation healthy? Note: high cloud cover may affect data reliability.\n\nLocation: Black Forest, Germany\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [8.2, 48.0]}\n```\n\nSatellite metadata:\n- NDVI: 0.72\n- Cloud cover: 60%\n\nPolygon boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[7.7, 47.5], [8.7, 47.5], [8.7, 48.5], [7.7, 48.5], [7.7, 47.5]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "explanation": "NDVI > 0.6 indicates dense healthy vegetation. Despite high cloud cover, the NDVI reading is clear enough.",
+        "data_types": [
+          "satellite_imagery",
+          "ndvi",
+          "cloud_cover",
+          "vector_boundary"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          8.2,
+          48.0
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_006",
+      "benchmark": "geomultimodal",
+      "category": "vegetation_health",
+      "difficulty": "easy",
+      "prompt_natural": "Given satellite scene metadata (cloud cover 10%, NDVI 0.08) and the polygon boundary, is vegetation healthy? Answer with True or False.",
+      "prompt_structured": "Given satellite scene metadata (cloud cover 10%, NDVI 0.08) and the polygon boundary, is vegetation healthy?\n\nLocation: Gobi Desert, Mongolia\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [105.0, 43.0]}\n```\n\nSatellite metadata:\n- NDVI: 0.08\n- Cloud cover: 10%\n\nPolygon boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[104.0, 42.0], [106.0, 42.0], [106.0, 44.0], [104.0, 44.0], [104.0, 42.0]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "explanation": "NDVI < 0.1 indicates barren desert terrain.",
+        "data_types": [
+          "satellite_imagery",
+          "ndvi",
+          "cloud_cover",
+          "vector_boundary"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          105.0,
+          43.0
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_007",
+      "benchmark": "geomultimodal",
+      "category": "elevation_climate",
+      "difficulty": "easy",
+      "prompt_natural": "The elevation at this point is 4808m, the temperature is -15C. Is this above the tree line? Answer with True or False.",
+      "prompt_structured": "The elevation at this point is 4808m, the temperature is -15C. Is this above the tree line?\n\nLocation: Mont Blanc summit, France\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [6.865, 45.8326]}\n```\n\nElevation: 4808m\nTemperature: -15C\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "explanation": "The alpine tree line in the European Alps is typically around 2000-2500m. At 4808m, this is well above.",
+        "data_types": [
+          "elevation",
+          "temperature",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          6.865,
+          45.8326
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_008",
+      "benchmark": "geomultimodal",
+      "category": "elevation_climate",
+      "difficulty": "easy",
+      "prompt_natural": "The elevation at this point is 800m, the temperature is 10C. Is this above the tree line? Answer with True or False.",
+      "prompt_structured": "The elevation at this point is 800m, the temperature is 10C. Is this above the tree line?\n\nLocation: Black Forest, Germany\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [8.15, 47.95]}\n```\n\nElevation: 800m\nTemperature: 10C\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "explanation": "800m is well below the tree line in central Europe (~2000m). Temperate forests grow here.",
+        "data_types": [
+          "elevation",
+          "temperature",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          8.15,
+          47.95
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_009",
+      "benchmark": "geomultimodal",
+      "category": "elevation_climate",
+      "difficulty": "medium",
+      "prompt_natural": "The elevation at this point is 5200m, the temperature is -10C. Is this above the tree line? Answer with True or False.",
+      "prompt_structured": "The elevation at this point is 5200m, the temperature is -10C. Is this above the tree line?\n\nLocation: Tibetan Plateau, China\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [91.0, 32.0]}\n```\n\nElevation: 5200m\nTemperature: -10C\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "explanation": "The tree line on the Tibetan Plateau is around 4500m. At 5200m this is above it.",
+        "data_types": [
+          "elevation",
+          "temperature",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          91.0,
+          32.0
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_010",
+      "benchmark": "geomultimodal",
+      "category": "elevation_climate",
+      "difficulty": "medium",
+      "prompt_natural": "The elevation at this point is 3400m, the temperature is 8C. Is this above the tree line? Answer with True or False.",
+      "prompt_structured": "The elevation at this point is 3400m, the temperature is 8C. Is this above the tree line?\n\nLocation: Andes, Peru (near Cusco)\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [-72.0, -13.5]}\n```\n\nElevation: 3400m\nTemperature: 8C\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "explanation": "The tree line in the tropical Andes is around 3500-4000m. At 3400m there is still vegetation.",
+        "data_types": [
+          "elevation",
+          "temperature",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -72.0,
+          -13.5
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_011",
+      "benchmark": "geomultimodal",
+      "category": "elevation_climate",
+      "difficulty": "easy",
+      "prompt_natural": "The elevation at this point is 4500m, the temperature is -5C. Is this above the tree line? Answer with True or False.",
+      "prompt_structured": "The elevation at this point is 4500m, the temperature is -5C. Is this above the tree line?\n\nLocation: Kilimanjaro, Tanzania\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [37.3556, -3.0674]}\n```\n\nElevation: 4500m\nTemperature: -5C\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "explanation": "The tree line on Kilimanjaro is around 3800-4000m. At 4500m this is in the alpine desert zone.",
+        "data_types": [
+          "elevation",
+          "temperature",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          37.3556,
+          -3.0674
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_012",
+      "benchmark": "geomultimodal",
+      "category": "elevation_climate",
+      "difficulty": "medium",
+      "prompt_natural": "The elevation at this point is 500m, the temperature is 5C. Is this above the tree line? Answer with True or False.",
+      "prompt_structured": "The elevation at this point is 500m, the temperature is 5C. Is this above the tree line?\n\nLocation: Scottish Highlands\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [-5.0, 57.0]}\n```\n\nElevation: 500m\nTemperature: 5C\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "explanation": "The tree line in Scotland is around 600-700m. 500m is below it.",
+        "data_types": [
+          "elevation",
+          "temperature",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -5.0,
+          57.0
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_013",
+      "benchmark": "geomultimodal",
+      "category": "urban_classification",
+      "difficulty": "easy",
+      "prompt_natural": "A point at (40.7484N, -73.9857E) has NDVI 0.12, elevation 10m, and population density 27000 per sq km. Is this an urban area? Answer with True or False.",
+      "prompt_structured": "A point at (40.7484N, -73.9857E) has NDVI 0.12, elevation 10m, and population density 27000 per sq km. Is this an urban area?\n\nLocation: Manhattan, New York\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.9857, 40.7484]}\n```\n\nNDVI: 0.12\nElevation: 10m\nPopulation density: 27000 per sq km\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "explanation": "Low NDVI, low elevation, and very high population density clearly indicate an urban area.",
+        "data_types": [
+          "ndvi",
+          "elevation",
+          "population_density",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.9857,
+          40.7484
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_014",
+      "benchmark": "geomultimodal",
+      "category": "urban_classification",
+      "difficulty": "easy",
+      "prompt_natural": "A point at (-3.0N, -60.0E) has NDVI 0.85, elevation 50m, and population density 2 per sq km. Is this an urban area? Answer with True or False.",
+      "prompt_structured": "A point at (-3.0N, -60.0E) has NDVI 0.85, elevation 50m, and population density 2 per sq km. Is this an urban area?\n\nLocation: Amazon Rainforest\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [-60.0, -3.0]}\n```\n\nNDVI: 0.85\nElevation: 50m\nPopulation density: 2 per sq km\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "explanation": "Very high NDVI and extremely low population density indicate a forested, non-urban area.",
+        "data_types": [
+          "ndvi",
+          "elevation",
+          "population_density",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -60.0,
+          -3.0
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_015",
+      "benchmark": "geomultimodal",
+      "category": "urban_classification",
+      "difficulty": "medium",
+      "prompt_natural": "A point at (48.85N, 2.35E) has NDVI 0.3, elevation 35m, and population density 5000 per sq km. Is this an urban area? Answer with True or False.",
+      "prompt_structured": "A point at (48.85N, 2.35E) has NDVI 0.3, elevation 35m, and population density 5000 per sq km. Is this an urban area?\n\nLocation: Suburban Paris\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [2.35, 48.85]}\n```\n\nNDVI: 0.3\nElevation: 35m\nPopulation density: 5000 per sq km\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "explanation": "Moderate NDVI with high population density indicates a dense urban area with some green spaces.",
+        "data_types": [
+          "ndvi",
+          "elevation",
+          "population_density",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.35,
+          48.85
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_016",
+      "benchmark": "geomultimodal",
+      "category": "urban_classification",
+      "difficulty": "easy",
+      "prompt_natural": "A point at (52.0N, -1.5E) has NDVI 0.6, elevation 100m, and population density 50 per sq km. Is this an urban area? Answer with True or False.",
+      "prompt_structured": "A point at (52.0N, -1.5E) has NDVI 0.6, elevation 100m, and population density 50 per sq km. Is this an urban area?\n\nLocation: Rural England\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [-1.5, 52.0]}\n```\n\nNDVI: 0.6\nElevation: 100m\nPopulation density: 50 per sq km\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "explanation": "High NDVI and low population density indicate rural agricultural or natural land.",
+        "data_types": [
+          "ndvi",
+          "elevation",
+          "population_density",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -1.5,
+          52.0
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_017",
+      "benchmark": "geomultimodal",
+      "category": "data_reliability",
+      "difficulty": "medium",
+      "prompt_natural": "A satellite scene over Tropical zone, Indonesia has 85% cloud cover and reports NDVI of 0.45. Is this NDVI measurement reliable? Answer with True or False.",
+      "prompt_structured": "A satellite scene over Tropical zone, Indonesia has 85% cloud cover and reports NDVI of 0.45. Is this NDVI measurement reliable?\n\nLocation: Tropical zone, Indonesia\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [110.0, -7.0]}\n```\n\nCloud cover: 85%\nReported NDVI: 0.45\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "explanation": "Cloud cover above 70-80% makes optical satellite data unreliable. The NDVI may be affected by cloud shadows.",
+        "data_types": [
+          "cloud_cover",
+          "ndvi",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          110.0,
+          -7.0
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_018",
+      "benchmark": "geomultimodal",
+      "category": "data_reliability",
+      "difficulty": "easy",
+      "prompt_natural": "A satellite scene over Nevada Desert, USA has 3% cloud cover and reports NDVI of 0.1. Is this NDVI measurement reliable? Answer with True or False.",
+      "prompt_structured": "A satellite scene over Nevada Desert, USA has 3% cloud cover and reports NDVI of 0.1. Is this NDVI measurement reliable?\n\nLocation: Nevada Desert, USA\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [-116.0, 37.0]}\n```\n\nCloud cover: 3%\nReported NDVI: 0.1\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "explanation": "Very low cloud cover means clear skies and reliable optical measurements.",
+        "data_types": [
+          "cloud_cover",
+          "ndvi",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -116.0,
+          37.0
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_019",
+      "benchmark": "geomultimodal",
+      "category": "data_reliability",
+      "difficulty": "hard",
+      "prompt_natural": "A satellite scene over UK Midlands has 55% cloud cover and reports NDVI of 0.5. Is this NDVI measurement reliable? Answer with True or False.",
+      "prompt_structured": "A satellite scene over UK Midlands has 55% cloud cover and reports NDVI of 0.5. Is this NDVI measurement reliable?\n\nLocation: UK Midlands\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [-1.5, 52.5]}\n```\n\nCloud cover: 55%\nReported NDVI: 0.5\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "explanation": "Cloud cover around 50-60% can still yield usable data for cloud-free pixels. Moderate reliability.",
+        "data_types": [
+          "cloud_cover",
+          "ndvi",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -1.5,
+          52.5
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_020",
+      "benchmark": "geomultimodal",
+      "category": "data_reliability",
+      "difficulty": "easy",
+      "prompt_natural": "A satellite scene over Congo Basin, DRC has 92% cloud cover and reports NDVI of 0.7. Is this NDVI measurement reliable? Answer with True or False.",
+      "prompt_structured": "A satellite scene over Congo Basin, DRC has 92% cloud cover and reports NDVI of 0.7. Is this NDVI measurement reliable?\n\nLocation: Congo Basin, DRC\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [23.0, 0.0]}\n```\n\nCloud cover: 92%\nReported NDVI: 0.7\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "explanation": "Over 90% cloud cover makes virtually any optical measurement unreliable.",
+        "data_types": [
+          "cloud_cover",
+          "ndvi",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          23.0,
+          0.0
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_021",
+      "benchmark": "geomultimodal",
+      "category": "flood_risk",
+      "difficulty": "easy",
+      "prompt_natural": "A site at elevation -2m is 500m from a major river. Is this site at high flood risk? Answer with True or False.",
+      "prompt_structured": "A site at elevation -2m is 500m from a major river. Is this site at high flood risk?\n\nLocation: Netherlands lowlands\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [5.0, 52.0]}\n```\n\nElevation: -2m\nDistance to nearest major water body: 500m\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "explanation": "Negative elevation (below sea level) combined with proximity to water indicates very high flood risk.",
+        "data_types": [
+          "elevation",
+          "hydrology",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          5.0,
+          52.0
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_022",
+      "benchmark": "geomultimodal",
+      "category": "flood_risk",
+      "difficulty": "easy",
+      "prompt_natural": "A site at elevation 2500m is 5000m from a major river. Is this site at high flood risk? Answer with True or False.",
+      "prompt_structured": "A site at elevation 2500m is 5000m from a major river. Is this site at high flood risk?\n\nLocation: Swiss Alps\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [8.0, 46.8]}\n```\n\nElevation: 2500m\nDistance to nearest major water body: 5000m\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "explanation": "High elevation and distance from water bodies means very low flood risk.",
+        "data_types": [
+          "elevation",
+          "hydrology",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          8.0,
+          46.8
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_023",
+      "benchmark": "geomultimodal",
+      "category": "flood_risk",
+      "difficulty": "easy",
+      "prompt_natural": "A site at elevation 1m is 200m from a major river. Is this site at high flood risk? Answer with True or False.",
+      "prompt_structured": "A site at elevation 1m is 200m from a major river. Is this site at high flood risk?\n\nLocation: Bangkok, Thailand\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [100.5, 13.75]}\n```\n\nElevation: 1m\nDistance to nearest major water body: 200m\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "explanation": "Very low elevation (1m) and close proximity to a river indicate high flood risk.",
+        "data_types": [
+          "elevation",
+          "hydrology",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          100.5,
+          13.75
+        ]
+      },
+      "source": "curated_v1.0"
+    },
+    {
+      "id": "geomultimodal_024",
+      "benchmark": "geomultimodal",
+      "category": "flood_risk",
+      "difficulty": "medium",
+      "prompt_natural": "A site at elevation 1609m is 3000m from a major river. Is this site at high flood risk? Answer with True or False.",
+      "prompt_structured": "A site at elevation 1609m is 3000m from a major river. Is this site at high flood risk?\n\nLocation: Denver, Colorado\nCoordinates:\n```json\n{\"type\": \"Point\", \"coordinates\": [-104.99, 39.74]}\n```\n\nElevation: 1609m\nDistance to nearest major water body: 3000m\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "explanation": "High elevation (Mile High City) and moderate distance from water means low flood risk.",
+        "data_types": [
+          "elevation",
+          "hydrology",
+          "coordinates"
+        ]
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -104.99,
+          39.74
+        ]
+      },
+      "source": "curated_v1.0"
+    }
+  ]
+}

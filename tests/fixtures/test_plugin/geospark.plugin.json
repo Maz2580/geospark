@@ -1,0 +1,14 @@
+{
+  "id": "echo-tool",
+  "name": "Echo Tool",
+  "version": "0.1.0",
+  "description": "A test plugin that echoes queries.",
+  "author": "GeoSpark Tests",
+  "license": "Apache-2.0",
+  "entry_point": "tool",
+  "tool_class": "EchoTool",
+  "requires": [],
+  "tags": ["test", "echo"],
+  "homepage": "",
+  "min_geospark_version": "0.1.0"
+}

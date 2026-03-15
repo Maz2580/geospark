@@ -21,6 +21,8 @@ class BenchmarkName(str, Enum):
     GEOTOPO = "geotopo"
     GEODISTANCE = "geodistance"
     GEOCHANAGE = "geochanage"
+    GEOREASON = "georeason"
+    GEOMULTIMODAL = "geomultimodal"
 
 
 class Difficulty(str, Enum):

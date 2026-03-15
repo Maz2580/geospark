@@ -1,0 +1,2397 @@
+{
+  "name": "GeoReason",
+  "description": "Multi-step spatial reasoning chains: transitivity, buffer logic, distance chains",
+  "version": "1.0.0",
+  "total_questions": 55,
+  "questions": [
+    {
+      "id": "georeason_001",
+      "benchmark": "georeason",
+      "category": "distance_chain",
+      "difficulty": "medium",
+      "prompt_natural": "The Eiffel Tower is 5000m from a hospital. A hospital is 2000m from a destination point in the same direction. How far is the destination point from the Eiffel Tower? Give your answer as a number in meters.",
+      "prompt_structured": "The Eiffel Tower is 5000m from a hospital. A hospital is 2000m from a destination point in the same direction. How far is the destination point from the Eiffel Tower?\n\nStart (Eiffel Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.2945, 48.8584]}\n```\n\nIntermediate (a hospital):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.362639, 48.85838]}\n```\n\nEnd (destination):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.389895, 48.858377]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 7000.0,
+      "ground_truth_meta": {
+        "tolerance_m": 700.0,
+        "tolerance_pct": 0.1,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.2945,
+          48.8584
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          2.389895,
+          48.858377
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_002",
+      "benchmark": "georeason",
+      "category": "distance_chain",
+      "difficulty": "medium",
+      "prompt_natural": "The Big Ben is 3000m from a park. A park is 4000m from a destination point in the same direction. How far is the destination point from the Big Ben? Give your answer as a number in meters.",
+      "prompt_structured": "The Big Ben is 3000m from a park. A park is 4000m from a destination point in the same direction. How far is the destination point from the Big Ben?\n\nStart (Big Ben):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\n\nIntermediate (a park):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.527664]}\n```\n\nEnd (destination):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.563616]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 6999.9,
+      "ground_truth_meta": {
+        "tolerance_m": 700.0,
+        "tolerance_pct": 0.1,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1246,
+          51.5007
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -0.1246,
+          51.563616
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_003",
+      "benchmark": "georeason",
+      "category": "distance_chain",
+      "difficulty": "medium",
+      "prompt_natural": "The Colosseum is 1500m from a library. A library is 2500m from a destination point in the same direction. How far is the destination point from the Colosseum? Give your answer as a number in meters.",
+      "prompt_structured": "The Colosseum is 1500m from a library. A library is 2500m from a destination point in the same direction. How far is the destination point from the Colosseum?\n\nStart (Colosseum):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4922, 41.8902]}\n```\n\nIntermediate (a library):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.504982, 41.899749]}\n```\n\nEnd (destination):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.526291, 41.915663]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 4000.1,
+      "ground_truth_meta": {
+        "tolerance_m": 500,
+        "tolerance_pct": 0.1,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.4922,
+          41.8902
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          12.526291,
+          41.915663
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_004",
+      "benchmark": "georeason",
+      "category": "distance_chain",
+      "difficulty": "medium",
+      "prompt_natural": "The Statue of Liberty is 4000m from a school. A school is 3000m from a destination point in the opposite direction. How far is the destination point from the Statue of Liberty? Give your answer as a number in meters.",
+      "prompt_structured": "The Statue of Liberty is 4000m from a school. A school is 3000m from a destination point in the opposite direction. How far is the destination point from the Statue of Liberty?\n\nStart (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nIntermediate (a school):\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.997179, 40.68919]}\n```\n\nEnd (destination):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.03267, 40.689185]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 1000.0,
+      "ground_truth_meta": {
+        "tolerance_m": 500,
+        "tolerance_pct": 0.1,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -74.0445,
+          40.6892
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          -74.03267,
+          40.689185
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_005",
+      "benchmark": "georeason",
+      "category": "distance_chain",
+      "difficulty": "medium",
+      "prompt_natural": "The Tokyo Tower is 6000m from a museum. A museum is 2000m from a destination point in the opposite direction. How far is the destination point from the Tokyo Tower? Give your answer as a number in meters.",
+      "prompt_structured": "The Tokyo Tower is 6000m from a museum. A museum is 2000m from a destination point in the opposite direction. How far is the destination point from the Tokyo Tower?\n\nStart (Tokyo Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [139.7454, 35.6586]}\n```\n\nIntermediate (a museum):\n```json\n{\"type\": \"Point\", \"coordinates\": [139.7454, 35.604523]}\n```\n\nEnd (destination):\n```json\n{\"type\": \"Point\", \"coordinates\": [139.7454, 35.622549]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 3999.9,
+      "ground_truth_meta": {
+        "tolerance_m": 500,
+        "tolerance_pct": 0.1,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          139.7454,
+          35.6586
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          139.7454,
+          35.622549
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_006",
+      "benchmark": "georeason",
+      "category": "distance_chain",
+      "difficulty": "medium",
+      "prompt_natural": "The Sydney Opera House is 1000m from a ferry terminal. A ferry terminal is 1000m from a destination point at a right angle. How far is the destination point from the Sydney Opera House? Give your answer as a number in meters.",
+      "prompt_structured": "The Sydney Opera House is 1000m from a ferry terminal. A ferry terminal is 1000m from a destination point at a right angle. How far is the destination point from the Sydney Opera House?\n\nStart (Sydney Opera House):\n```json\n{\"type\": \"Point\", \"coordinates\": [151.2153, -33.8568]}\n```\n\nIntermediate (a ferry terminal):\n```json\n{\"type\": \"Point\", \"coordinates\": [151.2153, -33.847784]}\n```\n\nEnd (destination):\n```json\n{\"type\": \"Point\", \"coordinates\": [151.226105, -33.847784]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 1414.2,
+      "ground_truth_meta": {
+        "tolerance_m": 500,
+        "tolerance_pct": 0.1,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          151.2153,
+          -33.8568
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          151.226105,
+          -33.847784
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_007",
+      "benchmark": "georeason",
+      "category": "distance_chain",
+      "difficulty": "medium",
+      "prompt_natural": "The Burj Khalifa is 2000m from a metro station. A metro station is 3000m from a destination point at a right angle. How far is the destination point from the Burj Khalifa? Give your answer as a number in meters.",
+      "prompt_structured": "The Burj Khalifa is 2000m from a metro station. A metro station is 3000m from a destination point at a right angle. How far is the destination point from the Burj Khalifa?\n\nStart (Burj Khalifa):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2744, 25.1972]}\n```\n\nIntermediate (a metro station):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2744, 25.215254]}\n```\n\nEnd (destination):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.30417, 25.215251]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 3605.5,
+      "ground_truth_meta": {
+        "tolerance_m": 500,
+        "tolerance_pct": 0.1,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          55.2744,
+          25.1972
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          55.30417,
+          25.215251
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_008",
+      "benchmark": "georeason",
+      "category": "distance_chain",
+      "difficulty": "medium",
+      "prompt_natural": "The Pyramids of Giza is 5000m from a bazaar. A bazaar is 5000m from a destination point at a right angle. How far is the destination point from the Pyramids of Giza? Give your answer as a number in meters.",
+      "prompt_structured": "The Pyramids of Giza is 5000m from a bazaar. A bazaar is 5000m from a destination point at a right angle. How far is the destination point from the Pyramids of Giza?\n\nStart (Pyramids of Giza):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1342, 29.9792]}\n```\n\nIntermediate (a bazaar):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1342, 30.024305]}\n```\n\nEnd (destination):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.186033, 30.024295]}\n```\n\nGive your answer as a number in meters.",
+      "answer_type": "numeric",
+      "ground_truth": 7071.1,
+      "ground_truth_meta": {
+        "tolerance_m": 707.1,
+        "tolerance_pct": 0.1,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          31.1342,
+          29.9792
+        ]
+      },
+      "geometry_b": {
+        "type": "Point",
+        "coordinates": [
+          31.186033,
+          30.024295
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_009",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "medium",
+      "prompt_natural": "Point A at (48.8584N, 2.2898E) is inside the inner district of Paris. The inner district is within the city boundary of Paris. Is Point A within the city boundary? Answer with True or False.",
+      "prompt_structured": "Point A at (48.8584N, 2.2898E) is inside the inner district of Paris. The inner district is within the city boundary of Paris. Is Point A within the city boundary?\n\nPoint A:\n```json\n{\"type\": \"Point\", \"coordinates\": [2.289802, 48.858387]}\n```\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.36, 48.844], [2.36, 48.876], [2.2800000000000002, 48.876], [2.2800000000000002, 48.844], [2.36, 48.844]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.289802,
+          48.858387
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_010",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "hard",
+      "prompt_natural": "The inner district of Paris is within the city boundary. The city boundary of Paris is within a larger metropolitan region. Is the inner district within the metropolitan region? Answer with True or False.",
+      "prompt_structured": "The inner district of Paris is within the city boundary. The city boundary of Paris is within a larger metropolitan region. Is the inner district within the metropolitan region?\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.36, 48.844], [2.36, 48.876], [2.2800000000000002, 48.876], [2.2800000000000002, 48.844], [2.36, 48.844]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nMetropolitan region:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.52, 48.72], [2.52, 49.0], [2.12, 49.0], [2.12, 48.72], [2.52, 48.72]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.36,
+              48.844
+            ],
+            [
+              2.36,
+              48.876
+            ],
+            [
+              2.2800000000000002,
+              48.876
+            ],
+            [
+              2.2800000000000002,
+              48.844
+            ],
+            [
+              2.36,
+              48.844
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.52,
+              48.72
+            ],
+            [
+              2.52,
+              49.0
+            ],
+            [
+              2.12,
+              49.0
+            ],
+            [
+              2.12,
+              48.72
+            ],
+            [
+              2.52,
+              48.72
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_011",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "medium",
+      "prompt_natural": "Point A at (51.4640N, -0.1575E) is inside the inner district of London. The inner district is within the city boundary of London. Is Point A within the city boundary? Answer with True or False.",
+      "prompt_structured": "Point A at (51.4640N, -0.1575E) is inside the inner district of London. The inner district is within the city boundary of London. Is Point A within the city boundary?\n\nPoint A:\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.15746, 51.464048]}\n```\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-0.01999999999999999, 51.46], [-0.01999999999999999, 51.54], [-0.18, 51.54], [-0.18, 51.46], [-0.01999999999999999, 51.46]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.15746,
+          51.464048
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_012",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "hard",
+      "prompt_natural": "The inner district of London is within the city boundary. The city boundary of London is within a larger metropolitan region. Is the inner district within the metropolitan region? Answer with True or False.",
+      "prompt_structured": "The inner district of London is within the city boundary. The city boundary of London is within a larger metropolitan region. Is the inner district within the metropolitan region?\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-0.01999999999999999, 51.46], [-0.01999999999999999, 51.54], [-0.18, 51.54], [-0.18, 51.46], [-0.01999999999999999, 51.46]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nMetropolitan region:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.2, 51.3], [0.2, 51.7], [-0.4, 51.7], [-0.4, 51.3], [0.2, 51.3]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -0.01999999999999999,
+              51.46
+            ],
+            [
+              -0.01999999999999999,
+              51.54
+            ],
+            [
+              -0.18,
+              51.54
+            ],
+            [
+              -0.18,
+              51.46
+            ],
+            [
+              -0.01999999999999999,
+              51.46
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.2,
+              51.3
+            ],
+            [
+              0.2,
+              51.7
+            ],
+            [
+              -0.4,
+              51.7
+            ],
+            [
+              -0.4,
+              51.3
+            ],
+            [
+              0.2,
+              51.3
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_013",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "medium",
+      "prompt_natural": "Point A at (40.7791N, -73.9483E) is inside the inner district of New York. The inner district is within the city boundary of New York. Is Point A within the city boundary? Answer with True or False.",
+      "prompt_structured": "Point A at (40.7791N, -73.9483E) is inside the inner district of New York. The inner district is within the city boundary of New York. Is Point A within the city boundary?\n\nPoint A:\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.948277, 40.779133]}\n```\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.94500000000001, 40.71], [-73.94500000000001, 40.79], [-74.005, 40.79], [-74.005, 40.71], [-73.94500000000001, 40.71]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.948277,
+          40.779133
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_014",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "hard",
+      "prompt_natural": "The inner district of New York is within the city boundary. The city boundary of New York is within a larger metropolitan region. Is the inner district within the metropolitan region? Answer with True or False.",
+      "prompt_structured": "The inner district of New York is within the city boundary. The city boundary of New York is within a larger metropolitan region. Is the inner district within the metropolitan region?\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.94500000000001, 40.71], [-73.94500000000001, 40.79], [-74.005, 40.79], [-74.005, 40.71], [-73.94500000000001, 40.71]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nMetropolitan region:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.80000000000001, 40.55], [-73.80000000000001, 40.95], [-74.14999999999999, 40.95], [-74.14999999999999, 40.55], [-73.80000000000001, 40.55]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.94500000000001,
+              40.71
+            ],
+            [
+              -73.94500000000001,
+              40.79
+            ],
+            [
+              -74.005,
+              40.79
+            ],
+            [
+              -74.005,
+              40.71
+            ],
+            [
+              -73.94500000000001,
+              40.71
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.80000000000001,
+              40.55
+            ],
+            [
+              -73.80000000000001,
+              40.95
+            ],
+            [
+              -74.14999999999999,
+              40.95
+            ],
+            [
+              -74.14999999999999,
+              40.55
+            ],
+            [
+              -73.80000000000001,
+              40.55
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_015",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "medium",
+      "prompt_natural": "Point A at (41.9185N, 12.4701E) is inside the inner district of Rome. The inner district is within the city boundary of Rome. Is Point A within the city boundary? Answer with True or False.",
+      "prompt_structured": "Point A at (41.9185N, 12.4701E) is inside the inner district of Rome. The inner district is within the city boundary of Rome. Is Point A within the city boundary?\n\nPoint A:\n```json\n{\"type\": \"Point\", \"coordinates\": [12.470088, 41.918507]}\n```\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.505, 41.88], [12.505, 41.92], [12.445, 41.92], [12.445, 41.88], [12.505, 41.88]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.470088,
+          41.918507
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_016",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "hard",
+      "prompt_natural": "The inner district of Rome is within the city boundary. The city boundary of Rome is within a larger metropolitan region. Is the inner district within the metropolitan region? Answer with True or False.",
+      "prompt_structured": "The inner district of Rome is within the city boundary. The city boundary of Rome is within a larger metropolitan region. Is the inner district within the metropolitan region?\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.505, 41.88], [12.505, 41.92], [12.445, 41.92], [12.445, 41.88], [12.505, 41.88]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nMetropolitan region:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.65, 41.75], [12.65, 42.050000000000004], [12.3, 42.050000000000004], [12.3, 41.75], [12.65, 41.75]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.505,
+              41.88
+            ],
+            [
+              12.505,
+              41.92
+            ],
+            [
+              12.445,
+              41.92
+            ],
+            [
+              12.445,
+              41.88
+            ],
+            [
+              12.505,
+              41.88
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.65,
+              41.75
+            ],
+            [
+              12.65,
+              42.050000000000004
+            ],
+            [
+              12.3,
+              42.050000000000004
+            ],
+            [
+              12.3,
+              41.75
+            ],
+            [
+              12.65,
+              41.75
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_017",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "medium",
+      "prompt_natural": "Point A at (35.6938N, 139.7822E) is inside the inner district of Tokyo. The inner district is within the city boundary of Tokyo. Is Point A within the city boundary? Answer with True or False.",
+      "prompt_structured": "Point A at (35.6938N, 139.7822E) is inside the inner district of Tokyo. The inner district is within the city boundary of Tokyo. Is Point A within the city boundary?\n\nPoint A:\n```json\n{\"type\": \"Point\", \"coordinates\": [139.782185, 35.693809]}\n```\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.79, 35.645], [139.79, 35.705], [139.71, 35.705], [139.71, 35.645], [139.79, 35.645]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          139.782185,
+          35.693809
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_018",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "hard",
+      "prompt_natural": "The inner district of Tokyo is within the city boundary. The city boundary of Tokyo is within a larger metropolitan region. Is the inner district within the metropolitan region? Answer with True or False.",
+      "prompt_structured": "The inner district of Tokyo is within the city boundary. The city boundary of Tokyo is within a larger metropolitan region. Is the inner district within the metropolitan region?\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.79, 35.645], [139.79, 35.705], [139.71, 35.705], [139.71, 35.645], [139.79, 35.645]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nMetropolitan region:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.95, 35.5], [139.95, 35.85], [139.55, 35.85], [139.55, 35.5], [139.95, 35.5]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.79,
+              35.645
+            ],
+            [
+              139.79,
+              35.705
+            ],
+            [
+              139.71,
+              35.705
+            ],
+            [
+              139.71,
+              35.645
+            ],
+            [
+              139.79,
+              35.645
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.95,
+              35.5
+            ],
+            [
+              139.95,
+              35.85
+            ],
+            [
+              139.55,
+              35.85
+            ],
+            [
+              139.55,
+              35.5
+            ],
+            [
+              139.95,
+              35.5
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_019",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "medium",
+      "prompt_natural": "Point A at (-33.8412N, 151.2510E) is inside the inner district of Sydney. The inner district is within the city boundary of Sydney. Is Point A within the city boundary? Answer with True or False.",
+      "prompt_structured": "Point A at (-33.8412N, 151.2510E) is inside the inner district of Sydney. The inner district is within the city boundary of Sydney. Is Point A within the city boundary?\n\nPoint A:\n```json\n{\"type\": \"Point\", \"coordinates\": [151.251025, -33.841155]}\n```\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.255, -33.87], [151.255, -33.83], [151.195, -33.83], [151.195, -33.87], [151.255, -33.87]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.3, -33.9], [151.3, -33.8], [151.15, -33.8], [151.15, -33.9], [151.3, -33.9]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          151.251025,
+          -33.841155
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.3,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.9
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_020",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "hard",
+      "prompt_natural": "The inner district of Sydney is within the city boundary. The city boundary of Sydney is within a larger metropolitan region. Is the inner district within the metropolitan region? Answer with True or False.",
+      "prompt_structured": "The inner district of Sydney is within the city boundary. The city boundary of Sydney is within a larger metropolitan region. Is the inner district within the metropolitan region?\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.255, -33.87], [151.255, -33.83], [151.195, -33.83], [151.195, -33.87], [151.255, -33.87]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.3, -33.9], [151.3, -33.8], [151.15, -33.8], [151.15, -33.9], [151.3, -33.9]]]}\n```\n\nMetropolitan region:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.4, -34.0], [151.4, -33.699999999999996], [151.05, -33.699999999999996], [151.05, -34.0], [151.4, -34.0]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.255,
+              -33.87
+            ],
+            [
+              151.255,
+              -33.83
+            ],
+            [
+              151.195,
+              -33.83
+            ],
+            [
+              151.195,
+              -33.87
+            ],
+            [
+              151.255,
+              -33.87
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.4,
+              -34.0
+            ],
+            [
+              151.4,
+              -33.699999999999996
+            ],
+            [
+              151.05,
+              -33.699999999999996
+            ],
+            [
+              151.05,
+              -34.0
+            ],
+            [
+              151.4,
+              -34.0
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_021",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "medium",
+      "prompt_natural": "Point A at (25.1409N, 55.1628E) is inside the inner district of Dubai. The inner district is within the city boundary of Dubai. Is Point A within the city boundary? Answer with True or False.",
+      "prompt_structured": "Point A at (25.1409N, 55.1628E) is inside the inner district of Dubai. The inner district is within the city boundary of Dubai. Is Point A within the city boundary?\n\nPoint A:\n```json\n{\"type\": \"Point\", \"coordinates\": [55.16278, 25.140934]}\n```\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.26, 25.125], [55.26, 25.225], [55.14, 25.225], [55.14, 25.125], [55.26, 25.125]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.05], [55.35, 25.3], [55.05, 25.3], [55.05, 25.05], [55.35, 25.05]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          55.16278,
+          25.140934
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.35,
+              25.05
+            ],
+            [
+              55.35,
+              25.3
+            ],
+            [
+              55.05,
+              25.3
+            ],
+            [
+              55.05,
+              25.05
+            ],
+            [
+              55.35,
+              25.05
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_022",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "hard",
+      "prompt_natural": "The inner district of Dubai is within the city boundary. The city boundary of Dubai is within a larger metropolitan region. Is the inner district within the metropolitan region? Answer with True or False.",
+      "prompt_structured": "The inner district of Dubai is within the city boundary. The city boundary of Dubai is within a larger metropolitan region. Is the inner district within the metropolitan region?\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.26, 25.125], [55.26, 25.225], [55.14, 25.225], [55.14, 25.125], [55.26, 25.125]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.05], [55.35, 25.3], [55.05, 25.3], [55.05, 25.05], [55.35, 25.05]]]}\n```\n\nMetropolitan region:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.45, 24.95], [55.45, 25.400000000000002], [54.949999999999996, 25.400000000000002], [54.949999999999996, 24.95], [55.45, 24.95]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.26,
+              25.125
+            ],
+            [
+              55.26,
+              25.225
+            ],
+            [
+              55.14,
+              25.225
+            ],
+            [
+              55.14,
+              25.125
+            ],
+            [
+              55.26,
+              25.125
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.45,
+              24.95
+            ],
+            [
+              55.45,
+              25.400000000000002
+            ],
+            [
+              54.949999999999996,
+              25.400000000000002
+            ],
+            [
+              54.949999999999996,
+              24.95
+            ],
+            [
+              55.45,
+              24.95
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_023",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "medium",
+      "prompt_natural": "Point A at (30.0230N, 31.2746E) is inside the inner district of Cairo. The inner district is within the city boundary of Cairo. Is Point A within the city boundary? Answer with True or False.",
+      "prompt_structured": "Point A at (30.0230N, 31.2746E) is inside the inner district of Cairo. The inner district is within the city boundary of Cairo. Is Point A within the city boundary?\n\nPoint A:\n```json\n{\"type\": \"Point\", \"coordinates\": [31.274597, 30.023009]}\n```\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.275000000000002, 29.995], [31.275000000000002, 30.055], [31.175, 30.055], [31.175, 29.995], [31.275000000000002, 29.995]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.35, 29.95], [31.35, 30.1], [31.1, 30.1], [31.1, 29.95], [31.35, 29.95]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          31.274597,
+          30.023009
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.35,
+              29.95
+            ],
+            [
+              31.35,
+              30.1
+            ],
+            [
+              31.1,
+              30.1
+            ],
+            [
+              31.1,
+              29.95
+            ],
+            [
+              31.35,
+              29.95
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_024",
+      "benchmark": "georeason",
+      "category": "transitivity",
+      "difficulty": "hard",
+      "prompt_natural": "The inner district of Cairo is within the city boundary. The city boundary of Cairo is within a larger metropolitan region. Is the inner district within the metropolitan region? Answer with True or False.",
+      "prompt_structured": "The inner district of Cairo is within the city boundary. The city boundary of Cairo is within a larger metropolitan region. Is the inner district within the metropolitan region?\n\nInner district:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.275000000000002, 29.995], [31.275000000000002, 30.055], [31.175, 30.055], [31.175, 29.995], [31.275000000000002, 29.995]]]}\n```\n\nCity boundary:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.35, 29.95], [31.35, 30.1], [31.1, 30.1], [31.1, 29.95], [31.35, 29.95]]]}\n```\n\nMetropolitan region:\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.450000000000003, 29.849999999999998], [31.450000000000003, 30.200000000000003], [31.0, 30.200000000000003], [31.0, 29.849999999999998], [31.450000000000003, 29.849999999999998]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "reasoning_type": "spatial_transitivity",
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.275000000000002,
+              29.995
+            ],
+            [
+              31.275000000000002,
+              30.055
+            ],
+            [
+              31.175,
+              30.055
+            ],
+            [
+              31.175,
+              29.995
+            ],
+            [
+              31.275000000000002,
+              29.995
+            ]
+          ]
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.450000000000003,
+              29.849999999999998
+            ],
+            [
+              31.450000000000003,
+              30.200000000000003
+            ],
+            [
+              31.0,
+              30.200000000000003
+            ],
+            [
+              31.0,
+              29.849999999999998
+            ],
+            [
+              31.450000000000003,
+              29.849999999999998
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_025",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "medium",
+      "prompt_natural": "A sensor at (48.8272N, 2.4350E) has a detection radius of 1649m. The sensor is approximately 1099m from the Paris city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (48.8272N, 2.4350E) has a detection radius of 1649m. The sensor is approximately 1099m from the Paris city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [2.434974, 48.827204]}\n```\n\nBuffer radius: 1649 meters\n\nCity boundary (Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "buffer_m": 1649,
+        "actual_distance_m": 1099.5,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.434974,
+          48.827204
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_026",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "hard",
+      "prompt_natural": "A sensor at (48.8272N, 2.4350E) has a detection radius of 550m. The sensor is approximately 1099m from the Paris city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (48.8272N, 2.4350E) has a detection radius of 550m. The sensor is approximately 1099m from the Paris city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [2.434974, 48.827204]}\n```\n\nBuffer radius: 550 meters\n\nCity boundary (Paris):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[2.42, 48.82], [2.42, 48.9], [2.22, 48.9], [2.22, 48.82], [2.42, 48.82]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "buffer_m": 550,
+        "actual_distance_m": 1099.5,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.434974,
+          48.827204
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.42,
+              48.82
+            ],
+            [
+              2.42,
+              48.9
+            ],
+            [
+              2.22,
+              48.9
+            ],
+            [
+              2.22,
+              48.82
+            ],
+            [
+              2.42,
+              48.82
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_027",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "medium",
+      "prompt_natural": "A sensor at (51.5933N, -0.3151E) has a detection radius of 1565m. The sensor is approximately 1043m from the London city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (51.5933N, -0.3151E) has a detection radius of 1565m. The sensor is approximately 1043m from the London city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.315054, 51.593337]}\n```\n\nBuffer radius: 1565 meters\n\nCity boundary (London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "buffer_m": 1565,
+        "actual_distance_m": 1043.2,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.315054,
+          51.593337
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_028",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "hard",
+      "prompt_natural": "A sensor at (51.5933N, -0.3151E) has a detection radius of 522m. The sensor is approximately 1043m from the London city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (51.5933N, -0.3151E) has a detection radius of 522m. The sensor is approximately 1043m from the London city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.315054, 51.593337]}\n```\n\nBuffer radius: 522 meters\n\nCity boundary (London):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[0.1, 51.4], [0.1, 51.6], [-0.3, 51.6], [-0.3, 51.4], [0.1, 51.4]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "buffer_m": 522,
+        "actual_distance_m": 1043.2,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.315054,
+          51.593337
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.1,
+              51.4
+            ],
+            [
+              0.1,
+              51.6
+            ],
+            [
+              -0.3,
+              51.6
+            ],
+            [
+              -0.3,
+              51.4
+            ],
+            [
+              0.1,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_029",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "medium",
+      "prompt_natural": "A sensor at (40.6395N, -73.9625E) has a detection radius of 1747m. The sensor is approximately 1164m from the New York city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (40.6395N, -73.9625E) has a detection radius of 1747m. The sensor is approximately 1164m from the New York city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.962498, 40.639513]}\n```\n\nBuffer radius: 1747 meters\n\nCity boundary (New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "buffer_m": 1747,
+        "actual_distance_m": 1164.6,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.962498,
+          40.639513
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_030",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "hard",
+      "prompt_natural": "A sensor at (40.6395N, -73.9625E) has a detection radius of 582m. The sensor is approximately 1164m from the New York city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (40.6395N, -73.9625E) has a detection radius of 582m. The sensor is approximately 1164m from the New York city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [-73.962498, 40.639513]}\n```\n\nBuffer radius: 582 meters\n\nCity boundary (New York):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[-73.9, 40.65], [-73.9, 40.85], [-74.05, 40.85], [-74.05, 40.65], [-73.9, 40.65]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "buffer_m": 582,
+        "actual_distance_m": 1164.6,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -73.962498,
+          40.639513
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.9,
+              40.65
+            ],
+            [
+              -73.9,
+              40.85
+            ],
+            [
+              -74.05,
+              40.85
+            ],
+            [
+              -74.05,
+              40.65
+            ],
+            [
+              -73.9,
+              40.65
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_031",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "medium",
+      "prompt_natural": "A sensor at (41.9382N, 12.5649E) has a detection radius of 1860m. The sensor is approximately 1239m from the Rome city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (41.9382N, 12.5649E) has a detection radius of 1860m. The sensor is approximately 1239m from the Rome city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [12.564949, 41.938234]}\n```\n\nBuffer radius: 1860 meters\n\nCity boundary (Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "buffer_m": 1860,
+        "actual_distance_m": 1239.7,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.564949,
+          41.938234
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_032",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "hard",
+      "prompt_natural": "A sensor at (41.9382N, 12.5649E) has a detection radius of 620m. The sensor is approximately 1239m from the Rome city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (41.9382N, 12.5649E) has a detection radius of 620m. The sensor is approximately 1239m from the Rome city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [12.564949, 41.938234]}\n```\n\nBuffer radius: 620 meters\n\nCity boundary (Rome):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[12.55, 41.85], [12.55, 41.95], [12.4, 41.95], [12.4, 41.85], [12.55, 41.85]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "buffer_m": 620,
+        "actual_distance_m": 1239.7,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.564949,
+          41.938234
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.55,
+              41.85
+            ],
+            [
+              12.55,
+              41.95
+            ],
+            [
+              12.4,
+              41.95
+            ],
+            [
+              12.4,
+              41.85
+            ],
+            [
+              12.55,
+              41.85
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_033",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "medium",
+      "prompt_natural": "A sensor at (35.6012N, 139.6371E) has a detection radius of 1748m. The sensor is approximately 1165m from the Tokyo city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (35.6012N, 139.6371E) has a detection radius of 1748m. The sensor is approximately 1165m from the Tokyo city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [139.637143, 35.601227]}\n```\n\nBuffer radius: 1748 meters\n\nCity boundary (Tokyo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "buffer_m": 1748,
+        "actual_distance_m": 1165.0,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          139.637143,
+          35.601227
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_034",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "hard",
+      "prompt_natural": "A sensor at (35.6012N, 139.6371E) has a detection radius of 583m. The sensor is approximately 1165m from the Tokyo city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (35.6012N, 139.6371E) has a detection radius of 583m. The sensor is approximately 1165m from the Tokyo city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [139.637143, 35.601227]}\n```\n\nBuffer radius: 583 meters\n\nCity boundary (Tokyo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[139.85, 35.6], [139.85, 35.75], [139.65, 35.75], [139.65, 35.6], [139.85, 35.6]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "buffer_m": 583,
+        "actual_distance_m": 1165.0,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          139.637143,
+          35.601227
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.85,
+              35.6
+            ],
+            [
+              139.85,
+              35.75
+            ],
+            [
+              139.65,
+              35.75
+            ],
+            [
+              139.65,
+              35.6
+            ],
+            [
+              139.85,
+              35.6
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_035",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "medium",
+      "prompt_natural": "A sensor at (-33.7812N, 151.2146E) has a detection radius of 3132m. The sensor is approximately 2088m from the Sydney city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (-33.7812N, 151.2146E) has a detection radius of 3132m. The sensor is approximately 2088m from the Sydney city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [151.214639, -33.781175]}\n```\n\nBuffer radius: 3132 meters\n\nCity boundary (Sydney):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.3, -33.9], [151.3, -33.8], [151.15, -33.8], [151.15, -33.9], [151.3, -33.9]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "buffer_m": 3132,
+        "actual_distance_m": 2088.0,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          151.214639,
+          -33.781175
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.3,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.9
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_036",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "hard",
+      "prompt_natural": "A sensor at (-33.7812N, 151.2146E) has a detection radius of 1044m. The sensor is approximately 2088m from the Sydney city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (-33.7812N, 151.2146E) has a detection radius of 1044m. The sensor is approximately 2088m from the Sydney city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [151.214639, -33.781175]}\n```\n\nBuffer radius: 1044 meters\n\nCity boundary (Sydney):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[151.3, -33.9], [151.3, -33.8], [151.15, -33.8], [151.15, -33.9], [151.3, -33.9]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "buffer_m": 1044,
+        "actual_distance_m": 2088.0,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          151.214639,
+          -33.781175
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              151.3,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.8
+            ],
+            [
+              151.15,
+              -33.9
+            ],
+            [
+              151.3,
+              -33.9
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_037",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "medium",
+      "prompt_natural": "A sensor at (25.1415N, 55.3676E) has a detection radius of 2668m. The sensor is approximately 1778m from the Dubai city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (25.1415N, 55.3676E) has a detection radius of 2668m. The sensor is approximately 1778m from the Dubai city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [55.367639, 25.141484]}\n```\n\nBuffer radius: 2668 meters\n\nCity boundary (Dubai):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.05], [55.35, 25.3], [55.05, 25.3], [55.05, 25.05], [55.35, 25.05]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "buffer_m": 2668,
+        "actual_distance_m": 1778.6,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          55.367639,
+          25.141484
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.35,
+              25.05
+            ],
+            [
+              55.35,
+              25.3
+            ],
+            [
+              55.05,
+              25.3
+            ],
+            [
+              55.05,
+              25.05
+            ],
+            [
+              55.35,
+              25.05
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_038",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "hard",
+      "prompt_natural": "A sensor at (25.1415N, 55.3676E) has a detection radius of 889m. The sensor is approximately 1778m from the Dubai city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (25.1415N, 55.3676E) has a detection radius of 889m. The sensor is approximately 1778m from the Dubai city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [55.367639, 25.141484]}\n```\n\nBuffer radius: 889 meters\n\nCity boundary (Dubai):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[55.35, 25.05], [55.35, 25.3], [55.05, 25.3], [55.05, 25.05], [55.35, 25.05]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "buffer_m": 889,
+        "actual_distance_m": 1778.6,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          55.367639,
+          25.141484
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              55.35,
+              25.05
+            ],
+            [
+              55.35,
+              25.3
+            ],
+            [
+              55.05,
+              25.3
+            ],
+            [
+              55.05,
+              25.05
+            ],
+            [
+              55.35,
+              25.05
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_039",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "medium",
+      "prompt_natural": "A sensor at (30.0343N, 31.0895E) has a detection radius of 1521m. The sensor is approximately 1013m from the Cairo city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (30.0343N, 31.0895E) has a detection radius of 1521m. The sensor is approximately 1013m from the Cairo city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [31.089488, 30.034273]}\n```\n\nBuffer radius: 1521 meters\n\nCity boundary (Cairo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.35, 29.95], [31.35, 30.1], [31.1, 30.1], [31.1, 29.95], [31.35, 29.95]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": true,
+      "ground_truth_meta": {
+        "buffer_m": 1521,
+        "actual_distance_m": 1013.9,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          31.089488,
+          30.034273
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.35,
+              29.95
+            ],
+            [
+              31.35,
+              30.1
+            ],
+            [
+              31.1,
+              30.1
+            ],
+            [
+              31.1,
+              29.95
+            ],
+            [
+              31.35,
+              29.95
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_040",
+      "benchmark": "georeason",
+      "category": "buffer_intersection",
+      "difficulty": "hard",
+      "prompt_natural": "A sensor at (30.0343N, 31.0895E) has a detection radius of 507m. The sensor is approximately 1013m from the Cairo city boundary. Does the sensor's coverage area intersect with the city boundary? Answer with True or False.",
+      "prompt_structured": "A sensor at (30.0343N, 31.0895E) has a detection radius of 507m. The sensor is approximately 1013m from the Cairo city boundary. Does the sensor's coverage area intersect with the city boundary?\n\nSensor location:\n```json\n{\"type\": \"Point\", \"coordinates\": [31.089488, 30.034273]}\n```\n\nBuffer radius: 507 meters\n\nCity boundary (Cairo):\n```json\n{\"type\": \"Polygon\", \"coordinates\": [[[31.35, 29.95], [31.35, 30.1], [31.1, 30.1], [31.1, 29.95], [31.35, 29.95]]]}\n```\n\nAnswer with True or False.",
+      "answer_type": "boolean",
+      "ground_truth": false,
+      "ground_truth_meta": {
+        "buffer_m": 507,
+        "actual_distance_m": 1013.9,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          31.089488,
+          30.034273
+        ]
+      },
+      "geometry_b": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              31.35,
+              29.95
+            ],
+            [
+              31.35,
+              30.1
+            ],
+            [
+              31.1,
+              30.1
+            ],
+            [
+              31.1,
+              29.95
+            ],
+            [
+              31.35,
+              29.95
+            ]
+          ]
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_041",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Tokyo Skytree closer to the Table Mountain or to the Colosseum?",
+      "prompt_structured": "Is the Tokyo Skytree closer to the Table Mountain or to the Colosseum?\n\nReference (Tokyo Skytree):\n```json\n{\"type\": \"Point\", \"coordinates\": [139.8107, 35.7101]}\n```\n\nOption A (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\n\nOption B (Colosseum):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4922, 41.8902]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Colosseum",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Table Mountain",
+          "Colosseum"
+        ],
+        "distance_to_a_m": 14743478.3,
+        "distance_to_b_m": 9881966.6,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          139.8107,
+          35.7101
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_042",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Sacre-Coeur closer to the Meiji Shrine or to the Pyramids of Giza?",
+      "prompt_structured": "Is the Sacre-Coeur closer to the Meiji Shrine or to the Pyramids of Giza?\n\nReference (Sacre-Coeur):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.3431, 48.8867]}\n```\n\nOption A (Meiji Shrine):\n```json\n{\"type\": \"Point\", \"coordinates\": [139.6993, 35.6764]}\n```\n\nOption B (Pyramids of Giza):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1342, 29.9792]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Pyramids of Giza",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Meiji Shrine",
+          "Pyramids of Giza"
+        ],
+        "distance_to_a_m": 9734841.5,
+        "distance_to_b_m": 3213729.4,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.3431,
+          48.8867
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_043",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Bondi Beach closer to the Petronas Towers or to the Table Mountain?",
+      "prompt_structured": "Is the Bondi Beach closer to the Petronas Towers or to the Table Mountain?\n\nReference (Bondi Beach):\n```json\n{\"type\": \"Point\", \"coordinates\": [151.2743, -33.8915]}\n```\n\nOption A (Petronas Towers):\n```json\n{\"type\": \"Point\", \"coordinates\": [101.7118, 3.1578]}\n```\n\nOption B (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Petronas Towers",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Petronas Towers",
+          "Table Mountain"
+        ],
+        "distance_to_a_m": 6615052.7,
+        "distance_to_b_m": 11033271.0,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          151.2743,
+          -33.8915
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_044",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the One World Trade Center closer to the Blue Mosque or to the Christ the Redeemer?",
+      "prompt_structured": "Is the One World Trade Center closer to the Blue Mosque or to the Christ the Redeemer?\n\nReference (One World Trade Center):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0134, 40.7127]}\n```\n\nOption A (Blue Mosque):\n```json\n{\"type\": \"Point\", \"coordinates\": [28.9771, 41.0054]}\n```\n\nOption B (Christ the Redeemer):\n```json\n{\"type\": \"Point\", \"coordinates\": [-43.2105, -22.9519]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Christ the Redeemer",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Blue Mosque",
+          "Christ the Redeemer"
+        ],
+        "distance_to_a_m": 8090711.5,
+        "distance_to_b_m": 7735721.9,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -74.0134,
+          40.7127
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_045",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Space Needle closer to the Christ the Redeemer or to the Tower of London?",
+      "prompt_structured": "Is the Space Needle closer to the Christ the Redeemer or to the Tower of London?\n\nReference (Space Needle):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.3493, 47.6205]}\n```\n\nOption A (Christ the Redeemer):\n```json\n{\"type\": \"Point\", \"coordinates\": [-43.2105, -22.9519]}\n```\n\nOption B (Tower of London):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.0761, 51.5081]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Tower of London",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Christ the Redeemer",
+          "Tower of London"
+        ],
+        "distance_to_a_m": 11089178.8,
+        "distance_to_b_m": 7724262.6,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -122.3493,
+          47.6205
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_046",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Buckingham Palace closer to the Big Ben or to the Sensoji Temple?",
+      "prompt_structured": "Is the Buckingham Palace closer to the Big Ben or to the Sensoji Temple?\n\nReference (Buckingham Palace):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1419, 51.5014]}\n```\n\nOption A (Big Ben):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1246, 51.5007]}\n```\n\nOption B (Sensoji Temple):\n```json\n{\"type\": \"Point\", \"coordinates\": [139.7966, 35.7148]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Big Ben",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Big Ben",
+          "Sensoji Temple"
+        ],
+        "distance_to_a_m": 1203.8,
+        "distance_to_b_m": 9584637.8,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1419,
+          51.5014
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_047",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Tokyo Skytree closer to the Angkor Wat or to the Pantheon?",
+      "prompt_structured": "Is the Tokyo Skytree closer to the Angkor Wat or to the Pantheon?\n\nReference (Tokyo Skytree):\n```json\n{\"type\": \"Point\", \"coordinates\": [139.8107, 35.7101]}\n```\n\nOption A (Angkor Wat):\n```json\n{\"type\": \"Point\", \"coordinates\": [103.867, 13.4125]}\n```\n\nOption B (Pantheon):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4768, 41.8986]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Angkor Wat",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Angkor Wat",
+          "Pantheon"
+        ],
+        "distance_to_a_m": 4359673.9,
+        "distance_to_b_m": 9882078.6,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          139.8107,
+          35.7101
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_048",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Table Mountain closer to the Tokyo Skytree or to the Petronas Towers?",
+      "prompt_structured": "Is the Table Mountain closer to the Tokyo Skytree or to the Petronas Towers?\n\nReference (Table Mountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [18.4041, -33.9628]}\n```\n\nOption A (Tokyo Skytree):\n```json\n{\"type\": \"Point\", \"coordinates\": [139.8107, 35.7101]}\n```\n\nOption B (Petronas Towers):\n```json\n{\"type\": \"Point\", \"coordinates\": [101.7118, 3.1578]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Petronas Towers",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Tokyo Skytree",
+          "Petronas Towers"
+        ],
+        "distance_to_a_m": 14743478.3,
+        "distance_to_b_m": 9591413.3,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          18.4041,
+          -33.9628
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_049",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the London Eye closer to the Statue of Liberty or to the Great Wall (Badaling)?",
+      "prompt_structured": "Is the London Eye closer to the Statue of Liberty or to the Great Wall (Badaling)?\n\nReference (London Eye):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1195, 51.5033]}\n```\n\nOption A (Statue of Liberty):\n```json\n{\"type\": \"Point\", \"coordinates\": [-74.0445, 40.6892]}\n```\n\nOption B (Great Wall (Badaling)):\n```json\n{\"type\": \"Point\", \"coordinates\": [116.0046, 40.3588]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Statue of Liberty",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Statue of Liberty",
+          "Great Wall (Badaling)"
+        ],
+        "distance_to_a_m": 5590102.2,
+        "distance_to_b_m": 8101859.7,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1195,
+          51.5033
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_050",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Pyramids of Giza closer to the Sensoji Temple or to the Arc de Triomphe?",
+      "prompt_structured": "Is the Pyramids of Giza closer to the Sensoji Temple or to the Arc de Triomphe?\n\nReference (Pyramids of Giza):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1342, 29.9792]}\n```\n\nOption A (Sensoji Temple):\n```json\n{\"type\": \"Point\", \"coordinates\": [139.7966, 35.7148]}\n```\n\nOption B (Arc de Triomphe):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.295, 48.8738]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Arc de Triomphe",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Sensoji Temple",
+          "Arc de Triomphe"
+        ],
+        "distance_to_a_m": 9601964.7,
+        "distance_to_b_m": 3216062.0,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          31.1342,
+          29.9792
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_051",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Arc de Triomphe closer to the Buckingham Palace or to the Brandenburg Gate?",
+      "prompt_structured": "Is the Arc de Triomphe closer to the Buckingham Palace or to the Brandenburg Gate?\n\nReference (Arc de Triomphe):\n```json\n{\"type\": \"Point\", \"coordinates\": [2.295, 48.8738]}\n```\n\nOption A (Buckingham Palace):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1419, 51.5014]}\n```\n\nOption B (Brandenburg Gate):\n```json\n{\"type\": \"Point\", \"coordinates\": [13.3777, 52.5163]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Buckingham Palace",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Buckingham Palace",
+          "Brandenburg Gate"
+        ],
+        "distance_to_a_m": 340120.1,
+        "distance_to_b_m": 880400.7,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          2.295,
+          48.8738
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_052",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Pantheon closer to the Kremlin or to the Palm Jumeirah?",
+      "prompt_structured": "Is the Pantheon closer to the Kremlin or to the Palm Jumeirah?\n\nReference (Pantheon):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4768, 41.8986]}\n```\n\nOption A (Kremlin):\n```json\n{\"type\": \"Point\", \"coordinates\": [37.6173, 55.752]}\n```\n\nOption B (Palm Jumeirah):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.1326, 25.1124]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Kremlin",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Kremlin",
+          "Palm Jumeirah"
+        ],
+        "distance_to_a_m": 2380773.2,
+        "distance_to_b_m": 4322453.3,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          12.4768,
+          41.8986
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_053",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Cairo Tower closer to the Burj Khalifa or to the London Eye?",
+      "prompt_structured": "Is the Cairo Tower closer to the Burj Khalifa or to the London Eye?\n\nReference (Cairo Tower):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.2244, 30.0459]}\n```\n\nOption A (Burj Khalifa):\n```json\n{\"type\": \"Point\", \"coordinates\": [55.2744, 25.1972]}\n```\n\nOption B (London Eye):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1195, 51.5033]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Burj Khalifa",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Burj Khalifa",
+          "London Eye"
+        ],
+        "distance_to_a_m": 2428896.9,
+        "distance_to_b_m": 3512460.4,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          31.2244,
+          30.0459
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_054",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Great Wall (Badaling) closer to the Alcatraz Island or to the Pyramids of Giza?",
+      "prompt_structured": "Is the Great Wall (Badaling) closer to the Alcatraz Island or to the Pyramids of Giza?\n\nReference (Great Wall (Badaling)):\n```json\n{\"type\": \"Point\", \"coordinates\": [116.0046, 40.3588]}\n```\n\nOption A (Alcatraz Island):\n```json\n{\"type\": \"Point\", \"coordinates\": [-122.4229, 37.8267]}\n```\n\nOption B (Pyramids of Giza):\n```json\n{\"type\": \"Point\", \"coordinates\": [31.1342, 29.9792]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Pyramids of Giza",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Alcatraz Island",
+          "Pyramids of Giza"
+        ],
+        "distance_to_a_m": 9506871.8,
+        "distance_to_b_m": 7522024.0,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          116.0046,
+          40.3588
+        ]
+      },
+      "source": "generated_v1.0"
+    },
+    {
+      "id": "georeason_055",
+      "benchmark": "georeason",
+      "category": "comparative",
+      "difficulty": "hard",
+      "prompt_natural": "Is the Buckingham Palace closer to the Trevi Fountain or to the Christ the Redeemer?",
+      "prompt_structured": "Is the Buckingham Palace closer to the Trevi Fountain or to the Christ the Redeemer?\n\nReference (Buckingham Palace):\n```json\n{\"type\": \"Point\", \"coordinates\": [-0.1419, 51.5014]}\n```\n\nOption A (Trevi Fountain):\n```json\n{\"type\": \"Point\", \"coordinates\": [12.4833, 41.9009]}\n```\n\nOption B (Christ the Redeemer):\n```json\n{\"type\": \"Point\", \"coordinates\": [-43.2105, -22.9519]}\n```\n\nAnswer with the name of the closer landmark.",
+      "answer_type": "category",
+      "ground_truth": "Trevi Fountain",
+      "ground_truth_meta": {
+        "valid_categories": [
+          "Trevi Fountain",
+          "Christ the Redeemer"
+        ],
+        "distance_to_a_m": 1435175.7,
+        "distance_to_b_m": 9257231.3,
+        "reasoning_steps": 2
+      },
+      "geometry_a": {
+        "type": "Point",
+        "coordinates": [
+          -0.1419,
+          51.5014
+        ]
+      },
+      "source": "generated_v1.0"
+    }
+  ]
+}

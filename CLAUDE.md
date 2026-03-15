@@ -6,7 +6,7 @@
 - **Language**: Python 3.11+
 - **Package manager**: pip (venv at `.venv/`)
 - **License**: Apache 2.0
-- **Status**: Phase 2 (Ecosystem) — 249 tests passing
+- **Status**: Phase 3 (Platform) — 441 tests passing
 
 ## Architecture
 
@@ -48,7 +48,24 @@ geospark/
 ├── memory/         # Session persistence + spatial memory
 │   ├── session_store.py # Save/resume conversations
 │   └── spatial_memory.py  # Persistent spatial knowledge
-├── bench/          # GeoSpark Bench evaluation framework
+├── bench/          # GeoSpark Bench evaluation framework (5 benchmarks, 535 questions)
+│   ├── datasets/        # JSON benchmark datasets
+│   ├── generate_datasets.py  # Dataset generator
+│   ├── runner.py        # BenchRunner + load/list
+│   └── scorer.py        # Scoring + parsing
+├── flows/          # GeoSpark Flows (workflow automation)
+│   ├── flow_schema.py   # Flow, FlowStep, FlowRoute, FlowRun models
+│   ├── flow_builder.py  # Fluent builder API
+│   ├── flow_runner.py   # Topological execution engine
+│   └── templates.py     # Pre-built flow templates
+├── knowledge/      # Spatial Knowledge Graph
+│   ├── entities.py      # SpatialEntity, SpatialRelation models
+│   ├── graph.py         # SpatialKnowledgeGraph (BFS, auto-relate, query)
+│   └── loaders.py       # GeoJSON + Overpass loaders
+├── plugins/        # Community Plugin System
+│   ├── manifest.py      # PluginManifest (geospark.plugin.json schema)
+│   ├── loader.py        # PluginLoader (discover, load, validate)
+│   └── hooks.py         # PluginHooks (lifecycle callbacks)
 ├── utils/          # Shared utilities
 ├── api.py          # FastAPI REST server (8 endpoints)
 └── cli.py          # CLI entry point (Click + Rich)
@@ -143,7 +160,7 @@ docker compose up geospark     # Just GeoSpark API
 - **Approximate vs geodesic**: For rough estimates use degree-to-meter approximation (111,320 m/deg). For production use pyproj geodesic calculations.
 - **File locks on Windows**: Venv files can get locked by background processes. If venv is corrupted, kill python processes first then recreate.
 
-## Roadmap Phase (Current: Phase 2 complete, Phase 3 next)
+## Roadmap Phase (Current: Phase 3 complete, Phase 4 next)
 
 ### Phase 0 - Foundation (COMPLETE)
 - [x] Protocol schema, spatial engine, CRS handler, 3 tools, CLI, MCP, Docker, CI/CD
@@ -171,8 +188,15 @@ docker compose up geospark     # Just GeoSpark API
 - [x] 4 LLM integrations (OpenAI, Anthropic, Ollama, Generic)
 - [x] 249 passing tests
 
-### Phase 3 - Platform (NEXT)
-- [ ] GeoSpark Flows (AI-powered workflow automation)
-- [ ] Spatial Knowledge Graph
-- [ ] Community plugin system
-- [ ] GeoSpark Bench v1.0 (200+ questions per benchmark)
+### Phase 3 - Platform (COMPLETE)
+- [x] GeoSpark Bench v1.0 (5 benchmarks: GeoTopo 210q, GeoDistance 210q, GeoChange 36q, GeoReason 55q, GeoMultimodal 24q)
+- [x] GeoSpark Flows (flow schema, builder, runner, 4 templates)
+- [x] Spatial Knowledge Graph (entities, relations, BFS, auto-relate, GeoJSON/Overpass loaders)
+- [x] Community Plugin System (manifest, lifecycle hooks, loader, dependency checking)
+- [x] 441 passing tests
+
+### Phase 4 - Scale (NEXT)
+- [ ] Production deployment (cloud hosting, monitoring)
+- [ ] Community marketplace for plugins
+- [ ] Advanced benchmarking (IRT-calibrated difficulty, leaderboard)
+- [ ] Enterprise features (auth, rate limiting, audit logs)

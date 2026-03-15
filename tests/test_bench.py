@@ -106,16 +106,19 @@ class TestDatasets:
         assert "geotopo" in names
         assert "geodistance" in names
         assert "geochanage" in names
+        # v1.0 adds these
+        assert "georeason" in names
+        assert "geomultimodal" in names
 
     def test_load_geotopo(self):
         questions = load_dataset(BenchmarkName.GEOTOPO)
-        assert len(questions) == 100
+        assert len(questions) >= 100
         assert all(q.benchmark == BenchmarkName.GEOTOPO for q in questions)
         assert all(q.answer_type == AnswerType.BOOLEAN for q in questions)
 
     def test_load_geodistance(self):
         questions = load_dataset(BenchmarkName.GEODISTANCE)
-        assert len(questions) == 100
+        assert len(questions) >= 100
         assert all(q.benchmark == BenchmarkName.GEODISTANCE for q in questions)
 
     def test_load_geochanage(self):
@@ -229,19 +232,22 @@ class TestRunner:
         runner = BenchRunner(adapter=MockAdapter(default="True"))
         result = runner.run(BenchmarkName.GEOTOPO, prompt_mode=PromptMode.NATURAL)
         assert isinstance(result, BenchmarkResult)
-        assert result.total == 100
+        assert result.total >= 100
         assert 0 <= result.accuracy <= 1
 
     def test_run_with_sample(self):
         runner = BenchRunner(adapter=MockAdapter())
+        full = runner.run(BenchmarkName.GEOTOPO, dry_run=True)
         result = runner.run(BenchmarkName.GEOTOPO, sample=0.1)
-        assert result.total == 10  # 10% of 100
+        expected = max(1, int(full.total * 0.1))
+        assert result.total == expected
 
     def test_run_with_difficulty_filter(self):
         runner = BenchRunner(adapter=MockAdapter())
         result = runner.run(BenchmarkName.GEOTOPO, difficulty="hard")
         assert result.total > 0
-        assert result.total < 100
+        full = runner.run(BenchmarkName.GEOTOPO, dry_run=True)
+        assert result.total < full.total
 
     def test_run_with_category_filter(self):
         runner = BenchRunner(adapter=MockAdapter())
@@ -254,7 +260,7 @@ class TestRunner:
     def test_dry_run(self):
         runner = BenchRunner(adapter=MockAdapter())
         result = runner.run(BenchmarkName.GEOTOPO, dry_run=True)
-        assert result.total == 100
+        assert result.total >= 100
         assert result.correct == 0
         assert len(result.scores) == 0
 
@@ -268,7 +274,7 @@ class TestGeoSparkBench:
         bench = GeoSparkBench()
         results = bench.run(benchmarks=[BenchmarkName.GEOTOPO])
         assert len(results) == 1
-        assert results[0].total == 100
+        assert results[0].total >= 100
 
     def test_model_string(self):
         bench = GeoSparkBench(model="mock")

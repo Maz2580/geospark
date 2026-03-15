@@ -51,9 +51,12 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
 - **GeoSpark Protocol (GSP)** — A standardized JSON protocol for spatial queries. Like MCP, but for geospatial.
 - **Spatial Reasoning Engine** — Topology, distance, CRS transforms, buffering, area calculations. All geometrically correct.
 - **MCP Server** — Use GeoSpark as a tool in Claude, ChatGPT, or any MCP-compatible AI assistant.
-- **Pluggable Tools** — Geocoding, satellite imagery (STAC), terrain/elevation, change detection, and more.
+- **Pluggable Tools** — Geocoding, satellite imagery (STAC), terrain/elevation, routing, spectral indices, change detection.
+- **GeoSpark Bench** — 535 benchmark questions across 5 suites proving LLMs fail 70%+ on spatial tasks. [See results →](examples/benchmark_demo.ipynb)
+- **GeoSpark Flows** — DAG-based workflow automation with conditional routing and pre-built templates.
+- **Spatial Knowledge Graph** — Entity-relation graph with BFS traversal, auto-relate, and natural language queries.
+- **Plugin System** — Community plugin ecosystem with manifest-based discovery, lifecycle hooks, and dependency management.
 - **Zero-Cost Stack** — OpenRouter free models + Supabase free tier. Full spatial AI at $0/month.
-- **GeoSpark Bench** — Benchmark suite proving LLMs fail 70%+ on spatial tasks. [See results →](examples/benchmark_demo.ipynb)
 
 ## Quick Start
 
@@ -152,21 +155,31 @@ python -m geospark.bench list
 ┌──────────────────────────────────────────────────┐
 │             Spatial Reasoning Engine              │
 │  Topology · Distance · CRS · Buffer · Centroid   │
+│  Planner · Cache · Temporal · Aggregator         │
 └──────────┬───────────────────────────────────────┘
            │
-    ┌──────┴──────┬──────────────┬─────────────┐
-    v             v              v             v
-┌────────┐ ┌──────────┐ ┌──────────┐ ┌────────────┐
-│Geocoder│ │Satellite │ │ Terrain  │ │  Change    │
-│(Nomin.)│ │ (STAC)   │ │(Elevat.) │ │ Detection  │
-└────────┘ └──────────┘ └──────────┘ └────────────┘
+    ┌──────┴──────┬──────────┬──────────┬──────────┐
+    v             v          v          v          v
+┌────────┐ ┌──────────┐ ┌────────┐ ┌────────┐ ┌────────┐
+│Geocoder│ │Satellite │ │Terrain │ │Routing │ │Change  │
+│        │ │(STAC,    │ │(Elev.) │ │(OSRM)  │ │Detect. │
+│        │ │NDVI, EVI)│ │        │ │        │ │        │
+└────────┘ └──────────┘ └────────┘ └────────┘ └────────┘
+           │
+    ┌──────┴──────┬──────────┬──────────┐
+    v             v          v          v
+┌────────┐ ┌──────────┐ ┌────────┐ ┌────────┐
+│ Flows  │ │Knowledge │ │Plugins │ │Spatial │
+│(DAG    │ │Graph     │ │(Commun │ │RAG     │
+│Runner) │ │(BFS,NL)  │ │ity)   │ │        │
+└────────┘ └──────────┘ └────────┘ └────────┘
 ```
 
 ## Benchmark Results
 
-We evaluated **Gemma 12B** on 200 spatial reasoning questions — without any tools, using only its training data. Then we compared to GeoSpark's ground-truth engine.
+GeoSpark Bench v1.0 includes **535 questions** across 5 benchmark suites. We evaluated **Gemma 12B** on spatial reasoning tasks -- without any tools, using only its training data. Then we compared to GeoSpark's ground-truth engine.
 
-### GeoTopo — Topological Reasoning (100 questions)
+### GeoTopo — Topological Reasoning (210 questions)
 
 | Category | LLM Alone | GeoSpark | Gap |
 |----------|-----------|----------|-----|
@@ -178,7 +191,7 @@ We evaluated **Gemma 12B** on 200 spatial reasoning questions — without any to
 | touches (boundary) | 0% | **100%** | +100% |
 | **Overall** | **30%** | **100%** | **+70%** |
 
-### GeoDistance — Distance Reasoning (100 questions)
+### GeoDistance — Distance Reasoning (210 questions)
 
 | Category | LLM Alone | GeoSpark | Gap |
 |----------|-----------|----------|-----|
@@ -187,9 +200,17 @@ We evaluated **Gemma 12B** on 200 spatial reasoning questions — without any to
 | proximity threshold | 84.3% | **100%** | +15.7% |
 | **Overall** | **43%** | **100%** | **+57%** |
 
+### Additional Benchmarks
+
+| Benchmark | Questions | Categories |
+|-----------|-----------|------------|
+| **GeoChange** | 36 | Change detection, change type classification |
+| **GeoReason** | 55 | Multi-step reasoning: transitivity, distance chains, comparative, buffer intersection |
+| **GeoMultimodal** | 24 | Vegetation health, elevation/climate, flood risk, urban classification |
+
 **Key finding**: LLMs can reason about *relative proximity* from world knowledge (84% on "is X near Y?") but **cannot compute** distances or topology from coordinates (0%). GeoSpark fills exactly this gap.
 
-> Evaluated with [GeoSpark Bench](docs/ROADMAP.md) v0.1. Run your own: `python -m geospark.bench run --benchmark geotopo`
+> Evaluated with [GeoSpark Bench](docs/ROADMAP.md) v1.0. Run your own: `python -m geospark.bench run --benchmark geotopo`
 
 ## Why GeoSpark?
 
@@ -203,12 +224,13 @@ We evaluated **Gemma 12B** on 200 spatial reasoning questions — without any to
 
 ## Project Status
 
-| Phase | Status | Description |
-|-------|--------|-------------|
-| **Phase 0** — Foundation | **Complete** | Protocol, engine, tools, integrations, 50 tests |
-| **Phase 1** — Launch | **In Progress** | Benchmark, demo notebook, PyPI, public launch |
-| Phase 2 — Ecosystem | Planned | More tools, memory, spatial RAG, plugin system |
-| Phase 3 — Platform | Planned | GeoSpark Flows, knowledge graph, enterprise |
+| Phase | Status | Tests | Description |
+|-------|--------|-------|-------------|
+| **Phase 0** — Foundation | **Complete** | 50 | Protocol, engine, CRS, tools, CLI, MCP, Docker, CI/CD |
+| **Phase 1** — Launch | **Complete** | 96 | Bench v0.1, baselines, demo notebook, GitHub repo |
+| **Phase 2** — Ecosystem | **Complete** | 249 | 8 tools, RAG, memory, planner, cache, 4 LLM integrations |
+| **Phase 3** — Platform | **Complete** | 441 | Bench v1.0, Flows, Knowledge Graph, Plugin System |
+| Phase 4 — Scale | **Next** | -- | Enterprise features, cloud hosting, marketplace |
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for the detailed roadmap.
 

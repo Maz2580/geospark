@@ -1,7 +1,8 @@
 # GeoSpark: Technical Architecture & Roadmap
 
-**Version**: 1.0
+**Version**: 2.0
 **Date**: March 2026
+**Status**: Phase 3 Complete -- 441 tests passing
 
 ---
 
@@ -189,21 +190,60 @@ geospark/integrations/
 
 ```
 geospark/bench/
-├── runner.py             # Benchmark runner
-├── scorer.py             # Scoring functions
-├── report.py             # Generate evaluation reports
+├── __init__.py           # GeoSparkBench high-level API
+├── models.py             # BenchQuestion, BenchAnswer, ModelAdapter, enums
+├── runner.py             # BenchRunner (load, filter, sample, run)
+├── scorer.py             # Scoring (accuracy, F1, CIs, per-category)
+├── report.py             # Console, markdown, JSON, diff reports
+├── generate_datasets.py  # Reproducible dataset generator
 ├── datasets/
-│   ├── geotopo/          # Topological reasoning test cases
-│   ├── geodistance/      # Distance reasoning test cases
-│   ├── geochanage/       # Change detection test cases
-│   ├── geomultimodal/    # Multimodal spatial test cases
-│   ├── georeason/        # Complex reasoning chains
-│   └── geoworld/         # Real-world questions with ground truth
+│   ├── geotopo.json      # 210 topological reasoning questions
+│   ├── geodistance.json  # 210 distance/proximity questions
+│   ├── geochanage.json   # 36 change detection questions
+│   ├── georeason.json    # 55 multi-step spatial reasoning chains
+│   └── geomultimodal.json # 24 multimodal spatial questions
 └── baselines/
-    ├── gpt4.py           # GPT-4 baseline
-    ├── claude.py         # Claude baseline
-    └── gemini.py         # Gemini baseline
+    └── run_baselines.py  # Run evaluations against LLMs
 ```
+
+**Key Design**: 535 total questions across 5 benchmarks. Dual-prompt design (natural language + structured GeoJSON) on every question. ModelAdapter protocol for plugging in any LLM provider.
+
+### 7. `geospark.flows` -- Workflow Automation
+
+```
+geospark/flows/
+├── __init__.py           # Package exports
+├── flow_schema.py        # Flow, FlowStep, FlowRoute, FlowRun, FlowTrigger
+├── flow_builder.py       # Fluent builder API (chainable add_step/add_route/build)
+├── flow_runner.py        # Topological execution engine (Kahn's algorithm)
+└── templates.py          # Pre-built flow templates (vegetation, distance, area, change)
+```
+
+**Key Design**: Flows are directed acyclic graphs (DAGs) of steps. The runner uses topological sorting to determine execution order, evaluates conditions for dynamic routing, and resolves cross-step parameter references (`{step_id.key}`). Templates provide starting points for common spatial workflows.
+
+### 8. `geospark.knowledge` -- Spatial Knowledge Graph
+
+```
+geospark/knowledge/
+├── __init__.py           # Package exports
+├── entities.py           # SpatialEntity, SpatialRelation (Pydantic models)
+├── graph.py              # SpatialKnowledgeGraph (BFS, auto-relate, query)
+└── loaders.py            # GeoJSONLoader, OverpassLoader
+```
+
+**Key Design**: In-memory graph where entities have geometries and typed relations. Auto-relate discovers spatial relationships (contains, intersects, within, near) between entities. Natural language query parser supports "find X near Y" patterns. BFS for shortest path between entities.
+
+### 9. `geospark.plugins` -- Community Plugin System
+
+```
+geospark/plugins/
+├── __init__.py           # Package exports
+├── manifest.py           # PluginManifest (geospark.plugin.json schema)
+├── loader.py             # PluginLoader (discover, load, validate, unload)
+└── hooks.py              # PluginHooks (5 lifecycle callbacks)
+```
+
+**Key Design**: Plugins are directories containing a `geospark.plugin.json` manifest and a Python module with a `BaseTool` subclass. The loader discovers plugins by scanning directories, validates entry points and dependencies, and dynamically imports tool classes via `importlib`. Hooks provide before/after/error callbacks for tool lifecycle events.
 
 ---
 
@@ -274,134 +314,17 @@ Levels:
 
 ---
 
-## Development Roadmap
+## Development Status
 
-### Phase 0: Foundation (Weeks 1-8)
-*Goal: Working prototype that demonstrates the core value proposition*
+| Phase | Status | Tests | Key Deliverables |
+|-------|--------|-------|-----------------|
+| **Phase 0** - Foundation | **Complete** | 50 | Protocol, engine, CRS, 3 tools, CLI, MCP, Docker, CI/CD |
+| **Phase 1** - Launch | **Complete** | 96 | Bench v0.1 (236q), baselines, demo notebook, GitHub, README |
+| **Phase 2** - Ecosystem | **Complete** | 249 | 8 tools, NormalizedResult, 3 MCP servers, memory, RAG, planner, cache, 4 LLM integrations |
+| **Phase 3** - Platform | **Complete** | 441 | Bench v1.0 (535q), Flows, Knowledge Graph, Plugin System |
+| **Phase 4** - Scale | **Next** | -- | Enterprise features, cloud hosting, marketplace, advanced benchmarking |
 
-**Week 1-2: Protocol & Core**
-- [ ] Define GSP v0.1 JSON schema
-- [ ] Implement Pydantic models for queries and results
-- [ ] Build query parser and validator
-- [ ] Set up project structure, CI/CD, documentation framework
-
-**Week 3-4: Spatial Reasoning Engine**
-- [ ] Topology operations (contains, intersects, touches, crosses, overlaps, within)
-- [ ] Distance calculations (geodesic, Euclidean, driving distance)
-- [ ] CRS detection and automatic transformation
-- [ ] Spatial aggregation (zonal statistics, spatial joins)
-- [ ] H3 spatial indexing integration
-
-**Week 5-6: First Tools**
-- [ ] Geocoder (Nominatim + Overture Maps)
-- [ ] Satellite viewer (STAC client for Sentinel-2)
-- [ ] Terrain analyzer (SRTM/Copernicus DEM)
-- [ ] Band math calculator (NDVI, NDWI)
-
-**Week 7-8: LLM Integration & Demo**
-- [ ] OpenAI function calling integration
-- [ ] Anthropic tool use integration
-- [ ] MCP server implementation
-- [ ] Demo Jupyter notebook: "LLM with GeoSpark vs. LLM alone"
-- [ ] Demo video showing spatial reasoning improvement
-
-**Deliverable**: Working Python package that adds spatial reasoning to any LLM
-
-### Phase 1: Launch (Weeks 9-16)
-*Goal: Public launch with enough features to attract early adopters*
-
-**Week 9-10: GeoSpark Bench v1.0**
-- [ ] GeoTopo benchmark (200 topological reasoning test cases)
-- [ ] GeoDistance benchmark (200 distance reasoning test cases)
-- [ ] GeoChange benchmark (100 change detection cases with satellite imagery)
-- [ ] Baseline evaluations on GPT-4, Claude, Gemini
-- [ ] Academic preprint describing benchmark methodology
-
-**Week 11-12: Additional Tools + CLI**
-- [ ] Route analyzer (OSRM integration)
-- [ ] Climate querier (ERA5 data access)
-- [ ] Land use classifier (ESA WorldCover)
-- [ ] Population estimator (WorldPop data)
-- [ ] Flood risk assessor (basic DEM-based)
-- [ ] CLI interface for all operations
-
-**Week 13-14: Docker & Deployment**
-- [ ] Docker image with all dependencies
-- [ ] Docker Compose for PostGIS + GeoSpark stack
-- [ ] Kubernetes Helm chart
-- [ ] pip install geospark working from PyPI
-- [ ] Documentation site (MkDocs)
-
-**Week 15-16: Launch**
-- [ ] Polish README with compelling visuals
-- [ ] Create demo GIFs/videos
-- [ ] Launch on Hacker News, Reddit r/MachineLearning, r/gis
-- [ ] Submit to FOSS4G conference
-- [ ] Outreach to geospatial AI researchers
-
-**Deliverable**: v1.0 release on PyPI + GitHub with 5,000+ star target
-
-### Phase 2: Ecosystem (Weeks 17-32)
-*Goal: Build community and establish GeoSpark as the standard*
-
-**Weeks 17-20: Spatial RAG**
-- [ ] H3-based spatial chunking
-- [ ] Spatial-aware embedding model
-- [ ] Multi-resolution retrieval
-- [ ] Context window optimization for spatial data
-- [ ] Integration with vector databases (Chroma, Qdrant)
-
-**Weeks 21-24: Multi-Modal Fusion**
-- [ ] Satellite + street-level image alignment
-- [ ] Raster + vector data fusion
-- [ ] Temporal alignment for multi-source data
-- [ ] Sensor data ingestion framework
-- [ ] Text + spatial data combined retrieval
-
-**Weeks 25-28: Community & Plugin System**
-- [ ] Tool submission process (PR-based)
-- [ ] Tool quality scoring and testing framework
-- [ ] Community leaderboard for benchmark submissions
-- [ ] GeoSpark Hub web portal for tool discovery
-- [ ] Partner integrations (Planet, Maxar, UP42)
-
-**Weeks 29-32: Spatial Knowledge Graph**
-- [ ] Administrative boundary graph (global)
-- [ ] POI relationship graph
-- [ ] Land use / land cover context layer
-- [ ] Historical change knowledge base
-- [ ] Graph query interface (Cypher-like spatial queries)
-
-### Phase 3: Scale & Enterprise (Weeks 33-52)
-*Goal: Enterprise readiness, scale, and acquisition positioning*
-
-**Weeks 33-38: Enterprise Features**
-- [ ] Multi-tenant server mode
-- [ ] Authentication & authorization
-- [ ] Audit logging
-- [ ] Rate limiting & usage tracking
-- [ ] SLA-compatible deployment guides
-
-**Weeks 39-44: Scale & Performance**
-- [ ] Distributed query execution (Dask/Ray)
-- [ ] Streaming data support (Kafka/MQTT)
-- [ ] Edge deployment (ARM, NVIDIA Jetson)
-- [ ] Model distillation for on-device reasoning
-- [ ] Planetary-scale indexing optimization
-
-**Weeks 45-48: GeoSpark Bench v2.0**
-- [ ] GeoMultiModal benchmark
-- [ ] GeoReason benchmark (complex chains)
-- [ ] GeoWorld benchmark (real-world questions)
-- [ ] Annual evaluation report published
-- [ ] Integration with Papers With Code
-
-**Weeks 49-52: Strategic Positioning**
-- [ ] NeurIPS/ICLR workshop paper
-- [ ] AGU/EGU conference presentations
-- [ ] Enterprise pilot programs (3-5 organizations)
-- [ ] Open-source foundation setup
-- [ ] Partnership discussions with major AI companies
+See [ROADMAP.md](ROADMAP.md) for the detailed, task-level roadmap.
 
 ---
 

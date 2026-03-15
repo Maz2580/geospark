@@ -6,23 +6,51 @@
 - **Language**: Python 3.11+
 - **Package manager**: pip (venv at `.venv/`)
 - **License**: Apache 2.0
-- **Status**: Phase 0 (Foundation)
+- **Status**: Phase 2 (Ecosystem) — 249 tests passing
 
 ## Architecture
 
 ```
 geospark/
 ├── protocol/       # GSP schema (Pydantic models for queries/results)
-├── engine/         # Spatial reasoning core (topology, CRS, distance)
+├── engine/         # Spatial reasoning core (topology, CRS, distance, planner, cache)
+│   ├── core.py          # Engine orchestrator + QueryChain
+│   ├── spatial_reasoner.py  # Topology, distance, geometric operations
+│   ├── crs_handler.py   # CRS transformations, validation
+│   ├── planner.py       # Query execution planner
+│   ├── temporal_engine.py   # Time-series queries, change detection
+│   ├── aggregator.py    # Zonal stats, spatial joins
+│   └── cache.py         # Spatial-aware LRU caching
 ├── rag/            # Spatial retrieval-augmented generation
-├── tools/          # Pluggable tools (satellite, geocoding, terrain, etc.)
-├── integrations/   # LLM connectors (OpenRouter, MCP, Supabase)
-│   ├── openrouter.py    # Free LLM integration with optimized tool calling
-│   ├── mcp_server.py    # MCP server handler (spatial tools for any AI)
+│   ├── retriever.py     # Spatial + semantic feature retrieval
+│   ├── chunker.py       # Context-window-sized spatial chunks
+│   └── context_builder.py  # Optimal LLM context from spatial data
+├── tools/          # Pluggable tools (8 registered)
+│   ├── geocoding/       # Nominatim geocoder + reverse geocoder
+│   ├── satellite/       # STAC client, NDVI, spectral indices
+│   ├── terrain/         # Elevation (Open Elevation API)
+│   ├── routing/         # OSRM route analyzer
+│   ├── change_detection/  # Pixel change detection
+│   └── normalized_result.py  # Consistent result shape for all tools
+├── integrations/   # LLM connectors (5 providers)
+│   ├── openrouter.py    # Free LLM integration (7 model aliases)
+│   ├── openai_tools.py  # OpenAI function calling
+│   ├── anthropic_tools.py  # Anthropic tool use
+│   ├── ollama_tools.py  # Ollama (local models)
+│   ├── generic.py       # Any OpenAI-compatible API
+│   ├── mcp_server.py    # Monolithic MCP server (legacy)
 │   └── supabase_db.py   # PostGIS spatial database backend
+├── mcp_servers/    # Domain-specific MCP servers (Arion pattern)
+│   ├── spatial_reasoning.py  # Topology, distance, operations
+│   ├── geocoding.py     # Address <-> coordinates
+│   ├── terrain.py       # Elevation queries
+│   └── launcher.py      # Multi-server launcher
+├── memory/         # Session persistence + spatial memory
+│   ├── session_store.py # Save/resume conversations
+│   └── spatial_memory.py  # Persistent spatial knowledge
 ├── bench/          # GeoSpark Bench evaluation framework
 ├── utils/          # Shared utilities
-├── api.py          # FastAPI REST server
+├── api.py          # FastAPI REST server (8 endpoints)
 └── cli.py          # CLI entry point (Click + Rich)
 ```
 
@@ -115,31 +143,36 @@ docker compose up geospark     # Just GeoSpark API
 - **Approximate vs geodesic**: For rough estimates use degree-to-meter approximation (111,320 m/deg). For production use pyproj geodesic calculations.
 - **File locks on Windows**: Venv files can get locked by background processes. If venv is corrupted, kill python processes first then recreate.
 
-## Roadmap Phase (Current: Phase 0 → Phase 1)
+## Roadmap Phase (Current: Phase 2 complete, Phase 3 next)
 
 ### Phase 0 - Foundation (COMPLETE)
-- [x] PRD, Architecture, Business Plan (docs/)
-- [x] Project skeleton with venv + Docker
-- [x] Protocol schema (Pydantic models)
-- [x] Spatial reasoning engine (topology, distance, CRS)
-- [x] First 3 tools (geocoder, satellite, terrain) + change detection stub
-- [x] CLI (geospark.cli)
-- [x] MCP server handler with optimized tool descriptions
-- [x] pyproject.toml with proper extras (geo, api, llm, viz, satellite, postgis)
-- [x] CI/CD (GitHub Actions .github/workflows/ci.yml)
-- [x] Custom Claude skills (.claude/commands/) and agents (.claude/agents/)
-- [x] OpenRouter integration (free LLM + tool calling, 7 model aliases)
-- [x] Supabase PostGIS integration (spatial DB backend)
-- [x] FastAPI REST server (geospark/api.py) with 8 endpoints
-- [x] System prompt optimization (based on Manus/Devin/Cursor/Claude Code analysis)
-- [x] Fallback tool call parser for unreliable free models
-- [x] Full pipeline demo (examples/demo_full_pipeline.py)
-- [x] 50 passing tests (protocol, engine, MCP, OpenRouter, system prompt)
+- [x] Protocol schema, spatial engine, CRS handler, 3 tools, CLI, MCP, Docker, CI/CD
+- [x] OpenRouter + Supabase + FastAPI + system prompt optimization
+- [x] 50 passing tests
 
-### Phase 1 - Launch (IN PROGRESS)
-- [ ] GeoSpark Bench v0.1 (benchmark datasets + runner)
-- [ ] Demo notebook (side-by-side: LLM alone vs LLM + GeoSpark)
-- [ ] Git init + first commit
-- [ ] README.md with badges, quickstart, architecture diagram
-- [ ] PyPI package publish
-- [ ] Public launch (HN, Reddit, Twitter)
+### Phase 1 - Launch (COMPLETE)
+- [x] GeoSpark Bench v0.1 (GeoTopo 100q, GeoDistance 100q, GeoChange 36q)
+- [x] Baseline evaluation (Gemma 12B: 30% topo / 43% distance vs GeoSpark 100%)
+- [x] Demo notebook (examples/benchmark_demo.ipynb)
+- [x] Quickstart + MCP server examples
+- [x] Git init + GitHub repo (github.com/Maz2580/geospark)
+- [x] README with badges, benchmark table, architecture diagram
+- [x] PyPI package build working
+- [x] Launch post drafts (docs/launch/)
+
+### Phase 2 - Ecosystem (COMPLETE)
+- [x] NDVI + Spectral Indices tools (6 indices)
+- [x] Reverse geocoder + OSRM route analyzer
+- [x] Normalized tool result shape (NormalizedResult)
+- [x] 3 domain-specific MCP servers + launcher
+- [x] Session persistence + spatial memory
+- [x] Spatial RAG (retriever, chunker, context builder)
+- [x] Query planner, temporal engine, aggregator, cache
+- [x] 4 LLM integrations (OpenAI, Anthropic, Ollama, Generic)
+- [x] 249 passing tests
+
+### Phase 3 - Platform (NEXT)
+- [ ] GeoSpark Flows (AI-powered workflow automation)
+- [ ] Spatial Knowledge Graph
+- [ ] Community plugin system
+- [ ] GeoSpark Bench v1.0 (200+ questions per benchmark)

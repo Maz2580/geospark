@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Maz2580/geospark/actions"><img src="https://img.shields.io/github/actions/workflow/status/geospark/geospark/ci.yml?branch=main&label=tests" alt="CI"></a>
+  <a href="https://github.com/Maz2580/geospark/actions"><img src="https://img.shields.io/github/actions/workflow/status/Maz2580/geospark/ci.yml?branch=main&label=tests" alt="CI"></a>
   <a href="https://pypi.org/project/geospark/"><img src="https://img.shields.io/pypi/v/geospark?color=blue" alt="PyPI"></a>
   <a href="https://pypi.org/project/geospark/"><img src="https://img.shields.io/pypi/pyversions/geospark" alt="Python"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
@@ -53,7 +53,7 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
 - **MCP Server** — Use GeoSpark as a tool in Claude, ChatGPT, or any MCP-compatible AI assistant.
 - **Pluggable Tools** — Geocoding, satellite imagery (STAC), terrain/elevation, change detection, and more.
 - **Zero-Cost Stack** — OpenRouter free models + Supabase free tier. Full spatial AI at $0/month.
-- **GeoSpark Bench** — Benchmark suite for evaluating spatial reasoning in AI models (coming soon).
+- **GeoSpark Bench** — Benchmark suite proving LLMs fail 70%+ on spatial tasks. [See results →](examples/benchmark_demo.ipynb)
 
 ## Quick Start
 
@@ -119,6 +119,19 @@ docker run -p 8000:8000 geospark/geospark:latest
 
 # Full stack with PostGIS
 docker compose up
+```
+
+### Run the Benchmark
+
+```bash
+# Run GeoSpark Bench on topological reasoning
+python -m geospark.bench run --benchmark geotopo
+
+# Run all benchmarks
+python -m geospark.bench run
+
+# List available benchmarks
+python -m geospark.bench list
 ```
 
 ## Architecture

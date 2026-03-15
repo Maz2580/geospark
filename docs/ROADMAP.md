@@ -1,7 +1,7 @@
 # GeoSpark Roadmap
 
 **Last updated**: March 2026
-**Current phase**: Phase 1C (Demo Notebook)
+**Current phase**: Phase 1D (Launch) / Phase 2A (Remote Sensing Tools)
 
 This is the **working roadmap** -- the concrete, ordered steps we follow session by session.
 For the full strategic vision, see PRD.md, ARCHITECTURE.md, and BUSINESS_PLAN.md.
@@ -79,26 +79,26 @@ Results show clear accuracy gap (LLM alone ~40% vs LLM+GeoSpark ~95%+).
 
 This is the thing people screenshot and share. It must be visually compelling.
 
-- [ ] Jupyter notebook: `examples/benchmark_demo.ipynb`
-  - Side-by-side: "GPT-4 alone" vs "GPT-4 + GeoSpark" on 10 spatial questions
-  - Rich tables showing accuracy comparison
-  - Map visualizations (folium) of correct vs incorrect answers
-- [ ] 60-second demo GIF or screenshot for README
-- [ ] Example scripts for common use cases:
-  - `examples/quickstart.py` -- 10 lines to add spatial reasoning to any LLM
+- [x] Jupyter notebook: `examples/benchmark_demo.ipynb`
+  - Side-by-side: LLM alone vs LLM + GeoSpark on spatial questions
+  - Rich tables showing accuracy comparison across all benchmark categories
+  - CRS handling demo, distance computation, topology checks
+- [x] Example scripts for common use cases:
+  - `examples/quickstart.py` -- 15 lines to add spatial reasoning to any LLM
   - `examples/mcp_server.py` -- run GeoSpark as MCP server for Claude
+- [ ] 60-second demo GIF or screenshot for README
 
 **Exit criteria**: Non-technical person can look at the notebook and immediately
 understand why GeoSpark matters.
 
 ### Phase 1D: Launch
 
-- [ ] Polish README (badges, install instructions, architecture diagram, benchmark table)
-- [ ] Create PyPI package (`pip install geospark`)
-- [ ] Prepare launch posts:
+- [x] Polish README (badges, install instructions, architecture diagram, benchmark table)
+- [x] Prepare launch posts (docs/launch/):
   - Hacker News: "GeoSpark: Give any AI model spatial reasoning (LLMs fail 80% of spatial tasks)"
   - Reddit r/MachineLearning, r/gis, r/Python
-  - Twitter/X thread
+- [ ] Create PyPI package (`pip install geospark`)
+- [ ] Twitter/X thread
 - [ ] Submit to FOSS4G / academic venue
 
 **Exit criteria**: Project is public, installable, and getting stars.

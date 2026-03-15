@@ -1,1 +1,1 @@
-"""Geocoding tools."""
+"""Geocoding and reverse geocoding tools."""

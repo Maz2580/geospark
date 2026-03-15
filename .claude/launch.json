@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "GeoSpark API Server",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "uvicorn", "geospark.api:app", "--reload", "--port", "8000"],
+      "port": 8000
+    },
+    {
+      "name": "GeoSpark Bench Runner",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "geospark.bench", "run", "--benchmark", "geotopo"],
+      "port": 0
+    }
+  ]
+}

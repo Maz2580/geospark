@@ -12,9 +12,13 @@ from geospark.tools.base import BaseTool
 # Lazy imports for tools to avoid loading unused dependencies
 TOOL_CLASSES: dict[str, str] = {
     "geocoder": "geospark.tools.geocoding.nominatim.NominatimGeocoder",
+    "reverse_geocoder": "geospark.tools.geocoding.reverse.ReverseGeocoder",
     "satellite": "geospark.tools.satellite.stac_client.STACTool",
+    "ndvi": "geospark.tools.satellite.ndvi.NDVITool",
+    "spectral_indices": "geospark.tools.satellite.spectral_indices.SpectralIndicesTool",
     "terrain": "geospark.tools.terrain.elevation.ElevationTool",
     "change_detection": "geospark.tools.change_detection.pixel_change.PixelChangeTool",
+    "router": "geospark.tools.routing.osrm.OSRMRouteTool",
 }
 
 

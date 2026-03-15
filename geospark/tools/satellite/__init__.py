@@ -1,1 +1,1 @@
-"""Satellite imagery tools."""
+"""Satellite imagery and spectral analysis tools."""

@@ -143,10 +143,22 @@ class SpatialOperation(str, Enum):
     BAND_MATH = "band_math"
     CHANGE_DETECTION = "change_detection"
 
+    # Spectral Indices
+    NDVI = "ndvi"
+    EVI = "evi"
+    SAVI = "savi"
+    NDWI = "ndwi"
+    MNDWI = "mndwi"
+    NDBI = "ndbi"
+
     # Terrain
     ELEVATION = "elevation"
     SLOPE = "slope"
     VIEWSHED = "viewshed"
+
+    # Routing
+    ROUTE = "route"
+    ISOCHRONE = "isochrone"
 
 
 # --- Query & Result ---

@@ -1,0 +1,38 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, geospark]
+
+    steps:
+      - name: Pull latest code
+        run: |
+          cd /mnt/geospark
+          git pull origin main
+
+      - name: Rebuild and restart containers
+        run: |
+          cd /mnt/geospark
+          sudo docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+
+      - name: Wait for healthy
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8080/health > /dev/null 2>&1; then
+              echo "GeoSpark is healthy!"
+              curl -s http://localhost:8080/health
+              exit 0
+            fi
+            echo "Waiting for health check... ($i/30)"
+            sleep 2
+          done
+          echo "Health check failed after 60s"
+          exit 1
+
+      - name: Cleanup old Docker images
+        run: |
+          sudo docker image prune -f

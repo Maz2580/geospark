@@ -1,6 +1,6 @@
 # Production compose -- lightweight for free-tier VMs
 # Uses Supabase (remote) for DB, no local PostGIS/Redis needed
-# GeoSpark tunnel runs in Docker (separate from host's UrbanMind tunnel)
+# Cloudflare tunnel runs as a separate systemd service (cloudflared-geospark)
 #
 # Usage:
 #   docker compose -f docker-compose.prod.yml up -d
@@ -32,18 +32,3 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: geospark-tunnel
-    command: tunnel run
-    network_mode: host
-    environment:
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
-    depends_on:
-      - geospark
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 128M

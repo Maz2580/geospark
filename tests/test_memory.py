@@ -2,9 +2,6 @@
 from __future__ import annotations
 
 import tempfile
-from pathlib import Path
-
-import pytest
 
 from geospark.memory.session_store import Session, SessionStore
 from geospark.memory.spatial_memory import SpatialMemory, SpatialMemoryEntry

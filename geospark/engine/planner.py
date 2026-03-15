@@ -8,7 +8,7 @@ enabling multi-step spatial analysis pipelines.
 from __future__ import annotations
 
 import uuid
-from typing import Any
+from typing import Any, ClassVar
 
 from pydantic import BaseModel, Field
 
@@ -39,10 +39,10 @@ class QueryPlanner:
     """
 
     # Operations that can be parallelised (no geometry dependency)
-    _INDEPENDENT_OPS: set[str] = {"geocode", "reverse_geocode", "elevation"}
+    _INDEPENDENT_OPS: ClassVar[set[str]] = {"geocode", "reverse_geocode", "elevation"}
 
     # Operations that must run after geometry is available
-    _GEOMETRY_OPS: set[str] = {
+    _GEOMETRY_OPS: ClassVar[set[str]] = {
         "buffer", "centroid", "convex_hull", "area", "distance",
     }
 

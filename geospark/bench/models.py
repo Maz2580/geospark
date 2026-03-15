@@ -12,7 +12,6 @@ from typing import Any, Protocol, runtime_checkable
 
 from pydantic import BaseModel, Field
 
-
 # ---------------------------------------------------------------------------
 # Enums (no raw strings — Jordan's feedback)
 # ---------------------------------------------------------------------------

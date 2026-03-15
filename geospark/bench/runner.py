@@ -21,8 +21,7 @@ from geospark.bench.models import (
     ModelAdapter,
     PromptMode,
 )
-from geospark.bench.scorer import score_benchmark, BenchmarkResult
-
+from geospark.bench.scorer import BenchmarkResult, score_benchmark
 
 DATASETS_DIR = Path(__file__).parent / "datasets"
 
@@ -33,7 +32,7 @@ def load_dataset(benchmark: BenchmarkName) -> list[BenchQuestion]:
     if not path.exists():
         raise FileNotFoundError(f"Benchmark dataset not found: {path}")
 
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         data = json.load(f)
 
     return [BenchQuestion(**q) for q in data["questions"]]
@@ -45,7 +44,7 @@ def list_benchmarks() -> list[dict[str, Any]]:
     for name in BenchmarkName:
         path = DATASETS_DIR / f"{name.value}.json"
         if path.exists():
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 data = json.load(f)
             benchmarks.append({
                 "name": name.value,
@@ -155,8 +154,8 @@ class BenchRunner:
 
     def _parse_response(self, response: str, question: BenchQuestion) -> Any:
         """Extract a structured answer from the model's free-text response."""
-        from geospark.bench.scorer import parse_boolean, parse_numeric, parse_category
         from geospark.bench.models import AnswerType
+        from geospark.bench.scorer import parse_boolean, parse_category, parse_numeric
 
         if question.answer_type == AnswerType.BOOLEAN:
             return parse_boolean(response)

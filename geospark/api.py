@@ -22,7 +22,6 @@ from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.protocol.schema import (
     Point,
-    SpatialFeature,
     SpatialOperation,
     SpatialQuery,
     SpatialResult,
@@ -151,12 +150,12 @@ async def spatial_query(request: SpatialQueryRequest):
 
     try:
         op = SpatialOperation(request.operation)
-    except ValueError:
+    except ValueError as e:
         raise HTTPException(
             status_code=400,
             detail=f"Unknown operation: {request.operation}. "
             f"Available: {[o.value for o in SpatialOperation]}",
-        )
+        ) from e
 
     query = SpatialQuery(
         operation=op,
@@ -185,7 +184,7 @@ async def check_relationship(request: RelationshipRequest):
             result=result,
         )
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @app.post("/api/v1/ask", response_model=AskResponse)
@@ -216,7 +215,7 @@ async def ask(request: AskRequest):
             tokens_used=answer.tokens_used,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.get("/api/v1/tools")

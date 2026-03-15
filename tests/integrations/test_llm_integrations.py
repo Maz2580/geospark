@@ -8,14 +8,11 @@ from __future__ import annotations
 import json
 from unittest.mock import MagicMock, patch
 
-import pytest
-
-from geospark.integrations.openai_tools import OpenAIClient
 from geospark.integrations.anthropic_tools import AnthropicClient
-from geospark.integrations.ollama_tools import OllamaClient
 from geospark.integrations.generic import GenericLLMClient
+from geospark.integrations.ollama_tools import OllamaClient
+from geospark.integrations.openai_tools import OpenAIClient
 from geospark.integrations.openrouter import SpatialAnswer
-
 
 # ---------------------------------------------------------------------------
 # Instantiation tests (no API key required)

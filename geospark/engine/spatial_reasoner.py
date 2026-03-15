@@ -10,17 +10,16 @@ from __future__ import annotations
 
 from typing import Any
 
-import shapely
-from shapely.geometry import shape, mapping
-from shapely import ops
 from pyproj import Geod
+from shapely import ops
+from shapely.geometry import mapping, shape
 
 from geospark.protocol.schema import (
-    SpatialQuery,
-    SpatialResult,
     SpatialContext,
     SpatialFeature,
     SpatialOperation,
+    SpatialQuery,
+    SpatialResult,
 )
 
 

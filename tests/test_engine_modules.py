@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pytest
 
-from geospark.engine.aggregator import SpatialAggregator, ZonalStats
+from geospark.engine.aggregator import SpatialAggregator
 from geospark.engine.cache import SpatialCache
 from geospark.engine.planner import PlannedStep, QueryPlanner
 from geospark.engine.temporal_engine import (
@@ -14,7 +14,6 @@ from geospark.engine.temporal_engine import (
     TemporalEngine,
 )
 from geospark.protocol.schema import Point, SpatialOperation, SpatialQuery
-
 
 # ---------------------------------------------------------------------------
 # QueryPlanner

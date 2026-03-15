@@ -1,7 +1,7 @@
 """Base MCP server with shared tool dispatch pattern."""
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 
 class BaseMCPServer:
@@ -11,8 +11,8 @@ class BaseMCPServer:
     pattern ensures consistent error handling and result format.
     """
 
-    server_name: str = "geospark"
-    tools: list[dict[str, Any]] = []
+    server_name: ClassVar[str] = "geospark"
+    tools: ClassVar[list[dict[str, Any]]] = []
 
     def get_tools(self) -> list[dict[str, Any]]:
         """Return MCP tool definitions for this server."""

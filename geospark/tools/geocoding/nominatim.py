@@ -6,14 +6,16 @@ Uses OpenStreetMap's Nominatim service for geocoding and reverse geocoding.
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 import httpx
 
 from geospark.protocol.schema import (
-    SpatialQuery,
-    SpatialResult,
     SpatialContext,
     SpatialFeature,
     SpatialOperation,
+    SpatialQuery,
+    SpatialResult,
 )
 from geospark.tools.base import BaseTool
 
@@ -23,13 +25,13 @@ class NominatimGeocoder(BaseTool):
 
     name = "geocoder"
     description = "Convert addresses to coordinates and coordinates to addresses"
-    supported_operations = [
+    supported_operations: ClassVar[list[str]] = [
         SpatialOperation.GEOCODE.value,
         SpatialOperation.REVERSE_GEOCODE.value,
     ]
 
-    BASE_URL = "https://nominatim.openstreetmap.org"
-    HEADERS = {"User-Agent": "GeoSpark/0.1 (https://github.com/geospark/geospark)"}
+    BASE_URL: ClassVar[str] = "https://nominatim.openstreetmap.org"
+    HEADERS: ClassVar[dict[str, str]] = {"User-Agent": "GeoSpark/0.1 (https://github.com/geospark/geospark)"}
 
     def execute(self, query: SpatialQuery) -> SpatialResult:
         """Execute geocoding operation."""

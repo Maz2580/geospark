@@ -11,14 +11,13 @@ Usage:
 from __future__ import annotations
 
 import sys
-import json
 
 import click
 from rich.console import Console
 
+from geospark.bench import report
 from geospark.bench.models import BenchmarkName, MockAdapter, PromptMode
 from geospark.bench.runner import BenchRunner, list_benchmarks
-from geospark.bench import report
 
 console = Console()
 
@@ -103,7 +102,7 @@ def _resolve_adapter(model: str):
     # OpenRouter free models
     if model.startswith("openrouter:") or "/" in model:
         try:
-            from geospark.integrations.openrouter import OpenRouterClient
+            from geospark.integrations.openrouter import OpenRouterClient  # noqa: F401
             return _OpenRouterAdapter(model.replace("openrouter:", ""))
         except ImportError:
             console.print("[red]OpenRouter integration not available. Install with: pip install geospark[llm][/red]")

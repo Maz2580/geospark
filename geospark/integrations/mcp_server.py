@@ -13,20 +13,16 @@ Usage:
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.protocol.schema import (
     Point,
-    Polygon,
+    SpatialFilter,
     SpatialOperation,
     SpatialQuery,
-    SpatialFilter,
-    TemporalFilter,
 )
-
 
 # Tool definitions in MCP format
 # Pattern: "What it does. When to use it. What it returns. Do NOT use for X."

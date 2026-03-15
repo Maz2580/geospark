@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from geospark.tools.base import BaseTool
 
-
 # Lazy imports for tools to avoid loading unused dependencies
 TOOL_CLASSES: dict[str, str] = {
     "geocoder": "geospark.tools.geocoding.nominatim.NominatimGeocoder",

@@ -1,13 +1,12 @@
 """Tests for GeoSpark Engine."""
 
-import pytest
 from geospark.engine.core import Engine
-from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.engine.crs_handler import CRSHandler
+from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.protocol.schema import (
     Point,
-    SpatialQuery,
     SpatialOperation,
+    SpatialQuery,
 )
 
 

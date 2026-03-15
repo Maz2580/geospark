@@ -8,30 +8,27 @@ All tests run with MockAdapter — no live LLM calls needed.
 from __future__ import annotations
 
 import json
-import pytest
 
 from geospark.bench import (
-    GeoSparkBench,
     BenchmarkName,
     BenchmarkResult,
     BenchQuestion,
+    GeoSparkBench,
     MockAdapter,
     PromptMode,
-    load_dataset,
     list_benchmarks,
+    load_dataset,
     report,
 )
 from geospark.bench.models import AnswerType, Difficulty
+from geospark.bench.runner import BenchRunner
 from geospark.bench.scorer import (
     parse_boolean,
-    parse_numeric,
     parse_category,
+    parse_numeric,
     score_question,
-    score_benchmark,
 )
-from geospark.bench.runner import BenchRunner
 from geospark.engine.spatial_reasoner import SpatialReasoner
-
 
 # ---------------------------------------------------------------------------
 # Test: Answer Parsing

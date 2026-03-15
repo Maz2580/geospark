@@ -1,11 +1,9 @@
 """Tests for the GeoSpark Spatial RAG module."""
 from __future__ import annotations
 
-import pytest
-
 from geospark.rag.chunker import SpatialChunker
 from geospark.rag.context_builder import ContextBuilder
-from geospark.rag.retriever import RetrievedFeature, SpatialRetriever
+from geospark.rag.retriever import SpatialRetriever
 
 # Sample features for testing
 SAMPLE_FEATURES = [

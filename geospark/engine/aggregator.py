@@ -69,8 +69,8 @@ class SpatialAggregator:
         percentiles = {}
         for p in (25, 50, 75):
             idx = (p / 100) * (n - 1)
-            lo = int(math.floor(idx))
-            hi = int(math.ceil(idx))
+            lo = math.floor(idx)
+            hi = math.ceil(idx)
             if lo == hi:
                 percentiles[f"p{p}"] = sorted_vals[lo]
             else:
@@ -159,11 +159,11 @@ class SpatialAggregator:
         """
         try:
             import h3  # type: ignore[import-untyped]
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 "h3 package required for hexagonal aggregation. "
                 "Install with: pip install h3"
-            )
+            ) from e
 
         cells: dict[str, list[dict[str, Any]]] = {}
         for feat in features:

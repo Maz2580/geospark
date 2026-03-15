@@ -9,9 +9,9 @@ from __future__ import annotations
 import time
 from typing import Any
 
-from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.engine.crs_handler import CRSHandler
-from geospark.protocol.schema import SpatialQuery, SpatialResult, SpatialContext
+from geospark.engine.spatial_reasoner import SpatialReasoner
+from geospark.protocol.schema import SpatialContext, SpatialQuery, SpatialResult
 from geospark.tools.registry import ToolRegistry
 
 

@@ -1,7 +1,7 @@
 """MCP server for spatial reasoning — topology, distance, containment."""
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
@@ -18,7 +18,7 @@ class SpatialReasoningServer(BaseMCPServer):
 
     server_name = "geospark-spatial-reasoning"
 
-    tools = [
+    tools: ClassVar[list[dict[str, Any]]] = [
         {
             "name": "check_spatial_relationship",
             "description": (

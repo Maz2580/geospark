@@ -1,13 +1,14 @@
 """Tests for OpenRouter integration."""
 
 import os
-import pytest
 from unittest.mock import patch
 
+import pytest
+
 from geospark.integrations.openrouter import (
-    OpenRouterClient,
     FREE_MODELS,
     GEOSPARK_SYSTEM_PROMPT,
+    OpenRouterClient,
     SpatialAnswer,
 )
 
@@ -132,9 +133,9 @@ class TestSpatialAnswer:
 
 class TestOpenRouterClient:
     def test_requires_api_key(self):
-        with patch.dict(os.environ, {"OPENROUTER_API_KEY": ""}, clear=False):
-            with pytest.raises(ValueError, match="API key required"):
-                OpenRouterClient(api_key="")
+        with patch.dict(os.environ, {"OPENROUTER_API_KEY": ""}, clear=False), \
+                pytest.raises(ValueError, match="API key required"):
+            OpenRouterClient(api_key="")
 
     def test_list_free_models(self):
         with patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-key"}):

@@ -7,19 +7,18 @@ from satellite imagery bands.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 import httpx
 
 from geospark.protocol.schema import (
-    SpatialQuery,
-    SpatialResult,
     SpatialContext,
     SpatialFeature,
     SpatialOperation,
+    SpatialQuery,
+    SpatialResult,
 )
 from geospark.tools.base import BaseTool
-
 
 # Index definitions: formula, description, and required bands
 SPECTRAL_INDEX_FORMULAS: dict[str, dict[str, Any]] = {
@@ -82,7 +81,7 @@ class SpectralIndicesTool(BaseTool):
         "urban areas. Returns index metadata and formula info. "
         "Do NOT use for raw band download."
     )
-    supported_operations = [
+    supported_operations: ClassVar[list[str]] = [
         SpatialOperation.NDVI.value,
         SpatialOperation.EVI.value,
         SpatialOperation.SAVI.value,

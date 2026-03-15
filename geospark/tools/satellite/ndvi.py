@@ -8,16 +8,16 @@ stubs for when raster data is available.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 import httpx
 
 from geospark.protocol.schema import (
-    SpatialQuery,
-    SpatialResult,
     SpatialContext,
     SpatialFeature,
     SpatialOperation,
+    SpatialQuery,
+    SpatialResult,
 )
 from geospark.tools.base import BaseTool
 
@@ -37,7 +37,7 @@ class NDVITool(BaseTool):
         "land cover analysis. Returns scene metadata and NDVI stats. "
         "Do NOT use for water or urban indices."
     )
-    supported_operations = [
+    supported_operations: ClassVar[list[str]] = [
         SpatialOperation.NDVI.value,
         SpatialOperation.BAND_MATH.value,
     ]

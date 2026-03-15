@@ -6,25 +6,23 @@ and mocked HTTP responses. All tests run offline (no network calls).
 
 from __future__ import annotations
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import numpy as np
-import pytest
 
 from geospark.protocol.schema import (
     Point,
-    SpatialQuery,
     SpatialOperation,
-)
-from geospark.tools.satellite.ndvi import NDVITool
-from geospark.tools.satellite.spectral_indices import (
-    SpectralIndicesTool,
-    SPECTRAL_INDEX_FORMULAS,
+    SpatialQuery,
 )
 from geospark.tools.geocoding.reverse import ReverseGeocoder
+from geospark.tools.registry import TOOL_CLASSES, ToolRegistry
 from geospark.tools.routing.osrm import OSRMRouteTool
-from geospark.tools.registry import ToolRegistry, TOOL_CLASSES
-
+from geospark.tools.satellite.ndvi import NDVITool
+from geospark.tools.satellite.spectral_indices import (
+    SPECTRAL_INDEX_FORMULAS,
+    SpectralIndicesTool,
+)
 
 # ---- Instantiation & Schema Tests ----
 
@@ -331,7 +329,7 @@ class TestOSRMRouteURL:
     def test_extract_points_missing_metadata(self):
         tool = OSRMRouteTool()
         query = SpatialQuery(operation=SpatialOperation.ROUTE)
-        origin, dest, error = tool._extract_points(query)
+        origin, _dest, error = tool._extract_points(query)
         assert error is not None
         assert origin is None
 

@@ -7,16 +7,16 @@ using OpenStreetMap's Nominatim service.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 import httpx
 
 from geospark.protocol.schema import (
-    SpatialQuery,
-    SpatialResult,
     SpatialContext,
     SpatialFeature,
     SpatialOperation,
+    SpatialQuery,
+    SpatialResult,
 )
 from geospark.tools.base import BaseTool
 
@@ -34,10 +34,10 @@ class ReverseGeocoder(BaseTool):
         "lon/lat and need a human-readable location. Returns address "
         "components. Do NOT use for address-to-coordinate lookups."
     )
-    supported_operations = [SpatialOperation.REVERSE_GEOCODE.value]
+    supported_operations: ClassVar[list[str]] = [SpatialOperation.REVERSE_GEOCODE.value]
 
-    BASE_URL = "https://nominatim.openstreetmap.org/reverse"
-    HEADERS = {"User-Agent": "GeoSpark/0.1 (https://github.com/geospark/geospark)"}
+    BASE_URL: ClassVar[str] = "https://nominatim.openstreetmap.org/reverse"
+    HEADERS: ClassVar[dict[str, str]] = {"User-Agent": "GeoSpark/0.1 (https://github.com/geospark/geospark)"}
 
     def execute(self, query: SpatialQuery) -> SpatialResult:
         """Execute reverse geocoding.

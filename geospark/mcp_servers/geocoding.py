@@ -1,7 +1,7 @@
 """MCP server for geocoding — address to coordinates and reverse."""
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 from geospark.engine.core import Engine
 from geospark.mcp_servers.base import BaseMCPServer
@@ -16,7 +16,7 @@ class GeocodingServer(BaseMCPServer):
 
     server_name = "geospark-geocoding"
 
-    tools = [
+    tools: ClassVar[list[dict[str, Any]]] = [
         {
             "name": "geocode",
             "description": (

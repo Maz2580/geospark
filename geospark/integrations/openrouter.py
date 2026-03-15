@@ -25,10 +25,7 @@ from typing import Any
 
 import httpx
 
-from geospark.engine.core import Engine
 from geospark.integrations.mcp_server import MCP_TOOLS, GeoSparkMCPHandler
-from geospark.protocol.schema import SpatialResult
-
 
 # Best free models ranked by quality for geospatial tasks
 FREE_MODELS = {

@@ -45,7 +45,7 @@ def query(query_json: str) -> None:
 def geocode(address: str) -> None:
     """Geocode an address to coordinates."""
     from geospark import Engine
-    from geospark.protocol.schema import SpatialQuery, SpatialOperation
+    from geospark.protocol.schema import SpatialOperation, SpatialQuery
 
     engine = Engine(tools=["geocoder"])
     q = SpatialQuery(
@@ -78,7 +78,7 @@ def geocode(address: str) -> None:
 def elevation(lat: float, lon: float) -> None:
     """Get elevation at a coordinate (lat lon)."""
     from geospark import Engine
-    from geospark.protocol.schema import SpatialQuery, SpatialOperation, Point
+    from geospark.protocol.schema import Point, SpatialOperation, SpatialQuery
 
     engine = Engine(tools=["terrain"])
     q = SpatialQuery(

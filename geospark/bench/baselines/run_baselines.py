@@ -1,5 +1,5 @@
 """
-GeoSpark Bench — Baseline LLM Evaluation.
+GeoSpark Bench -- Baseline LLM Evaluation.
 
 Runs benchmarks against real LLMs to measure the accuracy gap between:
   - LLM alone (no tools, raw spatial reasoning)
@@ -16,24 +16,20 @@ Usage:
 
 from __future__ import annotations
 
-import json
 import os
 import sys
 import time
 from pathlib import Path
 
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-
-from dotenv import load_dotenv
-load_dotenv()
-
 import click
 import httpx
+from dotenv import load_dotenv
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.table import Table
+
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from geospark.bench import (
     BenchmarkName,
@@ -43,14 +39,13 @@ from geospark.bench import (
     load_dataset,
     report,
 )
-from geospark.bench.models import ModelAdapter
 from geospark.integrations.openrouter import FREE_MODELS
 
 console = Console()
 RESULTS_DIR = Path(__file__).parent / "results"
 
 # Models confirmed working for bench evaluations
-# (free tier rate limits vary — these are reliably available)
+# (free tier rate limits vary -- these are reliably available)
 BENCH_MODELS = {
     "gemma-12b": "google/gemma-3-12b-it:free",
     "gemma-4b": "google/gemma-3-4b-it:free",
@@ -59,7 +54,7 @@ BENCH_MODELS = {
 
 
 # ---------------------------------------------------------------------------
-# LLM-Only Adapter (no tools — tests raw spatial reasoning)
+# LLM-Only Adapter (no tools -- tests raw spatial reasoning)
 # ---------------------------------------------------------------------------
 
 class LLMOnlyAdapter:
@@ -106,7 +101,7 @@ class LLMOnlyAdapter:
         """Send prompt to LLM without any tools."""
         self._request_count += 1
 
-        # Proactive rate limiting — stay under free tier limits (~10 req/min)
+        # Proactive rate limiting -- stay under free tier limits (~10 req/min)
         if self._request_count > 1:
             time.sleep(8)
 
@@ -191,7 +186,7 @@ def generate_readme_table(results: list[BenchmarkResult]) -> str:
         ci_hi = max(s.ci_upper for s in r.by_difficulty.values()) if r.by_difficulty else 1
         lines.append(
             f"| {r.benchmark.value} | {r.model_id} | {r.prompt_mode.value} | "
-            f"**{r.accuracy:.1%}** | {r.correct}/{r.total} | {ci_lo:.0%}–{ci_hi:.0%} |"
+            f"**{r.accuracy:.1%}** | {r.correct}/{r.total} | {ci_lo:.0%}-{ci_hi:.0%} |"
         )
 
     lines.append("")
@@ -229,9 +224,10 @@ def generate_readme_table(results: list[BenchmarkResult]) -> str:
 )
 def main(benchmark, models, sample, mode):
     """Run baseline LLM evaluations for GeoSpark Bench."""
+    load_dotenv()
 
     console.print(Panel(
-        "[bold]GeoSpark Bench — Baseline LLM Evaluation[/bold]\n\n"
+        "[bold]GeoSpark Bench -- Baseline LLM Evaluation[/bold]\n\n"
         "Running benchmarks against LLMs WITHOUT spatial tools.\n"
         "This measures raw spatial reasoning ability.",
         title="GeoSpark Bench",
@@ -242,13 +238,9 @@ def main(benchmark, models, sample, mode):
         benchmarks = [BenchmarkName(benchmark)]
     else:
         benchmarks = [BenchmarkName.GEOTOPO, BenchmarkName.GEODISTANCE]
-        # Skip geochanage for now — it's knowledge-based, not reasoning
 
     # Determine prompt modes
-    if mode == "both":
-        modes = [PromptMode.NATURAL, PromptMode.STRUCTURED]
-    else:
-        modes = [PromptMode(mode)]
+    modes = [PromptMode.NATURAL, PromptMode.STRUCTURED] if mode == "both" else [PromptMode(mode)]
 
     # Calculate total runs
     total_runs = len(benchmarks) * len(models) * len(modes)
@@ -289,7 +281,7 @@ def main(benchmark, models, sample, mode):
 
     # Summary comparison
     if len(all_results) > 1:
-        console.print(Panel("[bold]Summary — All Results[/bold]"))
+        console.print(Panel("[bold]Summary -- All Results[/bold]"))
         table = Table(title="Baseline Accuracy (LLM only, no GeoSpark tools)")
         table.add_column("Benchmark", style="cyan")
         table.add_column("Model", style="green")

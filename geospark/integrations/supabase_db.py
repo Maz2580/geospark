@@ -51,10 +51,10 @@ class SupabaseBackend:
             try:
                 from supabase import create_client
                 self._client = create_client(self.url, self.key)
-            except ImportError:
+            except ImportError as e:
                 raise ImportError(
                     "supabase package required: pip install supabase"
-                )
+                ) from e
         return self._client
 
     async def initialize_schema(self) -> None:
@@ -197,7 +197,6 @@ $$ LANGUAGE plpgsql;
         source: str | None = None,
     ) -> dict[str, Any]:
         """Store a spatial feature in Supabase."""
-        import json
 
         data = {
             "geometry": f"SRID=4326;{self._geojson_to_wkt(geometry)}",

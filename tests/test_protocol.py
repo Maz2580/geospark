@@ -1,15 +1,13 @@
 """Tests for GeoSpark Protocol schema."""
 
-import pytest
 from geospark.protocol.schema import (
-    Point,
-    Polygon,
     BBox,
+    Point,
+    SpatialFeature,
+    SpatialFilter,
+    SpatialOperation,
     SpatialQuery,
     SpatialResult,
-    SpatialFeature,
-    SpatialOperation,
-    SpatialFilter,
     TemporalFilter,
 )
 

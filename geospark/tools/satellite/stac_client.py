@@ -7,12 +7,14 @@ Supports Sentinel-2, Landsat, and other STAC-compliant data sources.
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 from geospark.protocol.schema import (
-    SpatialQuery,
-    SpatialResult,
     SpatialContext,
     SpatialFeature,
     SpatialOperation,
+    SpatialQuery,
+    SpatialResult,
 )
 from geospark.tools.base import BaseTool
 
@@ -22,13 +24,13 @@ class STACTool(BaseTool):
 
     name = "satellite"
     description = "Browse and query satellite imagery from Sentinel-2, Landsat, and other sources"
-    supported_operations = [
+    supported_operations: ClassVar[list[str]] = [
         SpatialOperation.SATELLITE_VIEW.value,
         SpatialOperation.BAND_MATH.value,
     ]
 
     # Default STAC endpoints
-    STAC_ENDPOINTS = {
+    STAC_ENDPOINTS: ClassVar[dict[str, str]] = {
         "element84": "https://earth-search.aws.element84.com/v1",
         "planetary_computer": "https://planetarycomputer.microsoft.com/api/stac/v1",
     }

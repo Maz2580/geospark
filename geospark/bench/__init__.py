@@ -11,18 +11,18 @@ Usage:
 
 from __future__ import annotations
 
+from geospark.bench import report
 from geospark.bench.models import (
     BenchmarkName,
     BenchmarkResult,
     BenchQuestion,
     Difficulty,
-    ModelAdapter,
     MockAdapter,
+    ModelAdapter,
     PromptMode,
 )
-from geospark.bench.runner import BenchRunner, load_dataset, list_benchmarks
+from geospark.bench.runner import BenchRunner, list_benchmarks, load_dataset
 from geospark.bench.scorer import score_benchmark
-from geospark.bench import report
 
 
 class GeoSparkBench:
@@ -82,17 +82,17 @@ class GeoSparkBench:
 
 
 __all__ = [
-    "GeoSparkBench",
-    "BenchmarkName",
-    "BenchmarkResult",
     "BenchQuestion",
     "BenchRunner",
+    "BenchmarkName",
+    "BenchmarkResult",
     "Difficulty",
-    "ModelAdapter",
+    "GeoSparkBench",
     "MockAdapter",
+    "ModelAdapter",
     "PromptMode",
-    "load_dataset",
     "list_benchmarks",
+    "load_dataset",
     "report",
     "score_benchmark",
 ]

@@ -1,7 +1,6 @@
 """Tests for GeoSpark MCP Server handler."""
 
-import pytest
-from geospark.integrations.mcp_server import GeoSparkMCPHandler, MCP_TOOLS
+from geospark.integrations.mcp_server import MCP_TOOLS, GeoSparkMCPHandler
 
 
 class TestMCPToolDefinitions:

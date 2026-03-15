@@ -6,14 +6,16 @@ Provides elevation data access and terrain analysis using open DEM sources.
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 import httpx
 
 from geospark.protocol.schema import (
-    SpatialQuery,
-    SpatialResult,
     SpatialContext,
     SpatialFeature,
     SpatialOperation,
+    SpatialQuery,
+    SpatialResult,
 )
 from geospark.tools.base import BaseTool
 
@@ -23,7 +25,7 @@ class ElevationTool(BaseTool):
 
     name = "terrain"
     description = "Query elevation, slope, and aspect for any location"
-    supported_operations = [
+    supported_operations: ClassVar[list[str]] = [
         SpatialOperation.ELEVATION.value,
         SpatialOperation.SLOPE.value,
         SpatialOperation.VIEWSHED.value,

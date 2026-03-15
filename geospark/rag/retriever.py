@@ -1,10 +1,9 @@
 """Spatial retriever — find relevant features by location and semantics."""
 from __future__ import annotations
 
-import math
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from geospark.engine.spatial_reasoner import SpatialReasoner
 

@@ -7,9 +7,6 @@ Supports diff mode for comparing two runs (model A vs model B).
 
 from __future__ import annotations
 
-import json
-from typing import Any
-
 from geospark.bench.models import BenchmarkResult
 
 
@@ -64,7 +61,7 @@ def to_markdown(result: BenchmarkResult) -> str:
         lines.append("|----------|---------|----------|--------|")
         for cat_name, score in sorted(result.by_category.items()):
             lines.append(
-                f"| {cat_name} | {score.correct}/{score.total} | {score.accuracy:.1%} | {score.ci_lower:.0%}–{score.ci_upper:.0%} |"
+                f"| {cat_name} | {score.correct}/{score.total} | {score.accuracy:.1%} | {score.ci_lower:.0%}-{score.ci_upper:.0%} |"
             )
         lines.append("")
 
@@ -84,7 +81,7 @@ def diff(result_a: BenchmarkResult, result_b: BenchmarkResult) -> str:
     """
     lines = []
     lines.append("")
-    lines.append(f"  GeoSpark Bench — COMPARISON")
+    lines.append("  GeoSpark Bench — COMPARISON")
     lines.append(f"  {'=' * 60}")
     lines.append("")
     lines.append(f"  {'':>16}  {'Model A':>12}  {'Model B':>12}  {'Delta':>8}")

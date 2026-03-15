@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import math
 import re
-from typing import Any
 
 from geospark.bench.models import (
     AnswerType,
@@ -195,7 +194,7 @@ def score_benchmark(
     # Per-difficulty breakdown
     by_difficulty: dict[str, CategoryScore] = {}
     for diff_label in ("easy", "medium", "hard"):
-        diff_scores = [s for s, q in zip(scores, (q_map[s.question_id] for s in scores))
+        diff_scores = [s for s, q in zip(scores, (q_map[s.question_id] for s in scores), strict=False)
                        if q.difficulty.value == diff_label]
         if diff_scores:
             d_correct = sum(1 for s in diff_scores if s.correct)

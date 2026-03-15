@@ -7,16 +7,16 @@ Routing Machine) public demo server.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 import httpx
 
 from geospark.protocol.schema import (
-    SpatialQuery,
-    SpatialResult,
     SpatialContext,
     SpatialFeature,
     SpatialOperation,
+    SpatialQuery,
+    SpatialResult,
 )
 from geospark.tools.base import BaseTool
 
@@ -35,7 +35,7 @@ class OSRMRouteTool(BaseTool):
         "geometry, distance (meters), and duration (seconds). "
         "Do NOT use for non-driving modes (walking, cycling)."
     )
-    supported_operations = [
+    supported_operations: ClassVar[list[str]] = [
         SpatialOperation.ROUTE.value,
         SpatialOperation.ISOCHRONE.value,
     ]

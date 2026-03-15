@@ -7,7 +7,7 @@ All tools (built-in and community-contributed) implement this interface.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, ClassVar
 
 from geospark.protocol.schema import SpatialQuery, SpatialResult
 
@@ -23,9 +23,9 @@ class BaseTool(ABC):
     4. Register via ToolRegistry or drop in geospark/tools/custom/
     """
 
-    name: str = "base_tool"
-    description: str = "Base tool"
-    supported_operations: list[str] = []
+    name: ClassVar[str] = "base_tool"
+    description: ClassVar[str] = "Base tool"
+    supported_operations: ClassVar[list[str]] = []
 
     @abstractmethod
     def execute(self, query: SpatialQuery) -> SpatialResult:

@@ -7,10 +7,10 @@ mismatches. Provides automatic detection, transformation, and validation.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 from pyproj import CRS, Transformer
-from shapely.geometry import shape, mapping
+from shapely.geometry import mapping, shape
 from shapely.ops import transform
 
 from geospark.protocol.schema import Geometry
@@ -29,7 +29,7 @@ class CRSHandler:
     """
 
     # Cache transformers for performance
-    _transformer_cache: dict[tuple[str, str], Transformer] = {}
+    _transformer_cache: ClassVar[dict[tuple[str, str], Transformer]] = {}
 
     def get_transformer(self, from_crs: str, to_crs: str) -> Transformer:
         """Get a cached transformer between two CRS."""

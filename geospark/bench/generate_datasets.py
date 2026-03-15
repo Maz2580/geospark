@@ -15,13 +15,12 @@ from __future__ import annotations
 import json
 import random
 from pathlib import Path
-from typing import Any
 
-from shapely.geometry import shape, mapping, box, Point, Polygon, MultiPolygon
 from pyproj import Geod
+from shapely.geometry import box, mapping
 
-from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.bench.models import AnswerType, BenchmarkName, Difficulty
+from geospark.engine.spatial_reasoner import SpatialReasoner
 
 DATASETS_DIR = Path(__file__).parent / "datasets"
 GEOD = Geod(ellps="WGS84")
@@ -145,7 +144,7 @@ def generate_geotopo() -> list[dict]:
             ))
 
         # False cases: point outside
-        for i in range(2):
+        for _i in range(2):
             qid += 1
             outside_pt = _point_outside_bbox(bbox)
             point = _make_point(outside_pt)
@@ -246,7 +245,7 @@ def generate_geotopo() -> list[dict]:
 
     # Category 5: Polygon with hole (Dr. Chen's gotcha) — 10 questions
     hole_polygon = PARIS_WITH_HOLE
-    for i in range(5):
+    for _i in range(5):
         # Point inside the hole (should NOT be contained)
         hole_pt = [round(RNG.uniform(2.34, 2.36), 6), round(RNG.uniform(48.855, 48.860), 6)]
         point = _make_point(hole_pt)
@@ -407,7 +406,7 @@ def generate_geodistance() -> list[dict]:
     for name, info in LANDMARKS.items():
         cities_with_landmarks.setdefault(info["city"], []).append((name, info))
 
-    for city, lms in list(cities_with_landmarks.items())[:5]:
+    for _city, lms in list(cities_with_landmarks.items())[:5]:
         if len(lms) < 3:
             continue
         for _ in range(3):

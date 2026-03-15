@@ -1,7 +1,7 @@
 """MCP server for terrain analysis — elevation, slope, aspect."""
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 from geospark.engine.core import Engine
 from geospark.mcp_servers.base import BaseMCPServer
@@ -13,7 +13,7 @@ class TerrainServer(BaseMCPServer):
 
     server_name = "geospark-terrain"
 
-    tools = [
+    tools: ClassVar[list[dict[str, Any]]] = [
         {
             "name": "get_elevation",
             "description": (

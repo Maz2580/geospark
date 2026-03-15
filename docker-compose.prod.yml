@@ -1,0 +1,50 @@
+# Production compose -- lightweight for free-tier VMs
+# Uses Supabase (remote) for DB, no local PostGIS/Redis needed
+#
+# Usage:
+#   cp .env.production .env
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# With Cloudflare Tunnel:
+#   docker compose -f docker-compose.prod.yml --profile tunnel up -d
+
+services:
+  geospark:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: geospark-api
+    ports:
+      - "127.0.0.1:8000:8000"  # Only localhost -- cloudflared handles external
+    env_file: .env
+    environment:
+      - GEOSPARK_ENV=production
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: geospark-tunnel
+    profiles: ["tunnel"]
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - geospark
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M

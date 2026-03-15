@@ -24,7 +24,6 @@ env/
 # Environment / Secrets
 .env
 *.env.local
-.env.production
 
 # Data (large binary files -- use Git LFS or keep in data/)
 data/

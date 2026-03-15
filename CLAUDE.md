@@ -6,7 +6,7 @@
 - **Language**: Python 3.11+
 - **Package manager**: pip (venv at `.venv/`)
 - **License**: Apache 2.0
-- **Status**: Phase 3 (Platform) — 441 tests passing
+- **Status**: Phase 3 (Platform) + Phase 4 deployment — 446 tests passing
 
 ## Architecture
 
@@ -67,7 +67,7 @@ geospark/
 │   ├── loader.py        # PluginLoader (discover, load, validate)
 │   └── hooks.py         # PluginHooks (lifecycle callbacks)
 ├── utils/          # Shared utilities
-├── api.py          # FastAPI REST server (8 endpoints)
+├── api.py          # FastAPI REST server (9 endpoints, incl. /status)
 └── cli.py          # CLI entry point (Click + Rich)
 ```
 

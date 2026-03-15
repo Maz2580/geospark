@@ -11,6 +11,7 @@ Usage:
 from __future__ import annotations
 
 import os
+import time
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -31,6 +32,7 @@ load_dotenv()
 
 # Global engine instance
 _engine: Engine | None = None
+_start_time: float = time.time()
 
 
 def get_engine() -> Engine:
@@ -113,6 +115,39 @@ async def health():
     """Health check."""
     engine = get_engine()
     return HealthResponse(tools=engine.available_tools)
+
+
+@app.get("/api/v1/status")
+async def status():
+    """System status with uptime, memory, and tool information."""
+    import sys
+
+    uptime_seconds = time.time() - _start_time
+
+    # Read memory from /proc on Linux (Docker), fallback gracefully
+    memory: dict[str, Any] = {}
+    try:
+        with open("/proc/self/status") as f:
+            for line in f:
+                if line.startswith("VmRSS:"):
+                    memory["rss_mb"] = round(int(line.split()[1]) / 1024, 1)
+                elif line.startswith("VmSize:"):
+                    memory["vms_mb"] = round(int(line.split()[1]) / 1024, 1)
+    except OSError:
+        memory["note"] = "Memory info unavailable on this platform"
+
+    return {
+        "status": "ok",
+        "version": "0.1.0",
+        "uptime_seconds": round(uptime_seconds, 1),
+        "python_version": sys.version,
+        "memory": memory,
+        "tools": {
+            "loaded": get_engine().available_tools,
+            "count": len(get_engine().available_tools),
+        },
+        "environment": os.getenv("GEOSPARK_ENV", "development"),
+    }
 
 
 @app.get("/api/v1/info")

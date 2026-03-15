@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
-COPY pyproject.toml .
+COPY pyproject.toml README.md ./
 COPY geospark/ geospark/
 
 # Install only what the API needs: core + api deps (no geo/viz/satellite/postgis)
@@ -22,8 +22,8 @@ RUN pip install --no-cache-dir --prefix=/install ".[api]"
 FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgeos3.11.1 \
-    libproj25 \
+    libgeos-dev \
+    libproj-dev \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -32,7 +32,7 @@ COPY --from=builder /install /usr/local
 
 WORKDIR /app
 COPY geospark/ geospark/
-COPY pyproject.toml .
+COPY pyproject.toml README.md ./
 RUN pip install --no-cache-dir --no-deps -e .
 
 # Non-root user for security

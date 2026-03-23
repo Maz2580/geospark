@@ -222,8 +222,13 @@ All Phase 3 modules are built, tested (441 total tests), and passing.
 - [x] Published to PyPI as `geospark-ai` v0.1.0
 - [x] Install: `pip install geospark-ai[mcp]`
 
-### Phase 4D: Remaining Work
-- [ ] Implement `engine.ask()` (natural language spatial interface)
+### Phase 4D: Local LLM & engine.ask() (COMPLETE)
+- [x] Implement `engine.ask()` with auto provider fallback (Ollama → OpenRouter)
+- [x] Qwen 2.5 7B deployed on server via Ollama (0.9s tool calls on CPU, no rate limits)
+- [x] API `/api/v1/ask` now uses Ollama-first architecture
+- [x] MCP server version fix (reports GeoSpark 0.1.0, not SDK version)
+
+### Phase 4E: Remaining Work
 - [ ] Real satellite raster processing (wire up rasterio for NDVI)
 - [ ] Embedding-based RAG (replace word overlap with vectors)
 - [ ] CLI polish (`geospark distance`, `geospark relationship` commands)

@@ -61,18 +61,22 @@ class Engine:
         question: str,
         model: str | None = None,
         api_key: str | None = None,
+        provider: str | None = None,
+        ollama_url: str | None = None,
     ) -> SpatialResult:
         """
         Ask a natural language spatial question.
 
-        Uses OpenRouter to connect to an LLM with GeoSpark tools attached.
-        The LLM can call geocode, distance, elevation, topology, and spatial
-        operation tools to provide ground-truth answers.
+        Tries Ollama first (local, fast, free), falls back to OpenRouter.
+        Override with ``provider="ollama"`` or ``provider="openrouter"``.
 
         Args:
             question: Natural language spatial question.
-            model: Override the LLM model (default: GEOSPARK_DEFAULT_MODEL env).
-            api_key: Override the API key (default: OPENROUTER_API_KEY env).
+            model: Override the LLM model.
+            api_key: Override the OpenRouter API key.
+            provider: Force ``"ollama"`` or ``"openrouter"`` (default: auto).
+            ollama_url: Ollama base URL (default: OLLAMA_BASE_URL env or
+                ``http://localhost:11434``).
 
         Returns:
             SpatialResult with the answer, tools used, and metadata.
@@ -82,6 +86,73 @@ class Engine:
             result = engine.ask("How far is Paris from London?")
             print(result.spatial_context.summary)
         """
+        import os
+
+        tools = self.available_tools or ["geocoder", "terrain"]
+
+        # Determine provider order
+        if provider == "openrouter":
+            return self._ask_openrouter(question, model, api_key, tools)
+        if provider == "ollama":
+            return self._ask_ollama(question, model, ollama_url, tools)
+
+        # Auto mode: try Ollama first, fall back to OpenRouter
+        ollama_result = self._ask_ollama(question, model, ollama_url, tools)
+        if not ollama_result.errors:
+            return ollama_result
+
+        # Ollama failed — try OpenRouter
+        key = api_key or os.getenv("OPENROUTER_API_KEY", "")
+        if not key:
+            # Return the Ollama error since OpenRouter isn't configured either
+            return ollama_result
+
+        return self._ask_openrouter(question, model, api_key, tools)
+
+    def _ask_ollama(
+        self,
+        question: str,
+        model: str | None,
+        ollama_url: str | None,
+        tools: list[str],
+    ) -> SpatialResult:
+        """Try answering via local Ollama."""
+        import os
+
+        url = ollama_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+        use_model = model or os.getenv("GEOSPARK_OLLAMA_MODEL", "qwen2.5:7b")
+
+        from geospark.integrations.ollama_tools import OllamaClient
+
+        try:
+            with OllamaClient(model=use_model, base_url=url, tools=tools) as client:
+                answer = client.ask(question, model=use_model)
+        except Exception as e:
+            return SpatialResult(
+                errors=[f"Ollama call failed: {e}"],
+            )
+
+        return SpatialResult(
+            spatial_context=SpatialContext(
+                summary=answer.answer,
+                total_features=len(answer.tool_calls),
+            ),
+            metadata={
+                "model": answer.model,
+                "tools_used": [tc["tool"] for tc in answer.tool_calls],
+                "tokens_used": answer.tokens_used,
+                "source": "ollama",
+            },
+        )
+
+    def _ask_openrouter(
+        self,
+        question: str,
+        model: str | None,
+        api_key: str | None,
+        tools: list[str],
+    ) -> SpatialResult:
+        """Try answering via OpenRouter."""
         import os
 
         key = api_key or os.getenv("OPENROUTER_API_KEY", "")
@@ -95,13 +166,12 @@ class Engine:
 
         from geospark.integrations.openrouter import OpenRouterClient
 
-        tools = self.available_tools or ["geocoder", "terrain"]
         try:
             with OpenRouterClient(api_key=key, model=model, tools=tools) as client:
                 answer = client.ask(question, model=model)
         except Exception as e:
             return SpatialResult(
-                errors=[f"LLM call failed: {e}"],
+                errors=[f"OpenRouter call failed: {e}"],
             )
 
         return SpatialResult(

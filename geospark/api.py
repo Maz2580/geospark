@@ -253,30 +253,20 @@ async def ask(request: AskRequest):
     """
     Ask a natural language spatial question.
 
-    Uses OpenRouter free models + GeoSpark tools for grounded answers.
+    Tries local Ollama (Qwen 2.5 7B) first, falls back to OpenRouter.
     """
-    api_key = os.getenv("OPENROUTER_API_KEY")
-    if not api_key:
-        raise HTTPException(
-            status_code=503,
-            detail="OPENROUTER_API_KEY not configured. Set it in .env",
-        )
+    engine = get_engine()
+    result = engine.ask(request.question, model=request.model)
 
-    try:
-        from geospark.integrations.openrouter import OpenRouterClient
+    if result.errors:
+        raise HTTPException(status_code=503, detail=result.errors[0])
 
-        client = OpenRouterClient(model=request.model)
-        answer = client.ask(request.question)
-        client.close()
-
-        return AskResponse(
-            answer=answer.answer,
-            model=answer.model,
-            tools_used=[tc["tool"] for tc in answer.tool_calls],
-            tokens_used=answer.tokens_used,
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
+    return AskResponse(
+        answer=result.spatial_context.summary,
+        model=result.metadata.get("model", "unknown"),
+        tools_used=result.metadata.get("tools_used", []),
+        tokens_used=result.metadata.get("tokens_used", 0),
+    )
 
 
 @app.post("/api/v1/distance", response_model=DistanceResponse)

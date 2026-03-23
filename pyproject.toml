@@ -2,8 +2,11 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.build.targets.wheel]
+packages = ["geospark"]
+
 [project]
-name = "geospark"
+name = "geospark-ai"
 version = "0.1.0"
 description = "The Open-Source Geospatial Intelligence Protocol & Engine. Give any AI model a spatial mind."
 readme = "README.md"

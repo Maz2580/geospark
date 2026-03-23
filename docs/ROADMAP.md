@@ -1,7 +1,7 @@
 # GeoSpark Roadmap
 
 **Last updated**: March 2026
-**Current phase**: Phase 3 complete — Phase 4 next
+**Current phase**: Phase 4 in progress — deployed live + published to PyPI
 
 This is the **working roadmap** -- the concrete, ordered steps we follow session by session.
 For the full strategic vision, see PRD.md, ARCHITECTURE.md, and BUSINESS_PLAN.md.
@@ -97,7 +97,7 @@ understand why GeoSpark matters.
 - [x] Prepare launch posts (docs/launch/):
   - Hacker News: "GeoSpark: Give any AI model spatial reasoning (LLMs fail 80% of spatial tasks)"
   - Reddit r/MachineLearning, r/gis, r/Python
-- [ ] Create PyPI package (`pip install geospark`) (future)
+- [x] PyPI package published (`pip install geospark-ai`) -- https://pypi.org/project/geospark-ai/
 - [ ] Twitter/X thread (future)
 - [ ] Submit to FOSS4G / academic venue (future)
 
@@ -197,24 +197,55 @@ All Phase 3 modules are built, tested (441 total tests), and passing.
 
 ---
 
-## Phase 4: Enterprise & Scale
+## Phase 4: Deployment & Distribution (IN PROGRESS)
 
-### Phase 4A: Enterprise Features
+### Phase 4A: Live Deployment (COMPLETE)
+- [x] Production Docker setup (`Dockerfile.prod`, multi-stage build)
+- [x] Live deployment on VM (`ubuntu@172.26.135.224`, `/mnt/geospark`)
+- [x] Cloudflare Tunnel (`geospark` tunnel → `geospark.terrascout.app`)
+- [x] Auto-deploy via cron (checks GitHub every 5 min, rebuilds on change)
+- [x] API live at https://geospark.terrascout.app with 11 endpoints
+- [x] Swagger UI at https://geospark.terrascout.app/docs
 
+### Phase 4B: Code Quality (COMPLETE)
+- [x] Geodesic buffer (64-point sampling via `geod.fwd()`, 0.2% error)
+- [x] Geodesic area (`geod.geometry_area_perimeter()`, proper WGS84)
+- [x] Two-geometry topology checks (was stub, now functional)
+- [x] Geometric operations: union, intersection, difference (was stub)
+- [x] Temporal engine: compare_periods with overlap/gap, detect_change with categories, compute_trends
+- [x] 446 tests passing, 0 lint errors
+
+### Phase 4C: MCP & PyPI (COMPLETE)
+- [x] Official MCP SDK integration (`mcp>=1.0`, stdio transport)
+- [x] `geospark-mcp` CLI entry point (6 tools registered)
+- [x] Claude Desktop config template
+- [x] Published to PyPI as `geospark-ai` v0.1.0
+- [x] Install: `pip install geospark-ai[mcp]`
+
+### Phase 4D: Remaining Work
+- [ ] Implement `engine.ask()` (natural language spatial interface)
+- [ ] Real satellite raster processing (wire up rasterio for NDVI)
+- [ ] Embedding-based RAG (replace word overlap with vectors)
+- [ ] CLI polish (`geospark distance`, `geospark relationship` commands)
+- [ ] Run baselines on 5+ models for benchmark leaderboard
+
+---
+
+## Phase 5: Enterprise & Scale (FUTURE)
+
+### Phase 5A: Enterprise Features
 - [ ] Multi-tenant server mode
 - [ ] Authentication (SSO/SAML)
 - [ ] Audit logging
 - [ ] Rate limiting & usage tracking
 
-### Phase 4B: Scale
-
+### Phase 5B: Scale
 - [ ] Distributed query execution (Dask/Ray)
 - [ ] Streaming data support
 - [ ] Edge deployment (ARM/Jetson)
 - [ ] Planetary-scale indexing
 
-### Phase 4C: Strategic Positioning
-
+### Phase 5C: Strategic Positioning
 - [ ] NeurIPS/ICLR workshop paper
 - [ ] Enterprise pilot programs
 - [ ] Partnership discussions with AI companies

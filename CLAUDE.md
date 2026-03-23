@@ -6,7 +6,9 @@
 - **Language**: Python 3.11+
 - **Package manager**: pip (venv at `.venv/`)
 - **License**: Apache 2.0
-- **Status**: Phase 3 (Platform) + Phase 4 deployment — 446 tests passing
+- **Status**: Phase 4 (Deployment) — 446 tests passing, live at geospark.terrascout.app
+- **PyPI**: `pip install geospark-ai[mcp]` — https://pypi.org/project/geospark-ai/
+- **MCP**: `geospark-mcp` CLI command (6 tools, official MCP SDK)
 
 ## Architecture
 

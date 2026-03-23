@@ -56,19 +56,65 @@ class Engine:
         result.execution_time_ms = (time.time() - start_time) * 1000
         return result
 
-    def ask(self, question: str, llm: str = "anthropic") -> SpatialResult:
+    def ask(
+        self,
+        question: str,
+        model: str | None = None,
+        api_key: str | None = None,
+    ) -> SpatialResult:
         """
         Ask a natural language spatial question.
 
-        This method parses the question, determines required operations,
-        builds a query plan, executes it, and returns structured results.
+        Uses OpenRouter to connect to an LLM with GeoSpark tools attached.
+        The LLM can call geocode, distance, elevation, topology, and spatial
+        operation tools to provide ground-truth answers.
 
-        TODO: This is the core "ChatGPT moment" for geospatial.
-        The LLM integration layer translates natural language to GSP queries.
+        Args:
+            question: Natural language spatial question.
+            model: Override the LLM model (default: GEOSPARK_DEFAULT_MODEL env).
+            api_key: Override the API key (default: OPENROUTER_API_KEY env).
+
+        Returns:
+            SpatialResult with the answer, tools used, and metadata.
+
+        Examples:
+            engine = Engine(tools=["geocoder", "terrain"])
+            result = engine.ask("How far is Paris from London?")
+            print(result.spatial_context.summary)
         """
-        raise NotImplementedError(
-            "Natural language interface coming in Phase 1. "
-            "Use engine.execute(SpatialQuery(...)) for programmatic queries."
+        import os
+
+        key = api_key or os.getenv("OPENROUTER_API_KEY", "")
+        if not key:
+            return SpatialResult(
+                errors=[
+                    "OPENROUTER_API_KEY not set. "
+                    "Set it in .env or pass api_key= to engine.ask()"
+                ],
+            )
+
+        from geospark.integrations.openrouter import OpenRouterClient
+
+        tools = self.available_tools or ["geocoder", "terrain"]
+        try:
+            with OpenRouterClient(api_key=key, model=model, tools=tools) as client:
+                answer = client.ask(question, model=model)
+        except Exception as e:
+            return SpatialResult(
+                errors=[f"LLM call failed: {e}"],
+            )
+
+        return SpatialResult(
+            spatial_context=SpatialContext(
+                summary=answer.answer,
+                total_features=len(answer.tool_calls),
+            ),
+            metadata={
+                "model": answer.model,
+                "tools_used": [tc["tool"] for tc in answer.tool_calls],
+                "tokens_used": answer.tokens_used,
+                "source": "openrouter",
+            },
         )
 
     def chain(self, steps: list[dict[str, Any]]) -> QueryChain:

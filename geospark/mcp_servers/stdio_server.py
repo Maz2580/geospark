@@ -30,12 +30,13 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
+from geospark import __version__
 from geospark.mcp_servers.launcher import MCPServerLauncher
 
 
 def create_server() -> Server:
     """Create an MCP server with all GeoSpark spatial tools."""
-    server = Server("geospark")
+    server = Server("geospark", version=__version__)
     launcher = MCPServerLauncher()
 
     @server.list_tools()

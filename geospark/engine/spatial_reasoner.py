@@ -63,17 +63,31 @@ class SpatialReasoner:
         return handler(query)
 
     def _buffer(self, query: SpatialQuery) -> SpatialResult:
-        """Create a buffer around a geometry."""
+        """Create a geodesic buffer around a geometry."""
         if query.geometry is None:
             return SpatialResult(errors=["Buffer requires a geometry"])
 
         geom = shape(query.geometry.model_dump())
         radius = query.radius_m or 1000  # Default 1km
 
-        # For geographic coordinates, convert meters to approximate degrees
-        # TODO: Use pyproj for proper geodesic buffer
-        radius_deg = radius / 111_320  # Rough meters-to-degrees at equator
-        buffered = geom.buffer(radius_deg)
+        # Geodesic buffer: sample 64 points at exact distance from centroid
+        geod = Geod(ellps="WGS84")
+        center = geom.centroid
+        n_points = 64
+        coords = []
+        for i in range(n_points):
+            az = 360.0 * i / n_points
+            lon, lat, _ = geod.fwd(center.x, center.y, az, radius)
+            coords.append((lon, lat))
+        coords.append(coords[0])  # Close the ring
+
+        from shapely.geometry import Polygon as ShapelyPolygon
+
+        buffered = ShapelyPolygon(coords)
+
+        # Geodesic area
+        area_sq_m, _ = geod.geometry_area_perimeter(buffered)
+        area_sq_m = abs(area_sq_m)
 
         return SpatialResult(
             features=[
@@ -82,13 +96,13 @@ class SpatialReasoner:
                     properties={
                         "operation": "buffer",
                         "radius_m": radius,
-                        "area_sq_m": buffered.area * (111_320 ** 2),  # Approximate
+                        "area_sq_m": round(area_sq_m, 2),
                     },
                 )
             ],
             spatial_context=SpatialContext(
                 total_features=1,
-                summary=f"Buffer of {radius}m created",
+                summary=f"Geodesic buffer of {radius}m created ({area_sq_m / 1_000_000:.3f} sq km)",
             ),
         )
 
@@ -127,16 +141,16 @@ class SpatialReasoner:
         )
 
     def _area(self, query: SpatialQuery) -> SpatialResult:
-        """Calculate area of a geometry."""
+        """Calculate geodesic area of a geometry."""
         if query.geometry is None:
             return SpatialResult(errors=["Area requires a geometry"])
 
         geom = shape(query.geometry.model_dump())
 
-        # Approximate area in square meters (for geographic coordinates)
-        # TODO: Use pyproj for proper geodesic area calculation
-        area_sq_deg = geom.area
-        area_sq_m = area_sq_deg * (111_320 ** 2)  # Very rough approximation
+        # Geodesic area using pyproj
+        geod = Geod(ellps="WGS84")
+        area_sq_m, perimeter_m = geod.geometry_area_perimeter(geom)
+        area_sq_m = abs(area_sq_m)
 
         return SpatialResult(
             features=[
@@ -144,13 +158,14 @@ class SpatialReasoner:
                     geometry=mapping(geom),
                     properties={
                         "operation": "area",
-                        "area_sq_m": area_sq_m,
-                        "area_sq_km": area_sq_m / 1_000_000,
+                        "area_sq_m": round(area_sq_m, 2),
+                        "area_sq_km": round(area_sq_m / 1_000_000, 4),
+                        "perimeter_m": round(perimeter_m, 2),
                     },
                 )
             ],
             spatial_context=SpatialContext(
-                summary=f"Area: ~{area_sq_m / 1_000_000:.2f} sq km",
+                summary=f"Geodesic area: {area_sq_m / 1_000_000:.4f} sq km, perimeter: {perimeter_m:,.1f} m",
             ),
         )
 
@@ -205,21 +220,43 @@ class SpatialReasoner:
         if query.geometry is None:
             return SpatialResult(errors=["Topology check requires a geometry"])
 
-        # TODO: Accept second geometry from query metadata for comparison
-        geom = shape(query.geometry.model_dump())
+        geom_a = shape(query.geometry.model_dump())
+        geom_b_raw = (query.metadata or {}).get("geometry_b")
+
+        if geom_b_raw is None:
+            return SpatialResult(
+                features=[
+                    SpatialFeature(
+                        geometry=mapping(geom_a),
+                        properties={
+                            "operation": query.operation.value,
+                            "note": "Pass second geometry via metadata.geometry_b for comparison",
+                        },
+                    )
+                ],
+                spatial_context=SpatialContext(
+                    summary=f"Topology check: {query.operation.value} — needs geometry_b",
+                ),
+            )
+
+        geom_b = shape(geom_b_raw)
+        result = self.check_relationship(
+            mapping(geom_a), mapping(geom_b), query.operation.value
+        )
 
         return SpatialResult(
             features=[
                 SpatialFeature(
-                    geometry=mapping(geom),
+                    geometry=mapping(geom_a),
                     properties={
                         "operation": query.operation.value,
-                        "note": "Provide two geometries to check topology",
+                        "result": result,
+                        "geometry_b": mapping(geom_b),
                     },
                 )
             ],
             spatial_context=SpatialContext(
-                summary=f"Topology check: {query.operation.value}",
+                summary=f"{query.operation.value}: {result}",
             ),
         )
 
@@ -228,9 +265,48 @@ class SpatialReasoner:
         if query.geometry is None:
             return SpatialResult(errors=[f"{query.operation.value} requires geometries"])
 
+        geom_a = shape(query.geometry.model_dump())
+        geom_b_raw = (query.metadata or {}).get("geometry_b")
+
+        if geom_b_raw is None:
+            return SpatialResult(
+                errors=[
+                    f"{query.operation.value} requires two geometries. "
+                    "Pass the second via metadata.geometry_b"
+                ]
+            )
+
+        geom_b = shape(geom_b_raw)
+        op_map = {
+            SpatialOperation.UNION: geom_a.union,
+            SpatialOperation.INTERSECTION: geom_a.intersection,
+            SpatialOperation.DIFFERENCE: geom_a.difference,
+        }
+        op_fn = op_map.get(query.operation)
+        if op_fn is None:
+            return SpatialResult(errors=[f"Unsupported geometric operation: {query.operation.value}"])
+
+        result_geom = op_fn(geom_b)
+
+        geod = Geod(ellps="WGS84")
+        area_sq_m = 0.0
+        if not result_geom.is_empty and result_geom.geom_type in ("Polygon", "MultiPolygon"):
+            area_sq_m = abs(geod.geometry_area_perimeter(result_geom)[0])
+
         return SpatialResult(
+            features=[
+                SpatialFeature(
+                    geometry=mapping(result_geom),
+                    properties={
+                        "operation": query.operation.value,
+                        "area_sq_m": round(area_sq_m, 2),
+                        "is_empty": result_geom.is_empty,
+                    },
+                )
+            ],
             spatial_context=SpatialContext(
-                summary=f"Geometric operation: {query.operation.value} (requires two geometries)",
+                summary=f"{query.operation.value}: result is {result_geom.geom_type}"
+                f"{' (empty)' if result_geom.is_empty else ''}",
             ),
         )
 

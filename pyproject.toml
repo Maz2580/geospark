@@ -79,8 +79,11 @@ postgis = [
     "sqlalchemy>=2.0",
     "geoalchemy2>=0.14",
 ]
+mcp = [
+    "mcp>=1.0",
+]
 all = [
-    "geospark[geo,api,llm,viz,satellite,postgis]",
+    "geospark[geo,api,llm,viz,satellite,postgis,mcp]",
 ]
 dev = [
     "pytest>=8.0",
@@ -93,6 +96,7 @@ dev = [
 
 [project.scripts]
 geospark = "geospark.cli:main"
+geospark-mcp = "geospark.mcp_servers.stdio_server:run"
 
 [project.urls]
 Homepage = "https://github.com/Maz2580/geospark"

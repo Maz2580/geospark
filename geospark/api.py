@@ -17,6 +17,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from geospark.engine.core import Engine
@@ -56,6 +57,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
 
 # --- Request/Response Models ---
 
@@ -93,6 +101,24 @@ class RelationshipResponse(BaseModel):
     relationship: str
     result: bool
     note: str = "Ground-truth spatial reasoning via GeoSpark"
+
+
+class DistanceRequest(BaseModel):
+    lat_a: float = Field(..., description="Latitude of point A")
+    lon_a: float = Field(..., description="Longitude of point A")
+    lat_b: float = Field(..., description="Latitude of point B")
+    lon_b: float = Field(..., description="Longitude of point B")
+
+
+class DistanceResponse(BaseModel):
+    distance_m: float
+    distance_km: float
+    note: str = "Geodesic distance on WGS84 ellipsoid"
+
+
+class ElevationRequest(BaseModel):
+    latitude: float = Field(..., description="Latitude")
+    longitude: float = Field(..., description="Longitude")
 
 
 class AskRequest(BaseModel):
@@ -251,6 +277,34 @@ async def ask(request: AskRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+@app.post("/api/v1/distance", response_model=DistanceResponse)
+async def distance(request: DistanceRequest):
+    """Calculate geodesic distance between two points."""
+    geom_a = {"type": "Point", "coordinates": [request.lon_a, request.lat_a]}
+    geom_b = {"type": "Point", "coordinates": [request.lon_b, request.lat_b]}
+    d = SpatialReasoner.calculate_distance(geom_a, geom_b)
+    return DistanceResponse(distance_m=round(d, 2), distance_km=round(d / 1000, 3))
+
+
+@app.post("/api/v1/elevation")
+async def elevation(request: ElevationRequest):
+    """Get elevation at a point (meters above sea level)."""
+    engine = get_engine()
+    query = SpatialQuery(
+        operation=SpatialOperation.ELEVATION,
+        geometry=Point.from_latlon(request.latitude, request.longitude),
+    )
+    result = engine.execute(query)
+    if result.errors:
+        raise HTTPException(status_code=502, detail=result.errors[0])
+    return {
+        "latitude": request.latitude,
+        "longitude": request.longitude,
+        "elevation_m": result.features[0].properties.get("elevation_m") if result.features else None,
+        "source": "Open Elevation API",
+    }
 
 
 @app.get("/api/v1/tools")

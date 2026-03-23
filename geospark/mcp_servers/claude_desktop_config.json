@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "geospark": {
+      "command": "geospark-mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}

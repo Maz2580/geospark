@@ -120,13 +120,14 @@ class TestTemporalEngine:
         assert result.change_detected is False
 
     def test_detect_change(self):
-        """detect_change returns a ChangeResult."""
+        """detect_change returns a ChangeResult with expected change types."""
         engine = TemporalEngine()
         geom = {"type": "Polygon", "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 0]]]}
         result = engine.detect_change(geom, datetime(2020, 1, 1), datetime(2021, 1, 1))
         assert isinstance(result, ChangeResult)
-        assert result.change_count == 0
+        assert result.change_count > 0  # Long window identifies potential changes
         assert "366 days" in result.summary  # 2020 is a leap year
+        assert all("type" in c for c in result.changes)
 
     def test_temporal_filter(self):
         """temporal_filter keeps only features within the window."""

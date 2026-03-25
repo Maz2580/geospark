@@ -1,8 +1,10 @@
 """Spatial retriever — find relevant features by location and semantics."""
 from __future__ import annotations
 
+import math
 from typing import Any
 
+import httpx
 from pydantic import BaseModel
 
 from geospark.engine.spatial_reasoner import SpatialReasoner
@@ -17,20 +19,85 @@ class RetrievedFeature(BaseModel):
     source: str = ""
 
 
+def _cosine_similarity(a: list[float], b: list[float]) -> float:
+    """Compute cosine similarity between two vectors."""
+    dot = sum(x * y for x, y in zip(a, b, strict=False))
+    norm_a = math.sqrt(sum(x * x for x in a))
+    norm_b = math.sqrt(sum(x * x for x in b))
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return dot / (norm_a * norm_b)
+
+
 class SpatialRetriever:
     """Retrieves relevant spatial features for a query.
 
-    Combines spatial proximity with text-based semantic matching.
-    For production, integrate with vector databases (Pinecone, Qdrant)
-    for embedding-based similarity.
+    Combines spatial proximity with embedding-based semantic matching.
+    Uses Ollama embeddings when available, falls back to word overlap.
     """
 
-    def __init__(self, features: list[dict[str, Any]] | None = None) -> None:
+    def __init__(
+        self,
+        features: list[dict[str, Any]] | None = None,
+        ollama_url: str | None = None,
+        embed_model: str | None = None,
+    ) -> None:
         self._features: list[dict[str, Any]] = features or []
+        self._embeddings: list[list[float]] = []
+        self._ollama_url = ollama_url or "http://localhost:11434"
+        self._embed_model = embed_model or "qwen2.5:7b"
+        self._embedding_available: bool | None = None  # Lazy check
+
+    def _check_embedding_available(self) -> bool:
+        """Check if Ollama embedding is reachable (once, then cached)."""
+        if self._embedding_available is not None:
+            return self._embedding_available
+        try:
+            resp = httpx.post(
+                f"{self._ollama_url}/api/embed",
+                json={"model": self._embed_model, "input": "test"},
+                timeout=5.0,
+            )
+            self._embedding_available = resp.status_code == 200
+        except Exception:
+            self._embedding_available = False
+        return self._embedding_available
+
+    def _get_embedding(self, text: str) -> list[float]:
+        """Get embedding vector for text via Ollama."""
+        resp = httpx.post(
+            f"{self._ollama_url}/api/embed",
+            json={"model": self._embed_model, "input": text},
+            timeout=30.0,
+        )
+        resp.raise_for_status()
+        return resp.json()["embeddings"][0]
+
+    def _feature_text(self, feature: dict[str, Any]) -> str:
+        """Extract searchable text from a feature's properties."""
+        props = feature.get("properties", {})
+        return " ".join(str(v) for v in props.values())
 
     def add_features(self, features: list[dict[str, Any]]) -> int:
-        """Add features to the retriever's index."""
+        """Add features to the retriever's index.
+
+        If Ollama embeddings are available, pre-computes embeddings for
+        each feature. Falls back to word-overlap matching if not.
+        """
         self._features.extend(features)
+
+        # Pre-compute embeddings if available
+        if self._check_embedding_available():
+            for f in features:
+                try:
+                    text = self._feature_text(f)
+                    emb = self._get_embedding(text)
+                    self._embeddings.append(emb)
+                except Exception:
+                    self._embeddings.append([])
+        else:
+            self._embeddings.extend([] for _ in features)
+
         return len(self._features)
 
     def retrieve_by_location(
@@ -78,17 +145,52 @@ class SpatialRetriever:
         query: str,
         limit: int = 10,
     ) -> list[RetrievedFeature]:
-        """Retrieve features by text-based semantic matching.
+        """Retrieve features by semantic matching.
 
-        Simple word overlap matching. For production, replace with
-        embedding-based similarity (OpenAI embeddings, etc.).
+        Uses Ollama embedding cosine similarity when available,
+        falls back to word overlap otherwise.
         """
+        # Try embedding-based retrieval
+        if self._check_embedding_available() and any(self._embeddings):
+            return self._retrieve_by_embedding(query, limit)
+        return self._retrieve_by_word_overlap(query, limit)
+
+    def _retrieve_by_embedding(
+        self, query: str, limit: int
+    ) -> list[RetrievedFeature]:
+        """Embedding-based semantic retrieval via cosine similarity."""
+        try:
+            query_emb = self._get_embedding(query)
+        except Exception:
+            return self._retrieve_by_word_overlap(query, limit)
+
+        results = []
+        for i, feature in enumerate(self._features):
+            emb = self._embeddings[i] if i < len(self._embeddings) else []
+            if not emb:
+                continue
+            score = _cosine_similarity(query_emb, emb)
+            if score > 0.1:  # Minimum threshold
+                results.append(
+                    RetrievedFeature(
+                        feature=feature,
+                        relevance_score=score,
+                        source="embedding",
+                    )
+                )
+
+        results.sort(key=lambda r: r.relevance_score, reverse=True)
+        return results[:limit]
+
+    def _retrieve_by_word_overlap(
+        self, query: str, limit: int
+    ) -> list[RetrievedFeature]:
+        """Word overlap fallback for when embeddings aren't available."""
         query_words = set(query.lower().split())
         results = []
 
         for feature in self._features:
-            props = feature.get("properties", {})
-            text = " ".join(str(v) for v in props.values()).lower()
+            text = self._feature_text(feature).lower()
             text_words = set(text.split())
 
             overlap = len(query_words & text_words)
@@ -98,6 +200,7 @@ class SpatialRetriever:
                     RetrievedFeature(
                         feature=feature,
                         relevance_score=score,
+                        source="word_overlap",
                     )
                 )
 

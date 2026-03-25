@@ -95,6 +95,71 @@ def elevation(lat: float, lon: float) -> None:
 
 
 @main.command()
+@click.argument("coords", nargs=4, type=float)
+def distance(coords: tuple[float, ...]) -> None:
+    """Calculate geodesic distance: geospark distance LAT_A LON_A LAT_B LON_B."""
+    lat_a, lon_a, lat_b, lon_b = coords
+    from geospark.engine.spatial_reasoner import SpatialReasoner
+
+    geom_a = {"type": "Point", "coordinates": [lon_a, lat_a]}
+    geom_b = {"type": "Point", "coordinates": [lon_b, lat_b]}
+    d = SpatialReasoner.calculate_distance(geom_a, geom_b)
+
+    table = Table(title="Geodesic Distance")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value", style="green")
+    table.add_row("From", f"({lat_a}, {lon_a})")
+    table.add_row("To", f"({lat_b}, {lon_b})")
+    table.add_row("Distance (m)", f"{d:,.2f}")
+    table.add_row("Distance (km)", f"{d / 1000:,.3f}")
+    console.print(table)
+
+
+@main.command()
+@click.argument("relationship", type=click.Choice([
+    "contains", "within", "intersects", "touches", "crosses", "overlaps", "disjoint",
+]))
+@click.argument("geojson_a")
+@click.argument("geojson_b")
+def check(relationship: str, geojson_a: str, geojson_b: str) -> None:
+    """Check spatial relationship between two GeoJSON geometries."""
+    from geospark.engine.spatial_reasoner import SpatialReasoner
+
+    try:
+        a = json.loads(geojson_a)
+        b = json.loads(geojson_b)
+        result = SpatialReasoner.check_relationship(a, b, relationship)
+        color = "green" if result else "red"
+        console.print(f"{relationship}: [{color}]{result}[/{color}]")
+    except Exception as e:
+        console.print(f"[red]Error:[/red] {e}")
+
+
+@main.command()
+@click.argument("question")
+@click.option("--provider", type=click.Choice(["auto", "ollama", "openrouter"]), default="auto")
+@click.option("--model", default=None, help="Override LLM model")
+def ask(question: str, provider: str, model: str | None) -> None:
+    """Ask a natural language spatial question."""
+    from geospark import Engine
+
+    engine = Engine(tools=["geocoder", "terrain"])
+    prov = None if provider == "auto" else provider
+    result = engine.ask(question, model=model, provider=prov)
+
+    if result.errors:
+        console.print(f"[red]Error:[/red] {result.errors[0]}")
+        return
+
+    console.print(f"\n[bold]{result.spatial_context.summary}[/bold]\n")
+    if result.metadata:
+        source = result.metadata.get("source", "unknown")
+        used = result.metadata.get("tools_used", [])
+        if used:
+            console.print(f"[dim]Tools used: {', '.join(used)} | Source: {source}[/dim]")
+
+
+@main.command()
 def tools() -> None:
     """List available tools."""
     from geospark.tools.registry import TOOL_CLASSES

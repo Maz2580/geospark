@@ -228,11 +228,11 @@ All Phase 3 modules are built, tested (441 total tests), and passing.
 - [x] API `/api/v1/ask` now uses Ollama-first architecture
 - [x] MCP server version fix (reports GeoSpark 0.1.0, not SDK version)
 
-### Phase 4E: Remaining Work
-- [ ] Real satellite raster processing (wire up rasterio for NDVI)
-- [ ] Embedding-based RAG (replace word overlap with vectors)
-- [ ] CLI polish (`geospark distance`, `geospark relationship` commands)
-- [ ] Run baselines on 5+ models for benchmark leaderboard
+### Phase 4E: CLI & RAG Upgrades (COMPLETE)
+- [x] CLI: `geospark distance`, `geospark check`, `geospark ask` commands
+- [x] Embedding-based RAG via Ollama (cosine similarity, falls back to word overlap)
+- [ ] Real satellite raster processing (wire up rasterio for NDVI) — deferred to Phase 5
+- [ ] Run baselines on 5+ models for benchmark leaderboard — deferred to Phase 5
 
 ---
 

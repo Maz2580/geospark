@@ -46,6 +46,7 @@ Desktop.ini
 .coverage
 htmlcov/
 coverage.xml
+test_academic/
 
 # Type checking
 .mypy_cache/

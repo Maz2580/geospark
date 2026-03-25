@@ -16,8 +16,9 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Security
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
 from geospark.engine.core import Engine
@@ -63,6 +64,25 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
+
+# --- API Key Auth (optional) ---
+
+_bearer_scheme = HTTPBearer(auto_error=False)
+_bearer_security = Security(_bearer_scheme)
+
+
+async def verify_api_key(
+    credentials: HTTPAuthorizationCredentials | None = _bearer_security,
+) -> None:
+    """Check Bearer token against GEOSPARK_API_KEY env var.
+
+    If GEOSPARK_API_KEY is not set, all requests are allowed (open mode).
+    """
+    api_key = os.getenv("GEOSPARK_API_KEY")
+    if not api_key:
+        return  # No key configured — open access
+    if credentials is None or credentials.credentials != api_key:
+        raise HTTPException(status_code=401, detail="Invalid or missing API key")
 
 
 # --- Request/Response Models ---
@@ -188,7 +208,7 @@ async def info():
     }
 
 
-@app.post("/api/v1/geocode", response_model=SpatialResult)
+@app.post("/api/v1/geocode", response_model=SpatialResult, dependencies=[Depends(verify_api_key)])
 async def geocode(request: GeocodeRequest):
     """Geocode an address or place name."""
     engine = get_engine()
@@ -200,7 +220,7 @@ async def geocode(request: GeocodeRequest):
     return engine.execute(query)
 
 
-@app.post("/api/v1/query", response_model=SpatialResult)
+@app.post("/api/v1/query", response_model=SpatialResult, dependencies=[Depends(verify_api_key)])
 async def spatial_query(request: SpatialQueryRequest):
     """Execute a spatial query."""
     engine = get_engine()
@@ -226,7 +246,7 @@ async def spatial_query(request: SpatialQueryRequest):
     return engine.execute(query)
 
 
-@app.post("/api/v1/check-relationship", response_model=RelationshipResponse)
+@app.post("/api/v1/check-relationship", response_model=RelationshipResponse, dependencies=[Depends(verify_api_key)])
 async def check_relationship(request: RelationshipRequest):
     """
     Check topological relationship between two geometries.
@@ -248,7 +268,7 @@ async def check_relationship(request: RelationshipRequest):
         raise HTTPException(status_code=400, detail=str(e)) from e
 
 
-@app.post("/api/v1/ask", response_model=AskResponse)
+@app.post("/api/v1/ask", response_model=AskResponse, dependencies=[Depends(verify_api_key)])
 async def ask(request: AskRequest):
     """
     Ask a natural language spatial question.
@@ -269,7 +289,7 @@ async def ask(request: AskRequest):
     )
 
 
-@app.post("/api/v1/distance", response_model=DistanceResponse)
+@app.post("/api/v1/distance", response_model=DistanceResponse, dependencies=[Depends(verify_api_key)])
 async def distance(request: DistanceRequest):
     """Calculate geodesic distance between two points."""
     geom_a = {"type": "Point", "coordinates": [request.lon_a, request.lat_a]}
@@ -278,7 +298,7 @@ async def distance(request: DistanceRequest):
     return DistanceResponse(distance_m=round(d, 2), distance_km=round(d / 1000, 3))
 
 
-@app.post("/api/v1/elevation")
+@app.post("/api/v1/elevation", dependencies=[Depends(verify_api_key)])
 async def elevation(request: ElevationRequest):
     """Get elevation at a point (meters above sea level)."""
     engine = get_engine()

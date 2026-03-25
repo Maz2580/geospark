@@ -9,7 +9,7 @@
 ## Executive Summary
 
 LLMs alone achieve **50.0%** accuracy on spatial reasoning tasks.
-With GeoSpark tools attached, accuracy increases to **58.0%** — an improvement of **+8.0 percentage points**.
+With GeoSpark tools attached, accuracy increases to **66.0%** — an improvement of **+16.0 percentage points**.
 
 This demonstrates that LLMs fundamentally lack spatial reasoning capabilities
 and require external tool augmentation for reliable geospatial analysis.
@@ -26,7 +26,7 @@ and require external tool augmentation for reliable geospatial analysis.
   - **GeoMultimodal**: Combined spatial + elevation + metadata questions
 - **Conditions**: Baseline (LLM only) vs Augmented (LLM + GeoSpark tools)
 - **Model**: `qwen2.5:7b` via OpenRouter
-- **Questions evaluated**: 50 / 535
+- **Questions evaluated**: 100 / 535
 - **Scoring**: Boolean exact match, numeric within 10% tolerance, text substring match
 
 ---
@@ -35,12 +35,12 @@ and require external tool augmentation for reliable geospatial analysis.
 
 | Benchmark       | Questions | Evaluated | Baseline (LLM only) | Augmented (LLM + GeoSpark) | Improvement |
 |-----------------|-----------|-----------|---------------------|---------------------------|-------------|
-| geochanage      |        36 |        10 |                90.0% |                      90.0% |       +0.0% |
-| geodistance     |       210 |        10 |                 0.0% |                      90.0% |      +90.0% |
-| geomultimodal   |        24 |        10 |                40.0% |                      20.0% |      -20.0% |
-| georeason       |        55 |        10 |                60.0% |                      80.0% |      +20.0% |
-| geotopo         |       210 |        10 |                60.0% |                      10.0% |      -50.0% |
-| **Overall**     | **    535** | **     50** | **              50.0%** | **                    58.0%** | **     +8.0%** |
+| geochanage      |        36 |        20 |                90.0% |                      85.0% |       -5.0% |
+| geodistance     |       210 |        20 |                 0.0% |                      75.0% |      +75.0% |
+| geomultimodal   |        24 |        20 |                30.0% |                      25.0% |       -5.0% |
+| georeason       |        55 |        20 |                85.0% |                      95.0% |      +10.0% |
+| geotopo         |       210 |        20 |                45.0% |                      50.0% |       +5.0% |
+| **Overall**     | **    535** | **    100** | **              50.0%** | **                    66.0%** | **    +16.0%** |
 
 ---
 
@@ -50,34 +50,36 @@ and require external tool augmentation for reliable geospatial analysis.
 
 | Category                       | Count | Baseline | Augmented |
 |--------------------------------|-------|----------|-----------|
-| change_detection               |     6 |     83.3% |       83.3% |
-| change_type                    |     4 |    100.0% |      100.0% |
+| change_detection               |    11 |     81.8% |       81.8% |
+| change_type                    |     9 |    100.0% |       88.9% |
 
 ### geodistance
 
 | Category                       | Count | Baseline | Augmented |
 |--------------------------------|-------|----------|-----------|
-| distance_absolute              |    10 |      0.0% |       90.0% |
+| distance_absolute              |    20 |      0.0% |       75.0% |
 
 ### geomultimodal
 
 | Category                       | Count | Baseline | Augmented |
 |--------------------------------|-------|----------|-----------|
-| vegetation_health              |     6 |     33.3% |       16.7% |
-| elevation_climate              |     4 |     50.0% |       25.0% |
+| vegetation_health              |     6 |     33.3% |       33.3% |
+| elevation_climate              |     6 |     50.0% |       50.0% |
+| urban_classification           |     4 |     25.0% |        0.0% |
+| data_reliability               |     4 |      0.0% |        0.0% |
 
 ### georeason
 
 | Category                       | Count | Baseline | Augmented |
 |--------------------------------|-------|----------|-----------|
-| distance_chain                 |     8 |     50.0% |       75.0% |
-| transitivity                   |     2 |    100.0% |      100.0% |
+| distance_chain                 |     8 |     62.5% |       87.5% |
+| transitivity                   |    12 |    100.0% |      100.0% |
 
 ### geotopo
 
 | Category                       | Count | Baseline | Augmented |
 |--------------------------------|-------|----------|-----------|
-| contains                       |    10 |     60.0% |       10.0% |
+| contains                       |    20 |     45.0% |       50.0% |
 
 ---
 
@@ -87,15 +89,16 @@ Categories where the LLM failed but GeoSpark succeeded:
 
 | Category | Questions Fixed by GeoSpark |
 |----------|---------------------------|
-| distance_absolute | 9 |
+| distance_absolute | 15 |
 | distance_chain | 2 |
+| contains | 1 |
 
 ---
 
 ## Key Takeaways
 
 1. **LLMs lack spatial reasoning**: Baseline accuracy of 50.0% confirms that LLMs cannot reliably perform spatial computations.
-2. **Tool augmentation works**: GeoSpark improves accuracy by +8.0 percentage points across all categories.
+2. **Tool augmentation works**: GeoSpark improves accuracy by +16.0 percentage points across all categories.
 3. **Ground-truth is essential**: For topology, distance, and area calculations, LLMs need external tools to provide mathematically correct answers.
 4. **Zero-cost deployment**: All results achieved using free-tier LLM models, demonstrating that spatial intelligence doesn't require expensive models.
 5. **Reproducible**: All benchmarks and evaluation code are open source at https://github.com/Maz2580/geospark

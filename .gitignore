@@ -23,6 +23,7 @@ env/
 
 # Environment / Secrets
 .env
+.env.production
 *.env.local
 
 # Data (large binary files -- use Git LFS or keep in data/)
@@ -60,9 +61,5 @@ docker-compose.override.yml
 # Resources (cloned reference repos -- not part of GeoSpark)
 resources/
 
-# Claude Code (session data, not project config)
-# NOTE: .claude/commands/ and .claude/agents/ ARE committed (project dev tools)
-.claude/settings*
-.claude/todos*
-.claude/teams*
-.claude/tasks*
+# Claude Code
+.claude/

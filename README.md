@@ -61,7 +61,7 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
 ## Quick Start
 
 ```bash
-pip install geospark
+pip install geospark-ai
 ```
 
 ### As a Python library
@@ -177,40 +177,19 @@ python -m geospark.bench list
 
 ## Benchmark Results
 
-GeoSpark Bench v1.0 includes **535 questions** across 5 benchmark suites. We evaluated **Gemma 12B** on spatial reasoning tasks -- without any tools, using only its training data. Then we compared to GeoSpark's ground-truth engine.
+GeoSpark Bench v1.0 includes **535 questions** across 5 benchmark suites. We evaluated **Qwen 2.5 7B** (via Ollama) on spatial reasoning tasks — baseline (LLM alone) vs. augmented (LLM + GeoSpark tools).
 
-### GeoTopo — Topological Reasoning (210 questions)
+| Benchmark | Questions | LLM Alone | With GeoSpark | Improvement |
+|-----------|-----------|-----------|---------------|-------------|
+| **GeoDistance** | 210 | 0% | **75%** | **+75%** |
+| **GeoReason** | 55 | 85% | **95%** | **+10%** |
+| **GeoTopo** | 210 | 45% | **50%** | **+5%** |
+| **GeoChange** | 36 | 90% | 85% | -5% |
+| **GeoMultimodal** | 24 | 30% | 25% | -5% |
 
-| Category | LLM Alone | GeoSpark | Gap |
-|----------|-----------|----------|-----|
-| contains (point in polygon) | 52.6% | **100%** | +47.4% |
-| contains_with_hole | 50.0% | **100%** | +50.0% |
-| intersects | 50.0% | **100%** | +50.0% |
-| within | 33.3% | **100%** | +66.7% |
-| disjoint | 0% | **100%** | +100% |
-| touches (boundary) | 0% | **100%** | +100% |
-| **Overall** | **30%** | **100%** | **+70%** |
+**Key finding**: LLMs literally **cannot compute** geodesic distances from coordinates (0% accuracy). With GeoSpark tool augmentation, accuracy rises to 75%. LLMs can reason about *relative proximity* from world knowledge, but GeoSpark fills the gap where ground-truth computation is required.
 
-### GeoDistance — Distance Reasoning (210 questions)
-
-| Category | LLM Alone | GeoSpark | Gap |
-|----------|-----------|----------|-----|
-| absolute distance | 0% | **100%** | +100% |
-| nearest neighbor | 0% | **100%** | +100% |
-| proximity threshold | 84.3% | **100%** | +15.7% |
-| **Overall** | **43%** | **100%** | **+57%** |
-
-### Additional Benchmarks
-
-| Benchmark | Questions | Categories |
-|-----------|-----------|------------|
-| **GeoChange** | 36 | Change detection, change type classification |
-| **GeoReason** | 55 | Multi-step reasoning: transitivity, distance chains, comparative, buffer intersection |
-| **GeoMultimodal** | 24 | Vegetation health, elevation/climate, flood risk, urban classification |
-
-**Key finding**: LLMs can reason about *relative proximity* from world knowledge (84% on "is X near Y?") but **cannot compute** distances or topology from coordinates (0%). GeoSpark fills exactly this gap.
-
-> Evaluated with [GeoSpark Bench](docs/ROADMAP.md) v1.0. Run your own: `python -m geospark.bench run --benchmark geotopo`
+> Evaluated with [GeoSpark Bench](docs/BENCHMARK_REPORT.md) v1.0. Run your own: `python -m geospark.bench run --benchmark geotopo`
 
 ## Why GeoSpark?
 
@@ -229,8 +208,8 @@ GeoSpark Bench v1.0 includes **535 questions** across 5 benchmark suites. We eva
 | **Phase 0** — Foundation | **Complete** | 50 | Protocol, engine, CRS, tools, CLI, MCP, Docker, CI/CD |
 | **Phase 1** — Launch | **Complete** | 96 | Bench v0.1, baselines, demo notebook, GitHub repo |
 | **Phase 2** — Ecosystem | **Complete** | 249 | 8 tools, RAG, memory, planner, cache, 4 LLM integrations |
-| **Phase 3** — Platform | **Complete** | 441 | Bench v1.0, Flows, Knowledge Graph, Plugin System |
-| Phase 4 — Scale | **Next** | -- | Enterprise features, cloud hosting, marketplace |
+| **Phase 3** — Platform | **Complete** | 446 | Bench v1.0, Flows, Knowledge Graph, Plugin System |
+| **Phase 4** — Scale | **In Progress** | 446 | Live API, Docker deploy, API auth, benchmarking |
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for the detailed roadmap.
 
@@ -259,6 +238,17 @@ mypy geospark/
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
+## Live API
+
+GeoSpark is deployed and accessible at **[geospark.terrascout.app](https://geospark.terrascout.app/docs)** — 11 endpoints with interactive Swagger documentation.
+
+## Author
+
+Created by **Mazdak Ghasemi Tootkaboni** ([University of Melbourne](https://www.unimelb.edu.au/))
+
+- ORCID: [0000-0001-8084-5270](https://orcid.org/0000-0001-8084-5270)
+- GitHub: [@Maz2580](https://github.com/Maz2580)
+
 ## License
 
-[Apache 2.0](LICENSE)
+[Apache 2.0](LICENSE) — Copyright 2024-2026 Mazdak Ghasemi Tootkaboni

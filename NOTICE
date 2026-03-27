@@ -1,0 +1,22 @@
+GeoSpark
+Copyright 2024-2026 Mazdak Ghasemi Tootkaboni
+
+Licensed under the Apache License, Version 2.0.
+
+This product was created by Mazdak Ghasemi Tootkaboni at the
+University of Melbourne (M.GhasemiTootkaboni@unimelb.edu.au).
+
+This product includes the following third-party software:
+- Shapely (BSD 3-Clause) - Geometry operations
+- PyProj (MIT) - CRS transformations
+- Pydantic (MIT) - Data validation
+- HTTPX (BSD 3-Clause) - HTTP client
+- FastAPI (MIT) - REST API framework
+- Click (BSD 3-Clause) - CLI framework
+- Rich (MIT) - Terminal formatting
+
+Geospatial data services used:
+- OpenStreetMap/Nominatim (ODbL) - Geocoding
+- Open Elevation API - Elevation data
+- OSRM (BSD 2-Clause) - Routing
+- SpatioTemporal Asset Catalogs (STAC) - Satellite data discovery

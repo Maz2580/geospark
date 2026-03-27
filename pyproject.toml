@@ -13,7 +13,7 @@ readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"
 authors = [
-    { name = "GeoSpark Contributors" },
+    { name = "Mazdak Ghasemi Tootkaboni", email = "M.GhasemiTootkaboni@unimelb.edu.au" },
 ]
 keywords = [
     "geospatial",

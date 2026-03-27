@@ -6,8 +6,8 @@
 
 <p align="center">
   <a href="https://github.com/Maz2580/geospark/actions"><img src="https://img.shields.io/github/actions/workflow/status/Maz2580/geospark/ci.yml?branch=main&label=tests" alt="CI"></a>
-  <a href="https://pypi.org/project/geospark/"><img src="https://img.shields.io/pypi/v/geospark?color=blue" alt="PyPI"></a>
-  <a href="https://pypi.org/project/geospark/"><img src="https://img.shields.io/pypi/pyversions/geospark" alt="Python"></a>
+  <a href="https://pypi.org/project/geospark-ai/"><img src="https://img.shields.io/pypi/v/geospark-ai?color=blue" alt="PyPI"></a>
+  <a href="https://pypi.org/project/geospark-ai/"><img src="https://img.shields.io/pypi/pyversions/geospark-ai" alt="Python"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
 </p>
 

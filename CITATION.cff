@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use GeoSpark in your research, please cite it as below."
+title: "GeoSpark: The Open-Source Geospatial Intelligence Protocol & Engine"
+type: software
+authors:
+  - family-names: "Ghasemi Tootkaboni"
+    given-names: "Mazdak"
+    email: "M.GhasemiTootkaboni@unimelb.edu.au"
+    affiliation: "University of Melbourne"
+    orcid: "https://orcid.org/0000-0001-8084-5270"
+repository-code: "https://github.com/Maz2580/geospark"
+url: "https://geospark.terrascout.app"
+license: Apache-2.0
+version: "0.1.0"
+date-released: "2025-01-01"
+keywords:
+  - geospatial
+  - spatial-reasoning
+  - llm
+  - ai
+  - gis
+  - mcp
+  - protocol
+abstract: >-
+  GeoSpark is an open-source Geospatial Intelligence Protocol and Engine
+  that gives AI models genuine spatial reasoning capabilities. Current LLMs
+  fail 42-80% on spatial tasks; GeoSpark provides ground-truth spatial
+  computation via a standardized protocol, pluggable tool system, and
+  MCP server integration.

@@ -19,8 +19,8 @@ from typing import Any
 
 import httpx
 
-from geospark.integrations.mcp_server import MCP_TOOLS, GeoSparkMCPHandler
 from geospark.integrations.openrouter import GEOSPARK_SYSTEM_PROMPT, SpatialAnswer
+from geospark.mcp_servers.launcher import MCPServerLauncher
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class OllamaClient:
         self.model = model
         self.base_url = base_url.rstrip("/")
 
-        self.geo_handler = GeoSparkMCPHandler(tools=tools or ["geocoder", "terrain"])
+        self._launcher = MCPServerLauncher()
 
         self.client = httpx.Client(
             headers={"Content-Type": "application/json"},
@@ -92,7 +92,7 @@ class OllamaClient:
                     except json.JSONDecodeError:
                         fn_args = {}
 
-                result = self.geo_handler.handle_tool_call(fn_name, fn_args)
+                result = self._launcher.handle_tool_call(fn_name, fn_args)
                 tool_results.append({"tool": fn_name, "args": fn_args, "result": result})
 
                 messages.append({
@@ -141,7 +141,7 @@ class OllamaClient:
                     "parameters": tool["inputSchema"],
                 },
             }
-            for tool in MCP_TOOLS
+            for tool in self._launcher.get_all_tools()
         ]
 
     def list_models(self) -> list[str]:

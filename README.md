@@ -81,47 +81,55 @@ SpatialReasoner.calculate_distance(
 # Returns: ~3,300 meters (actual geodesic distance)
 ```
 
-### As an MCP Server (for Claude, ChatGPT, etc.)
+### As an MCP Server (for Claude Desktop)
 
-```python
-from geospark.integrations.mcp_server import GeoSparkMCPHandler
-
-handler = GeoSparkMCPHandler()
-tools = handler.get_tools()       # MCP tool definitions
-result = handler.handle_tool_call("geocode", {
-    "explanation": "Need coordinates for spatial analysis",
-    "query": "Big Ben, London"
-})
+```bash
+pip install geospark-ai[mcp]
+geospark-mcp  # Starts stdio MCP server with 6 spatial tools
 ```
 
-### With a free LLM (via OpenRouter)
+Add to your Claude Desktop config (`~/.claude/claude_desktop_config.json`):
+```json
+{
+  "mcpServers": {
+    "geospark": { "command": "geospark-mcp" }
+  }
+}
+```
+
+### Natural language spatial questions
 
 ```python
-from geospark.integrations.openrouter import OpenRouterClient
+from geospark import Engine
 
-client = OpenRouterClient()  # Uses OPENROUTER_API_KEY env var
-answer = client.ask("Is the Eiffel Tower within 5km of the Louvre?")
-print(answer)
-# The model calls geocode + spatial_query tools automatically
+engine = Engine(tools=["geocoder", "terrain"])
+result = engine.ask("How far is the Eiffel Tower from Big Ben?")
+print(result.spatial_context.summary)
+# Automatically geocodes both locations + computes geodesic distance
 ```
+
+Tries local Ollama first (free, fast), falls back to OpenRouter.
 
 ### CLI
 
 ```bash
 geospark geocode "Tokyo Tower, Japan"
 geospark elevation 35.6586 139.7454
+geospark distance 48.8566 2.3522 51.5074 -- -0.1278  # Paris → London
+geospark ask "Is Tokyo closer to Seoul or Beijing?"
 geospark tools    # List available tools
 geospark info     # System info
 ```
 
-### Docker
+### Try the Live API (no install needed)
+
+Explore all 11 endpoints interactively at **[geospark.terrascout.app/docs](https://geospark.terrascout.app/docs)**
 
 ```bash
-# In-memory backend
-docker run -p 8000:8000 geospark/geospark:latest
-
-# Full stack with PostGIS
-docker compose up
+# Quick test
+curl -X POST https://geospark.terrascout.app/api/v1/distance \
+  -H "Content-Type: application/json" \
+  -d '{"lat_a": 48.8566, "lon_a": 2.3522, "lat_b": 51.5074, "lon_b": -0.1278}'
 ```
 
 ### Run the Benchmark

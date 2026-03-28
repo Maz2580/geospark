@@ -281,11 +281,14 @@ async def ask(request: AskRequest):
     if result.errors:
         raise HTTPException(status_code=503, detail=result.errors[0])
 
+    # sources format: ["ollama:qwen2.5:7b", "geocode", "calculate_distance"]
+    model_source = result.sources[0] if result.sources else "unknown"
+    tools_used = result.sources[1:] if len(result.sources) > 1 else []
     return AskResponse(
         answer=result.spatial_context.summary,
-        model=result.metadata.get("model", "unknown"),
-        tools_used=result.metadata.get("tools_used", []),
-        tokens_used=result.metadata.get("tokens_used", 0),
+        model=model_source,
+        tools_used=tools_used,
+        tokens_used=0,
     )
 
 

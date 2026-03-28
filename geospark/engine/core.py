@@ -132,17 +132,13 @@ class Engine:
                 errors=[f"Ollama call failed: {e}"],
             )
 
+        tools_used = [tc["tool"] for tc in answer.tool_calls]
         return SpatialResult(
             spatial_context=SpatialContext(
                 summary=answer.answer,
                 total_features=len(answer.tool_calls),
             ),
-            metadata={
-                "model": answer.model,
-                "tools_used": [tc["tool"] for tc in answer.tool_calls],
-                "tokens_used": answer.tokens_used,
-                "source": "ollama",
-            },
+            sources=[f"ollama:{answer.model}", *tools_used],
         )
 
     def _ask_openrouter(
@@ -174,17 +170,13 @@ class Engine:
                 errors=[f"OpenRouter call failed: {e}"],
             )
 
+        tools_used = [tc["tool"] for tc in answer.tool_calls]
         return SpatialResult(
             spatial_context=SpatialContext(
                 summary=answer.answer,
                 total_features=len(answer.tool_calls),
             ),
-            metadata={
-                "model": answer.model,
-                "tools_used": [tc["tool"] for tc in answer.tool_calls],
-                "tokens_used": answer.tokens_used,
-                "source": "openrouter",
-            },
+            sources=[f"openrouter:{answer.model}", *tools_used],
         )
 
     def chain(self, steps: list[dict[str, Any]]) -> QueryChain:

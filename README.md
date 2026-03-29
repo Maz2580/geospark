@@ -219,7 +219,7 @@ GeoSpark Bench v1.0 includes **535 questions** across 5 benchmark suites. We eva
 | **Phase 3** — Platform | **Complete** | 446 | Bench v1.0, Flows, Knowledge Graph, Plugin System |
 | **Phase 4** — Scale | **In Progress** | 446 | Live API, Docker deploy, API auth, benchmarking |
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for the detailed roadmap.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
 
 ## Development
 

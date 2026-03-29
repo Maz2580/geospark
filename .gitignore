@@ -61,5 +61,12 @@ docker-compose.override.yml
 # Resources (cloned reference repos -- not part of GeoSpark)
 resources/
 
+# Internal docs (keep locally, not public)
+docs/PRD.md
+docs/BUSINESS_PLAN.md
+docs/ROADMAP.md
+docs/launch/
+docs/superpowers/
+
 # Claude Code
 .claude/

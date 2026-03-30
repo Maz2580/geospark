@@ -185,19 +185,34 @@ python -m geospark.bench list
 
 ## Benchmark Results
 
-GeoSpark Bench v1.0 includes **535 questions** across 5 benchmark suites. We evaluated **Qwen 2.5 7B** (via Ollama) on spatial reasoning tasks — baseline (LLM alone) vs. augmented (LLM + GeoSpark tools).
+GeoSpark Bench v1.0 — **535 questions** across 5 benchmarks, evaluated on **5 LLM families** (Qwen, Llama, Gemma, Mistral, Phi) via Ollama.
 
-| Benchmark | Questions | LLM Alone | With GeoSpark | Improvement |
-|-----------|-----------|-----------|---------------|-------------|
-| **GeoDistance** | 210 | 0% | **75%** | **+75%** |
-| **GeoReason** | 55 | 85% | **95%** | **+10%** |
-| **GeoTopo** | 210 | 45% | **50%** | **+5%** |
-| **GeoChange** | 36 | 90% | 85% | -5% |
-| **GeoMultimodal** | 24 | 30% | 25% | -5% |
+### Baseline: LLM Alone (No Tools)
 
-**Key finding**: LLMs literally **cannot compute** geodesic distances from coordinates (0% accuracy). With GeoSpark tool augmentation, accuracy rises to 75%. LLMs can reason about *relative proximity* from world knowledge, but GeoSpark fills the gap where ground-truth computation is required.
+| Benchmark | Qwen 2.5 7B | Llama 3.1 8B | Gemma 2 9B | Mistral 7B | Phi-3.5 3.8B | Mean |
+|-----------|:-----------:|:-----------:|:----------:|:----------:|:-----------:|:----:|
+| GeoDistance | **0%** | **0%** | 30% | **0%** | **0%** | **6%** |
+| GeoTopo | 45% | 50% | 50% | 50% | 45% | 48% |
+| GeoChange | 90% | 65% | 80% | 85% | 75% | 79% |
+| GeoReason | 85% | 65% | 90% | 75% | 70% | 77% |
+| GeoMultimodal | 30% | 35% | 30% | 35% | 35% | 33% |
 
-> Evaluated with [GeoSpark Bench](docs/BENCHMARK_REPORT.md) v1.0. Run your own: `python -m geospark.bench run --benchmark geotopo`
+### With GeoSpark Tool Augmentation
+
+| Benchmark | Qwen 2.5 7B | Llama 3.1 8B | Mistral 7B | Improvement (best) |
+|-----------|:-----------:|:-----------:|:----------:|:------------------:|
+| GeoDistance | **70%** | 10% | 0% | **+70%** |
+| GeoReason | **100%** | 65% | 80% | **+15%** |
+| GeoTopo | 50% | 50% | 50% | +5% |
+
+**Key findings**:
+- **0% on distance** across 4/5 models — LLMs cannot compute geodesic distances from coordinates
+- **48% on topology** — random chance on binary questions, confirming no spatial predicate capability
+- **79% on change detection** — knowledge-based spatial reasoning works; the deficit is strictly computational
+- **70% with tools** (Qwen 2.5 7B) — tool augmentation fixes the computational gap
+- **100% on reasoning** (Qwen 2.5 7B) — structured prompting solves multi-step spatial chains
+
+> Full results: [Benchmark Report](docs/BENCHMARK_REPORT.md) | Run your own: `python -m geospark.bench run`
 
 ## Why GeoSpark?
 

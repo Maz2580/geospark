@@ -13,7 +13,7 @@
 
 ---
 
-Current LLMs fail at spatial reasoning — mislabeling topological relationships ~80% of the time and showing 42–80% performance drops on complex spatial tasks ([source](https://arxiv.org/abs/2310.11783)). **GeoSpark fixes this.**
+Current LLMs fail at spatial reasoning — achieving 0% on geodesic distance computation and ~48% (random chance) on topological reasoning across five model families in our benchmarks. **GeoSpark fixes this.**
 
 ## The Problem
 

@@ -294,5 +294,100 @@ def flow_info(template_name: str) -> None:
     console.print(table)
 
 
+@main.command()
+@click.argument("goal")
+def agent(goal: str) -> None:
+    """Run the autonomous spatial agent with a goal."""
+    from geospark.agents import GeoAgent
+
+    ag = GeoAgent()
+    console.print(f"[bold]GeoAgent[/bold]: {goal}\n")
+    result = ag.run(goal)
+
+    for step in result.steps:
+        icon = "[green]done[/green]" if not step.error else f"[red]{step.error[:40]}[/red]"
+        console.print(f"  {step.action}: {step.description} [{icon}]")
+
+    console.print(f"\n[bold]Summary[/bold]: {result.summary}")
+    console.print(f"[dim]({result.total_duration_s}s, {len(result.steps)} steps)[/dim]")
+
+
+@main.command()
+@click.argument("location")
+@click.option("--radius", default=2000, help="Search radius in meters")
+def report(location: str, radius: int) -> None:
+    """Generate a spatial intelligence report for a location."""
+    from geospark.agents import SpatialReport
+
+    reporter = SpatialReport()
+    console.print(f"[bold]Analyzing[/bold]: {location}\n")
+    rep = reporter.analyze(location, radius_m=radius)
+
+    table = Table(title=f"Spatial Report: {location}")
+    table.add_column("Property", style="cyan")
+    table.add_column("Value", style="green")
+
+    table.add_row("Address", rep.address[:80] if rep.address else "N/A")
+    table.add_row("Coordinates", str(rep.coordinates))
+    table.add_row("Elevation", f"{rep.elevation_m}m" if rep.elevation_m else "N/A")
+    table.add_row("Nearby amenities", str(len(rep.nearby)))
+
+    console.print(table)
+
+    if rep.accessibility:
+        acc_table = Table(title="Accessibility")
+        acc_table.add_column("Service", style="cyan")
+        acc_table.add_column("Nearest", style="green")
+        acc_table.add_column("Distance")
+        for a in rep.accessibility:
+            if a.available:
+                acc_table.add_row(a.service, a.nearest_name[:40], f"{a.distance_m}m")
+            else:
+                acc_table.add_row(a.service, "[dim]none found[/dim]", "-")
+        console.print(acc_table)
+
+    console.print(f"\n[bold]Summary[/bold]: {rep.summary}")
+    console.print(f"[dim]({rep.duration_s}s)[/dim]")
+
+
+@main.command("site-select")
+@click.option("--within", required=True, help="Search area (city/neighborhood)")
+@click.option("--near", default=None, help="Comma-separated amenity types to be near")
+@click.option("--avoid", default=None, help="Comma-separated amenity types to avoid")
+@click.option("--facility", default="restaurant", help="Facility type to place")
+@click.option("--radius", default=5000, help="Search radius in meters")
+def site_select(within: str, near: str | None, avoid: str | None, facility: str, radius: int) -> None:
+    """Find optimal locations based on spatial criteria."""
+    from geospark.agents import SiteSelector
+
+    near_list = [x.strip() for x in near.split(",")] if near else []
+    avoid_list = [x.strip() for x in avoid.split(",")] if avoid else []
+
+    selector = SiteSelector()
+    console.print(f"[bold]Site Selection[/bold]: {facility} in {within}\n")
+    result = selector.find(
+        within=within,
+        near=near_list,
+        avoid=avoid_list,
+        facility_type=facility,
+        radius_m=radius,
+    )
+
+    if result.candidates:
+        table = Table(title=f"Top Candidates ({len(result.candidates)} found)")
+        table.add_column("#", style="dim")
+        table.add_column("Location", style="cyan")
+        table.add_column("Score", style="green")
+        table.add_column("Details")
+
+        for i, c in enumerate(result.candidates[:10], 1):
+            details = ", ".join(f"{k}: {v}m" for k, v in c.details.items() if k.startswith("nearest"))
+            table.add_row(str(i), c.name[:50], f"{c.score:.2f}", details[:60])
+        console.print(table)
+
+    console.print(f"\n[bold]Summary[/bold]: {result.summary}")
+    console.print(f"[dim]({result.duration_s}s)[/dim]")
+
+
 if __name__ == "__main__":
     main()

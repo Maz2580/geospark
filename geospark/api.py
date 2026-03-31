@@ -388,3 +388,59 @@ async def flow_run_template(template_name: str, request: TemplateRunRequest):
         "step_results": run.step_results,
         "errors": run.errors,
     }
+
+
+# --- Agent Endpoints ---
+
+
+class AgentRunRequest(BaseModel):
+    goal: str = Field(..., description="Natural language spatial goal")
+
+
+class ReportRequest(BaseModel):
+    location: str = Field(..., description="Location to analyze")
+    radius_m: float = Field(2000, description="Search radius in meters")
+
+
+class SiteSelectRequest(BaseModel):
+    within: str = Field(..., description="Search area (city/neighborhood)")
+    near: list[str] = Field(default_factory=list, description="Amenity types to be near")
+    avoid: list[str] = Field(default_factory=list, description="Amenity types to avoid")
+    facility_type: str = Field("restaurant", description="Facility type to place")
+    radius_m: float = Field(5000, description="Search radius in meters")
+
+
+@app.post("/api/v1/agent/run", dependencies=[Depends(verify_api_key)])
+async def agent_run(request: AgentRunRequest):
+    """Run the autonomous spatial agent with a goal."""
+    from geospark.agents import GeoAgent
+
+    ag = GeoAgent(engine=get_engine())
+    result = ag.run(request.goal)
+    return result.model_dump()
+
+
+@app.post("/api/v1/agent/report", dependencies=[Depends(verify_api_key)])
+async def agent_report(request: ReportRequest):
+    """Generate a spatial intelligence report for a location."""
+    from geospark.agents import SpatialReport
+
+    reporter = SpatialReport(engine=get_engine())
+    report = reporter.analyze(request.location, radius_m=request.radius_m)
+    return report.model_dump()
+
+
+@app.post("/api/v1/agent/site-select", dependencies=[Depends(verify_api_key)])
+async def agent_site_select(request: SiteSelectRequest):
+    """Find optimal locations based on spatial criteria."""
+    from geospark.agents import SiteSelector
+
+    selector = SiteSelector(engine=get_engine())
+    result = selector.find(
+        within=request.within,
+        near=request.near,
+        avoid=request.avoid,
+        facility_type=request.facility_type,
+        radius_m=request.radius_m,
+    )
+    return result.model_dump()

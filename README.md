@@ -48,15 +48,18 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
 
 ## Key Features
 
-- **GeoSpark Protocol (GSP)** — A standardized JSON protocol for spatial queries. Like MCP, but for geospatial.
-- **Spatial Reasoning Engine** — Topology, distance, CRS transforms, buffering, area calculations. All geometrically correct.
-- **MCP Server** — Use GeoSpark as a tool in Claude, ChatGPT, or any MCP-compatible AI assistant.
+- **Autonomous Spatial Agents** — Give a goal, get a complete analysis. No manual step-by-step. Three built-in agents:
+  - `GeoAgent` — Multi-step spatial analysis from natural language ("Find hospitals near the Eiffel Tower")
+  - `SpatialReport` — One-command location intelligence dossier (amenities, accessibility, elevation, narrative)
+  - `SiteSelector` — Optimal location finding with multi-criteria scoring ("Best pharmacy spot in Zurich near hospitals and schools")
+- **Spatial Reasoning Engine** — Topology, geodesic distance, CRS transforms, buffering, area. All geometrically correct, not LLM-guessed.
+- **MCP Server** — 6 tools for Claude Desktop and any MCP-compatible AI assistant. `pip install geospark-ai[mcp] && geospark-mcp`
+- **GeoSpark Bench** — 535 benchmark questions, 5 LLM families evaluated. LLMs score 0% on distance; with GeoSpark tools, 70%. [Results →](docs/BENCHMARK_REPORT.md)
+- **GeoSpark Protocol (GSP)** — Standardized JSON protocol for spatial queries and results.
 - **Pluggable Tools** — Geocoding, satellite imagery (STAC), terrain/elevation, routing, spectral indices, change detection.
-- **GeoSpark Bench** — 535 benchmark questions across 5 suites, 5 LLM families evaluated. [See results →](docs/BENCHMARK_REPORT.md)
-- **GeoSpark Flows** — DAG-based workflow automation with conditional routing, pre-built templates, CLI (`geospark flow run`), and REST API.
-- **Spatial Knowledge Graph** — Entity-relation graph with BFS traversal, auto-relate, OSM admin boundary loader, and natural language queries.
-- **Plugin System** — Community plugin ecosystem with manifest-based discovery, lifecycle hooks, and dependency management.
-- **Zero-Cost Stack** — Local Ollama (primary) + OpenRouter fallback + Supabase. Full spatial AI at $0/month.
+- **GeoSpark Flows** — DAG-based workflow automation with CLI and REST API.
+- **Spatial Knowledge Graph** — Entity-relation graph with OSM admin boundaries, BFS traversal, and natural language queries.
+- **Zero-Cost Stack** — Local Ollama + OpenRouter fallback + Supabase. Full spatial AI at $0/month.
 
 ## Quick Start
 
@@ -64,14 +67,31 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
 pip install geospark-ai
 ```
 
+### Autonomous Agents (the fastest way to use GeoSpark)
+
+```python
+from geospark.agents import GeoAgent, SpatialReport, SiteSelector
+
+# Autonomous spatial analysis — plans and executes multi-step workflows
+agent = GeoAgent()
+result = agent.run("Find all hospitals within 2km of the Eiffel Tower")
+print(result.summary)  # "Within 2km of the Eiffel Tower, there are 3 hospitals..."
+
+# Location intelligence dossier — one command, complete analysis
+reporter = SpatialReport()
+report = reporter.analyze("Federation Square, Melbourne")
+print(report.accessibility)  # Nearest hospital, school, pharmacy with distances
+
+# Optimal site selection — multi-criteria spatial scoring
+selector = SiteSelector()
+result = selector.find(within="Zurich", near=["hospital", "school"], facility_type="pharmacy")
+print(result.best)  # Best-scoring location with explanation
+```
+
 ### As a Python library
 
 ```python
-from geospark import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
-
-# Spatial relationship check
-SpatialReasoner.check_relationship(polygon_a, polygon_b, "intersects")
 
 # Distance calculation (geodesic, not Euclidean)
 SpatialReasoner.calculate_distance(
@@ -79,6 +99,9 @@ SpatialReasoner.calculate_distance(
     {"type": "Point", "coordinates": [2.3376, 48.8606]},   # Louvre
 )
 # Returns: ~3,300 meters (actual geodesic distance)
+
+# Spatial relationship check (ground-truth, not LLM-guessed)
+SpatialReasoner.check_relationship(polygon_a, polygon_b, "intersects")
 ```
 
 ### As an MCP Server (for Claude Desktop)
@@ -113,12 +136,16 @@ Tries local Ollama first (free, fast), falls back to OpenRouter.
 ### CLI
 
 ```bash
+# Autonomous agents
+geospark agent "Find all parks within 2km of Big Ben"
+geospark report "Federation Square, Melbourne"
+geospark site-select --within "Paris" --near "metro,schools" --facility restaurant
+
+# Spatial tools
 geospark geocode "Tokyo Tower, Japan"
 geospark elevation 35.6586 139.7454
 geospark distance 48.8566 2.3522 51.5074 -- -0.1278  # Paris → London
 geospark ask "Is Tokyo closer to Seoul or Beijing?"
-geospark tools    # List available tools
-geospark info     # System info
 ```
 
 ### Try the Live API (no install needed)
@@ -228,11 +255,9 @@ GeoSpark Bench v1.0 — **535 questions** across 5 benchmarks, evaluated on **5 
 
 | Phase | Status | Tests | Description |
 |-------|--------|-------|-------------|
-| **Phase 0** — Foundation | **Complete** | 50 | Protocol, engine, CRS, tools, CLI, MCP, Docker, CI/CD |
-| **Phase 1** — Launch | **Complete** | 96 | Bench v0.1, baselines, demo notebook, GitHub repo |
-| **Phase 2** — Ecosystem | **Complete** | 249 | 8 tools, RAG, memory, planner, cache, 4 LLM integrations |
-| **Phase 3** — Platform | **Complete** | 446 | Bench v1.0, Flows, Knowledge Graph, Plugin System |
-| **Phase 4** — Scale | **In Progress** | 446 | Live API, Docker deploy, API auth, benchmarking |
+| **Phase 0-3** — Foundation to Platform | **Complete** | 446 | Protocol, engine, tools, MCP, Bench, Flows, Knowledge Graph, Plugins |
+| **Phase 4** — Deployment | **Complete** | 446 | Live API, Docker, PyPI v0.2.0, Ollama, API auth, 5-model benchmarks |
+| **Phase 5** — Autonomous Agents | **Complete** | 446 | GeoAgent, SpatialReport, SiteSelector — CLI + REST API |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
 

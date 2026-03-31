@@ -337,3 +337,54 @@ async def list_models():
     from geospark.integrations.openrouter import FREE_MODELS
 
     return {"models": FREE_MODELS}
+
+
+# --- Flow Endpoints ---
+
+
+class TemplateRunRequest(BaseModel):
+    parameters: dict[str, Any] = Field(default_factory=dict, description="Override template parameters")
+
+
+@app.get("/api/v1/flows/templates")
+async def flow_list_templates():
+    """List available flow templates."""
+    from geospark.flows import list_templates
+
+    return {"templates": list_templates()}
+
+
+@app.get("/api/v1/flows/templates/{template_name}")
+async def flow_get_template(template_name: str):
+    """Get a flow template definition."""
+    from geospark.flows import get_template
+
+    try:
+        f = get_template(template_name)
+        return f.model_dump()
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"Template not found: {template_name}") from None
+
+
+@app.post("/api/v1/flows/templates/{template_name}/run", dependencies=[Depends(verify_api_key)])
+async def flow_run_template(template_name: str, request: TemplateRunRequest):
+    """Run a flow template with optional parameter overrides."""
+    from geospark.flows import FlowRunner, get_template
+
+    try:
+        f = get_template(template_name, **request.parameters)
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"Template not found: {template_name}") from None
+
+    engine = get_engine()
+    runner = FlowRunner(engine=engine)
+    run = runner.run(f)
+
+    return {
+        "run_id": str(run.id),
+        "flow_name": f.name,
+        "status": run.status,
+        "steps_completed": len(run.step_results),
+        "step_results": run.step_results,
+        "errors": run.errors,
+    }

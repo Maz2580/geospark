@@ -209,5 +209,90 @@ def info() -> None:
     console.print(table)
 
 
+@main.group()
+def flow() -> None:
+    """Manage GeoSpark flows."""
+
+
+@flow.command("list")
+def flow_list() -> None:
+    """List available flow templates."""
+    from geospark.flows import list_templates
+
+    templates = list_templates()
+    table = Table(title="Flow Templates")
+    table.add_column("Template", style="cyan")
+    for t in templates:
+        table.add_row(t)
+    console.print(table)
+
+
+@flow.command("run")
+@click.argument("template_name")
+@click.option("--params", default=None, help="JSON overrides for template parameters")
+def flow_run(template_name: str, params: str | None) -> None:
+    """Run a flow template by name."""
+    from geospark import Engine
+    from geospark.flows import FlowRunner, get_template
+
+    overrides = json.loads(params) if params else {}
+    try:
+        f = get_template(template_name, **overrides)
+    except KeyError:
+        console.print(f"[red]Unknown template: {template_name}[/red]")
+        return
+
+    engine = Engine(tools=["geocoder", "terrain"])
+    runner = FlowRunner(engine=engine)
+    console.print(f"Running flow: [bold]{f.name}[/bold] ({len(f.steps)} steps)")
+
+    run = runner.run(f)
+
+    table = Table(title=f"Flow Run: {run.status}")
+    table.add_column("Step", style="cyan")
+    table.add_column("Status", style="green")
+    table.add_column("Result")
+
+    for step in f.steps:
+        result = run.step_results.get(step.id, {})
+        status = "done" if step.id in run.step_results else "skipped"
+        summary = str(result.get("summary", result.get("features", "")))[:60]
+        table.add_row(step.name, status, summary)
+
+    console.print(table)
+
+    if run.errors:
+        for err in run.errors:
+            console.print(f"[red]Error: {err}[/red]")
+
+
+@flow.command("info")
+@click.argument("template_name")
+def flow_info(template_name: str) -> None:
+    """Show details of a flow template."""
+    from geospark.flows import get_template
+
+    try:
+        f = get_template(template_name)
+    except KeyError:
+        console.print(f"[red]Unknown template: {template_name}[/red]")
+        return
+
+    console.print(f"[bold]{f.name}[/bold]")
+    console.print(f"{f.description}\n")
+
+    table = Table(title="Steps")
+    table.add_column("#", style="dim")
+    table.add_column("Step", style="cyan")
+    table.add_column("Operation", style="green")
+    table.add_column("Depends On", style="yellow")
+
+    for i, step in enumerate(f.steps, 1):
+        deps = ", ".join(step.depends_on) if step.depends_on else "-"
+        table.add_row(str(i), step.name, step.operation, deps)
+
+    console.print(table)
+
+
 if __name__ == "__main__":
     main()

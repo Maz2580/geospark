@@ -52,11 +52,11 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
 - **Spatial Reasoning Engine** — Topology, distance, CRS transforms, buffering, area calculations. All geometrically correct.
 - **MCP Server** — Use GeoSpark as a tool in Claude, ChatGPT, or any MCP-compatible AI assistant.
 - **Pluggable Tools** — Geocoding, satellite imagery (STAC), terrain/elevation, routing, spectral indices, change detection.
-- **GeoSpark Bench** — 535 benchmark questions across 5 suites proving LLMs fail 70%+ on spatial tasks. [See results →](examples/benchmark_demo.ipynb)
-- **GeoSpark Flows** — DAG-based workflow automation with conditional routing and pre-built templates.
-- **Spatial Knowledge Graph** — Entity-relation graph with BFS traversal, auto-relate, and natural language queries.
+- **GeoSpark Bench** — 535 benchmark questions across 5 suites, 5 LLM families evaluated. [See results →](docs/BENCHMARK_REPORT.md)
+- **GeoSpark Flows** — DAG-based workflow automation with conditional routing, pre-built templates, CLI (`geospark flow run`), and REST API.
+- **Spatial Knowledge Graph** — Entity-relation graph with BFS traversal, auto-relate, OSM admin boundary loader, and natural language queries.
 - **Plugin System** — Community plugin ecosystem with manifest-based discovery, lifecycle hooks, and dependency management.
-- **Zero-Cost Stack** — OpenRouter free models + Supabase free tier. Full spatial AI at $0/month.
+- **Zero-Cost Stack** — Local Ollama (primary) + OpenRouter fallback + Supabase. Full spatial AI at $0/month.
 
 ## Quick Start
 

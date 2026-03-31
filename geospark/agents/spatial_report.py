@@ -135,8 +135,8 @@ class SpatialReport:
             "latitude": lat,
             "longitude": lon,
         })
-        if elev.get("status") == "success":
-            report.elevation_m = elev.get("result", {}).get("elevation_m")
+        if elev.get("status") == "success" and elev.get("result"):
+            report.elevation_m = elev["result"].get("elevation_m")
 
         # Step 3: Nearby amenities (all service types)
         delta = radius_m / 111320

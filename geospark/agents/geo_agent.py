@@ -325,8 +325,8 @@ Respond with ONLY valid JSON (no markdown, no explanation):
                 "longitude": coords[0],
             })
             elevation = None
-            if elev_result.get("status") == "success":
-                elevation = elev_result.get("result", {}).get("elevation_m")
+            if elev_result.get("status") == "success" and elev_result.get("result"):
+                elevation = elev_result["result"].get("elevation_m")
 
             result.findings.setdefault("analysis", {})[loc_name] = {
                 "coordinates": coords,

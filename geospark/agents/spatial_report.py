@@ -204,8 +204,10 @@ class SpatialReport:
             f"Location: {report.address}\n"
             f"Coordinates: {report.coordinates}\n"
             f"Elevation: {report.elevation_m}m\n"
-            f"Nearby amenities: {json.dumps(amenity_counts)}\n"
-            f"Accessibility:\n" + "\n".join(access_lines)
+            f"Search radius: {report.query} (analyzed within the search area)\n"
+            f"Total nearby amenities found: {len(report.nearby)}\n"
+            f"By type: {json.dumps(amenity_counts)}\n"
+            f"Accessibility (nearest of each service type):\n" + "\n".join(access_lines)
         )
 
         prompt = f"""Write a 3-5 sentence spatial intelligence summary for this location.

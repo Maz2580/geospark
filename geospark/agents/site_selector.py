@@ -198,7 +198,9 @@ class SiteSelector:
                 for f in feats:
                     try:
                         d = SpatialReasoner.calculate_distance(cp_geom, f["geometry"])
-                        distances.append(d)
+                        # Skip self-matches (distance < 10m means same feature)
+                        if d > 10:
+                            distances.append(d)
                     except Exception:
                         continue
                 if distances:

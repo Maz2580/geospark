@@ -390,6 +390,117 @@ async def flow_run_template(template_name: str, request: TemplateRunRequest):
     }
 
 
+# --- Persistent Flow Endpoints ---
+
+
+class SaveFlowRequest(BaseModel):
+    name: str = Field(..., description="Flow name")
+    description: str = Field("", description="Flow description")
+    steps: list[dict[str, Any]] = Field(..., description="Flow step definitions")
+    trigger: dict[str, Any] | None = Field(None, description="Trigger config")
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+def _get_store():
+    """Get flow store, raise 503 if not configured."""
+    from geospark.flows.persistence import get_flow_store
+
+    store = get_flow_store()
+    if store is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Flow persistence not configured. Set GEOSPARK_FLOW_BACKEND=supabase",
+        )
+    return store
+
+
+@app.get("/api/v1/flows")
+async def flow_list():
+    """List saved flows (requires persistence backend)."""
+    store = _get_store()
+    flows = store.list_flows()
+    return {"flows": [f.model_dump() for f in flows]}
+
+
+@app.post("/api/v1/flows", dependencies=[Depends(verify_api_key)])
+async def flow_save(request: SaveFlowRequest):
+    """Save a flow definition (requires persistence backend)."""
+    from geospark.flows.flow_schema import Flow, FlowStep, FlowTrigger
+
+    store = _get_store()
+    steps = [FlowStep(**s) for s in request.steps]
+    trigger = FlowTrigger(**request.trigger) if request.trigger else FlowTrigger()
+    flow = Flow(
+        name=request.name,
+        description=request.description,
+        steps=steps,
+        trigger=trigger,
+        metadata=request.metadata,
+    )
+    flow_id = store.save_flow(flow)
+    return {"flow_id": flow_id, "name": flow.name}
+
+
+@app.get("/api/v1/flows/{flow_id}")
+async def flow_get(flow_id: str):
+    """Get a saved flow by ID."""
+    store = _get_store()
+    flow = store.get_flow(flow_id)
+    if flow is None:
+        raise HTTPException(status_code=404, detail="Flow not found")
+    return flow.model_dump()
+
+
+@app.delete("/api/v1/flows/{flow_id}", dependencies=[Depends(verify_api_key)])
+async def flow_delete(flow_id: str):
+    """Delete a saved flow and its runs."""
+    store = _get_store()
+    deleted = store.delete_flow(flow_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Flow not found")
+    return {"deleted": flow_id}
+
+
+@app.post("/api/v1/flows/{flow_id}/run", dependencies=[Depends(verify_api_key)])
+async def flow_run_saved(flow_id: str):
+    """Run a saved flow."""
+    from geospark.flows import FlowRunner
+
+    store = _get_store()
+    flow = store.get_flow(flow_id)
+    if flow is None:
+        raise HTTPException(status_code=404, detail="Flow not found")
+
+    runner = FlowRunner(engine=get_engine(), store=store)
+    run = runner.run(flow)
+
+    return {
+        "run_id": run.id,
+        "flow_id": flow_id,
+        "status": run.status,
+        "steps_completed": len(run.step_results),
+        "errors": run.errors,
+    }
+
+
+@app.get("/api/v1/flow-runs")
+async def flow_run_list(flow_id: str | None = None):
+    """List flow runs, optionally filtered by flow_id."""
+    store = _get_store()
+    runs = store.list_runs(flow_id=flow_id)
+    return {"runs": [r.model_dump() for r in runs]}
+
+
+@app.get("/api/v1/flow-runs/{run_id}")
+async def flow_run_get(run_id: str):
+    """Get a specific flow run."""
+    store = _get_store()
+    run = store.get_run(run_id)
+    if run is None:
+        raise HTTPException(status_code=404, detail="Run not found")
+    return run.model_dump()
+
+
 # --- Agent Endpoints ---
 
 

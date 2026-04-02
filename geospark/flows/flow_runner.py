@@ -56,8 +56,9 @@ class FlowRunner:
         print(run.status, run.step_results)
     """
 
-    def __init__(self, engine: Engine | None = None) -> None:
+    def __init__(self, engine: Engine | None = None, store: Any | None = None) -> None:
         self.engine = engine or Engine()
+        self._store = store  # Optional FlowStore for persistence
 
     def run(self, flow: Flow) -> FlowRun:
         """Execute a flow, running each step in dependency order.
@@ -70,6 +71,7 @@ class FlowRunner:
         """
         flow_run = FlowRun(flow_id=flow.id, status="running")
         flow_run.started_at = datetime.utcnow()
+        self._persist_run(flow_run)
 
         context: dict[str, Any] = {}
 
@@ -79,6 +81,7 @@ class FlowRunner:
             flow_run.status = "failed"
             flow_run.errors.append(str(err))
             flow_run.completed_at = datetime.utcnow()
+            self._persist_run(flow_run)
             return flow_run
 
         for step in ordered_steps:
@@ -87,6 +90,7 @@ class FlowRunner:
                 result = self._execute_step(step, context)
                 context[step.id] = result
                 flow_run.step_results[step.id] = result
+                self._persist_run(flow_run)
 
                 # Evaluate routes and add routed steps to context
                 for route in step.routes:
@@ -98,12 +102,22 @@ class FlowRunner:
                 flow_run.errors.append(f"Step '{step.id}' failed: {err}")
                 flow_run.completed_at = datetime.utcnow()
                 flow_run.current_step_id = None
+                self._persist_run(flow_run)
                 return flow_run
 
         flow_run.status = "completed"
         flow_run.completed_at = datetime.utcnow()
         flow_run.current_step_id = None
+        self._persist_run(flow_run)
         return flow_run
+
+    def _persist_run(self, run: FlowRun) -> None:
+        """Persist run state if a store is configured."""
+        if self._store is not None:
+            try:
+                self._store.save_run(run)
+            except Exception as err:
+                logger.warning("Failed to persist run %s: %s", run.id, err)
 
     def _execute_step(self, step: FlowStep, context: dict[str, Any]) -> dict[str, Any]:
         """Execute a single flow step.

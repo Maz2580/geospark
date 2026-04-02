@@ -294,6 +294,110 @@ def flow_info(template_name: str) -> None:
     console.print(table)
 
 
+@flow.command("saved")
+def flow_saved() -> None:
+    """List saved flows (requires Supabase persistence)."""
+    from geospark.flows.persistence import get_flow_store
+
+    store = get_flow_store()
+    if store is None:
+        console.print("[yellow]Flow persistence not configured. Set GEOSPARK_FLOW_BACKEND=supabase[/yellow]")
+        return
+
+    flows = store.list_flows()
+    if not flows:
+        console.print("[dim]No saved flows[/dim]")
+        return
+
+    table = Table(title=f"Saved Flows ({len(flows)})")
+    table.add_column("ID", style="dim", max_width=12)
+    table.add_column("Name", style="cyan")
+    table.add_column("Steps", style="green")
+    table.add_column("Trigger")
+
+    for f in flows:
+        table.add_row(f.id[:12], f.name, str(len(f.steps)), f.trigger.trigger_type)
+
+    console.print(table)
+
+
+@flow.command("get")
+@click.argument("flow_id")
+def flow_get(flow_id: str) -> None:
+    """Get a saved flow by ID."""
+    from geospark.flows.persistence import get_flow_store
+
+    store = get_flow_store()
+    if store is None:
+        console.print("[yellow]Flow persistence not configured[/yellow]")
+        return
+
+    f = store.get_flow(flow_id)
+    if f is None:
+        console.print(f"[red]Flow not found: {flow_id}[/red]")
+        return
+
+    console.print(f"[bold]{f.name}[/bold]")
+    console.print(f"{f.description}\n")
+
+    table = Table(title="Steps")
+    table.add_column("#", style="dim")
+    table.add_column("Step", style="cyan")
+    table.add_column("Operation", style="green")
+
+    for i, step in enumerate(f.steps, 1):
+        table.add_row(str(i), step.name, step.operation or "-")
+
+    console.print(table)
+
+
+@flow.command("delete")
+@click.argument("flow_id")
+def flow_delete(flow_id: str) -> None:
+    """Delete a saved flow."""
+    from geospark.flows.persistence import get_flow_store
+
+    store = get_flow_store()
+    if store is None:
+        console.print("[yellow]Flow persistence not configured[/yellow]")
+        return
+
+    deleted = store.delete_flow(flow_id)
+    if deleted:
+        console.print(f"[green]Deleted flow: {flow_id}[/green]")
+    else:
+        console.print(f"[red]Flow not found: {flow_id}[/red]")
+
+
+@flow.command("runs")
+@click.argument("flow_id")
+def flow_runs(flow_id: str) -> None:
+    """List runs for a saved flow."""
+    from geospark.flows.persistence import get_flow_store
+
+    store = get_flow_store()
+    if store is None:
+        console.print("[yellow]Flow persistence not configured[/yellow]")
+        return
+
+    runs = store.list_runs(flow_id=flow_id)
+    if not runs:
+        console.print("[dim]No runs found[/dim]")
+        return
+
+    table = Table(title=f"Runs ({len(runs)})")
+    table.add_column("Run ID", style="dim", max_width=12)
+    table.add_column("Status", style="green")
+    table.add_column("Steps")
+    table.add_column("Started")
+
+    for r in runs:
+        started = r.started_at.strftime("%Y-%m-%d %H:%M") if r.started_at else "-"
+        table.add_row(r.id[:12], r.status, str(len(r.step_results)), started)
+
+    console.print(table)
+
+
 @main.command()
 @click.argument("goal")
 def agent(goal: str) -> None:

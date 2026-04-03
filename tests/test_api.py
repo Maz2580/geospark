@@ -8,6 +8,7 @@ fastapi = pytest.importorskip("fastapi", reason="FastAPI not installed (install 
 
 from fastapi.testclient import TestClient  # noqa: E402
 
+import geospark  # noqa: E402
 from geospark.api import app  # noqa: E402
 
 
@@ -22,7 +23,7 @@ class TestHealthEndpoint:
         assert resp.status_code == 200
         data = resp.json()
         assert data["status"] == "ok"
-        assert data["version"] == "0.1.0"
+        assert data["version"] == geospark.__version__
         assert isinstance(data["tools"], list)
 
 
@@ -32,7 +33,7 @@ class TestStatusEndpoint:
         assert resp.status_code == 200
         data = resp.json()
         assert data["status"] == "ok"
-        assert data["version"] == "0.1.0"
+        assert data["version"] == geospark.__version__
         assert isinstance(data["uptime_seconds"], float)
         assert data["uptime_seconds"] >= 0
         assert "python_version" in data

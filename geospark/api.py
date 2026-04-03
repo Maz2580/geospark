@@ -21,6 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
+from geospark import __version__
 from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.protocol.schema import (
@@ -54,7 +55,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="GeoSpark API",
     description="The Open-Source Geospatial Intelligence Engine. Give any AI model a spatial mind.",
-    version="0.1.0",
+    version=__version__,
     lifespan=lifespan,
 )
 
@@ -90,7 +91,7 @@ async def verify_api_key(
 
 class HealthResponse(BaseModel):
     status: str = "ok"
-    version: str = "0.1.0"
+    version: str = __version__
     tools: list[str] = []
 
 
@@ -184,7 +185,7 @@ async def status():
 
     return {
         "status": "ok",
-        "version": "0.1.0",
+        "version": __version__,
         "uptime_seconds": round(uptime_seconds, 1),
         "python_version": sys.version,
         "memory": memory,
@@ -201,7 +202,7 @@ async def info():
     """System information."""
     return {
         "name": "GeoSpark",
-        "version": "0.1.0",
+        "version": __version__,
         "protocol": "GSP v0.1",
         "tools": get_engine().available_tools,
         "database": os.getenv("GEOSPARK_DB_BACKEND", "memory"),

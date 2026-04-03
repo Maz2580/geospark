@@ -12,11 +12,13 @@ import click
 from rich.console import Console
 from rich.table import Table
 
+from geospark import __version__
+
 console = Console()
 
 
 @click.group()
-@click.version_option(version="0.1.0", prog_name="geospark")
+@click.version_option(version=__version__, prog_name="geospark")
 def main() -> None:
     """GeoSpark: The Open-Source Geospatial Intelligence Engine."""
     pass

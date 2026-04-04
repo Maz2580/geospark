@@ -24,18 +24,25 @@ class FiresChannel:
     """Active fire detections via NASA FIRMS."""
 
     name = "fires"
-    description = "Near-real-time active fire detections from NASA MODIS/VIIRS satellites (free)"
-    tier = 0
+    description = "Near-real-time active fire detections from NASA MODIS/VIIRS (free API key)"
+    tier = 1  # FIRMS API requires free MAP_KEY registration
 
-    # Free CSV endpoints (no API key, last 24h/48h)
-    FIRMS_CSV_URL = "https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/csv"
-    FIRMS_VIIRS_URL = "https://firms.modaps.eosdis.nasa.gov/data/active_fire/suomi-npp-viirs-c2/csv"
-
-    # Alternative: area query endpoint (free for small areas)
     FIRMS_AREA_URL = "https://firms.modaps.eosdis.nasa.gov/api/area/csv"
 
+    def __init__(self) -> None:
+        import os
+
+        self._map_key = os.getenv("FIRMS_MAP_KEY", "")
+
     def check(self) -> ChannelStatus:
-        """Check NASA FIRMS availability."""
+        """Check NASA FIRMS availability and configuration."""
+        if not self._map_key:
+            return ChannelStatus(
+                name=self.name,
+                status="unconfigured",
+                message="Set FIRMS_MAP_KEY env var (free at https://firms.modaps.eosdis.nasa.gov/api/area/)",
+                tier=self.tier,
+            )
         try:
             resp = httpx.head(
                 "https://firms.modaps.eosdis.nasa.gov/",
@@ -44,7 +51,7 @@ class FiresChannel:
             )
             if resp.status_code < 400:
                 return ChannelStatus(
-                    name=self.name, status="ok", message="NASA FIRMS reachable", tier=self.tier
+                    name=self.name, status="ok", message="NASA FIRMS reachable (key configured)", tier=self.tier
                 )
             return ChannelStatus(
                 name=self.name, status="warn", message=f"FIRMS returned {resp.status_code}", tier=self.tier
@@ -88,26 +95,35 @@ class FiresChannel:
             max_lat, max_lon = lat + 0.5, lon + 0.5
             location = location or f"({lat}, {lon})"
         elif location:
-            geo_lat, geo_lon, location_name = await self._geocode(location)
-            if geo_lat is None:
-                return ChannelResult(
-                    channel=self.name, query={"location": location},
-                    errors=[f"Could not geocode: {location}"],
-                )
-            min_lat, min_lon = geo_lat - 0.5, geo_lon - 0.5
-            max_lat, max_lon = geo_lat + 0.5, geo_lon + 0.5
-            location = location_name
+            # Check well-known regions first (natural features that don't geocode well)
+            known = self._known_region(location)
+            if known:
+                min_lat, min_lon, max_lat, max_lon = known
+            else:
+                geo_lat, geo_lon, location_name = await self._geocode(location)
+                if geo_lat is None:
+                    return ChannelResult(
+                        channel=self.name, query={"location": location},
+                        errors=[f"Could not geocode: {location}. Try using lat/lon or bbox instead."],
+                    )
+                min_lat, min_lon = geo_lat - 0.5, geo_lon - 0.5
+                max_lat, max_lon = geo_lat + 0.5, geo_lon + 0.5
+                location = location_name
         else:
             return ChannelResult(channel=self.name, errors=["Provide location, lat/lon, or bbox"])
 
-        # Use the free area CSV endpoint
-        # Format: west,south,east,north
-        area_str = f"{min_lon},{min_lat},{max_lon},{max_lat}"
-        period = f"{days}"
+        if not self._map_key:
+            return ChannelResult(
+                channel=self.name,
+                query={"location": location},
+                errors=["FIRMS_MAP_KEY not set. Register free at https://firms.modaps.eosdis.nasa.gov/api/area/"],
+            )
 
-        url = f"{self.FIRMS_AREA_URL}/MODIS_NRT/{area_str}/{period}"
-        if source == "viirs":
-            url = f"{self.FIRMS_AREA_URL}/VIIRS_SNPP_NRT/{area_str}/{period}"
+        # FIRMS area query: MAP_KEY/source/bbox/days
+        area_str = f"{min_lon},{min_lat},{max_lon},{max_lat}"
+
+        source_id = "MODIS_NRT" if source == "modis" else "VIIRS_SNPP_NRT"
+        url = f"{self.FIRMS_AREA_URL}/csv/{self._map_key}/{source_id}/{area_str}/{days}"
 
         try:
             async with httpx.AsyncClient(timeout=30) as client:
@@ -192,6 +208,26 @@ class FiresChannel:
             source="nasa-firms",
             total_results=len(features),
         )
+
+    @staticmethod
+    def _known_region(location: str) -> tuple[float, float, float, float] | None:
+        """Return bbox for well-known regions that don't geocode well."""
+        regions: dict[str, tuple[float, float, float, float]] = {
+            "amazon": (-5.0, -65.0, 0.0, -55.0),
+            "amazon rainforest": (-5.0, -65.0, 0.0, -55.0),
+            "sahara": (20.0, -5.0, 30.0, 10.0),
+            "sahel": (10.0, -10.0, 15.0, 10.0),
+            "siberia": (55.0, 80.0, 65.0, 100.0),
+            "borneo": (-2.0, 109.0, 2.0, 117.0),
+            "california": (34.0, -122.0, 40.0, -117.0),
+            "australia bushfire": (-38.0, 145.0, -30.0, 152.0),
+            "congo": (-5.0, 15.0, 5.0, 30.0),
+        }
+        key = location.lower().strip()
+        for name, bbox in regions.items():
+            if name in key or key in name:
+                return bbox
+        return None
 
     async def _geocode(self, location: str) -> tuple[float | None, float | None, str]:
         """Geocode via GeoSpark's geocoder."""

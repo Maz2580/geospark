@@ -23,15 +23,32 @@ class AirQualityChannel:
     """Air quality data via OpenAQ API."""
 
     name = "air-quality"
-    description = "Real-time air quality from government stations worldwide (OpenAQ, free)"
-    tier = 0
+    description = "Real-time air quality from government stations worldwide (OpenAQ, free API key)"
+    tier = 1  # OpenAQ v3 requires free API key registration
 
-    API_URL = "https://api.openaq.org/v2"
+    API_URL = "https://api.openaq.org/v3"
+
+    def __init__(self) -> None:
+        import os
+
+        self._api_key = os.getenv("OPENAQ_API_KEY", "")
 
     def check(self) -> ChannelStatus:
-        """Check OpenAQ API availability."""
+        """Check OpenAQ API availability and configuration."""
+        if not self._api_key:
+            return ChannelStatus(
+                name=self.name,
+                status="unconfigured",
+                message="Set OPENAQ_API_KEY env var (free at https://openaq.org/register)",
+                tier=self.tier,
+            )
         try:
-            resp = httpx.get(f"{self.API_URL}/locations", params={"limit": 1}, timeout=10)
+            resp = httpx.get(
+                f"{self.API_URL}/locations",
+                params={"limit": 1},
+                headers={"X-API-Key": self._api_key},
+                timeout=10,
+            )
             if resp.status_code == 200:
                 return ChannelStatus(
                     name=self.name, status="ok", message="OpenAQ API reachable", tier=self.tier
@@ -66,7 +83,6 @@ class AirQualityChannel:
         """
         filters = filters or {}
         radius = filters.get("radius_m", 25000)
-        parameter = filters.get("parameter")
         limit = filters.get("limit", 10)
 
         # Resolve coordinates
@@ -87,19 +103,27 @@ class AirQualityChannel:
         else:
             return ChannelResult(channel=self.name, errors=["Provide location, lat/lon, or bbox"])
 
-        # Query OpenAQ for nearby stations with latest measurements
+        if not self._api_key:
+            return ChannelResult(
+                channel=self.name,
+                query={"location": location_name},
+                errors=["OPENAQ_API_KEY not set. Register free at https://openaq.org/register"],
+            )
+
+        # Query OpenAQ v3 for nearby stations with latest measurements
         params: dict[str, Any] = {
             "coordinates": f"{resolved_lat},{resolved_lon}",
             "radius": radius,
             "limit": limit,
-            "order_by": "distance",
         }
-        if parameter:
-            params["parameter"] = parameter
 
         try:
             async with httpx.AsyncClient(timeout=15) as client:
-                resp = await client.get(f"{self.API_URL}/latest", params=params)
+                resp = await client.get(
+                    f"{self.API_URL}/locations",
+                    params=params,
+                    headers={"X-API-Key": self._api_key},
+                )
                 resp.raise_for_status()
                 data = resp.json()
         except Exception as e:

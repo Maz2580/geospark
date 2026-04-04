@@ -13,6 +13,8 @@ from geospark.data_channels.base import BaseChannel, ChannelStatus
 # Registry of available channels: name → import path
 CHANNEL_CLASSES: dict[str, str] = {
     "weather": "geospark.data_channels.weather.WeatherChannel",
+    "air-quality": "geospark.data_channels.air_quality.AirQualityChannel",
+    "fires": "geospark.data_channels.fires.FiresChannel",
 }
 
 

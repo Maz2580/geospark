@@ -597,5 +597,96 @@ def data_weather(location: str, forecast: int) -> None:
         console.print(ftable)
 
 
+@data.command("air-quality")
+@click.argument("location")
+@click.option("--radius", default=25000, help="Search radius in meters")
+def data_air_quality(location: str, radius: int) -> None:
+    """Get air quality data for a location."""
+    import asyncio
+
+    from geospark.data_channels.air_quality import AirQualityChannel
+
+    async def _run():
+        ch = AirQualityChannel()
+        return await ch.search(location=location, filters={"radius_m": radius})
+
+    result = asyncio.run(_run())
+
+    if result.errors:
+        console.print(f"[red]Error: {result.errors[0]}[/red]")
+        return
+
+    if result.is_empty:
+        console.print(f"[yellow]No air quality stations found near {location}[/yellow]")
+        return
+
+    table = Table(title=f"Air Quality: {location}")
+    table.add_column("Station", style="cyan")
+    table.add_column("PM2.5")
+    table.add_column("NO2")
+    table.add_column("O3")
+    table.add_column("AQI Category", style="green")
+    table.add_column("Distance")
+
+    for f in result.features[:10]:
+        m = f.get("measurements", {})
+        pm25 = m.get("pm25", {}).get("value", "-")
+        no2 = m.get("no2", {}).get("value", "-")
+        o3 = m.get("o3", {}).get("value", "-")
+        aqi = f.get("aqi_category", "-") or "-"
+        dist = f"{f.get('distance_m', 0):.0f}m" if f.get("distance_m") else "-"
+        table.add_row(f.get("station_name", "?")[:30], str(pm25), str(no2), str(o3), aqi, dist)
+
+    console.print(table)
+
+
+@data.command("fires")
+@click.argument("location")
+@click.option("--days", default=1, help="Lookback days (1-2)")
+def data_fires(location: str, days: int) -> None:
+    """Check for active fires near a location."""
+    import asyncio
+
+    from geospark.data_channels.fires import FiresChannel
+
+    async def _run():
+        ch = FiresChannel()
+        return await ch.search(location=location, filters={"days": days})
+
+    result = asyncio.run(_run())
+
+    if result.errors:
+        console.print(f"[red]Error: {result.errors[0]}[/red]")
+        return
+
+    if result.is_empty:
+        console.print(f"[green]No active fires detected near {location} (last {days} day(s))[/green]")
+        return
+
+    table = Table(title=f"Active Fires: {location} (last {days} day(s))")
+    table.add_column("Date", style="cyan")
+    table.add_column("Time")
+    table.add_column("Lat")
+    table.add_column("Lon")
+    table.add_column("Confidence", style="green")
+    table.add_column("FRP")
+    table.add_column("Satellite")
+
+    for f in result.features[:20]:
+        coords = f.get("coordinates", [0, 0])
+        table.add_row(
+            f.get("acq_date", ""),
+            f.get("acq_time", ""),
+            f"{coords[1]:.4f}",
+            f"{coords[0]:.4f}",
+            f"{f.get('confidence', '')}",
+            str(f.get("frp", "-")),
+            f.get("satellite", ""),
+        )
+
+    console.print(table)
+    console.print(f"[dim]Total fires: {result.total_results}[/dim]")
+
+
 if __name__ == "__main__":
     main()

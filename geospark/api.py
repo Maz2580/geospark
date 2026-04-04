@@ -507,6 +507,65 @@ async def flow_run_get(run_id: str):
     return run.model_dump()
 
 
+# --- Data Channel Endpoints ---
+
+
+class DataChannelRequest(BaseModel):
+    location: str | None = Field(None, description="Location name to geocode")
+    lat: float | None = Field(None, description="Latitude")
+    lon: float | None = Field(None, description="Longitude")
+    start_date: str | None = Field(None, description="Start date (YYYY-MM-DD)")
+    end_date: str | None = Field(None, description="End date (YYYY-MM-DD)")
+    filters: dict[str, Any] = Field(default_factory=dict)
+
+
+@app.get("/api/v1/data/channels")
+async def data_list_channels():
+    """List available data channels."""
+    from geospark.data_channels import ChannelRegistry
+
+    registry = ChannelRegistry()
+    channels = registry.load_all()
+    return {
+        "channels": [
+            {"name": ch.name, "description": ch.description, "tier": ch.tier}
+            for ch in channels
+        ]
+    }
+
+
+@app.get("/api/v1/data/status")
+async def data_channel_status():
+    """Health check all data channels."""
+    from geospark.data_channels import ChannelRegistry
+
+    registry = ChannelRegistry()
+    return {"channels": [s.model_dump() for s in registry.check_all()]}
+
+
+@app.post("/api/v1/data/{channel_name}")
+async def data_query(channel_name: str, request: DataChannelRequest):
+    """Query a data channel."""
+    from geospark.data_channels import ChannelRegistry
+
+    registry = ChannelRegistry()
+    try:
+        result = await registry.search(
+            channel_name,
+            location=request.location,
+            lat=request.lat,
+            lon=request.lon,
+            start_date=request.start_date,
+            end_date=request.end_date,
+            filters=request.filters,
+        )
+        return result.model_dump()
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from None
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=str(e)) from e
+
+
 # --- Agent Endpoints ---
 
 

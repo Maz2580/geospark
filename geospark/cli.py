@@ -495,5 +495,107 @@ def site_select(within: str, near: str | None, avoid: str | None, facility: str,
     console.print(f"[dim]({result.duration_s}s)[/dim]")
 
 
+@main.group()
+def data() -> None:
+    """Access live geospatial data channels."""
+
+
+@data.command("list")
+def data_list() -> None:
+    """List available data channels."""
+    from geospark.data_channels import ChannelRegistry
+
+    registry = ChannelRegistry()
+    channels = registry.load_all()
+
+    table = Table(title="Data Channels")
+    table.add_column("Name", style="cyan")
+    table.add_column("Tier", style="green")
+    table.add_column("Description")
+
+    for ch in channels:
+        tier_label = {0: "Free", 1: "Free+Key", 2: "Commercial"}.get(ch.tier, "?")
+        table.add_row(ch.name, tier_label, ch.description[:60])
+
+    console.print(table)
+
+
+@data.command("status")
+def data_status() -> None:
+    """Check health of all data channels."""
+    from geospark.data_channels import ChannelRegistry
+
+    registry = ChannelRegistry()
+    statuses = registry.check_all()
+
+    table = Table(title="Channel Status")
+    table.add_column("Channel", style="cyan")
+    table.add_column("Status", style="green")
+    table.add_column("Message")
+
+    for s in statuses:
+        color = {"ok": "green", "warn": "yellow", "error": "red"}.get(s.status, "dim")
+        table.add_row(s.name, f"[{color}]{s.status}[/{color}]", s.message)
+
+    console.print(table)
+
+
+@data.command("weather")
+@click.argument("location")
+@click.option("--forecast", default=3, help="Forecast days (1-16)")
+def data_weather(location: str, forecast: int) -> None:
+    """Get weather data for a location."""
+    import asyncio
+
+    from geospark.data_channels.weather import WeatherChannel
+
+    async def _run():
+        ch = WeatherChannel()
+        return await ch.search(location=location, filters={"forecast_days": forecast})
+
+    result = asyncio.run(_run())
+
+    if result.errors:
+        console.print(f"[red]Error: {result.errors[0]}[/red]")
+        return
+
+    # Current conditions
+    current = next((f for f in result.features if f.get("type") == "current_weather"), None)
+    if current:
+        table = Table(title=f"Current Weather: {current.get('location', location)}")
+        table.add_column("Metric", style="cyan")
+        table.add_column("Value", style="green")
+
+        table.add_row("Temperature", f"{current.get('temperature_c')}°C")
+        table.add_row("Feels Like", f"{current.get('feels_like_c')}°C")
+        table.add_row("Humidity", f"{current.get('humidity_pct')}%")
+        table.add_row("Wind", f"{current.get('wind_speed_kmh')} km/h")
+        table.add_row("Conditions", current.get("weather_description", ""))
+        table.add_row("Precipitation", f"{current.get('precipitation_mm')} mm")
+
+        console.print(table)
+
+    # Forecast
+    forecasts = [f for f in result.features if f.get("type") == "daily_forecast"]
+    if forecasts:
+        ftable = Table(title=f"Forecast ({len(forecasts)} days)")
+        ftable.add_column("Date", style="cyan")
+        ftable.add_column("High", style="red")
+        ftable.add_column("Low", style="blue")
+        ftable.add_column("Rain", style="green")
+        ftable.add_column("Wind", style="yellow")
+
+        for f in forecasts:
+            ftable.add_row(
+                f.get("date", ""),
+                f"{f.get('temp_max_c')}°C",
+                f"{f.get('temp_min_c')}°C",
+                f"{f.get('precipitation_mm')} mm",
+                f"{f.get('wind_max_kmh')} km/h",
+            )
+
+        console.print(ftable)
+
+
 if __name__ == "__main__":
     main()

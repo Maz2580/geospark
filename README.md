@@ -56,10 +56,15 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
 - **MCP Server** — 6 tools for Claude Desktop and any MCP-compatible AI assistant. `pip install geospark-ai[mcp] && geospark-mcp`
 - **GeoSpark Bench** — 535 benchmark questions, 5 LLM families evaluated. LLMs score 0% on distance; with GeoSpark tools, 70%. [Results →](docs/BENCHMARK_REPORT.md)
 - **GeoSpark Protocol (GSP)** — Standardized JSON protocol for spatial queries and results.
+- **Live Data Channels** — Pluggable real-time data sources:
+  - Weather (Open-Meteo) — current conditions + forecast for any location
+  - Air Quality (OpenAQ) — PM2.5, NO2, O3 from government stations with WHO health categories
+  - Active Fires (NASA FIRMS) — near-real-time satellite fire detections
+- **LLM Gateway** — OpenAI-compatible proxy over local Ollama models. Any app can use 7 models for free by changing one URL.
 - **Pluggable Tools** — Geocoding, satellite imagery (STAC), terrain/elevation with vertical datum awareness (NAVD88/EGM96/WGS84), routing, spectral indices.
-- **GeoSpark Flows** — DAG-based workflow automation with CLI and REST API.
+- **GeoSpark Flows** — DAG-based workflow automation with persistence (Supabase), CLI, and REST API.
 - **Spatial Knowledge Graph** — Entity-relation graph with OSM admin boundaries, BFS traversal, and natural language queries.
-- **Zero-Cost Stack** — Local Ollama (primary, no limits) + OpenRouter free tier (fallback, ~200 req/day) + Supabase free tier (500MB). When rate-limited, GeoSpark returns clear error messages with fallback suggestions.
+- **Zero-Cost Stack** — Local Ollama (primary, no limits) + OpenRouter free tier (fallback) + Supabase free tier. All inference on your hardware.
 
 ## Quick Start
 
@@ -161,11 +166,15 @@ geospark elevation 35.6586 139.7454
 geospark distance 48.8566 2.3522 51.5074 -- -0.1278  # Paris → London
 geospark ask "Is Tokyo closer to Seoul or Beijing?"
 
+# Live data channels
+geospark data weather "Melbourne, Australia"     # Weather + forecast
+geospark data air-quality "Delhi"                # PM2.5, NO2, O3
+geospark data fires "Amazon Rainforest"          # Active fire detections
+geospark data status                             # Check all channels
+
 # Flow workflows
 geospark flow list                     # List templates
 geospark flow run distance_analysis    # Run a template
-geospark flow saved                    # List saved flows (Supabase)
-geospark flow runs <flow_id>           # View run history
 ```
 
 ### Try the Live API (no install needed)
@@ -283,7 +292,8 @@ GeoSpark Bench v1.0 — **535 questions** across 5 benchmarks, evaluated on **5 
 |-------|--------|-------|-------------|
 | **Phase 0-3** — Foundation to Platform | **Complete** | 446 | Protocol, engine, tools, MCP, Bench, Flows, Knowledge Graph, Plugins |
 | **Phase 4** — Deployment | **Complete** | 446 | Live API, Docker, PyPI, Ollama, API auth, 5-model benchmarks |
-| **Phase 5** — Autonomous Agents | **Complete** | 446 | GeoAgent, SpatialReport, SiteSelector — CLI + REST API |
+| **Phase 5** — Autonomous Agents | **Complete** | 446 | GeoAgent, SpatialReport, SiteSelector, LLM Gateway |
+| **Phase 6** — Data Channels | **Complete** | 446 | Weather, Air Quality, NASA Fires — free, real-time |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
 

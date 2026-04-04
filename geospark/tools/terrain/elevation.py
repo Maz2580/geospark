@@ -18,6 +18,7 @@ from geospark.protocol.schema import (
     SpatialResult,
 )
 from geospark.tools.base import BaseTool
+from geospark.tools.terrain.vertical_datum import infer_datum
 
 
 class ElevationTool(BaseTool):
@@ -63,6 +64,8 @@ class ElevationTool(BaseTool):
 
             elevation = data["results"][0]["elevation"]
 
+            datum = infer_datum("open-elevation-api")
+
             return SpatialResult(
                 features=[
                     SpatialFeature(
@@ -71,18 +74,18 @@ class ElevationTool(BaseTool):
                             "elevation_m": elevation,
                             "latitude": lat,
                             "longitude": lon,
-                            "elevation_source": "open-elevation-api",
-                            "vertical_datum": "SRTM (EGM96 geoid)",
-                            "vertical_datum_note": (
-                                "Open Elevation API uses SRTM data with EGM96 geoid. "
-                                "Values are approximate orthometric heights, not WGS84 ellipsoidal."
-                            ),
+                            "elevation_source": datum.source,
+                            "vertical_datum": datum.datum,
+                            "height_type": datum.height_type,
+                            "geoid_model": datum.geoid_model,
+                            "datum_confidence": datum.confidence,
+                            "datum_note": datum.note,
                         },
                     )
                 ],
                 spatial_context=SpatialContext(
                     total_features=1,
-                    summary=f"Elevation at ({lat:.4f}, {lon:.4f}): {elevation}m (SRTM/EGM96)",
+                    summary=f"Elevation at ({lat:.4f}, {lon:.4f}): {elevation}m ({datum.datum})",
                 ),
                 sources=["open-elevation-api"],
             )

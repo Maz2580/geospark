@@ -62,9 +62,14 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["*"],
 )
+
+# --- LLM Gateway Router ---
+from geospark.llm_gateway import router as llm_router  # noqa: E402
+
+app.include_router(llm_router)
 
 # --- API Key Auth (optional) ---
 

@@ -93,7 +93,7 @@ print(result.best)  # Best-scoring location with explanation
 ```python
 from geospark.engine.spatial_reasoner import SpatialReasoner
 
-# Distance calculation (geodesic, not Euclidean)
+# Distance calculation (geodesic on WGS84 ellipsoid, not Euclidean)
 SpatialReasoner.calculate_distance(
     {"type": "Point", "coordinates": [2.2945, 48.8584]},   # Eiffel Tower
     {"type": "Point", "coordinates": [2.3376, 48.8606]},   # Louvre
@@ -102,6 +102,20 @@ SpatialReasoner.calculate_distance(
 
 # Spatial relationship check (ground-truth, not LLM-guessed)
 SpatialReasoner.check_relationship(polygon_a, polygon_b, "intersects")
+```
+
+### Vertical Datum Awareness
+
+```python
+from geospark.tools.terrain.vertical_datum import infer_datum, format_elevation_warning
+
+# Infer vertical datum from elevation source
+info = infer_datum("3dep")  # USGS 3DEP → NAVD88
+print(info.datum, info.height_type)  # "NAVD88", "orthometric"
+
+# Warn when mixing datums (NAVD88 vs EGM96 = ~17m difference in Colorado)
+warning = format_elevation_warning("3dep", "srtm", "Denver, CO")
+# "WARNING: Comparing elevations from '3dep' (NAVD88) and 'srtm' (EGM96)..."
 ```
 
 ### As an MCP Server (for Claude Desktop)
@@ -146,6 +160,12 @@ geospark geocode "Tokyo Tower, Japan"
 geospark elevation 35.6586 139.7454
 geospark distance 48.8566 2.3522 51.5074 -- -0.1278  # Paris → London
 geospark ask "Is Tokyo closer to Seoul or Beijing?"
+
+# Flow workflows
+geospark flow list                     # List templates
+geospark flow run distance_analysis    # Run a template
+geospark flow saved                    # List saved flows (Supabase)
+geospark flow runs <flow_id>           # View run history
 ```
 
 ### Try the Live API (no install needed)
@@ -179,8 +199,14 @@ python -m geospark.bench list
 │                   User / LLM                    │
 │         (Claude, ChatGPT, Ollama, ...)          │
 └──────────┬──────────────────────┬───────────────┘
-           │ MCP                  │ REST API
+           │ MCP                  │ REST API (28 endpoints)
            v                      v
+┌──────────────────────────────────────────────────┐
+│           Autonomous Agents Layer                │
+│  GeoAgent · SpatialReport · SiteSelector         │
+└──────────┬───────────────────────────────────────┘
+           │
+           v
 ┌──────────────────────────────────────────────────┐
 │              GeoSpark Protocol (GSP)             │
 │         Standardized JSON query/result           │
@@ -196,17 +222,17 @@ python -m geospark.bench list
     ┌──────┴──────┬──────────┬──────────┬──────────┐
     v             v          v          v          v
 ┌────────┐ ┌──────────┐ ┌────────┐ ┌────────┐ ┌────────┐
-│Geocoder│ │Satellite │ │Terrain │ │Routing │ │Change  │
-│        │ │(STAC,    │ │(Elev.) │ │(OSRM)  │ │Detect. │
-│        │ │NDVI, EVI)│ │        │ │        │ │        │
+│Geocoder│ │Satellite │ │Terrain │ │Routing │ │Spectral│
+│        │ │(STAC)    │ │+ Datum │ │(OSRM)  │ │Indices │
+│        │ │          │ │Aware.  │ │        │ │        │
 └────────┘ └──────────┘ └────────┘ └────────┘ └────────┘
            │
     ┌──────┴──────┬──────────┬──────────┐
     v             v          v          v
 ┌────────┐ ┌──────────┐ ┌────────┐ ┌────────┐
 │ Flows  │ │Knowledge │ │Plugins │ │Spatial │
-│(DAG    │ │Graph     │ │(Commun │ │RAG     │
-│Runner) │ │(BFS,NL)  │ │ity)   │ │        │
+│+ Persist│ │Graph+OSM │ │        │ │RAG     │
+│(Supa.) │ │(Admin)   │ │        │ │(Embed) │
 └────────┘ └──────────┘ └────────┘ └────────┘
 ```
 

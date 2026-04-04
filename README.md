@@ -60,7 +60,6 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
   - Weather (Open-Meteo) — current conditions + forecast for any location
   - Air Quality (OpenAQ) — PM2.5, NO2, O3 from government stations with WHO health categories
   - Active Fires (NASA FIRMS) — near-real-time satellite fire detections
-- **LLM Gateway** — OpenAI-compatible proxy over local Ollama models. Any app can use 7 models for free by changing one URL.
 - **Pluggable Tools** — Geocoding, satellite imagery (STAC), terrain/elevation with vertical datum awareness (NAVD88/EGM96/WGS84), routing, spectral indices.
 - **GeoSpark Flows** — DAG-based workflow automation with persistence (Supabase), CLI, and REST API.
 - **Spatial Knowledge Graph** — Entity-relation graph with OSM admin boundaries, BFS traversal, and natural language queries.
@@ -292,7 +291,7 @@ GeoSpark Bench v1.0 — **535 questions** across 5 benchmarks, evaluated on **5 
 |-------|--------|-------|-------------|
 | **Phase 0-3** — Foundation to Platform | **Complete** | 446 | Protocol, engine, tools, MCP, Bench, Flows, Knowledge Graph, Plugins |
 | **Phase 4** — Deployment | **Complete** | 446 | Live API, Docker, PyPI, Ollama, API auth, 5-model benchmarks |
-| **Phase 5** — Autonomous Agents | **Complete** | 446 | GeoAgent, SpatialReport, SiteSelector, LLM Gateway |
+| **Phase 5** — Autonomous Agents | **Complete** | 446 | GeoAgent, SpatialReport, SiteSelector |
 | **Phase 6** — Data Channels | **Complete** | 446 | Weather, Air Quality, NASA Fires — free, real-time |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.

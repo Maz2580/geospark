@@ -20,7 +20,7 @@ import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-router = APIRouter(prefix="/api/v1/llm", tags=["LLM Gateway"])
+router = APIRouter(prefix="/api/v1/llm", include_in_schema=False)
 
 OLLAMA_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 

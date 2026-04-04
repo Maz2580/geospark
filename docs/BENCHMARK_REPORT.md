@@ -35,7 +35,7 @@ and require external tool augmentation for reliable geospatial analysis.
 
 | Benchmark       | Questions | Evaluated | Baseline (LLM only) | Augmented (LLM + GeoSpark) | Improvement |
 |-----------------|-----------|-----------|---------------------|---------------------------|-------------|
-| geochanage      |        36 |        20 |                90.0% |                      85.0% |       -5.0% |
+| geochange      |        36 |        20 |                90.0% |                      85.0% |       -5.0% |
 | geodistance     |       210 |        20 |                 0.0% |                      75.0% |      +75.0% |
 | geomultimodal   |        24 |        20 |                30.0% |                      25.0% |       -5.0% |
 | georeason       |        55 |        20 |                85.0% |                      95.0% |      +10.0% |
@@ -46,7 +46,7 @@ and require external tool augmentation for reliable geospatial analysis.
 
 ## Per-Category Breakdown
 
-### geochanage
+### geochange
 
 | Category                       | Count | Baseline | Augmented |
 |--------------------------------|-------|----------|-----------|

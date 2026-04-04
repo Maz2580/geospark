@@ -20,7 +20,7 @@ class BenchmarkName(str, Enum):
     """Available benchmark suites."""
     GEOTOPO = "geotopo"
     GEODISTANCE = "geodistance"
-    GEOCHANAGE = "geochanage"
+    GEOCHANGE = "geochange"
     GEOREASON = "georeason"
     GEOMULTIMODAL = "geomultimodal"
 

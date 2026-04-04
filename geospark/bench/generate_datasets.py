@@ -7,7 +7,7 @@ Run with:
 Generates:
 - geotopo.json       (200+ topological reasoning questions)
 - geodistance.json   (200+ distance/proximity questions)
-- geochanage.json    (50 change detection questions)
+- geochange.json    (50 change detection questions)
 - georeason.json     (50+ multi-step spatial reasoning questions)
 - geomultimodal.json (50+ multimodal spatial questions)
 """
@@ -792,7 +792,7 @@ CHANGE_SCENARIOS = [
 ]
 
 
-def generate_geochanage() -> list[dict]:
+def generate_geochange() -> list[dict]:
     """Generate 50 change detection questions."""
     questions: list[dict] = []
     qid = 0
@@ -802,7 +802,7 @@ def generate_geochanage() -> list[dict]:
         qid += 1
         point = _make_point(scenario["coords"])
         questions.append({
-            "id": f"geochanage_{qid:03d}",
+            "id": f"geochange_{qid:03d}",
             "benchmark": BenchmarkName.GEOCHANAGE.value,
             "category": "change_detection",
             "difficulty": scenario["difficulty"],
@@ -836,7 +836,7 @@ def generate_geochanage() -> list[dict]:
                            "ice_loss", "wildfire", "dam_construction", "volcanic",
                            "vegetation_recovery"]
             questions.append({
-                "id": f"geochanage_{qid:03d}",
+                "id": f"geochange_{qid:03d}",
                 "benchmark": BenchmarkName.GEOCHANAGE.value,
                 "category": "change_type",
                 "difficulty": "hard",
@@ -1568,7 +1568,7 @@ def generate_all() -> None:
             "name": "GeoChange",
             "description": "Temporal change detection (text-based v0.1)",
             "version": "0.1.0",
-            "generator": generate_geochanage,
+            "generator": generate_geochange,
         },
         BenchmarkName.GEOREASON: {
             "name": "GeoReason",

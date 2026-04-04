@@ -70,3 +70,6 @@ docs/superpowers/
 
 # Claude Code
 .claude/
+verification_roadmap.md
+docs/UI_IMPLEMENTATION_PLAN.md
+docs/FLOW_PERSISTENCE_PLAN.md

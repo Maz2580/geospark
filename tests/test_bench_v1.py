@@ -39,7 +39,7 @@ class TestNewBenchmarkNames:
         assert len(BenchmarkName) == 5
 
     def test_enum_values(self):
-        expected = {"geotopo", "geodistance", "geochanage", "georeason", "geomultimodal"}
+        expected = {"geotopo", "geodistance", "geochange", "georeason", "geomultimodal"}
         actual = {b.value for b in BenchmarkName}
         assert actual == expected
 

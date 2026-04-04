@@ -105,7 +105,7 @@ class TestDatasets:
         names = {b["name"] for b in benchmarks}
         assert "geotopo" in names
         assert "geodistance" in names
-        assert "geochanage" in names
+        assert "geochange" in names
         # v1.0 adds these
         assert "georeason" in names
         assert "geomultimodal" in names
@@ -121,8 +121,8 @@ class TestDatasets:
         assert len(questions) >= 100
         assert all(q.benchmark == BenchmarkName.GEODISTANCE for q in questions)
 
-    def test_load_geochanage(self):
-        questions = load_dataset(BenchmarkName.GEOCHANAGE)
+    def test_load_geochange(self):
+        questions = load_dataset(BenchmarkName.GEOCHANGE)
         assert len(questions) >= 30
 
     def test_questions_have_dual_prompts(self):

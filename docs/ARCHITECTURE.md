@@ -199,7 +199,7 @@ geospark/bench/
 ├── datasets/
 │   ├── geotopo.json      # 210 topological reasoning questions
 │   ├── geodistance.json  # 210 distance/proximity questions
-│   ├── geochanage.json   # 36 change detection questions
+│   ├── geochange.json   # 36 change detection questions
 │   ├── georeason.json    # 55 multi-step spatial reasoning chains
 │   └── geomultimodal.json # 24 multimodal spatial questions
 └── baselines/
@@ -439,7 +439,7 @@ result = chain.run()
 from geospark.bench import GeoSparkBench
 
 bench = GeoSparkBench(model="gpt-4", tools=engine.tools)
-results = bench.run(benchmarks=["geotopo", "geodistance", "geochanage"])
+results = bench.run(benchmarks=["geotopo", "geodistance", "geochange"])
 results.report()
 ```
 

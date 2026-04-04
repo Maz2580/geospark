@@ -3,6 +3,9 @@ STAC Client Tool.
 
 Accesses satellite imagery through SpatioTemporal Asset Catalog (STAC) APIs.
 Supports Sentinel-2, Landsat, and other STAC-compliant data sources.
+
+STAC API version: 1.0.0 (via pystac-client).
+Temporal filtering uses ISO 8601 datetime strings.
 """
 
 from __future__ import annotations
@@ -94,6 +97,15 @@ class STACTool(BaseTool):
                         "assets": list(item.assets.keys()),
                     },
                 )
+            )
+
+        if not features:
+            return SpatialResult(
+                spatial_context=SpatialContext(
+                    total_features=0,
+                    summary="No satellite scenes found matching the search criteria",
+                ),
+                sources=["element84-earth-search"],
             )
 
         return SpatialResult(

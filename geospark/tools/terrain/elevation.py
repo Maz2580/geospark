@@ -71,12 +71,18 @@ class ElevationTool(BaseTool):
                             "elevation_m": elevation,
                             "latitude": lat,
                             "longitude": lon,
+                            "elevation_source": "open-elevation-api",
+                            "vertical_datum": "SRTM (EGM96 geoid)",
+                            "vertical_datum_note": (
+                                "Open Elevation API uses SRTM data with EGM96 geoid. "
+                                "Values are approximate orthometric heights, not WGS84 ellipsoidal."
+                            ),
                         },
                     )
                 ],
                 spatial_context=SpatialContext(
                     total_features=1,
-                    summary=f"Elevation at ({lat:.4f}, {lon:.4f}): {elevation}m",
+                    summary=f"Elevation at ({lat:.4f}, {lon:.4f}): {elevation}m (SRTM/EGM96)",
                 ),
                 sources=["open-elevation-api"],
             )

@@ -42,7 +42,12 @@ class Engine:
                 self.tool_registry.load_tool(tool_name)
 
     def execute(self, query: SpatialQuery) -> SpatialResult:
-        """Execute a spatial query and return results."""
+        """Execute a spatial query and return results.
+
+        Note:
+            If no CRS is specified on the query, EPSG:4326 (WGS84) is assumed.
+            This is the GeoSpark protocol default.
+        """
         start_time = time.time()
 
         # Normalize CRS if needed

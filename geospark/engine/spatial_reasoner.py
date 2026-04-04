@@ -4,6 +4,19 @@ Spatial Reasoning Engine.
 Performs topology, distance, containment, and geometric operations
 that LLMs fundamentally cannot do. This is the core value proposition
 of GeoSpark -- giving AI models genuine spatial capabilities.
+
+Coordinate assumptions:
+    - All geometries are assumed WGS84 (EPSG:4326) unless CRS is specified.
+    - Distances use pyproj Geod on the WGS84 ellipsoid (geodesic, not planar).
+    - Areas use pyproj geometry_area_perimeter (geodesic on WGS84).
+    - Buffers use 64-point geodesic sampling via Geod.fwd().
+    - Topology checks use Shapely (planar predicates on projected coordinates).
+
+Limitations:
+    - Antimeridian (±180° longitude) crossing is not explicitly handled.
+      Geometries that span the antimeridian may produce incorrect results.
+    - Topology checks are planar (Shapely), not geodesic. For global-scale
+      geometries, results may differ from true spherical topology.
 """
 
 from __future__ import annotations
@@ -161,6 +174,7 @@ class SpatialReasoner:
                         "area_sq_m": round(area_sq_m, 2),
                         "area_sq_km": round(area_sq_m / 1_000_000, 4),
                         "perimeter_m": round(perimeter_m, 2),
+                        "area_method": "geodesic (WGS84 ellipsoid)",
                     },
                 )
             ],

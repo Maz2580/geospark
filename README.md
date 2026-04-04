@@ -59,7 +59,7 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
 - **Pluggable Tools** — Geocoding, satellite imagery (STAC), terrain/elevation, routing, spectral indices, change detection.
 - **GeoSpark Flows** — DAG-based workflow automation with CLI and REST API.
 - **Spatial Knowledge Graph** — Entity-relation graph with OSM admin boundaries, BFS traversal, and natural language queries.
-- **Zero-Cost Stack** — Local Ollama + OpenRouter fallback + Supabase. Full spatial AI at $0/month.
+- **Zero-Cost Stack** — Local Ollama (primary, no limits) + OpenRouter free tier (fallback, ~200 req/day) + Supabase free tier (500MB). When rate-limited, GeoSpark returns clear error messages with fallback suggestions.
 
 ## Quick Start
 

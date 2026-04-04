@@ -56,7 +56,7 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
 - **MCP Server** — 6 tools for Claude Desktop and any MCP-compatible AI assistant. `pip install geospark-ai[mcp] && geospark-mcp`
 - **GeoSpark Bench** — 535 benchmark questions, 5 LLM families evaluated. LLMs score 0% on distance; with GeoSpark tools, 70%. [Results →](docs/BENCHMARK_REPORT.md)
 - **GeoSpark Protocol (GSP)** — Standardized JSON protocol for spatial queries and results.
-- **Pluggable Tools** — Geocoding, satellite imagery (STAC), terrain/elevation, routing, spectral indices, change detection.
+- **Pluggable Tools** — Geocoding, satellite imagery (STAC), terrain/elevation with vertical datum awareness (NAVD88/EGM96/WGS84), routing, spectral indices.
 - **GeoSpark Flows** — DAG-based workflow automation with CLI and REST API.
 - **Spatial Knowledge Graph** — Entity-relation graph with OSM admin boundaries, BFS traversal, and natural language queries.
 - **Zero-Cost Stack** — Local Ollama (primary, no limits) + OpenRouter free tier (fallback, ~200 req/day) + Supabase free tier (500MB). When rate-limited, GeoSpark returns clear error messages with fallback suggestions.
@@ -256,7 +256,7 @@ GeoSpark Bench v1.0 — **535 questions** across 5 benchmarks, evaluated on **5 
 | Phase | Status | Tests | Description |
 |-------|--------|-------|-------------|
 | **Phase 0-3** — Foundation to Platform | **Complete** | 446 | Protocol, engine, tools, MCP, Bench, Flows, Knowledge Graph, Plugins |
-| **Phase 4** — Deployment | **Complete** | 446 | Live API, Docker, PyPI v0.2.0, Ollama, API auth, 5-model benchmarks |
+| **Phase 4** — Deployment | **Complete** | 446 | Live API, Docker, PyPI, Ollama, API auth, 5-model benchmarks |
 | **Phase 5** — Autonomous Agents | **Complete** | 446 | GeoAgent, SpatialReport, SiteSelector — CLI + REST API |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.

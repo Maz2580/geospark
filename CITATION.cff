@@ -11,8 +11,8 @@ authors:
 repository-code: "https://github.com/Maz2580/geospark"
 url: "https://geospark.terrascout.app"
 license: Apache-2.0
-version: "0.1.0"
-date-released: "2025-01-01"
+version: "0.4.0"
+date-released: "2026-04-04"
 keywords:
   - geospatial
   - spatial-reasoning
@@ -23,7 +23,7 @@ keywords:
   - protocol
 abstract: >-
   GeoSpark is an open-source Geospatial Intelligence Protocol and Engine
-  that gives AI models genuine spatial reasoning capabilities. Current LLMs
-  fail 42-80% on spatial tasks; GeoSpark provides ground-truth spatial
-  computation via a standardized protocol, pluggable tool system, and
-  MCP server integration.
+  that gives AI models genuine spatial reasoning capabilities. LLMs achieve
+  0% on geodesic distance computation across 4/5 model families tested;
+  GeoSpark provides ground-truth spatial computation via a standardized
+  protocol, autonomous agents, and MCP server integration.

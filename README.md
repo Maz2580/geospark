@@ -150,7 +150,7 @@ geospark ask "Is Tokyo closer to Seoul or Beijing?"
 
 ### Try the Live API (no install needed)
 
-Explore all 11 endpoints interactively at **[geospark.terrascout.app/docs](https://geospark.terrascout.app/docs)**
+Explore all 28 endpoints interactively at **[geospark.terrascout.app/docs](https://geospark.terrascout.app/docs)**
 
 ```bash
 # Quick test
@@ -288,7 +288,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Live API
 
-GeoSpark is deployed and accessible at **[geospark.terrascout.app](https://geospark.terrascout.app/docs)** — 11 endpoints with interactive Swagger documentation.
+GeoSpark is deployed and accessible at **[geospark.terrascout.app](https://geospark.terrascout.app/docs)** — 28 endpoints with interactive Swagger documentation.
 
 ## Author
 

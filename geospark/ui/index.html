@@ -9,7 +9,8 @@
   <style>
     /* ===== LANDING PAGE DESIGN SYSTEM ===== */
     body.landing { background: #080b12; color: #e2e8f0; }
-    body.landing .container { max-width: 1100px; }
+    body.landing .container { max-width: 100%; padding: 0; }
+    body.landing .section-inner { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
 
     /* Nav override for dark landing */
     body.landing .nav {
@@ -28,7 +29,6 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      margin: -2rem -2rem 0 -2rem;
       padding: 2rem;
     }
 
@@ -222,7 +222,6 @@
       background: rgba(255,255,255,0.02);
       border-top: 1px solid rgba(255,255,255,0.04);
       border-bottom: 1px solid rgba(255,255,255,0.04);
-      margin: 0 -2rem;
     }
     .live-strip .ls-item {
       display: flex; align-items: center; gap: 0.5rem;
@@ -475,6 +474,7 @@
 
     <!-- ===== WHY GEOSPARK ===== -->
     <div class="section reveal">
+      <div class="section-inner">
       <div class="section-header">
         <h2>LLMs guess. GeoSpark computes.</h2>
         <p>Every spatial answer is computed on the WGS84 ellipsoid, not inferred from training data.</p>
@@ -513,10 +513,12 @@
           <div class="cred-desc">Spatial reasoning accuracy<br>with GeoSpark augmentation</div>
         </div>
       </div>
+      </div>
     </div>
 
     <!-- ===== PLATFORM ===== -->
     <div class="section reveal">
+      <div class="section-inner">
       <div class="section-header">
         <h2>The Platform</h2>
         <p>Spatial reasoning, live data, autonomous agents, and model-agnostic integration.</p>
@@ -554,10 +556,12 @@
           <p>9 local Ollama models, free APIs, no rate limits. Run the entire stack on your hardware at $0.</p>
         </div>
       </div>
+      </div>
     </div>
 
     <!-- ===== GET STARTED ===== -->
     <div class="section reveal">
+      <div class="section-inner">
       <div class="section-header">
         <h2>Get Started</h2>
       </div>
@@ -579,6 +583,7 @@
         <a href="/playground" class="btn btn-primary" style="padding:0.85rem 2.5rem;font-size:1rem;border-radius:10px;">Open Playground</a>
         &nbsp;&nbsp;
         <a href="https://github.com/Maz2580/geospark" target="_blank" style="color:#475569;font-size:0.9rem;font-weight:600;">View on GitHub &rarr;</a>
+      </div>
       </div>
     </div>
 

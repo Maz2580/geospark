@@ -480,6 +480,73 @@ td {
   .stat-row { gap: 1rem; }
 }
 
+/* Timeline */
+.timeline {
+  position: relative;
+  padding-left: 1.75rem;
+  margin-top: 1rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-border);
+}
+
+.timeline-step {
+  position: relative;
+  padding: 0.5rem 0 0.5rem 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.timeline-step::before {
+  content: '';
+  position: absolute;
+  left: -1.25rem;
+  top: 0.85rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 2px solid var(--color-surface);
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.timeline-step.error::before {
+  background: var(--color-error);
+  box-shadow: 0 0 0 2px var(--color-error);
+}
+
+.timeline-step .step-action {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+}
+
+.timeline-step .step-desc {
+  font-size: 0.9rem;
+  margin-top: 0.15rem;
+}
+
+.timeline-step .step-time {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+}
+
+/* Presets */
+.presets {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
 /* Utility */
 .mt-1 { margin-top: 0.5rem; }
 .mt-2 { margin-top: 1rem; }

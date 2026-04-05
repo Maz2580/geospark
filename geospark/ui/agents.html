@@ -38,7 +38,7 @@
         <div class="card-header"><div class="card-icon agent">&#129302;</div><h3>GeoAgent</h3></div>
         <p class="text-sm text-muted mb-2">
           Autonomous multi-step spatial analysis. Plans and executes geocoding, distance computation,
-          amenity search, weather checks, and more — all from a natural language goal.
+          amenity search, weather checks, and more &mdash; all from a natural language goal.
         </p>
         <div class="form-group">
           <label>Goal</label>
@@ -120,14 +120,20 @@
         if (data.summary) {
           html += `<div class="result-card"><div class="metric"><span class="label">Summary</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(data.summary)}</span></div></div>`;
         }
-        // Steps
+        // Steps as timeline
         if (data.steps?.length) {
-          html += '<div class="mt-2"><strong class="text-sm">Steps Executed:</strong>';
-          data.steps.forEach((s, i) => {
-            const icon = s.error ? '&#10060;' : '&#9989;';
-            html += `<div class="result-card"><div class="metric"><span class="label">${icon} ${s.action}</span><span class="value" style="white-space:normal;font-family:var(--font-sans);font-weight:400">${escapeHtml(s.description)}</span></div></div>`;
+          html += '<div class="mt-2"><strong class="text-sm">Execution Timeline</strong>';
+          html += '<div class="timeline">';
+          data.steps.forEach(s => {
+            const cls = s.error ? 'error' : '';
+            const time = s.duration_s ? `${s.duration_s}s` : '';
+            html += `<div class="timeline-step ${cls}">
+              <div class="step-action">${escapeHtml(s.action)}${time ? ` &middot; <span class="step-time">${time}</span>` : ''}</div>
+              <div class="step-desc">${escapeHtml(s.description)}</div>
+              ${s.error ? `<div class="text-sm" style="color:var(--color-error)">${escapeHtml(s.error)}</div>` : ''}
+            </div>`;
           });
-          html += '</div>';
+          html += '</div></div>';
         }
         // Duration
         if (data.total_duration_s) {

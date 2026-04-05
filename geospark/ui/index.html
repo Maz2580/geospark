@@ -25,7 +25,7 @@
       <h1>Give any AI model a spatial mind</h1>
       <p class="subtitle">
         Open-source geospatial intelligence engine. Ground-truth spatial reasoning
-        that LLMs get wrong 80% of the time — topology, distance, containment, all correct.
+        that LLMs get wrong 80% of the time &mdash; topology, distance, containment, all correct.
       </p>
       <div class="cta-group">
         <a href="/playground" class="btn btn-primary">Try the Playground</a>
@@ -39,10 +39,59 @@
       </div>
     </div>
 
-    <!-- Capabilities -->
+    <!-- Hero Comparison: LLM vs GeoSpark -->
     <div class="page-header">
+      <h1>LLM Guess vs. GeoSpark Verification</h1>
+      <p>See the difference between language model inference and ground-truth spatial reasoning.</p>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card" style="border-left:4px solid var(--color-error)">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--color-error-light)">&#10060;</div>
+          <h3>LLM Alone</h3>
+        </div>
+        <p class="text-sm text-muted mb-2"><em>"How far is the Eiffel Tower from Big Ben?"</em></p>
+        <div class="result-card">
+          <div class="metric"><span class="label">Answer</span><span class="value" style="color:var(--color-error)">~500 km</span></div>
+          <div class="metric"><span class="label">Method</span><span class="value">Guessed from training data</span></div>
+          <div class="metric"><span class="label">Accuracy</span><span class="value"><span class="badge badge-error">0% on distance benchmarks</span></span></div>
+        </div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--color-success)">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--color-primary-light)">&#9989;</div>
+          <h3>With GeoSpark</h3>
+        </div>
+        <p class="text-sm text-muted mb-2"><em>"How far is the Eiffel Tower from Big Ben?"</em></p>
+        <div class="result-card">
+          <div class="metric"><span class="label">Answer</span><span class="value" style="color:var(--color-success)">343,923 m (343.9 km)</span></div>
+          <div class="metric"><span class="label">Method</span><span class="value">Geodesic on WGS84 ellipsoid</span></div>
+          <div class="metric"><span class="label">Accuracy</span><span class="value"><span class="badge badge-ok">Ground truth verified</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Credibility Strip -->
+    <div class="grid grid-3 mt-3">
+      <div class="card text-center">
+        <div style="font-size:2.5rem;font-weight:800;color:var(--color-error)">0%</div>
+        <div class="text-sm text-muted">Distance accuracy<br>LLMs alone (4 of 5 models)</div>
+      </div>
+      <div class="card text-center">
+        <div style="font-size:2.5rem;font-weight:800;color:var(--color-primary)">535</div>
+        <div class="text-sm text-muted">Benchmark questions<br>across 5 categories</div>
+      </div>
+      <div class="card text-center">
+        <div style="font-size:2.5rem;font-weight:800;color:var(--color-primary)">100%</div>
+        <div class="text-sm text-muted">Ground-truth accuracy<br>with GeoSpark tools</div>
+      </div>
+    </div>
+
+    <!-- Capabilities -->
+    <div class="page-header mt-3">
       <h1>What GeoSpark Does</h1>
-      <p>Spatial reasoning, live data, and autonomous agents — all through one API.</p>
+      <p>Spatial reasoning, live data, and autonomous agents &mdash; all through one API.</p>
     </div>
 
     <div class="grid grid-3">
@@ -53,7 +102,7 @@
         </div>
         <p class="text-sm text-muted">
           Topology, geodesic distance, CRS transforms, buffering, area computation.
-          All geometrically correct on the WGS84 ellipsoid — not LLM-guessed.
+          All geometrically correct on the WGS84 ellipsoid &mdash; not LLM-guessed.
         </p>
       </div>
 

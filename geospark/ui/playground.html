@@ -25,7 +25,7 @@
   <div class="container">
     <div class="page-header">
       <h1>Playground</h1>
-      <p>Try GeoSpark's spatial tools interactively. All results are ground-truth — not LLM-guessed.</p>
+      <p>Try GeoSpark's spatial tools interactively. All results are ground-truth &mdash; not LLM-guessed.</p>
     </div>
 
     <div class="tabs">
@@ -42,6 +42,11 @@
         <div class="card">
           <div class="card-header"><div class="card-icon geo">&#128205;</div><h3>Geocode</h3></div>
           <p class="text-sm text-muted mb-2">Convert a place name to coordinates.</p>
+          <div class="presets mb-2">
+            <button class="btn btn-sm btn-secondary" onclick="$('#geo-query').value='Eiffel Tower, Paris';runGeocode()">Eiffel Tower</button>
+            <button class="btn btn-sm btn-secondary" onclick="$('#geo-query').value='Tokyo Tower, Japan';runGeocode()">Tokyo Tower</button>
+            <button class="btn btn-sm btn-secondary" onclick="$('#geo-query').value='Sydney Opera House';runGeocode()">Sydney Opera House</button>
+          </div>
           <div class="form-group">
             <label>Location</label>
             <input type="text" id="geo-query" placeholder="Eiffel Tower, Paris" value="Eiffel Tower, Paris">
@@ -61,11 +66,16 @@
         <div class="card">
           <div class="card-header"><div class="card-icon geo">&#128207;</div><h3>Geodesic Distance</h3></div>
           <p class="text-sm text-muted mb-2">Calculate the precise distance between two points on Earth.</p>
+          <div class="presets mb-2">
+            <button class="btn btn-sm btn-secondary" onclick="setDist(48.8566,2.3522,51.5074,-0.1278)">Paris &rarr; London</button>
+            <button class="btn btn-sm btn-secondary" onclick="setDist(35.6762,139.6503,37.5665,126.9780)">Tokyo &rarr; Seoul</button>
+            <button class="btn btn-sm btn-secondary" onclick="setDist(-33.8688,151.2093,-37.8136,144.9631)">Sydney &rarr; Melbourne</button>
+          </div>
           <div class="grid grid-2" style="gap:0.75rem">
-            <div class="form-group"><label>Point A — Lat</label><input type="number" id="dist-lat-a" step="any" value="48.8566"></div>
-            <div class="form-group"><label>Point A — Lon</label><input type="number" id="dist-lon-a" step="any" value="2.3522"></div>
-            <div class="form-group"><label>Point B — Lat</label><input type="number" id="dist-lat-b" step="any" value="51.5074"></div>
-            <div class="form-group"><label>Point B — Lon</label><input type="number" id="dist-lon-b" step="any" value="-0.1278"></div>
+            <div class="form-group"><label>Point A &mdash; Lat</label><input type="number" id="dist-lat-a" step="any" value="48.8566"></div>
+            <div class="form-group"><label>Point A &mdash; Lon</label><input type="number" id="dist-lon-a" step="any" value="2.3522"></div>
+            <div class="form-group"><label>Point B &mdash; Lat</label><input type="number" id="dist-lat-b" step="any" value="51.5074"></div>
+            <div class="form-group"><label>Point B &mdash; Lon</label><input type="number" id="dist-lon-b" step="any" value="-0.1278"></div>
           </div>
           <button class="btn btn-primary" onclick="runDistance()">Calculate</button>
           <div id="dist-result" class="hidden"></div>
@@ -131,7 +141,11 @@
     <div class="tab-panel hidden" id="tab-ask">
       <div class="card">
         <div class="card-header"><div class="card-icon agent">&#128172;</div><h3>Ask GeoSpark</h3></div>
-        <p class="text-sm text-muted mb-2">Ask a spatial question in natural language. Uses local Ollama models — free and private.</p>
+        <p class="text-sm text-muted mb-2">Ask a spatial question in natural language. Uses local Ollama models &mdash; free and private.</p>
+        <div class="presets mb-2">
+          <button class="btn btn-sm btn-secondary" onclick="$('#ask-q').value='How far is the Eiffel Tower from Big Ben?';runAsk()">Eiffel Tower to Big Ben</button>
+          <button class="btn btn-sm btn-secondary" onclick="$('#ask-q').value='Is Tokyo closer to Seoul or Beijing?';runAsk()">Tokyo: Seoul or Beijing?</button>
+        </div>
         <div class="form-group">
           <label>Question</label>
           <input type="text" id="ask-q" placeholder="How far is the Eiffel Tower from Big Ben?" value="How far is the Eiffel Tower from Big Ben?">
@@ -146,6 +160,13 @@
   <script>
     // Init tabs
     initTabs($('.container'));
+
+    /* --- Preset helpers --- */
+    function setDist(la, lo, lb, lob) {
+      $('#dist-lat-a').value = la; $('#dist-lon-a').value = lo;
+      $('#dist-lat-b').value = lb; $('#dist-lon-b').value = lob;
+      runDistance();
+    }
 
     /* --- Geocode --- */
     async function runGeocode() {

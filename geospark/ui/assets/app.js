@@ -36,8 +36,21 @@ function showResult(el, data) {
   el.classList.add('success');
 }
 
-function showError(el, msg) {
-  el.textContent = typeof msg === 'string' ? msg : JSON.stringify(msg);
+function showError(el, rawMsg) {
+  let msg = typeof rawMsg === 'string' ? rawMsg : JSON.stringify(rawMsg);
+  // Add helpful suggestions for common errors
+  let suggestion = '';
+  if (msg.includes('502') || msg.includes('Ollama'))
+    suggestion = 'The LLM service may be busy. Try again in a few seconds.';
+  else if (msg.includes('504') || msg.includes('timed out'))
+    suggestion = 'The request timed out. Try a simpler query or shorter radius.';
+  else if (msg.includes('geocode') || msg.includes('No results'))
+    suggestion = 'Try adding a city or country name to your search.';
+  else if (msg.includes('API_KEY') || msg.includes('unconfigured'))
+    suggestion = 'This channel requires a free API key. See the status page for details.';
+
+  el.innerHTML = `<strong>Error:</strong> ${escapeHtml(msg)}` +
+    (suggestion ? `<br><span class="text-sm" style="color:var(--color-text-secondary)">Tip: ${suggestion}</span>` : '');
   el.classList.remove('hidden', 'success');
   el.classList.add('error');
 }
@@ -87,11 +100,11 @@ function addMarker(map, lat, lon, label) {
 function fitBounds(map, points) {
   if (points.length === 0) return;
   if (points.length === 1) {
-    map.setView([points[0][0], points[0][1]], 13);
+    map.flyTo([points[0][0], points[0][1]], 13, { duration: 1.2 });
     return;
   }
   const bounds = L.latLngBounds(points.map(p => [p[0], p[1]]));
-  map.fitBounds(bounds, { padding: [40, 40] });
+  map.flyToBounds(bounds, { padding: [40, 40], duration: 1.2 });
 }
 
 /* --- Tab Management --- */

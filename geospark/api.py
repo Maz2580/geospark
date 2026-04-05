@@ -13,12 +13,15 @@ from __future__ import annotations
 import os
 import time
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Security
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from geospark import __version__
@@ -65,6 +68,45 @@ app.add_middleware(
     allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["*"],
 )
+
+# --- Static UI ---
+_ui_dir = Path(__file__).parent / "ui"
+if _ui_dir.exists():
+    app.mount("/assets", StaticFiles(directory=str(_ui_dir / "assets")), name="assets")
+
+
+def _serve_page(page: str) -> HTMLResponse:
+    """Serve an HTML page from the ui/ directory."""
+    path = _ui_dir / page
+    if path.exists():
+        return HTMLResponse(path.read_text(encoding="utf-8"))
+    raise HTTPException(status_code=404, detail="Page not found")
+
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+async def ui_index():
+    return _serve_page("index.html")
+
+
+@app.get("/playground", response_class=HTMLResponse, include_in_schema=False)
+async def ui_playground():
+    return _serve_page("playground.html")
+
+
+@app.get("/agents", response_class=HTMLResponse, include_in_schema=False)
+async def ui_agents():
+    return _serve_page("agents.html")
+
+
+@app.get("/data", response_class=HTMLResponse, include_in_schema=False)
+async def ui_data():
+    return _serve_page("data.html")
+
+
+@app.get("/status", response_class=HTMLResponse, include_in_schema=False)
+async def ui_status():
+    return _serve_page("status.html")
+
 
 # --- LLM Gateway Router ---
 from geospark.llm_gateway import router as llm_router  # noqa: E402

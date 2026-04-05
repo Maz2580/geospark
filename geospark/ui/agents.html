@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agents — GeoSpark</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <nav class="nav">
+    <span class="nav-brand">GeoSpark</span>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/playground">Playground</a>
+      <a href="/agents">Agents</a>
+      <a href="/data">Data</a>
+      <a href="/status">Status</a>
+      <a href="/docs">API Docs</a>
+    </div>
+    <span class="nav-version"></span>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Autonomous Agents</h1>
+      <p>Give a goal, get a complete spatial analysis. No manual step-by-step.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="tab-geoagent">GeoAgent</button>
+      <button class="tab" data-tab="tab-report">Spatial Report</button>
+      <button class="tab" data-tab="tab-site">Site Selector</button>
+    </div>
+
+    <!-- GeoAgent -->
+    <div class="tab-panel" id="tab-geoagent">
+      <div class="card">
+        <div class="card-header"><div class="card-icon agent">&#129302;</div><h3>GeoAgent</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Autonomous multi-step spatial analysis. Plans and executes geocoding, distance computation,
+          amenity search, weather checks, and more — all from a natural language goal.
+        </p>
+        <div class="form-group">
+          <label>Goal</label>
+          <input type="text" id="agent-goal" placeholder="Find all hospitals within 2km of the Eiffel Tower" value="Find all hospitals within 2km of the Eiffel Tower">
+        </div>
+        <button class="btn btn-primary" onclick="runAgent()">Run Agent</button>
+        <div id="agent-result" class="result-box hidden"></div>
+      </div>
+    </div>
+
+    <!-- Spatial Report -->
+    <div class="tab-panel hidden" id="tab-report">
+      <div class="card">
+        <div class="card-header"><div class="card-icon agent">&#128220;</div><h3>Spatial Report</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Comprehensive location dossier: coordinates, elevation, weather, air quality,
+          nearby amenities, accessibility scores, and an LLM-generated narrative.
+        </p>
+        <div class="grid grid-2" style="gap:0.75rem">
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="report-location" placeholder="Federation Square, Melbourne" value="Federation Square, Melbourne">
+          </div>
+          <div class="form-group">
+            <label>Radius (m)</label>
+            <input type="number" id="report-radius" value="2000">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="runReport()">Generate Report</button>
+        <div id="report-result" class="result-box hidden"></div>
+      </div>
+    </div>
+
+    <!-- Site Selector -->
+    <div class="tab-panel hidden" id="tab-site">
+      <div class="card">
+        <div class="card-header"><div class="card-icon agent">&#128204;</div><h3>Site Selector</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Find the optimal location for a facility based on proximity to amenities.
+          Multi-criteria spatial scoring with distance weighting.
+        </p>
+        <div class="grid grid-2" style="gap:0.75rem">
+          <div class="form-group">
+            <label>Search Area</label>
+            <input type="text" id="site-within" placeholder="Zurich" value="Zurich">
+          </div>
+          <div class="form-group">
+            <label>Facility Type</label>
+            <input type="text" id="site-facility" placeholder="pharmacy" value="pharmacy">
+          </div>
+          <div class="form-group">
+            <label>Near (comma-separated)</label>
+            <input type="text" id="site-near" placeholder="hospital, school" value="hospital, school">
+          </div>
+          <div class="form-group">
+            <label>Radius (m)</label>
+            <input type="number" id="site-radius" value="5000">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="runSiteSelect()">Find Best Location</button>
+        <div id="site-result" class="result-box hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    initTabs($('.container'));
+
+    /* --- GeoAgent --- */
+    async function runAgent() {
+      const el = $('#agent-result');
+      showLoading(el, 'Agent is planning and executing... (may take 30-60 seconds)');
+      try {
+        const data = await geo.post('/api/v1/agent/run', { goal: $('#agent-goal').value });
+
+        let html = '';
+        // Summary
+        if (data.summary) {
+          html += `<div class="result-card"><div class="metric"><span class="label">Summary</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(data.summary)}</span></div></div>`;
+        }
+        // Steps
+        if (data.steps?.length) {
+          html += '<div class="mt-2"><strong class="text-sm">Steps Executed:</strong>';
+          data.steps.forEach((s, i) => {
+            const icon = s.error ? '&#10060;' : '&#9989;';
+            html += `<div class="result-card"><div class="metric"><span class="label">${icon} ${s.action}</span><span class="value" style="white-space:normal;font-family:var(--font-sans);font-weight:400">${escapeHtml(s.description)}</span></div></div>`;
+          });
+          html += '</div>';
+        }
+        // Duration
+        if (data.total_duration_s) {
+          html += `<p class="text-sm text-muted mt-2">Completed in ${data.total_duration_s}s</p>`;
+        }
+        html += jsonToggle(data, 'agent-json');
+        el.innerHTML = html;
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+
+    /* --- Spatial Report --- */
+    async function runReport() {
+      const el = $('#report-result');
+      showLoading(el, 'Generating location dossier... (may take 30-60 seconds)');
+      try {
+        const data = await geo.post('/api/v1/agent/report', {
+          location: $('#report-location').value,
+          radius_m: parseFloat($('#report-radius').value),
+        });
+
+        let html = '';
+        // Summary
+        if (data.summary) {
+          html += `<div class="result-card"><div class="metric"><span class="label">Summary</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(data.summary)}</span></div></div>`;
+        }
+        // Core info
+        html += resultCard([
+          ['Address', data.address || '—'],
+          ['Coordinates', data.coordinates?.map(c => c?.toFixed(6)).join(', ') || '—'],
+          ['Elevation', data.elevation_m != null ? data.elevation_m + ' m' : '—'],
+        ]);
+        // Weather
+        if (data.weather) {
+          const w = data.weather;
+          html += '<div class="mt-1"><strong class="text-sm">Weather</strong></div>';
+          html += resultCard([
+            ['Conditions', w.conditions || '—'],
+            ['Temperature', w.temperature_c != null ? w.temperature_c + ' C' : '—'],
+            ['Feels Like', w.feels_like_c != null ? w.feels_like_c + ' C' : '—'],
+            ['Humidity', w.humidity_pct != null ? w.humidity_pct + '%' : '—'],
+            ['Wind', w.wind_speed_kmh != null ? w.wind_speed_kmh + ' km/h' : '—'],
+          ]);
+        }
+        // Air quality
+        if (data.air_quality) {
+          const aq = data.air_quality;
+          html += '<div class="mt-1"><strong class="text-sm">Air Quality</strong></div>';
+          html += resultCard([
+            ['Station', aq.station_name || '—'],
+            ['PM2.5', aq.pm25 != null ? aq.pm25 + ' (' + (aq.pm25_category || '') + ')' : '—'],
+            ['NO2', aq.no2 ?? '—'],
+            ['O3', aq.o3 ?? '—'],
+          ]);
+        }
+        // Accessibility
+        if (data.accessibility?.length) {
+          html += '<div class="mt-1"><strong class="text-sm">Accessibility</strong></div>';
+          html += resultCard(data.accessibility.map(a => [
+            a.service,
+            a.available ? `${a.nearest_name} (${a.distance_m}m)` : 'Not found',
+          ]));
+        }
+        // Duration
+        if (data.duration_s) {
+          html += `<p class="text-sm text-muted mt-2">Generated in ${data.duration_s}s</p>`;
+        }
+        html += jsonToggle(data, 'report-json');
+        el.innerHTML = html;
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+
+    /* --- Site Selector --- */
+    async function runSiteSelect() {
+      const el = $('#site-result');
+      showLoading(el, 'Evaluating candidate locations... (may take 30-60 seconds)');
+      try {
+        const near = $('#site-near').value.split(',').map(s => s.trim()).filter(Boolean);
+        const data = await geo.post('/api/v1/agent/site-select', {
+          within: $('#site-within').value,
+          near: near,
+          facility_type: $('#site-facility').value,
+          radius_m: parseFloat($('#site-radius').value),
+        });
+
+        let html = '';
+        // Best result
+        if (data.best) {
+          html += '<div class="mt-1"><strong class="text-sm">Best Location</strong></div>';
+          html += resultCard([
+            ['Name', data.best.name || '—'],
+            ['Score', data.best.score?.toFixed(2) || '—'],
+            ['Coordinates', data.best.coordinates?.map(c => c?.toFixed(6)).join(', ') || '—'],
+          ]);
+        }
+        // Candidates
+        if (data.candidates?.length) {
+          html += `<div class="mt-1"><strong class="text-sm">Top ${Math.min(5, data.candidates.length)} Candidates</strong></div>`;
+          data.candidates.slice(0, 5).forEach((c, i) => {
+            html += resultCard([
+              [`#${i + 1}`, c.name || '—'],
+              ['Score', c.score?.toFixed(2) || '—'],
+            ]);
+          });
+        }
+        if (data.duration_s) {
+          html += `<p class="text-sm text-muted mt-2">Completed in ${data.duration_s}s</p>`;
+        }
+        html += jsonToggle(data, 'site-json');
+        el.innerHTML = html;
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+  </script>
+</body>
+</html>

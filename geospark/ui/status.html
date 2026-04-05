@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Status — GeoSpark</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <nav class="nav">
+    <span class="nav-brand">GeoSpark</span>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/playground">Playground</a>
+      <a href="/agents">Agents</a>
+      <a href="/data">Data</a>
+      <a href="/status">Status</a>
+      <a href="/docs">API Docs</a>
+    </div>
+    <span class="nav-version"></span>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>System Status</h1>
+      <p>Live system information, available tools, and LLM models.</p>
+    </div>
+
+    <div class="grid grid-2">
+      <!-- System Info -->
+      <div class="card">
+        <div class="card-header"><div class="card-icon status">&#9881;</div><h3>System</h3></div>
+        <div id="sys-info" class="text-sm text-muted">Loading...</div>
+      </div>
+
+      <!-- Health -->
+      <div class="card">
+        <div class="card-header"><div class="card-icon geo">&#128154;</div><h3>Health</h3></div>
+        <div id="health-info" class="text-sm text-muted">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Tools -->
+    <div class="card mt-2">
+      <div class="card-header"><div class="card-icon geo">&#128295;</div><h3>Available Tools</h3></div>
+      <div id="tools-info" class="text-sm text-muted">Loading...</div>
+    </div>
+
+    <!-- Data Channels -->
+    <div class="card mt-2">
+      <div class="card-header"><div class="card-icon data">&#128225;</div><h3>Data Channels</h3></div>
+      <div id="channels-info" class="text-sm text-muted">Loading...</div>
+    </div>
+
+    <!-- LLM Models -->
+    <div class="card mt-2">
+      <div class="card-header"><div class="card-icon agent">&#129302;</div><h3>LLM Models (Local Ollama)</h3></div>
+      <div id="models-info" class="text-sm text-muted">Loading...</div>
+    </div>
+  </div>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    // Load all status data
+    Promise.all([
+      geo.get('/health').catch(() => null),
+      geo.get('/api/v1/status').catch(() => null),
+      geo.get('/api/v1/tools').catch(() => null),
+      geo.get('/api/v1/data/status').catch(() => null),
+      geo.get('/api/v1/llm/models').catch(() => null),
+    ]).then(([health, status, tools, channels, models]) => {
+
+      // Health
+      if (health) {
+        $('#health-info').innerHTML = resultCard([
+          ['Status', `<span class="badge badge-ok">${health.status}</span>`],
+          ['Version', health.version],
+          ['Tools Loaded', health.tools?.join(', ') || 'none'],
+        ]);
+      }
+
+      // System
+      if (status) {
+        const upH = Math.floor(status.uptime_seconds / 3600);
+        const upM = Math.floor((status.uptime_seconds % 3600) / 60);
+        $('#sys-info').innerHTML = resultCard([
+          ['Version', status.version],
+          ['Environment', status.environment],
+          ['Uptime', `${upH}h ${upM}m`],
+          ['Python', status.python_version?.split(' ')[0] || '—'],
+          ['Memory (RSS)', status.memory?.rss_mb ? status.memory.rss_mb + ' MB' : '—'],
+        ]);
+      }
+
+      // Tools
+      if (tools) {
+        let html = '<div class="table-wrap"><table><thead><tr><th>Tool</th><th>Status</th></tr></thead><tbody>';
+        (tools.available || []).forEach(t => {
+          const loaded = tools.loaded?.includes(t);
+          html += `<tr><td class="mono">${t}</td><td><span class="badge ${loaded ? 'badge-ok' : 'badge-info'}">${loaded ? 'loaded' : 'available'}</span></td></tr>`;
+        });
+        html += '</tbody></table></div>';
+        $('#tools-info').innerHTML = html;
+      }
+
+      // Channels
+      if (channels) {
+        let html = '<div class="table-wrap"><table><thead><tr><th>Channel</th><th>Status</th><th>Message</th><th>Tier</th></tr></thead><tbody>';
+        channels.channels?.forEach(ch => {
+          const cls = ch.status === 'ok' ? 'badge-ok' : ch.status === 'unconfigured' ? 'badge-warn' : 'badge-error';
+          const tierLabel = ch.tier === 0 ? 'Free' : ch.tier === 1 ? 'Free+Key' : 'Commercial';
+          html += `<tr><td class="mono">${ch.name}</td><td><span class="badge ${cls}">${ch.status}</span></td><td class="text-sm">${ch.message || ''}</td><td>${tierLabel}</td></tr>`;
+        });
+        html += '</tbody></table></div>';
+        $('#channels-info').innerHTML = html;
+      }
+
+      // LLM Models
+      if (models?.data?.length) {
+        let html = '<div class="table-wrap"><table><thead><tr><th>Model</th><th>Size</th><th>Family</th><th>Quantization</th></tr></thead><tbody>';
+        models.data.forEach(m => {
+          html += `<tr><td class="mono">${m.id}</td><td>${m.size_gb} GB</td><td>${m.family || '—'}</td><td>${m.quantization || '—'}</td></tr>`;
+        });
+        html += '</tbody></table></div>';
+        html += `<p class="text-sm text-muted mt-1">${models.data.length} models available. All running on CPU (256GB RAM, no GPU).</p>`;
+        $('#models-info').innerHTML = html;
+      } else {
+        $('#models-info').innerHTML = '<p class="text-muted">Could not reach LLM service.</p>';
+      }
+    });
+  </script>
+</body>
+</html>

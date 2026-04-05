@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Channels — GeoSpark</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+  <nav class="nav">
+    <span class="nav-brand">GeoSpark</span>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/playground">Playground</a>
+      <a href="/agents">Agents</a>
+      <a href="/data">Data</a>
+      <a href="/status">Status</a>
+      <a href="/docs">API Docs</a>
+    </div>
+    <span class="nav-version"></span>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Live Data Channels</h1>
+      <p>Real-time geospatial data from free, authoritative sources.</p>
+    </div>
+
+    <!-- Channel Status -->
+    <div class="card mb-2" id="channel-status">
+      <div class="card-header"><h3>Channel Status</h3></div>
+      <div id="status-grid" class="text-sm text-muted">Loading...</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="tab-weather">Weather</button>
+      <button class="tab" data-tab="tab-airquality">Air Quality</button>
+      <button class="tab" data-tab="tab-fires">Active Fires</button>
+    </div>
+
+    <!-- Weather -->
+    <div class="tab-panel" id="tab-weather">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-icon data">&#127780;</div><h3>Weather</h3></div>
+          <p class="text-sm text-muted mb-2">Current conditions and forecast from Open-Meteo. Free, no API key needed.</p>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="wx-location" placeholder="Melbourne, Australia" value="Melbourne, Australia">
+          </div>
+          <button class="btn btn-primary" onclick="runWeather()">Get Weather</button>
+          <div id="wx-result" class="hidden"></div>
+        </div>
+        <div>
+          <div id="wx-map" class="map-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Air Quality -->
+    <div class="tab-panel hidden" id="tab-airquality">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-icon data">&#127981;</div><h3>Air Quality</h3></div>
+          <p class="text-sm text-muted mb-2">PM2.5, NO2, O3 from government stations via OpenAQ. Requires free API key.</p>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="aq-location" placeholder="Delhi" value="Delhi">
+          </div>
+          <button class="btn btn-primary" onclick="runAirQuality()">Check Air Quality</button>
+          <div id="aq-result" class="hidden"></div>
+        </div>
+        <div>
+          <div id="aq-map" class="map-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fires -->
+    <div class="tab-panel hidden" id="tab-fires">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-icon data" style="background:#fef2f2">&#128293;</div><h3>Active Fires</h3></div>
+          <p class="text-sm text-muted mb-2">Near-real-time fire detections from NASA FIRMS (MODIS/VIIRS). Requires free MAP_KEY.</p>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="fire-location" placeholder="Amazon Rainforest" value="California">
+          </div>
+          <button class="btn btn-primary" onclick="runFires()">Detect Fires</button>
+          <div id="fire-result" class="hidden"></div>
+        </div>
+        <div>
+          <div id="fire-map" class="map-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    initTabs($('.container'));
+
+    // Load channel status
+    geo.get('/api/v1/data/status').then(data => {
+      const grid = $('#status-grid');
+      grid.innerHTML = data.channels.map(ch => {
+        const cls = ch.status === 'ok' ? 'badge-ok' : ch.status === 'unconfigured' ? 'badge-warn' : 'badge-error';
+        return `<span class="badge ${cls}" style="margin:0.25rem">${ch.name}: ${ch.status}</span>`;
+      }).join(' ');
+    }).catch(() => { $('#status-grid').textContent = 'Could not load status'; });
+
+    /* --- Weather --- */
+    async function runWeather() {
+      const el = $('#wx-result');
+      el.innerHTML = '<div class="loading-overlay"><span class="spinner"></span>Fetching weather...</div>';
+      el.classList.remove('hidden');
+      try {
+        const data = await geo.post('/api/v1/data/weather', { location: $('#wx-location').value });
+        if (data.errors?.length) { showError(el, data.errors[0]); return; }
+
+        let html = '';
+        const current = data.features?.find(f => f.type === 'current_weather');
+        if (current) {
+          html += '<div class="mt-1"><strong class="text-sm">Current Conditions</strong></div>';
+          html += resultCard([
+            ['Location', current.location || '—'],
+            ['Temperature', current.temperature_c + ' C'],
+            ['Feels Like', current.feels_like_c + ' C'],
+            ['Humidity', current.humidity_pct + '%'],
+            ['Wind', current.wind_speed_kmh + ' km/h'],
+            ['Conditions', current.weather_description || '—'],
+            ['Precipitation', current.precipitation_mm + ' mm'],
+          ]);
+
+          // Map
+          const map = createMap('wx-map', current.coordinates[1], current.coordinates[0], 10);
+          addMarker(map, current.coordinates[1], current.coordinates[0], `${current.temperature_c} C — ${current.weather_description}`);
+        }
+
+        const forecasts = data.features?.filter(f => f.type === 'daily_forecast') || [];
+        if (forecasts.length) {
+          html += '<div class="mt-2"><strong class="text-sm">Forecast</strong></div>';
+          html += '<div class="table-wrap"><table><thead><tr><th>Date</th><th>High</th><th>Low</th><th>Rain</th><th>Wind</th></tr></thead><tbody>';
+          forecasts.forEach(f => {
+            html += `<tr><td>${f.date}</td><td>${f.temp_max_c} C</td><td>${f.temp_min_c} C</td><td>${f.precipitation_mm} mm</td><td>${f.wind_max_kmh} km/h</td></tr>`;
+          });
+          html += '</tbody></table></div>';
+        }
+        html += jsonToggle(data, 'wx-json');
+        el.innerHTML = html;
+        el.classList.remove('error');
+      } catch (e) { showError(el, e.message); }
+    }
+
+    /* --- Air Quality --- */
+    async function runAirQuality() {
+      const el = $('#aq-result');
+      el.innerHTML = '<div class="loading-overlay"><span class="spinner"></span>Fetching air quality data...</div>';
+      el.classList.remove('hidden');
+      try {
+        const data = await geo.post('/api/v1/data/air-quality', { location: $('#aq-location').value });
+        if (data.errors?.length) { showError(el, data.errors[0]); return; }
+        if (!data.features?.length) { el.innerHTML = '<p class="text-muted">No monitoring stations found.</p>'; return; }
+
+        let html = '<div class="table-wrap"><table><thead><tr><th>Station</th><th>PM2.5</th><th>NO2</th><th>O3</th><th>Category</th><th>Distance</th></tr></thead><tbody>';
+        const map = createMap('aq-map', 0, 0, 2);
+        const pts = [];
+
+        data.features.slice(0, 10).forEach(f => {
+          const m = f.measurements || {};
+          html += `<tr>
+            <td>${f.station_name || '?'}</td>
+            <td>${m.pm25?.value ?? '—'}</td>
+            <td>${m.no2?.value ?? '—'}</td>
+            <td>${m.o3?.value ?? '—'}</td>
+            <td>${f.aqi_category || '—'}</td>
+            <td>${f.distance_m ? Math.round(f.distance_m) + 'm' : '—'}</td>
+          </tr>`;
+          if (f.coordinates?.[0] && f.coordinates?.[1]) {
+            addMarker(map, f.coordinates[1], f.coordinates[0], f.station_name || 'Station');
+            pts.push([f.coordinates[1], f.coordinates[0]]);
+          }
+        });
+        html += '</tbody></table></div>';
+        if (pts.length) fitBounds(map, pts);
+        html += jsonToggle(data, 'aq-json');
+        el.innerHTML = html;
+        el.classList.remove('error');
+      } catch (e) { showError(el, e.message); }
+    }
+
+    /* --- Fires --- */
+    async function runFires() {
+      const el = $('#fire-result');
+      el.innerHTML = '<div class="loading-overlay"><span class="spinner"></span>Checking for active fires...</div>';
+      el.classList.remove('hidden');
+      try {
+        const data = await geo.post('/api/v1/data/fires', { location: $('#fire-location').value });
+        if (data.errors?.length) { showError(el, data.errors[0]); return; }
+
+        if (!data.features?.length) {
+          el.innerHTML = `<div class="result-card"><div class="metric"><span class="label">Result</span><span class="value" style="color:var(--color-success)">No active fires detected</span></div></div>`;
+          el.innerHTML += `<p class="text-sm text-muted mt-1">${data.metadata?.note || ''}</p>`;
+          el.classList.remove('error');
+          return;
+        }
+
+        let html = `<div class="result-card"><div class="metric"><span class="label">Fires Detected</span><span class="value" style="color:var(--color-error)">${data.features.length}</span></div></div>`;
+        html += '<div class="table-wrap mt-1"><table><thead><tr><th>Date</th><th>Time</th><th>Confidence</th><th>Brightness</th><th>FRP</th><th>Satellite</th></tr></thead><tbody>';
+
+        const map = createMap('fire-map', 0, 0, 2);
+        const pts = [];
+        data.features.slice(0, 20).forEach(f => {
+          html += `<tr><td>${f.acq_date}</td><td>${f.acq_time}</td><td>${f.confidence}%</td><td>${f.brightness || '—'}</td><td>${f.frp || '—'}</td><td>${f.satellite || '—'}</td></tr>`;
+          if (f.coordinates) {
+            L.circleMarker([f.coordinates[1], f.coordinates[0]], { radius: 5, color: '#dc2626', fillColor: '#ef4444', fillOpacity: 0.8 }).addTo(map).bindPopup(`Fire: ${f.confidence}% confidence`);
+            pts.push([f.coordinates[1], f.coordinates[0]]);
+          }
+        });
+        html += '</tbody></table></div>';
+        if (pts.length) fitBounds(map, pts);
+        html += jsonToggle(data, 'fire-json');
+        el.innerHTML = html;
+        el.classList.remove('error');
+      } catch (e) { showError(el, e.message); }
+    }
+  </script>
+</body>
+</html>

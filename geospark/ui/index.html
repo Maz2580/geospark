@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoSpark — Geospatial Intelligence Engine</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <nav class="nav">
+    <span class="nav-brand">GeoSpark</span>
+    <div class="nav-links">
+      <a href="/" class="active">Home</a>
+      <a href="/playground">Playground</a>
+      <a href="/agents">Agents</a>
+      <a href="/data">Data</a>
+      <a href="/status">Status</a>
+      <a href="/docs">API Docs</a>
+    </div>
+    <span class="nav-version"></span>
+  </nav>
+
+  <div class="container">
+    <div class="hero">
+      <h1>Give any AI model a spatial mind</h1>
+      <p class="subtitle">
+        Open-source geospatial intelligence engine. Ground-truth spatial reasoning
+        that LLMs get wrong 80% of the time — topology, distance, containment, all correct.
+      </p>
+      <div class="cta-group">
+        <a href="/playground" class="btn btn-primary">Try the Playground</a>
+        <a href="https://github.com/Maz2580/geospark" class="btn btn-ghost" target="_blank">View on GitHub</a>
+      </div>
+      <div class="stat-row" id="hero-stats">
+        <div class="stat"><div class="number" id="stat-tools">—</div><div class="label">Tools</div></div>
+        <div class="stat"><div class="number" id="stat-models">—</div><div class="label">LLM Models</div></div>
+        <div class="stat"><div class="number" id="stat-endpoints">25</div><div class="label">API Endpoints</div></div>
+        <div class="stat"><div class="number">535</div><div class="label">Benchmark Questions</div></div>
+      </div>
+    </div>
+
+    <!-- Capabilities -->
+    <div class="page-header">
+      <h1>What GeoSpark Does</h1>
+      <p>Spatial reasoning, live data, and autonomous agents — all through one API.</p>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon geo">&#127758;</div>
+          <h3>Spatial Reasoning</h3>
+        </div>
+        <p class="text-sm text-muted">
+          Topology, geodesic distance, CRS transforms, buffering, area computation.
+          All geometrically correct on the WGS84 ellipsoid — not LLM-guessed.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon agent">&#129302;</div>
+          <h3>Autonomous Agents</h3>
+        </div>
+        <p class="text-sm text-muted">
+          Give a goal, get a complete analysis. GeoAgent plans multi-step workflows.
+          SpatialReport generates location dossiers. SiteSelector finds optimal locations.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon data">&#127780;</div>
+          <h3>Live Data Channels</h3>
+        </div>
+        <p class="text-sm text-muted">
+          Real-time weather (Open-Meteo), air quality (OpenAQ), and active fire
+          detections (NASA FIRMS). Pluggable channel architecture.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon geo">&#128268;</div>
+          <h3>MCP Server</h3>
+        </div>
+        <p class="text-sm text-muted">
+          6 spatial tools for Claude Desktop and any MCP-compatible AI assistant.
+          <code>pip install geospark-ai[mcp] && geospark-mcp</code>
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon status">&#128202;</div>
+          <h3>GeoSpark Bench</h3>
+        </div>
+        <p class="text-sm text-muted">
+          535 benchmark questions across 5 categories. LLMs score 0% on distance
+          and ~48% on topology. With GeoSpark tools: up to 100%.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon agent">&#128176;</div>
+          <h3>Zero-Cost Stack</h3>
+        </div>
+        <p class="text-sm text-muted">
+          Local Ollama models (9 available), free APIs, no rate limits.
+          Everything runs on your hardware or our server.
+        </p>
+      </div>
+    </div>
+
+    <!-- Benchmark -->
+    <div class="page-header mt-3">
+      <h1>Benchmark Results</h1>
+      <p>LLMs fail at spatial reasoning. GeoSpark fixes this.</p>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Benchmark</th>
+              <th>LLM Alone (avg)</th>
+              <th>With GeoSpark (best)</th>
+              <th>Improvement</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>GeoDistance</td><td>6%</td><td>70%</td><td><strong>+64%</strong></td></tr>
+            <tr><td>GeoTopo</td><td>48%</td><td>50%</td><td>+2%</td></tr>
+            <tr><td>GeoReason</td><td>77%</td><td>100%</td><td><strong>+23%</strong></td></tr>
+            <tr><td>GeoChange</td><td>79%</td><td>—</td><td>Knowledge-based</td></tr>
+            <tr><td>GeoMultimodal</td><td>33%</td><td>—</td><td>In progress</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-sm text-muted mt-2">
+        5 LLM families tested: Qwen, Llama, Gemma, Mistral, Phi. Full report on
+        <a href="https://github.com/Maz2580/geospark" target="_blank">GitHub</a>.
+      </p>
+    </div>
+
+    <!-- Quick start -->
+    <div class="page-header mt-3">
+      <h1>Quick Start</h1>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><h3>Install</h3></div>
+        <pre class="result-box">pip install geospark-ai</pre>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Use</h3></div>
+        <pre class="result-box">from geospark import Engine
+
+engine = Engine(tools=["geocoder", "terrain"])
+result = engine.ask("How far is the Eiffel Tower from Big Ben?")
+print(result.spatial_context.summary)</pre>
+      </div>
+    </div>
+
+    <footer style="text-align:center; padding:3rem 0 1rem; color:var(--color-text-secondary); font-size:0.85rem;">
+      Created by <a href="https://github.com/Maz2580" target="_blank">Mazdak Ghasemi Tootkaboni</a>
+      &middot; <a href="https://github.com/Maz2580/geospark" target="_blank">GitHub</a>
+      &middot; <a href="https://pypi.org/project/geospark-ai/" target="_blank">PyPI</a>
+      &middot; Apache 2.0
+    </footer>
+  </div>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    // Load live stats
+    Promise.all([
+      geo.get('/api/v1/tools').catch(() => null),
+      geo.get('/api/v1/llm/models').catch(() => null),
+    ]).then(([tools, models]) => {
+      if (tools) $('#stat-tools').textContent = tools.available?.length || '—';
+      if (models) $('#stat-models').textContent = models.data?.length || '—';
+    });
+  </script>
+</body>
+</html>

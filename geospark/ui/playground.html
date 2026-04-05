@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playground — GeoSpark</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+  <nav class="nav">
+    <span class="nav-brand">GeoSpark</span>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/playground">Playground</a>
+      <a href="/agents">Agents</a>
+      <a href="/data">Data</a>
+      <a href="/status">Status</a>
+      <a href="/docs">API Docs</a>
+    </div>
+    <span class="nav-version"></span>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Playground</h1>
+      <p>Try GeoSpark's spatial tools interactively. All results are ground-truth — not LLM-guessed.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="tab-geocode">Geocode</button>
+      <button class="tab" data-tab="tab-distance">Distance</button>
+      <button class="tab" data-tab="tab-elevation">Elevation</button>
+      <button class="tab" data-tab="tab-relationship">Relationship</button>
+      <button class="tab" data-tab="tab-ask">Ask GeoSpark</button>
+    </div>
+
+    <!-- Geocode -->
+    <div class="tab-panel" id="tab-geocode">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-icon geo">&#128205;</div><h3>Geocode</h3></div>
+          <p class="text-sm text-muted mb-2">Convert a place name to coordinates.</p>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="geo-query" placeholder="Eiffel Tower, Paris" value="Eiffel Tower, Paris">
+          </div>
+          <button class="btn btn-primary" onclick="runGeocode()">Geocode</button>
+          <div id="geo-result" class="result-box hidden"></div>
+        </div>
+        <div>
+          <div id="geo-map" class="map-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Distance -->
+    <div class="tab-panel hidden" id="tab-distance">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-icon geo">&#128207;</div><h3>Geodesic Distance</h3></div>
+          <p class="text-sm text-muted mb-2">Calculate the precise distance between two points on Earth.</p>
+          <div class="grid grid-2" style="gap:0.75rem">
+            <div class="form-group"><label>Point A — Lat</label><input type="number" id="dist-lat-a" step="any" value="48.8566"></div>
+            <div class="form-group"><label>Point A — Lon</label><input type="number" id="dist-lon-a" step="any" value="2.3522"></div>
+            <div class="form-group"><label>Point B — Lat</label><input type="number" id="dist-lat-b" step="any" value="51.5074"></div>
+            <div class="form-group"><label>Point B — Lon</label><input type="number" id="dist-lon-b" step="any" value="-0.1278"></div>
+          </div>
+          <button class="btn btn-primary" onclick="runDistance()">Calculate</button>
+          <div id="dist-result" class="hidden"></div>
+        </div>
+        <div>
+          <div id="dist-map" class="map-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Elevation -->
+    <div class="tab-panel hidden" id="tab-elevation">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-icon geo">&#9968;</div><h3>Elevation</h3></div>
+          <p class="text-sm text-muted mb-2">Get elevation above sea level at any point.</p>
+          <div class="grid grid-2" style="gap:0.75rem">
+            <div class="form-group"><label>Latitude</label><input type="number" id="elev-lat" step="any" value="27.9881"></div>
+            <div class="form-group"><label>Longitude</label><input type="number" id="elev-lon" step="any" value="86.9250"></div>
+          </div>
+          <button class="btn btn-primary" onclick="runElevation()">Get Elevation</button>
+          <div id="elev-result" class="hidden"></div>
+        </div>
+        <div>
+          <div id="elev-map" class="map-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Relationship -->
+    <div class="tab-panel hidden" id="tab-relationship">
+      <div class="card">
+        <div class="card-header"><div class="card-icon geo">&#128296;</div><h3>Spatial Relationship Check</h3></div>
+        <p class="text-sm text-muted mb-2">Check if two geometries have a topological relationship (contains, intersects, within, etc.).</p>
+        <div class="grid grid-2" style="gap:0.75rem">
+          <div class="form-group">
+            <label>Geometry A (GeoJSON)</label>
+            <textarea id="rel-geom-a" rows="5">{"type": "Polygon", "coordinates": [[[2.29, 48.85], [2.30, 48.85], [2.30, 48.86], [2.29, 48.86], [2.29, 48.85]]]}</textarea>
+          </div>
+          <div class="form-group">
+            <label>Geometry B (GeoJSON)</label>
+            <textarea id="rel-geom-b" rows="5">{"type": "Point", "coordinates": [2.295, 48.855]}</textarea>
+          </div>
+        </div>
+        <div class="form-group" style="max-width:300px">
+          <label>Relationship</label>
+          <select id="rel-type">
+            <option value="contains">contains</option>
+            <option value="intersects">intersects</option>
+            <option value="within">within</option>
+            <option value="touches">touches</option>
+            <option value="disjoint">disjoint</option>
+            <option value="overlaps">overlaps</option>
+            <option value="crosses">crosses</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="runRelationship()">Check</button>
+        <div id="rel-result" class="hidden"></div>
+      </div>
+    </div>
+
+    <!-- Ask -->
+    <div class="tab-panel hidden" id="tab-ask">
+      <div class="card">
+        <div class="card-header"><div class="card-icon agent">&#128172;</div><h3>Ask GeoSpark</h3></div>
+        <p class="text-sm text-muted mb-2">Ask a spatial question in natural language. Uses local Ollama models — free and private.</p>
+        <div class="form-group">
+          <label>Question</label>
+          <input type="text" id="ask-q" placeholder="How far is the Eiffel Tower from Big Ben?" value="How far is the Eiffel Tower from Big Ben?">
+        </div>
+        <button class="btn btn-primary" onclick="runAsk()">Ask</button>
+        <div id="ask-result" class="result-box hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    // Init tabs
+    initTabs($('.container'));
+
+    /* --- Geocode --- */
+    async function runGeocode() {
+      const el = $('#geo-result');
+      showLoading(el, 'Geocoding...');
+      try {
+        const data = await geo.post('/api/v1/geocode', { query: $('#geo-query').value });
+        const features = data.features || [];
+        if (features.length === 0) { showError(el, 'No results found'); return; }
+
+        const f = features[0];
+        const coords = f.geometry?.coordinates || [];
+        const props = f.properties || {};
+        el.innerHTML = resultCard([
+          ['Address', props.display_name || '—'],
+          ['Longitude', coords[0]?.toFixed(6)],
+          ['Latitude', coords[1]?.toFixed(6)],
+        ]) + jsonToggle(data, 'geo-json');
+
+        el.classList.remove('hidden');
+        // Map
+        const map = createMap('geo-map', coords[1], coords[0], 14);
+        addMarker(map, coords[1], coords[0], props.display_name || 'Result');
+      } catch (e) { showError(el, e.message); }
+    }
+
+    /* --- Distance --- */
+    async function runDistance() {
+      const el = $('#dist-result');
+      el.innerHTML = '<div class="loading-overlay"><span class="spinner"></span>Calculating...</div>';
+      el.classList.remove('hidden');
+      try {
+        const body = {
+          lat_a: parseFloat($('#dist-lat-a').value),
+          lon_a: parseFloat($('#dist-lon-a').value),
+          lat_b: parseFloat($('#dist-lat-b').value),
+          lon_b: parseFloat($('#dist-lon-b').value),
+        };
+        const data = await geo.post('/api/v1/distance', body);
+        el.innerHTML = resultCard([
+          ['Distance (m)', data.distance_m?.toLocaleString() + ' m'],
+          ['Distance (km)', data.distance_km?.toLocaleString() + ' km'],
+          ['Method', 'Geodesic on WGS84 ellipsoid'],
+        ]) + jsonToggle(data, 'dist-json');
+
+        // Map
+        const map = createMap('dist-map', (body.lat_a + body.lat_b) / 2, (body.lon_a + body.lon_b) / 2, 4);
+        addMarker(map, body.lat_a, body.lon_a, 'Point A');
+        addMarker(map, body.lat_b, body.lon_b, 'Point B');
+        L.polyline([[body.lat_a, body.lon_a], [body.lat_b, body.lon_b]], { color: '#2d9c6f', weight: 2, dashArray: '6 4' }).addTo(map);
+        fitBounds(map, [[body.lat_a, body.lon_a], [body.lat_b, body.lon_b]]);
+      } catch (e) { showError(el, e.message); el.classList.add('error'); }
+    }
+
+    /* --- Elevation --- */
+    async function runElevation() {
+      const el = $('#elev-result');
+      el.innerHTML = '<div class="loading-overlay"><span class="spinner"></span>Fetching elevation...</div>';
+      el.classList.remove('hidden');
+      try {
+        const lat = parseFloat($('#elev-lat').value);
+        const lon = parseFloat($('#elev-lon').value);
+        const data = await geo.post('/api/v1/elevation', { latitude: lat, longitude: lon });
+        el.innerHTML = resultCard([
+          ['Elevation', (data.elevation_m ?? '—') + ' m'],
+          ['Latitude', lat.toFixed(6)],
+          ['Longitude', lon.toFixed(6)],
+          ['Source', data.source || 'Open Elevation API'],
+        ]) + jsonToggle(data, 'elev-json');
+
+        const map = createMap('elev-map', lat, lon, 10);
+        addMarker(map, lat, lon, `Elevation: ${data.elevation_m}m`);
+      } catch (e) { showError(el, e.message); el.classList.add('error'); }
+    }
+
+    /* --- Relationship --- */
+    async function runRelationship() {
+      const el = $('#rel-result');
+      el.innerHTML = '<div class="loading-overlay"><span class="spinner"></span>Checking relationship...</div>';
+      el.classList.remove('hidden');
+      try {
+        const body = {
+          geometry_a: JSON.parse($('#rel-geom-a').value),
+          geometry_b: JSON.parse($('#rel-geom-b').value),
+          relationship: $('#rel-type').value,
+        };
+        const data = await geo.post('/api/v1/check-relationship', body);
+        const color = data.result ? 'var(--color-success)' : 'var(--color-error)';
+        el.innerHTML = `
+          <div class="result-card">
+            <div class="metric">
+              <span class="label">Relationship</span>
+              <span class="value">${data.relationship}</span>
+            </div>
+            <div class="metric">
+              <span class="label">Result</span>
+              <span class="value" style="color:${color}; font-size:1rem">${data.result ? 'TRUE' : 'FALSE'}</span>
+            </div>
+          </div>
+        ` + jsonToggle(data, 'rel-json');
+      } catch (e) { showError(el, e.message); el.classList.add('error'); }
+    }
+
+    /* --- Ask --- */
+    async function runAsk() {
+      const el = $('#ask-result');
+      showLoading(el, 'Thinking... (may take 5-30 seconds)');
+      try {
+        const data = await geo.post('/api/v1/ask', { question: $('#ask-q').value });
+        el.innerHTML = `
+          <div class="result-card">
+            <div class="metric"><span class="label">Answer</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(data.answer)}</span></div>
+            <div class="metric"><span class="label">Model</span><span class="value">${data.model}</span></div>
+            <div class="metric"><span class="label">Tools Used</span><span class="value">${data.tools_used?.join(', ') || 'none'}</span></div>
+          </div>
+        ` + jsonToggle(data, 'ask-json');
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+  </script>
+</body>
+</html>

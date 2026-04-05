@@ -2,6 +2,18 @@
 
 from geospark.agents.geo_agent import GeoAgent
 from geospark.agents.site_selector import SiteSelector
-from geospark.agents.spatial_report import SpatialReport
+from geospark.agents.spatial_report import (
+    AirQualitySnapshot,
+    LocationReport,
+    SpatialReport,
+    WeatherSnapshot,
+)
 
-__all__ = ["GeoAgent", "SiteSelector", "SpatialReport"]
+__all__ = [
+    "AirQualitySnapshot",
+    "GeoAgent",
+    "LocationReport",
+    "SiteSelector",
+    "SpatialReport",
+    "WeatherSnapshot",
+]

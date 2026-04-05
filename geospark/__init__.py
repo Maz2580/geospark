@@ -4,7 +4,7 @@ GeoSpark: The Open-Source Geospatial Intelligence Protocol & Engine.
 Give any AI model a spatial mind. Open source. Run anywhere.
 """
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 
 from geospark.engine.core import Engine
 

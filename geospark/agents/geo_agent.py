@@ -118,6 +118,16 @@ class GeoAgent:
             self._analyze_area(result, geocoded, params)
         elif intent == "check_relationship":
             self._check_relationships(result, geocoded, params)
+        elif intent == "weather":
+            self._get_weather(result, geocoded)
+        elif intent == "air_quality":
+            self._get_air_quality(result, geocoded)
+        elif intent == "fire_detection":
+            self._detect_fires(result, geocoded)
+        elif intent == "environmental":
+            self._get_weather(result, geocoded)
+            self._get_air_quality(result, geocoded)
+            self._detect_fires(result, geocoded)
         else:
             # Generic: try to find nearby amenities for each location
             self._find_nearby(result, geocoded, params)
@@ -148,13 +158,19 @@ Task: {goal}
 Respond with ONLY valid JSON (no markdown, no explanation):
 {{
   "locations": ["list of place names mentioned"],
-  "intent": "one of: find_nearby, distance, analyze_area, check_relationship",
+  "intent": "one of: find_nearby, distance, analyze_area, check_relationship, weather, air_quality, fire_detection, environmental",
   "params": {{
     "amenity_type": "type of thing to find (hospital, school, park, etc.) or null",
     "radius_m": radius in meters or 3000,
     "relationship": "contains, intersects, within, or null"
   }}
-}}"""
+}}
+
+Intent guide:
+- weather: questions about temperature, rain, forecast, climate conditions
+- air_quality: questions about pollution, PM2.5, air quality, smog
+- fire_detection: questions about wildfires, active fires, burning
+- environmental: broad questions about environment, conditions, or livability that combine multiple data sources"""
 
         try:
             resp = httpx.post(
@@ -187,10 +203,19 @@ Respond with ONLY valid JSON (no markdown, no explanation):
                     locations.append(word)
 
             intent = "find_nearby"
-            if "distance" in goal.lower() or "far" in goal.lower():
+            gl = goal.lower()
+            if "distance" in gl or "far" in gl:
                 intent = "distance"
-            elif "contain" in goal.lower() or "inside" in goal.lower():
+            elif "contain" in gl or "inside" in gl:
                 intent = "check_relationship"
+            elif "weather" in gl or "temperature" in gl or "forecast" in gl or "rain" in gl:
+                intent = "weather"
+            elif "air quality" in gl or "pollution" in gl or "pm2.5" in gl or "smog" in gl:
+                intent = "air_quality"
+            elif "fire" in gl or "wildfire" in gl or "burning" in gl:
+                intent = "fire_detection"
+            elif "environment" in gl or "livability" in gl or "conditions" in gl:
+                intent = "environmental"
 
             return locations, intent, {"radius_m": 3000}
 
@@ -380,6 +405,182 @@ Respond with ONLY valid JSON (no markdown, no explanation):
                         description=f"Check {relationship}: {name_a} vs {name_b}",
                         error=str(e),
                     ))
+
+    def _get_weather(
+        self,
+        result: AgentResult,
+        geocoded: dict[str, dict],
+    ) -> None:
+        """Fetch weather data for geocoded locations."""
+        import asyncio
+
+        from geospark.data_channels.weather import WeatherChannel
+
+        for loc_name, geo in geocoded.items():
+            coords = geo.get("coordinates")
+            if not coords:
+                continue
+            lon, lat = coords[0], coords[1]
+            t0 = time.time()
+            try:
+
+                async def _run(_lat=lat, _lon=lon):
+                    ch = WeatherChannel()
+                    return await ch.search(lat=_lat, lon=_lon, filters={"forecast_days": 3})
+
+                ch_result = asyncio.run(_run())
+                if ch_result.errors:
+                    result.steps.append(AgentStep(
+                        action="weather",
+                        description=f"Weather for {loc_name}",
+                        error=ch_result.errors[0],
+                        duration_s=round(time.time() - t0, 1),
+                    ))
+                    continue
+
+                current = next(
+                    (f for f in ch_result.features if f.get("type") == "current_weather"),
+                    None,
+                )
+                forecasts = [
+                    f for f in ch_result.features if f.get("type") == "daily_forecast"
+                ]
+                weather_data = {
+                    "current": current,
+                    "forecast": forecasts,
+                }
+                result.findings.setdefault("weather", {})[loc_name] = weather_data
+                desc = (
+                    f"Weather at {loc_name}: "
+                    f"{current.get('weather_description', '?')}, "
+                    f"{current.get('temperature_c')}°C"
+                    if current
+                    else f"Weather data retrieved for {loc_name}"
+                )
+                result.steps.append(AgentStep(
+                    action="weather",
+                    description=desc,
+                    result=weather_data,
+                    duration_s=round(time.time() - t0, 1),
+                ))
+            except Exception as e:
+                result.steps.append(AgentStep(
+                    action="weather",
+                    description=f"Weather for {loc_name}",
+                    error=str(e),
+                    duration_s=round(time.time() - t0, 1),
+                ))
+
+    def _get_air_quality(
+        self,
+        result: AgentResult,
+        geocoded: dict[str, dict],
+    ) -> None:
+        """Fetch air quality data for geocoded locations."""
+        import asyncio
+
+        from geospark.data_channels.air_quality import AirQualityChannel
+
+        for loc_name, geo in geocoded.items():
+            coords = geo.get("coordinates")
+            if not coords:
+                continue
+            lon, lat = coords[0], coords[1]
+            t0 = time.time()
+            try:
+
+                async def _run(_lat=lat, _lon=lon):
+                    ch = AirQualityChannel()
+                    return await ch.search(lat=_lat, lon=_lon, filters={"limit": 5})
+
+                ch_result = asyncio.run(_run())
+                if ch_result.errors:
+                    result.steps.append(AgentStep(
+                        action="air_quality",
+                        description=f"Air quality for {loc_name}",
+                        error=ch_result.errors[0],
+                        duration_s=round(time.time() - t0, 1),
+                    ))
+                    continue
+
+                stations = ch_result.features
+                result.findings.setdefault("air_quality", {})[loc_name] = {
+                    "stations": stations,
+                    "count": len(stations),
+                }
+                if stations:
+                    aqi = stations[0].get("aqi_category", "?")
+                    desc = f"Air quality at {loc_name}: {aqi} ({len(stations)} stations)"
+                else:
+                    desc = f"No air quality stations found near {loc_name}"
+                result.steps.append(AgentStep(
+                    action="air_quality",
+                    description=desc,
+                    result={"stations_found": len(stations)},
+                    duration_s=round(time.time() - t0, 1),
+                ))
+            except Exception as e:
+                result.steps.append(AgentStep(
+                    action="air_quality",
+                    description=f"Air quality for {loc_name}",
+                    error=str(e),
+                    duration_s=round(time.time() - t0, 1),
+                ))
+
+    def _detect_fires(
+        self,
+        result: AgentResult,
+        geocoded: dict[str, dict],
+    ) -> None:
+        """Check for active fires near geocoded locations."""
+        import asyncio
+
+        from geospark.data_channels.fires import FiresChannel
+
+        for loc_name, geo in geocoded.items():
+            coords = geo.get("coordinates")
+            if not coords:
+                continue
+            lon, lat = coords[0], coords[1]
+            t0 = time.time()
+            try:
+
+                async def _run(_lat=lat, _lon=lon):
+                    ch = FiresChannel()
+                    return await ch.search(lat=_lat, lon=_lon, filters={"days": 2})
+
+                ch_result = asyncio.run(_run())
+                if ch_result.errors:
+                    result.steps.append(AgentStep(
+                        action="fire_detection",
+                        description=f"Fire detection for {loc_name}",
+                        error=ch_result.errors[0],
+                        duration_s=round(time.time() - t0, 1),
+                    ))
+                    continue
+
+                fires = ch_result.features
+                result.findings.setdefault("fires", {})[loc_name] = {
+                    "detections": fires,
+                    "count": len(fires),
+                }
+                if fires:
+                    desc = f"Active fires near {loc_name}: {len(fires)} detections"
+                else:
+                    desc = f"No active fires detected near {loc_name}"
+                result.steps.append(AgentStep(
+                    action="fire_detection",
+                    description=desc,
+                    result={"fires_detected": len(fires)},
+                    duration_s=round(time.time() - t0, 1),
+                ))
+            except Exception as e:
+                result.steps.append(AgentStep(
+                    action="fire_detection",
+                    description=f"Fire detection for {loc_name}",
+                    error=str(e),
+                    duration_s=round(time.time() - t0, 1),
+                ))
 
     def _generate_summary(self, result: AgentResult) -> str:
         """Generate a human-readable summary of the findings."""

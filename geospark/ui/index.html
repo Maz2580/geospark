@@ -3,8 +3,195 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GeoSpark — Geospatial Intelligence Engine</title>
+  <title>GeoSpark &mdash; Geospatial Intelligence Engine</title>
   <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    /* Hero-specific overrides for the interactive landing */
+    .hero-interactive {
+      position: relative;
+      background: linear-gradient(160deg, #0f1218 0%, #1a2332 40%, #162420 100%);
+      color: #fff;
+      margin: -2rem -2rem 0 -2rem;
+      padding: 0;
+      overflow: hidden;
+    }
+    .hero-interactive .hero-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 3.5rem 2rem 1.5rem;
+    }
+    .hero-interactive h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      margin-bottom: 0.5rem;
+      line-height: 1.1;
+    }
+    .hero-interactive h1 span { color: var(--color-primary); }
+    .hero-interactive .subtitle {
+      font-size: 1.1rem;
+      color: #8b95a5;
+      max-width: 540px;
+      margin: 0 auto 1.5rem;
+      line-height: 1.5;
+    }
+    /* Live search bar in hero */
+    .hero-search {
+      max-width: 600px;
+      margin: 0 auto 1rem;
+      display: flex;
+      gap: 0;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .hero-search:focus-within {
+      border-color: var(--color-primary);
+      background: rgba(255,255,255,0.12);
+    }
+    .hero-search input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      padding: 0.85rem 1.25rem;
+      outline: none;
+      font-family: var(--font-sans);
+    }
+    .hero-search input::placeholder { color: #586069; }
+    .hero-search button {
+      background: var(--color-primary);
+      border: none;
+      color: #fff;
+      padding: 0.85rem 1.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: background 0.2s;
+    }
+    .hero-search button:hover { background: var(--color-primary-hover); }
+    .hero-presets {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .hero-presets button {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #8b95a5;
+      padding: 0.35rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font-sans);
+    }
+    .hero-presets button:hover {
+      background: rgba(45,156,111,0.15);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+    /* Hero map */
+    .hero-map-wrap {
+      position: relative;
+      height: 280px;
+      margin: 0 2rem;
+      border-radius: 12px 12px 0 0;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-bottom: none;
+    }
+    .hero-map-wrap #hero-map { height: 100%; width: 100%; }
+    /* Hero result overlay */
+    .hero-result {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      background: rgba(15,18,24,0.92);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(45,156,111,0.3);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      z-index: 20;
+      display: none;
+    }
+    .hero-result.visible { display: block; animation: slideUp 0.4s ease; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hero-result .hr-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #586069; }
+    .hero-result .hr-value { font-size: 1.1rem; font-weight: 700; color: var(--color-primary); font-family: var(--font-mono); }
+    .hero-result .hr-method { font-size: 0.75rem; color: #586069; margin-top: 0.25rem; }
+    /* Live pulse section */
+    .live-pulse {
+      background: #0f1218;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      margin: 0 -2rem;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .pulse-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+      color: #8b95a5;
+    }
+    .pulse-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      animation: pulse 2s infinite;
+    }
+    .pulse-dot.warn { background: var(--color-warn); }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .pulse-value { color: #fff; font-weight: 600; font-family: var(--font-mono); }
+    /* Comparison section */
+    .versus { position: relative; }
+    .versus::before {
+      content: 'VS';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--color-bg);
+      border: 2px solid var(--color-border);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.7rem;
+      color: var(--color-text-secondary);
+      z-index: 2;
+    }
+    @media (max-width: 768px) {
+      .hero-interactive h1 { font-size: 1.75rem; }
+      .hero-map-wrap { margin: 0 1rem; height: 200px; }
+      .live-pulse { gap: 1rem; padding: 1rem; }
+      .versus::before { display: none; }
+    }
+  </style>
 </head>
 <body>
   <nav class="nav">
@@ -21,31 +208,53 @@
   </nav>
 
   <div class="container">
-    <div class="hero">
-      <h1>Give any AI model a spatial mind</h1>
-      <p class="subtitle">
-        Open-source geospatial intelligence engine. Ground-truth spatial reasoning
-        that LLMs get wrong 80% of the time &mdash; topology, distance, containment, all correct.
-      </p>
-      <div class="cta-group">
-        <a href="/playground" class="btn btn-primary">Try the Playground</a>
-        <a href="https://github.com/Maz2580/geospark" class="btn btn-ghost" target="_blank">View on GitHub</a>
+
+    <!-- ===== INTERACTIVE HERO ===== -->
+    <div class="hero-interactive">
+      <div class="hero-content">
+        <h1>Spatial intelligence,<br><span>verified.</span></h1>
+        <p class="subtitle">
+          The open-source engine that gives AI models ground-truth spatial reasoning.
+          LLMs guess. GeoSpark computes.
+        </p>
+
+        <div class="hero-search">
+          <input type="text" id="hero-q" placeholder="Try: How far is Paris from London?" value="How far is the Eiffel Tower from Big Ben?">
+          <button onclick="heroDistance()">Compute</button>
+        </div>
+        <div class="hero-presets">
+          <button onclick="heroPreset('Paris','Eiffel Tower',48.8584,2.2945,'London','Big Ben',51.5007,-0.1246)">Paris &rarr; London</button>
+          <button onclick="heroPreset('Tokyo','Tokyo Tower',35.6586,139.7454,'Sydney','Opera House',-33.8568,151.2153)">Tokyo &rarr; Sydney</button>
+          <button onclick="heroPreset('New York','Statue of Liberty',40.6892,-74.0445,'Los Angeles','Hollywood Sign',34.1341,-118.3215)">NYC &rarr; LA</button>
+          <button onclick="heroPreset('Dubai','Burj Khalifa',25.1972,55.2744,'Mumbai','Gateway of India',18.9220,72.8347)">Dubai &rarr; Mumbai</button>
+        </div>
       </div>
-      <div class="stat-row" id="hero-stats">
-        <div class="stat"><div class="number" id="stat-tools">—</div><div class="label">Tools</div></div>
-        <div class="stat"><div class="number" id="stat-models">—</div><div class="label">LLM Models</div></div>
-        <div class="stat"><div class="number" id="stat-endpoints">25</div><div class="label">API Endpoints</div></div>
-        <div class="stat"><div class="number">535</div><div class="label">Benchmark Questions</div></div>
+
+      <div class="hero-map-wrap">
+        <div id="hero-map"></div>
+        <div class="hero-result" id="hero-result">
+          <div class="hr-label">Geodesic Distance</div>
+          <div class="hr-value" id="hero-dist-value">&mdash;</div>
+          <div class="hr-method">WGS84 ellipsoid &middot; pyproj Geod.inv &middot; not LLM-guessed</div>
+        </div>
       </div>
     </div>
 
-    <!-- Hero Comparison: LLM vs GeoSpark -->
-    <div class="page-header">
-      <h1>LLM Guess vs. GeoSpark Verification</h1>
-      <p>See the difference between language model inference and ground-truth spatial reasoning.</p>
+    <!-- ===== LIVE DATA PULSE ===== -->
+    <div class="live-pulse" id="live-pulse">
+      <div class="pulse-item"><span class="pulse-dot"></span> System <span class="pulse-value" id="lp-status">...</span></div>
+      <div class="pulse-item"><span class="pulse-dot"></span> Models <span class="pulse-value" id="lp-models">...</span></div>
+      <div class="pulse-item"><span class="pulse-dot"></span> Weather <span class="pulse-value" id="lp-weather">...</span></div>
+      <div class="pulse-item"><span class="pulse-dot"></span> Version <span class="pulse-value" id="lp-version">...</span></div>
     </div>
 
-    <div class="grid grid-2">
+    <!-- ===== LLM vs GeoSpark ===== -->
+    <div class="page-header mt-3">
+      <h1>Why GeoSpark?</h1>
+      <p>Language models guess spatial answers. GeoSpark computes them.</p>
+    </div>
+
+    <div class="grid grid-2 versus">
       <div class="card" style="border-left:4px solid var(--color-error)">
         <div class="card-header">
           <div class="card-icon" style="background:var(--color-error-light)">&#10060;</div>
@@ -72,141 +281,86 @@
       </div>
     </div>
 
-    <!-- Credibility Strip -->
+    <!-- ===== CREDIBILITY STRIP ===== -->
     <div class="grid grid-3 mt-3">
       <div class="card text-center">
-        <div style="font-size:2.5rem;font-weight:800;color:var(--color-error)">0%</div>
-        <div class="text-sm text-muted">Distance accuracy<br>LLMs alone (4 of 5 models)</div>
+        <div style="font-size:2.75rem;font-weight:800;color:var(--color-error)">0%</div>
+        <div class="text-sm text-muted">Distance accuracy &mdash; LLMs alone<br>(4 of 5 model families)</div>
       </div>
       <div class="card text-center">
-        <div style="font-size:2.5rem;font-weight:800;color:var(--color-primary)">535</div>
-        <div class="text-sm text-muted">Benchmark questions<br>across 5 categories</div>
+        <div style="font-size:2.75rem;font-weight:800;color:var(--color-primary)">535</div>
+        <div class="text-sm text-muted">Benchmark questions<br>5 categories, 5 LLM families</div>
       </div>
       <div class="card text-center">
-        <div style="font-size:2.5rem;font-weight:800;color:var(--color-primary)">100%</div>
-        <div class="text-sm text-muted">Ground-truth accuracy<br>with GeoSpark tools</div>
+        <div style="font-size:2.75rem;font-weight:800;color:var(--color-primary)">100%</div>
+        <div class="text-sm text-muted">Spatial reasoning accuracy<br>with GeoSpark tool augmentation</div>
       </div>
     </div>
 
-    <!-- Capabilities -->
+    <!-- ===== CAPABILITIES ===== -->
     <div class="page-header mt-3">
-      <h1>What GeoSpark Does</h1>
-      <p>Spatial reasoning, live data, and autonomous agents &mdash; all through one API.</p>
+      <h1>Platform</h1>
+      <p>Spatial reasoning, live data, autonomous agents, and model-agnostic integration.</p>
     </div>
 
     <div class="grid grid-3">
       <div class="card">
-        <div class="card-header">
-          <div class="card-icon geo">&#127758;</div>
-          <h3>Spatial Reasoning</h3>
-        </div>
+        <div class="card-header"><div class="card-icon geo">&#127758;</div><h3>Spatial Engine</h3></div>
         <p class="text-sm text-muted">
-          Topology, geodesic distance, CRS transforms, buffering, area computation.
-          All geometrically correct on the WGS84 ellipsoid &mdash; not LLM-guessed.
+          Topology, geodesic distance, CRS transforms, buffering, area.
+          All geometrically correct on WGS84 &mdash; not approximated.
         </p>
       </div>
-
       <div class="card">
-        <div class="card-header">
-          <div class="card-icon agent">&#129302;</div>
-          <h3>Autonomous Agents</h3>
-        </div>
+        <div class="card-header"><div class="card-icon agent">&#129302;</div><h3>Autonomous Agents</h3></div>
         <p class="text-sm text-muted">
-          Give a goal, get a complete analysis. GeoAgent plans multi-step workflows.
-          SpatialReport generates location dossiers. SiteSelector finds optimal locations.
+          Give a goal, get analysis. GeoAgent, SpatialReport (with live weather
+          + air quality), and SiteSelector.
         </p>
       </div>
-
       <div class="card">
-        <div class="card-header">
-          <div class="card-icon data">&#127780;</div>
-          <h3>Live Data Channels</h3>
-        </div>
+        <div class="card-header"><div class="card-icon data">&#127780;</div><h3>Live Data</h3></div>
         <p class="text-sm text-muted">
-          Real-time weather (Open-Meteo), air quality (OpenAQ), and active fire
-          detections (NASA FIRMS). Pluggable channel architecture.
+          Weather (Open-Meteo), air quality (OpenAQ), fire detection (NASA FIRMS).
+          Real-time channels, always current.
         </p>
       </div>
-
       <div class="card">
-        <div class="card-header">
-          <div class="card-icon geo">&#128268;</div>
-          <h3>MCP Server</h3>
-        </div>
+        <div class="card-header"><div class="card-icon geo">&#128268;</div><h3>MCP + Integrations</h3></div>
         <p class="text-sm text-muted">
-          6 spatial tools for Claude Desktop and any MCP-compatible AI assistant.
-          <code>pip install geospark-ai[mcp] && geospark-mcp</code>
+          6 MCP tools for Claude Desktop. OpenAI, Anthropic, Ollama integrations.
+          Any LLM gains spatial reasoning.
         </p>
       </div>
-
       <div class="card">
-        <div class="card-header">
-          <div class="card-icon status">&#128202;</div>
-          <h3>GeoSpark Bench</h3>
-        </div>
+        <div class="card-header"><div class="card-icon status">&#128202;</div><h3>Benchmarked</h3></div>
         <p class="text-sm text-muted">
-          535 benchmark questions across 5 categories. LLMs score 0% on distance
-          and ~48% on topology. With GeoSpark tools: up to 100%.
+          535 questions across 5 benchmarks. 5 model families evaluated.
+          Reproducible, citeable results.
         </p>
       </div>
-
       <div class="card">
-        <div class="card-header">
-          <div class="card-icon agent">&#128176;</div>
-          <h3>Zero-Cost Stack</h3>
-        </div>
+        <div class="card-header"><div class="card-icon agent">&#128176;</div><h3>Zero-Cost</h3></div>
         <p class="text-sm text-muted">
-          Local Ollama models (9 available), free APIs, no rate limits.
-          Everything runs on your hardware or our server.
+          9 local Ollama models, free APIs, no rate limits.
+          Entire stack runs on your hardware at $0.
         </p>
       </div>
     </div>
 
-    <!-- Benchmark -->
+    <!-- ===== QUICK START ===== -->
     <div class="page-header mt-3">
-      <h1>Benchmark Results</h1>
-      <p>LLMs fail at spatial reasoning. GeoSpark fixes this.</p>
-    </div>
-
-    <div class="card">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Benchmark</th>
-              <th>LLM Alone (avg)</th>
-              <th>With GeoSpark (best)</th>
-              <th>Improvement</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>GeoDistance</td><td>6%</td><td>70%</td><td><strong>+64%</strong></td></tr>
-            <tr><td>GeoTopo</td><td>48%</td><td>50%</td><td>+2%</td></tr>
-            <tr><td>GeoReason</td><td>77%</td><td>100%</td><td><strong>+23%</strong></td></tr>
-            <tr><td>GeoChange</td><td>79%</td><td>—</td><td>Knowledge-based</td></tr>
-            <tr><td>GeoMultimodal</td><td>33%</td><td>—</td><td>In progress</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="text-sm text-muted mt-2">
-        5 LLM families tested: Qwen, Llama, Gemma, Mistral, Phi. Full report on
-        <a href="https://github.com/Maz2580/geospark" target="_blank">GitHub</a>.
-      </p>
-    </div>
-
-    <!-- Quick start -->
-    <div class="page-header mt-3">
-      <h1>Quick Start</h1>
+      <h1>Get Started</h1>
     </div>
 
     <div class="grid grid-2">
       <div class="card">
         <div class="card-header"><h3>Install</h3></div>
-        <pre class="result-box">pip install geospark-ai</pre>
+        <pre class="result-box" style="margin-top:0">pip install geospark-ai</pre>
       </div>
       <div class="card">
         <div class="card-header"><h3>Use</h3></div>
-        <pre class="result-box">from geospark import Engine
+        <pre class="result-box" style="margin-top:0">from geospark import Engine
 
 engine = Engine(tools=["geocoder", "terrain"])
 result = engine.ask("How far is the Eiffel Tower from Big Ben?")
@@ -216,6 +370,7 @@ print(result.spatial_context.summary)</pre>
 
     <footer style="text-align:center; padding:3rem 0 1rem; color:var(--color-text-secondary); font-size:0.85rem;">
       Created by <a href="https://github.com/Maz2580" target="_blank">Mazdak Ghasemi Tootkaboni</a>
+      &middot; University of Melbourne
       &middot; <a href="https://github.com/Maz2580/geospark" target="_blank">GitHub</a>
       &middot; <a href="https://pypi.org/project/geospark-ai/" target="_blank">PyPI</a>
       &middot; Apache 2.0
@@ -224,14 +379,120 @@ print(result.spatial_context.summary)</pre>
 
   <script src="/assets/app.js"></script>
   <script>
-    // Load live stats
+    /* ===== Hero Map ===== */
+    const heroMap = L.map('hero-map', {
+      zoomControl: false,
+      attributionControl: false,
+    }).setView([30, 10], 2);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+    }).addTo(heroMap);
+
+    let heroLine = null;
+    let heroMarkers = [];
+
+    function clearHeroMap() {
+      heroMarkers.forEach(m => heroMap.removeLayer(m));
+      heroMarkers = [];
+      if (heroLine) { heroMap.removeLayer(heroLine); heroLine = null; }
+    }
+
+    async function heroDistance() {
+      // Quick: use the preset Paris-London as default live demo
+      // The search bar dispatches to the distance API with geocoded coords
+      const q = $('#hero-q').value;
+      const resultEl = $('#hero-result');
+      resultEl.classList.remove('visible');
+
+      // Try to extract two location names
+      const match = q.match(/(.+?)\s+(?:from|to|and)\s+(.+)/i);
+      if (!match) {
+        // Fallback: run the default Paris-London
+        heroPreset('Paris','Eiffel Tower',48.8584,2.2945,'London','Big Ben',51.5007,-0.1246);
+        return;
+      }
+
+      // Geocode both locations
+      try {
+        const [dataA, dataB] = await Promise.all([
+          geo.post('/api/v1/geocode', { query: match[1].trim(), limit: 1 }),
+          geo.post('/api/v1/geocode', { query: match[2].trim(), limit: 1 }),
+        ]);
+
+        const fA = dataA.features?.[0];
+        const fB = dataB.features?.[0];
+        if (!fA || !fB) return;
+
+        const cA = fA.geometry.coordinates;
+        const cB = fB.geometry.coordinates;
+        const nameA = fA.properties?.display_name?.split(',')[0] || match[1];
+        const nameB = fB.properties?.display_name?.split(',')[0] || match[2];
+
+        await showHeroResult(nameA, cA[1], cA[0], nameB, cB[1], cB[0]);
+      } catch (e) {
+        // Fallback
+        heroPreset('Paris','Eiffel Tower',48.8584,2.2945,'London','Big Ben',51.5007,-0.1246);
+      }
+    }
+
+    function heroPreset(cityA, nameA, latA, lonA, cityB, nameB, latB, lonB) {
+      $('#hero-q').value = `${nameA}, ${cityA} to ${nameB}, ${cityB}`;
+      showHeroResult(nameA, latA, lonA, nameB, latB, lonB);
+    }
+
+    async function showHeroResult(nameA, latA, lonA, nameB, latB, lonB) {
+      clearHeroMap();
+      const resultEl = $('#hero-result');
+
+      // Add markers
+      const mA = L.circleMarker([latA, lonA], { radius: 6, color: '#2d9c6f', fillColor: '#2d9c6f', fillOpacity: 1, weight: 2 }).addTo(heroMap).bindPopup(nameA);
+      const mB = L.circleMarker([latB, lonB], { radius: 6, color: '#2d9c6f', fillColor: '#2d9c6f', fillOpacity: 1, weight: 2 }).addTo(heroMap).bindPopup(nameB);
+      heroMarkers = [mA, mB];
+
+      // Draw arc
+      heroLine = L.polyline([[latA, lonA], [latB, lonB]], {
+        color: '#2d9c6f',
+        weight: 2,
+        opacity: 0.7,
+        dashArray: '8 6',
+      }).addTo(heroMap);
+
+      // Fly to bounds
+      heroMap.flyToBounds([[latA, lonA], [latB, lonB]], { padding: [60, 60], duration: 1.5 });
+
+      // Compute distance
+      try {
+        const data = await geo.post('/api/v1/distance', { lat_a: latA, lon_a: lonA, lat_b: latB, lon_b: lonB });
+        $('#hero-dist-value').textContent = `${data.distance_m.toLocaleString()} m (${data.distance_km} km)`;
+        resultEl.classList.add('visible');
+      } catch (e) {
+        $('#hero-dist-value').textContent = 'Service unavailable';
+        resultEl.classList.add('visible');
+      }
+    }
+
+    /* ===== Live Pulse ===== */
     Promise.all([
-      geo.get('/api/v1/tools').catch(() => null),
+      geo.get('/health').catch(() => null),
       geo.get('/api/v1/llm/models').catch(() => null),
-    ]).then(([tools, models]) => {
-      if (tools) $('#stat-tools').textContent = tools.available?.length || '—';
-      if (models) $('#stat-models').textContent = models.data?.length || '—';
+      geo.post('/api/v1/data/weather', { location: 'London' }).catch(() => null),
+    ]).then(([health, models, weather]) => {
+      if (health) {
+        $('#lp-status').textContent = health.status.toUpperCase();
+        $('#lp-version').textContent = 'v' + health.version;
+      }
+      if (models?.data) {
+        $('#lp-models').textContent = models.data.length + ' available';
+      }
+      if (weather?.features) {
+        const c = weather.features.find(f => f.type === 'current_weather');
+        if (c) $('#lp-weather').textContent = `London ${c.temperature_c}\u00B0C`;
+      }
     });
+
+    /* ===== Auto-run hero demo on load ===== */
+    setTimeout(() => heroPreset('Paris','Eiffel Tower',48.8584,2.2945,'London','Big Ben',51.5007,-0.1246), 800);
   </script>
 </body>
 </html>

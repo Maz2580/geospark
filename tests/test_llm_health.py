@@ -4,10 +4,16 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 import pytest
-from fastapi.testclient import TestClient
 
-from geospark.api import app
-from geospark.llm_gateway import (
+fastapi = pytest.importorskip(
+    "fastapi",
+    reason="FastAPI not installed (install with pip install -e '.[api]')",
+)
+
+from fastapi.testclient import TestClient  # noqa: E402
+
+from geospark.api import app  # noqa: E402
+from geospark.llm_gateway import (  # noqa: E402
     _compute_status,
     _estimate_cold_load_s,
     _get_load_average,

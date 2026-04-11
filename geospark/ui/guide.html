@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guide &mdash; GeoSpark</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    .guide-hero {
+      padding: 2rem 0 1rem;
+      text-align: center;
+    }
+    .guide-hero h1 {
+      font-size: 2.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .guide-hero p {
+      font-size: 1.05rem;
+      color: var(--color-text-secondary);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .step-list {
+      counter-reset: step;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .step-list li {
+      counter-increment: step;
+      position: relative;
+      padding: 1rem 1rem 1rem 3.5rem;
+      margin-bottom: 0.75rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+    }
+    .step-list li::before {
+      content: counter(step);
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-primary);
+      color: white;
+      font-weight: 700;
+      border-radius: 50%;
+      font-size: 0.9rem;
+    }
+    .step-list li strong {
+      display: block;
+      margin-bottom: 0.3rem;
+      color: var(--color-text);
+    }
+    .step-list li .step-body {
+      color: var(--color-text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .step-list li code {
+      background: rgba(0,0,0,0.3);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+    .concept-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    .concept-card {
+      padding: 1.25rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+    }
+    .concept-card h4 {
+      margin: 0 0 0.5rem 0;
+      color: var(--color-text);
+      font-size: 1.05rem;
+    }
+    .concept-card p {
+      color: var(--color-text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin: 0 0 0.75rem 0;
+    }
+    .concept-card .concept-tag {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      background: rgba(45,156,111,0.15);
+      color: var(--color-primary);
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 0.4rem;
+    }
+    .warn-box {
+      padding: 1rem 1.25rem;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 8px;
+      color: #fcd34d;
+      font-size: 0.9rem;
+      margin: 1rem 0;
+    }
+    .info-box {
+      padding: 1rem 1.25rem;
+      background: rgba(45,156,111,0.06);
+      border: 1px solid rgba(45,156,111,0.2);
+      border-radius: 8px;
+      color: #6ee7b7;
+      font-size: 0.9rem;
+      margin: 1rem 0;
+    }
+    .kbd {
+      display: inline-block;
+      padding: 0.1rem 0.45rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-family: var(--font-mono, monospace);
+    }
+    .try-btn {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.4rem 0.9rem;
+      background: var(--color-primary);
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .try-btn:hover { background: var(--color-primary-hover); }
+    .code-block {
+      padding: 1rem;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      font-family: var(--font-mono, 'Courier New', monospace);
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body class="dark">
+  <nav class="nav">
+    <span class="nav-brand">GeoSpark</span>
+    <div class="nav-links">
+      <a href="/guide">Guide</a>
+      <a href="/">Home</a>
+      <a href="/playground">Playground</a>
+      <a href="/agents">Agents</a>
+      <a href="/memory">Memory</a>
+      <a href="/context">Context</a>
+      <a href="/data">Data</a>
+      <a href="/status">Status</a>
+      <a href="/docs">API Docs</a>
+    </div>
+    <span class="nav-version"></span>
+  </nav>
+
+  <div class="container">
+    <div class="guide-hero">
+      <h1>GeoSpark Guide</h1>
+      <p>New here? This page walks you through everything you can do with GeoSpark in about 10 minutes.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="tab-overview">Overview</button>
+      <button class="tab" data-tab="tab-quickstart">Quick Start</button>
+      <button class="tab" data-tab="tab-walkthroughs">Walkthroughs</button>
+      <button class="tab" data-tab="tab-setup">Setup</button>
+      <button class="tab" data-tab="tab-concepts">Concepts</button>
+    </div>
+
+    <!-- ========== OVERVIEW ========== -->
+    <div class="tab-panel" id="tab-overview">
+      <div class="card">
+        <div class="card-header"><div class="card-icon geo">&#127758;</div><h3>What is GeoSpark?</h3></div>
+        <p class="text-sm">
+          GeoSpark is an open-source <strong>geospatial intelligence engine</strong> that gives AI models real spatial reasoning. Most LLMs fail at spatial tasks &mdash; they score 0% on geodesic distance and ~48% on topology checks. GeoSpark fixes this by providing ground-truth computation through a standardized protocol.
+        </p>
+        <p class="text-sm mt-1">
+          Beyond the spatial engine, GeoSpark is also a <strong>multi-agent platform</strong> with persistent memory, a tiered context database, and live data channels. Everything runs on your hardware at $0 cost.
+        </p>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card-header"><div class="card-icon agent">&#128269;</div><h3>What can you do with it?</h3></div>
+        <div class="concept-grid">
+          <div class="concept-card">
+            <span class="concept-tag">Coordinator</span>
+            <h4>Ask in natural language</h4>
+            <p>One input, intelligent routing. The coordinator picks the right specialist (GeoAgent, SpatialReport, SiteSelector) automatically.</p>
+            <a href="/agents" class="try-btn">Try it &rarr;</a>
+          </div>
+          <div class="concept-card">
+            <span class="concept-tag">Memory</span>
+            <h4>Teach it things</h4>
+            <p>Store facts and timestamped episodes. Vector-based recall with automatic contradiction detection across sessions.</p>
+            <a href="/memory" class="try-btn">Try it &rarr;</a>
+          </div>
+          <div class="concept-card">
+            <span class="concept-tag">Context</span>
+            <h4>Manage missions and datasets</h4>
+            <p>Hierarchical storage with tiered loading (L0/L1/L2). Keep LLM prompts small by sending abstracts instead of full data.</p>
+            <a href="/context" class="try-btn">Try it &rarr;</a>
+          </div>
+          <div class="concept-card">
+            <span class="concept-tag">Playground</span>
+            <h4>Run spatial computations</h4>
+            <p>Geocode, measure distances, check topology relationships, get elevations. All ground-truth, not LLM guesses.</p>
+            <a href="/playground" class="try-btn">Try it &rarr;</a>
+          </div>
+          <div class="concept-card">
+            <span class="concept-tag">Data</span>
+            <h4>Query live data sources</h4>
+            <p>Weather forecasts, air quality measurements, active fire detections. Real-time from Open-Meteo, OpenAQ, NASA FIRMS.</p>
+            <a href="/data" class="try-btn">Try it &rarr;</a>
+          </div>
+          <div class="concept-card">
+            <span class="concept-tag">Agents</span>
+            <h4>Run autonomous analyses</h4>
+            <p>Three specialists: GeoAgent for general spatial tasks, SpatialReport for location dossiers, SiteSelector for optimal site finding.</p>
+            <a href="/agents" class="try-btn">Try it &rarr;</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card-header"><div class="card-icon status">&#128218;</div><h3>How pages fit together</h3></div>
+        <pre class="code-block">User / LLM
+    |
+    v
+Coordinator  (Agents tab)   - classifies your goal
+    |
+    v
+Specialist Agents                 - GeoAgent, SpatialReport, SiteSelector
+    |
+    v
+Spatial Memory + Context DB       - persistent knowledge across sessions
+    |
+    v
+Spatial Reasoning Engine          - topology, distance, CRS, buffer
+    |
+    v
+Tools + Data Channels             - geocoder, elevation, weather, air quality, fires
+</pre>
+      </div>
+    </div>
+
+    <!-- ========== QUICK START ========== -->
+    <div class="tab-panel hidden" id="tab-quickstart">
+      <div class="card">
+        <div class="card-header"><div class="card-icon geo">&#9889;</div><h3>60-second tour</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Follow these five steps to experience the full stack. No Ollama needed for steps 1 and 2.
+        </p>
+
+        <ol class="step-list">
+          <li>
+            <strong>Save a fact (Memory)</strong>
+            <div class="step-body">
+              Go to Memory, click <strong>Add</strong> tab, save: <em>"Eiffel Tower is at 48.8584 N, 2.2945 E"</em>. Then query <em>"Eiffel"</em> in the Recall tab.
+              <br><a href="/memory" class="try-btn">Go to Memory &rarr;</a>
+            </div>
+          </li>
+          <li>
+            <strong>Save a mission (Context)</strong>
+            <div class="step-body">
+              Go to Context, click <strong>Save</strong> tab, the form is pre-filled with <code>geospark://missions/example</code>. Click Save, then <strong>Browse</strong> to see it. Click the card to drill down through L0 &rarr; L1 &rarr; L2 tiers.
+              <br><a href="/context" class="try-btn">Go to Context &rarr;</a>
+            </div>
+          </li>
+          <li>
+            <strong>Classify a goal (Coordinator)</strong>
+            <div class="step-body">
+              Go to Agents, the first tab is <strong>Coordinator</strong>. Click <strong>"Classify only"</strong> with different prompts &mdash; see how each routes to a different specialist. No Ollama needed for classification.
+              <br><a href="/agents" class="try-btn">Go to Agents &rarr;</a>
+            </div>
+          </li>
+          <li>
+            <strong>Measure a distance (Playground)</strong>
+            <div class="step-body">
+              Go to Playground, <strong>Distance</strong> tab. Click the Paris &rarr; London preset. You'll get <code>343,923 m</code> &mdash; geodesic, not Euclidean, not an LLM guess.
+              <br><a href="/playground" class="try-btn">Go to Playground &rarr;</a>
+            </div>
+          </li>
+          <li>
+            <strong>Fetch real data (Data)</strong>
+            <div class="step-body">
+              Go to Data, query weather for any city. No API key needed for weather (Open-Meteo is free). Air quality and fires need free API keys &mdash; see Setup tab.
+              <br><a href="/data" class="try-btn">Go to Data &rarr;</a>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="info-box">
+        <strong>Tip:</strong> The "Classify only" button on the Coordinator tab is the fastest way to understand how GeoSpark's routing works. It shows the decision without actually invoking the specialist.
+      </div>
+    </div>
+
+    <!-- ========== WALKTHROUGHS ========== -->
+    <div class="tab-panel hidden" id="tab-walkthroughs">
+      <div class="card">
+        <div class="card-header"><div class="card-icon agent">&#128270;</div><h3>Walkthrough 1: Build knowledge about a city</h3></div>
+        <p class="text-sm text-muted mb-2">End-to-end: save facts + save a mission context + query both.</p>
+        <ol class="step-list">
+          <li>
+            <strong>Geocode the location</strong>
+            <div class="step-body">
+              Go to Playground, <strong>Geocode</strong> tab. Search <em>"Melbourne CBD"</em>. Note the coordinates.
+            </div>
+          </li>
+          <li>
+            <strong>Save the coordinates as a fact</strong>
+            <div class="step-body">
+              Go to Memory, <strong>Add</strong> tab, save a fact with the Melbourne coordinates you just geocoded. Tag it <code>melbourne, cbd</code>.
+            </div>
+          </li>
+          <li>
+            <strong>Create a mission context</strong>
+            <div class="step-body">
+              Go to Context, <strong>Save</strong> tab. URI: <code>geospark://missions/melbourne_study</code>. Category: <code>missions</code>. Abstract: <em>"Melbourne CBD study area"</em>. Tags: <code>melbourne, study</code>. Bounds: <code>144.9, -37.9, 145.1, -37.7</code>. Save it.
+            </div>
+          </li>
+          <li>
+            <strong>Query both systems</strong>
+            <div class="step-body">
+              Memory: recall <em>"Melbourne"</em> &rarr; see the fact. Context: query <em>"Melbourne"</em> &rarr; see the mission. Both systems reference the same place but from different angles (short-term vs. long-term knowledge).
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card-header"><div class="card-icon agent">&#128269;</div><h3>Walkthrough 2: Site selection via coordinator</h3></div>
+        <p class="text-sm text-muted mb-2">Requires Ollama running locally (see Setup tab).</p>
+        <ol class="step-list">
+          <li>
+            <strong>Start Ollama</strong>
+            <div class="step-body">
+              If not running: <code>ollama serve</code> in one terminal. Pull a model: <code>ollama pull qwen2.5:7b</code>.
+            </div>
+          </li>
+          <li>
+            <strong>Classify the goal first</strong>
+            <div class="step-body">
+              Go to Agents, <strong>Coordinator</strong> tab. Enter <em>"Find the best location for a pharmacy in Zurich near hospitals and schools"</em>. Click <strong>Classify only</strong> &rarr; should route to <code>site_selector</code>.
+            </div>
+          </li>
+          <li>
+            <strong>Run the full coordinator</strong>
+            <div class="step-body">
+              Click <strong>Run</strong>. The coordinator dispatches to SiteSelector, which fetches OSM candidates, computes distance-weighted scores, and returns ranked candidates. Takes 30-60 seconds.
+            </div>
+          </li>
+          <li>
+            <strong>Remember the result</strong>
+            <div class="step-body">
+              Once you see the top location, go to Memory and save it as a fact: <em>"Best pharmacy site in Zurich: [location]"</em>. Next time you recall <em>"Zurich pharmacy"</em>, it'll come back.
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card-header"><div class="card-icon status">&#127783;</div><h3>Walkthrough 3: Disaster response workflow</h3></div>
+        <p class="text-sm text-muted mb-2">Combines data channels + memory + context.</p>
+        <ol class="step-list">
+          <li>
+            <strong>Check active fires</strong>
+            <div class="step-body">
+              Go to Data, <strong>Fires</strong> tab. Search <em>"California"</em>. See real-time MODIS/VIIRS detections (requires <code>FIRMS_MAP_KEY</code>).
+            </div>
+          </li>
+          <li>
+            <strong>Save as an episode</strong>
+            <div class="step-body">
+              Go to Memory &rarr; Add tab. Save: <em>"3 active fires detected near Sacramento on [date]"</em>. Importance: <code>0.9</code> (high). Tags: <code>fire, california, urgent</code>.
+            </div>
+          </li>
+          <li>
+            <strong>Create a response mission</strong>
+            <div class="step-body">
+              Go to Context &rarr; Save tab. URI: <code>geospark://missions/california_fires_2026</code>. Abstract: <em>"Active wildfire response in California"</em>. Bounds: California bbox.
+            </div>
+          </li>
+          <li>
+            <strong>Future recall</strong>
+            <div class="step-body">
+              Next time someone asks about California fires, both Memory (recent episodes) and Context (the mission) surface the relevant information.
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ========== SETUP ========== -->
+    <div class="tab-panel hidden" id="tab-setup">
+      <div class="card">
+        <div class="card-header"><div class="card-icon geo">&#128295;</div><h3>Running GeoSpark locally</h3></div>
+        <p class="text-sm text-muted mb-2">This is already running if you're reading this page! But for reference:</p>
+        <pre class="code-block">git clone https://github.com/Maz2580/geospark.git
+cd geospark
+python -m venv .venv
+.venv/Scripts/activate              # Windows
+source .venv/bin/activate           # macOS/Linux
+pip install -e ".[api,intelligence]"
+uvicorn geospark.api:app --reload   # Serves the UI at http://localhost:8000</pre>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card-header"><div class="card-icon agent">&#129302;</div><h3>Ollama for local LLM</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Ollama runs LLMs on your machine. GeoSpark uses it for agent reasoning (GeoAgent, SpatialReport, SiteSelector) and the LLM gateway. Without it, those features will fail with a 502 or connection error.
+        </p>
+        <ol class="step-list">
+          <li>
+            <strong>Install Ollama</strong>
+            <div class="step-body">
+              Download from <code>https://ollama.com/download</code>. Works on macOS, Windows, Linux.
+            </div>
+          </li>
+          <li>
+            <strong>Start the service</strong>
+            <div class="step-body">
+              <code>ollama serve</code> in a terminal. Keeps running in the background on port 11434.
+            </div>
+          </li>
+          <li>
+            <strong>Pull a model</strong>
+            <div class="step-body">
+              <code>ollama pull qwen2.5:7b</code> (about 4.7 GB, ~5 min on a fast connection). This is the default GeoSpark model.
+            </div>
+          </li>
+          <li>
+            <strong>Verify</strong>
+            <div class="step-body">
+              Visit the Status page or run: <code>curl http://localhost:11434/api/tags</code>. You should see the list of installed models.
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card-header"><div class="card-icon data">&#128273;</div><h3>Free API keys for data channels</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Weather (Open-Meteo) needs no key. Air Quality (OpenAQ) and Fires (NASA FIRMS) are free but require registration.
+        </p>
+
+        <div class="concept-grid">
+          <div class="concept-card">
+            <span class="concept-tag">Tier 0</span>
+            <h4>Open-Meteo (Weather)</h4>
+            <p>No key needed. Just works.</p>
+          </div>
+          <div class="concept-card">
+            <span class="concept-tag">Tier 1</span>
+            <h4>OpenAQ (Air Quality)</h4>
+            <p>Register at <code>openaq.org/register</code>. Free. Set <code>OPENAQ_API_KEY</code> in <code>.env</code>.</p>
+          </div>
+          <div class="concept-card">
+            <span class="concept-tag">Tier 1</span>
+            <h4>NASA FIRMS (Fires)</h4>
+            <p>Register at <code>firms.modaps.eosdis.nasa.gov/api/area/</code>. Free. Set <code>FIRMS_MAP_KEY</code> in <code>.env</code>.</p>
+          </div>
+        </div>
+
+        <p class="text-sm text-muted mt-2">
+          After setting keys, restart the server (the reload flag catches <code>.env</code> changes automatically).
+        </p>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card-header"><div class="card-icon status">&#9888;</div><h3>Troubleshooting</h3></div>
+
+        <div class="warn-box">
+          <strong>502 Bad Gateway on /api/v1/llm/models</strong><br>
+          Ollama isn't running or is unreachable on port 11434. Start it with <code>ollama serve</code>. Or ignore the error &mdash; the LLM gateway is optional; memory, context, and data pages all work without it.
+        </div>
+
+        <div class="warn-box">
+          <strong>Agent runs hang or time out</strong><br>
+          Agents make real calls to Nominatim (geocoding), Overpass (OSM queries), and Ollama (reasoning). First call to Ollama is slow as the model loads into RAM (15-30s). Subsequent calls are under 5s.
+        </div>
+
+        <div class="warn-box">
+          <strong>"Channel unconfigured" on Data page</strong><br>
+          The corresponding API key is missing. Check the Status page &mdash; channels report their config state there.
+        </div>
+
+        <div class="warn-box">
+          <strong>Memory/Context recall returns nothing</strong><br>
+          Make sure you've actually saved something first. Empty store is empty. Use the Stats tab on each page to see counts.
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== CONCEPTS ========== -->
+    <div class="tab-panel hidden" id="tab-concepts">
+      <div class="card">
+        <div class="card-header"><div class="card-icon geo">&#128218;</div><h3>Glossary</h3></div>
+        <p class="text-sm text-muted mb-2">The key terms used across GeoSpark.</p>
+
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>Spatial Protocol (GSP)</h4>
+            <p>A standardized JSON schema for spatial queries and results. Any tool can implement GSP and plug into GeoSpark.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Spatial Reasoning Engine</h4>
+            <p>The core component that performs topology, distance, CRS transforms, and geometric operations &mdash; all computed on the WGS84 ellipsoid.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Specialist Agent</h4>
+            <p>An autonomous agent for a specific task: <strong>GeoAgent</strong> (general), <strong>SpatialReport</strong> (location dossiers), <strong>SiteSelector</strong> (optimal placement).</p>
+          </div>
+          <div class="concept-card">
+            <h4>Coordinator</h4>
+            <p>Meta-agent that classifies a natural language goal and routes it to the right specialist. Uses rule-based patterns and keyword matching.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Spatial Fact</h4>
+            <p>Time-agnostic knowledge: <em>"The Eiffel Tower is at 48.86 N, 2.29 E"</em>. Stored in Memory with confidence score.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Spatial Episode</h4>
+            <p>Timestamped observation: <em>"PM2.5 was 120 in Delhi on April 9"</em>. Has importance weight. Subject to compaction over time.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Contradiction</h4>
+            <p>Two facts that are highly similar but claim different values &mdash; likely describing the same entity with conflicting information. Auto-detected.</p>
+          </div>
+          <div class="concept-card">
+            <h4>GeoContext (L0/L1/L2)</h4>
+            <p><strong>L0</strong> = 1-2 sentence abstract, always in prompts. <strong>L1</strong> = structured outline. <strong>L2</strong> = full data, loaded only on demand.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Hotness Score</h4>
+            <p>Combined frequency + recency: <code>sigmoid(log1p(count)) * exp(-decay * age_days)</code>. Determines which contexts are hot or cold.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Data Channel</h4>
+            <p>Pluggable real-time data source. Tier 0 = free no key, Tier 1 = free with key, Tier 2 = commercial.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Flow</h4>
+            <p>A DAG of spatial operations that runs as a single workflow. Can be persisted and re-run. See <code>geospark flow list</code> in the CLI.</p>
+          </div>
+          <div class="concept-card">
+            <h4>MCP Server</h4>
+            <p>Model Context Protocol server. GeoSpark exposes 6 spatial tools over MCP so Claude Desktop and other MCP clients can use them natively.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card-header"><div class="card-icon agent">&#128279;</div><h3>Further reading</h3></div>
+        <ul class="text-sm" style="line-height:1.8;padding-left:1.2rem">
+          <li><a href="/docs" style="color:var(--color-primary)">Interactive API Docs</a> &mdash; Swagger UI with all 58 endpoints</li>
+          <li><a href="https://github.com/Maz2580/geospark" style="color:var(--color-primary)">GitHub repository</a> &mdash; source code, issues, contributing</li>
+          <li><a href="https://pypi.org/project/geospark-ai/" style="color:var(--color-primary)">PyPI package</a> &mdash; <code>pip install geospark-ai</code></li>
+          <li><a href="/status" style="color:var(--color-primary)">System Status</a> &mdash; server health, tools loaded, data channel keys configured</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    initTabs($('.container'));
+  </script>
+</body>
+</html>

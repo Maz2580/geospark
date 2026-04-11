@@ -46,6 +46,7 @@ dependencies = [
     "click>=8.0",
     "rich>=13.0",
     "python-dotenv>=1.0",
+    "numpy>=1.24",
 ]
 
 [project.optional-dependencies]
@@ -85,8 +86,11 @@ postgis = [
 mcp = [
     "mcp>=1.0",
 ]
+intelligence = [
+    "faiss-cpu>=1.7",
+]
 all = [
-    "geospark[geo,api,llm,viz,satellite,postgis,mcp]",
+    "geospark[geo,api,llm,viz,satellite,postgis,mcp,intelligence]",
 ]
 dev = [
     "pytest>=8.0",

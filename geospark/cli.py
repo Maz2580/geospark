@@ -688,5 +688,98 @@ def data_fires(location: str, days: int) -> None:
     console.print(f"[dim]Total fires: {result.total_results}[/dim]")
 
 
+@main.group()
+def memory() -> None:
+    """Spatial intelligence memory — facts, episodes, contradictions."""
+
+
+@memory.command("recall")
+@click.argument("query")
+@click.option("--type", "mem_type", type=click.Choice(["fact", "episode"]), default=None)
+@click.option("--limit", default=10, help="Max results")
+def memory_recall(query: str, mem_type: str | None, limit: int) -> None:
+    """Recall spatial memories matching a query."""
+    from geospark.memory.intelligence import SpatialIntelligence
+
+    intel = SpatialIntelligence()
+    results = intel.recall(query, limit=limit, memory_type=mem_type)
+
+    if not results:
+        console.print("[dim]No memories found[/dim]")
+        return
+
+    table = Table(title=f"Memory Recall: {query}")
+    table.add_column("Type", style="cyan", max_width=8)
+    table.add_column("Content", style="green")
+    table.add_column("Score", style="yellow", max_width=8)
+    table.add_column("Source", style="dim", max_width=15)
+
+    for r in results:
+        table.add_row(r["type"], r["content"][:80], str(r["score"]), r.get("source", "")[:15])
+
+    console.print(table)
+
+
+@memory.command("contradictions")
+def memory_contradictions() -> None:
+    """Find contradicting spatial facts."""
+    from geospark.memory.intelligence import SpatialIntelligence
+
+    intel = SpatialIntelligence()
+    contradictions = intel.find_contradictions()
+
+    if not contradictions:
+        console.print("[green]No contradictions found[/green]")
+        return
+
+    table = Table(title=f"Contradictions ({len(contradictions)})")
+    table.add_column("Fact A", style="cyan")
+    table.add_column("Fact B", style="yellow")
+    table.add_column("Similarity", style="red")
+
+    for c in contradictions:
+        table.add_row(c.fact_a_content[:50], c.fact_b_content[:50], f"{c.similarity:.2f}")
+
+    console.print(table)
+
+
+@memory.command("stats")
+def memory_stats() -> None:
+    """Show spatial intelligence statistics."""
+    from geospark.memory.intelligence import SpatialIntelligence
+
+    intel = SpatialIntelligence()
+    s = intel.stats()
+
+    table = Table(title="Spatial Intelligence")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value", style="green")
+
+    table.add_row("Active Facts", str(s.active_facts))
+    table.add_row("Total Facts", str(s.total_facts))
+    table.add_row("Active Episodes", str(s.active_episodes))
+    table.add_row("Total Episodes", str(s.total_episodes))
+    table.add_row("Connections", str(s.total_connections))
+    table.add_row("Contradictions", str(s.contradictions_found))
+    table.add_row("Vector Store", str(s.vector_store_count))
+    table.add_row("FAISS", "yes" if s.using_faiss else "no (numpy fallback)")
+
+    console.print(table)
+
+
+@memory.command("compact")
+@click.option("--max-age", default=30, help="Max age in days for episodes")
+@click.option("--importance", default=0.7, help="Keep episodes above this importance")
+def memory_compact(max_age: int, importance: float) -> None:
+    """Compact old low-importance episodes."""
+    from geospark.memory.intelligence import SpatialIntelligence
+
+    intel = SpatialIntelligence()
+    result = intel.compact(max_age_days=max_age, keep_important=importance)
+
+    console.print(f"[green]Compacted {result['compacted']} episodes[/green]")
+    console.print(f"[dim]Kept {result['kept']} episodes, {result['facts_preserved']} facts preserved[/dim]")
+
+
 if __name__ == "__main__":
     main()

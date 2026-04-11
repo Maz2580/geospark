@@ -662,3 +662,96 @@ async def agent_site_select(request: SiteSelectRequest):
         radius_m=request.radius_m,
     )
     return result.model_dump()
+
+
+# --- Spatial Intelligence (Memory) Endpoints ---
+
+
+class MemoryRecallRequest(BaseModel):
+    query: str = Field(..., description="Search query for spatial memories")
+    limit: int = Field(10, description="Max results")
+    memory_type: str | None = Field(None, description="Filter: 'fact' or 'episode'")
+
+
+class MemoryFactRequest(BaseModel):
+    content: str = Field(..., description="Spatial fact to remember")
+    source: str = Field("", description="Source attribution")
+    confidence: float = Field(1.0, description="Confidence 0.0 to 1.0")
+    tags: list[str] = Field(default_factory=list)
+
+
+class MemoryEpisodeRequest(BaseModel):
+    content: str = Field(..., description="Spatial observation to remember")
+    source: str = Field("", description="Source attribution")
+    importance: float = Field(0.5, description="Importance 0.0 to 1.0")
+    tags: list[str] = Field(default_factory=list)
+
+
+def _get_intelligence():
+    """Get or create the shared SpatialIntelligence instance."""
+    from geospark.memory.intelligence import SpatialIntelligence
+
+    if not hasattr(_get_intelligence, "_instance"):
+        _get_intelligence._instance = SpatialIntelligence()
+    return _get_intelligence._instance
+
+
+@app.post("/api/v1/memory/recall", dependencies=[Depends(verify_api_key)])
+async def memory_recall(request: MemoryRecallRequest):
+    """Recall spatial memories matching a query."""
+    intel = _get_intelligence()
+    results = intel.recall(
+        request.query, limit=request.limit, memory_type=request.memory_type
+    )
+    return {"query": request.query, "results": results, "count": len(results)}
+
+
+@app.post("/api/v1/memory/fact", dependencies=[Depends(verify_api_key)])
+async def memory_add_fact(request: MemoryFactRequest):
+    """Store a new spatial fact."""
+    intel = _get_intelligence()
+    fact = intel.remember_fact(
+        content=request.content,
+        source=request.source,
+        confidence=request.confidence,
+        tags=request.tags,
+    )
+    return {"id": fact.id, "content": fact.content, "type": "fact"}
+
+
+@app.post("/api/v1/memory/episode", dependencies=[Depends(verify_api_key)])
+async def memory_add_episode(request: MemoryEpisodeRequest):
+    """Store a timestamped spatial observation."""
+    intel = _get_intelligence()
+    episode = intel.remember_episode(
+        content=request.content,
+        source=request.source,
+        importance=request.importance,
+        tags=request.tags,
+    )
+    return {"id": episode.id, "content": episode.content, "type": "episode"}
+
+
+@app.get("/api/v1/memory/contradictions", dependencies=[Depends(verify_api_key)])
+async def memory_contradictions():
+    """Find contradicting spatial facts."""
+    intel = _get_intelligence()
+    contradictions = intel.find_contradictions()
+    return {
+        "contradictions": [c.model_dump(mode="json") for c in contradictions],
+        "count": len(contradictions),
+    }
+
+
+@app.get("/api/v1/memory/stats")
+async def memory_stats():
+    """Spatial intelligence statistics."""
+    intel = _get_intelligence()
+    return intel.stats().model_dump()
+
+
+@app.post("/api/v1/memory/compact", dependencies=[Depends(verify_api_key)])
+async def memory_compact():
+    """Compact old low-importance episodes."""
+    intel = _get_intelligence()
+    return intel.compact()

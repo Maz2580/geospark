@@ -6,7 +6,7 @@
 - **Language**: Python 3.11+
 - **Package manager**: pip (venv at `.venv/`)
 - **License**: Apache 2.0
-- **Status**: Phase 4 (Deployment) — 446 tests passing, live at geospark.terrascout.app
+- **Status**: Phase 7A complete -- 540 tests passing, live at geospark.terrascout.app
 - **PyPI**: `pip install geospark-ai[mcp]` — https://pypi.org/project/geospark-ai/
 - **MCP**: `geospark-mcp` CLI command (6 tools, official MCP SDK)
 
@@ -47,9 +47,11 @@ geospark/
 │   ├── geocoding.py     # Address <-> coordinates
 │   ├── terrain.py       # Elevation queries
 │   └── launcher.py      # Multi-server launcher
-├── memory/         # Session persistence + spatial memory
-│   ├── session_store.py # Save/resume conversations
-│   └── spatial_memory.py  # Persistent spatial knowledge
+├── memory/         # Session persistence + spatial memory + intelligence
+│   ├── session_store.py   # Save/resume conversations
+│   ├── spatial_memory.py  # Persistent spatial knowledge (basic)
+│   ├── intelligence.py    # Enhanced dual memory: facts + episodes + contradictions
+│   └── vector_store.py    # FAISS/numpy vector storage for embedding search
 ├── bench/          # GeoSpark Bench evaluation framework (5 benchmarks, 535 questions)
 │   ├── datasets/        # JSON benchmark datasets
 │   ├── generate_datasets.py  # Dataset generator
@@ -69,8 +71,8 @@ geospark/
 │   ├── loader.py        # PluginLoader (discover, load, validate)
 │   └── hooks.py         # PluginHooks (lifecycle callbacks)
 ├── utils/          # Shared utilities
-├── api.py          # FastAPI REST server (9 endpoints, incl. /status)
-└── cli.py          # CLI entry point (Click + Rich)
+├── api.py          # FastAPI REST server (34 endpoints, incl. /status, /memory/*)
+└── cli.py          # CLI entry point (Click + Rich, 13 commands)
 ```
 
 ## Development Commands
@@ -162,43 +164,22 @@ docker compose up geospark     # Just GeoSpark API
 - **Approximate vs geodesic**: For rough estimates use degree-to-meter approximation (111,320 m/deg). For production use pyproj geodesic calculations.
 - **File locks on Windows**: Venv files can get locked by background processes. If venv is corrupted, kill python processes first then recreate.
 
-## Roadmap Phase (Current: Phase 3 complete, Phase 4 next)
+## Roadmap Phase (Current: Phase 7A complete, Phase 7B next)
 
-### Phase 0 - Foundation (COMPLETE)
-- [x] Protocol schema, spatial engine, CRS handler, 3 tools, CLI, MCP, Docker, CI/CD
-- [x] OpenRouter + Supabase + FastAPI + system prompt optimization
-- [x] 50 passing tests
+See `docs/ROADMAP.md` for the full roadmap with all phases and details.
 
-### Phase 1 - Launch (COMPLETE)
-- [x] GeoSpark Bench v0.1 (GeoTopo 100q, GeoDistance 100q, GeoChange 36q)
-- [x] Baseline evaluation (Gemma 12B: 30% topo / 43% distance vs GeoSpark 100%)
-- [x] Demo notebook (examples/benchmark_demo.ipynb)
-- [x] Quickstart + MCP server examples
-- [x] Git init + GitHub repo (github.com/Maz2580/geospark)
-- [x] README with badges, benchmark table, architecture diagram
-- [x] PyPI package build working
-- [x] Launch post drafts (docs/launch/)
+### Completed Phases
+- **Phase 0**: Foundation -- protocol, engine, CRS, tools, CLI, MCP, Docker, CI/CD (50 tests)
+- **Phase 1**: Launch -- Bench v0.1, demo notebook, Git, PyPI, README (96 tests)
+- **Phase 2**: Ecosystem -- spectral indices, routing, RAG, memory, 4 LLM integrations (249 tests)
+- **Phase 3**: Platform -- Bench v1.0 (535q), Flows, Knowledge Graph, Plugin System (441 tests)
+- **Phase 4**: Deployment -- live server, Docker prod, MCP+PyPI, Ollama, CLI upgrades (446 tests)
+- **Phase 5**: Agents -- GeoAgent, SiteSelector, SpatialReport (autonomous)
+- **Phase 5.5**: LLM Gateway -- chat, generate, embeddings, 9 models
+- **Phase 6**: Data Channels -- Weather, Air Quality, NASA FIRMS, agent integration (474 tests)
+- **Phase 7A**: Spatial Intelligence -- dual memory, vector store, contradictions, auto-linking (540 tests)
 
-### Phase 2 - Ecosystem (COMPLETE)
-- [x] NDVI + Spectral Indices tools (6 indices)
-- [x] Reverse geocoder + OSRM route analyzer
-- [x] Normalized tool result shape (NormalizedResult)
-- [x] 3 domain-specific MCP servers + launcher
-- [x] Session persistence + spatial memory
-- [x] Spatial RAG (retriever, chunker, context builder)
-- [x] Query planner, temporal engine, aggregator, cache
-- [x] 4 LLM integrations (OpenAI, Anthropic, Ollama, Generic)
-- [x] 249 passing tests
-
-### Phase 3 - Platform (COMPLETE)
-- [x] GeoSpark Bench v1.0 (5 benchmarks: GeoTopo 210q, GeoDistance 210q, GeoChange 36q, GeoReason 55q, GeoMultimodal 24q)
-- [x] GeoSpark Flows (flow schema, builder, runner, 4 templates)
-- [x] Spatial Knowledge Graph (entities, relations, BFS, auto-relate, GeoJSON/Overpass loaders)
-- [x] Community Plugin System (manifest, lifecycle hooks, loader, dependency checking)
-- [x] 441 passing tests
-
-### Phase 4 - Scale (NEXT)
-- [ ] Production deployment (cloud hosting, monitoring)
-- [ ] Community marketplace for plugins
-- [ ] Advanced benchmarking (IRT-calibrated difficulty, leaderboard)
-- [ ] Enterprise features (auth, rate limiting, audit logs)
+### Current: Phase 7B - Geospatial Context Database
+- [ ] `GeoContext` model: uri, abstract (L0), overview (L1), full data (L2)
+- [ ] Hierarchical storage, lazy loading, hotness scoring
+- [ ] Recursive directory retrieval with spatial + temporal filtering

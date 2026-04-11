@@ -762,7 +762,11 @@ def memory_stats() -> None:
     table.add_row("Connections", str(s.total_connections))
     table.add_row("Contradictions", str(s.contradictions_found))
     table.add_row("Vector Store", str(s.vector_store_count))
-    table.add_row("FAISS", "yes" if s.using_faiss else "no (numpy fallback)")
+    if s.faiss_available:
+        backend = "yes (active)" if s.using_faiss else "yes (available, idle)"
+    else:
+        backend = "no (numpy fallback)"
+    table.add_row("FAISS", backend)
 
     console.print(table)
 
@@ -779,6 +783,240 @@ def memory_compact(max_age: int, importance: float) -> None:
 
     console.print(f"[green]Compacted {result['compacted']} episodes[/green]")
     console.print(f"[dim]Kept {result['kept']} episodes, {result['facts_preserved']} facts preserved[/dim]")
+
+
+@main.group()
+def context() -> None:
+    """Geospatial context database -- missions, datasets, analysis history."""
+
+
+@context.command("list")
+@click.option("--category", default=None, help="Filter by category")
+@click.option("--archived", is_flag=True, help="Include archived contexts")
+def context_list(category: str | None, archived: bool) -> None:
+    """List stored contexts."""
+    from geospark.context import ContextStore
+
+    store = ContextStore()
+    contexts = store.list_all(category=category, include_archived=archived)
+
+    if not contexts:
+        console.print("[dim]No contexts stored[/dim]")
+        return
+
+    table = Table(title=f"Contexts ({len(contexts)})")
+    table.add_column("URI", style="cyan", max_width=50)
+    table.add_column("Name", style="green")
+    table.add_column("Category", style="yellow", max_width=12)
+    table.add_column("Accesses", max_width=8)
+    table.add_column("Archived", max_width=8)
+
+    for ctx in contexts:
+        table.add_row(
+            ctx.uri[:50],
+            ctx.name[:30],
+            ctx.category,
+            str(ctx.access_count),
+            "yes" if ctx.is_archived else "no",
+        )
+    console.print(table)
+
+
+@context.command("show")
+@click.argument("uri")
+@click.option("--tier", type=click.Choice(["L0", "L1", "L2"]), default="L1")
+def context_show(uri: str, tier: str) -> None:
+    """Show a context by URI at a given tier."""
+    from geospark.context import ContextStore, ContextTier
+
+    store = ContextStore()
+    ctx = store.load(uri, touch=False)
+    if ctx is None:
+        console.print(f"[red]Context not found: {uri}[/red]")
+        return
+
+    tier_enum = ContextTier(tier)
+    console.print(ctx.to_prompt_summary(tier_enum))
+    console.print(f"\n[dim]Access count: {ctx.access_count} | Archived: {ctx.is_archived}[/dim]")
+
+
+@context.command("query")
+@click.argument("query")
+@click.option("--bbox", default=None, help="Bounding box: 'min_lon,min_lat,max_lon,max_lat'")
+@click.option("--category", default=None)
+@click.option("--limit", default=10)
+def context_query(query: str, bbox: str | None, category: str | None, limit: int) -> None:
+    """Query contexts by text, bbox, and category."""
+    from geospark.context import ContextRetriever, ContextStore
+
+    bbox_list = None
+    if bbox:
+        try:
+            bbox_list = [float(x) for x in bbox.split(",")]
+            if len(bbox_list) != 4:
+                raise ValueError("bbox must have 4 values")
+        except ValueError as e:
+            console.print(f"[red]Invalid bbox: {e}[/red]")
+            return
+
+    store = ContextStore()
+    retriever = ContextRetriever(store)
+    results, stats = retriever.retrieve(
+        query=query, bbox=bbox_list, category=category, limit=limit
+    )
+
+    if not results:
+        console.print(f"[dim]No contexts match '{query}'[/dim]")
+        return
+
+    table = Table(title=f"Context Query: {query}")
+    table.add_column("#", style="dim", max_width=3)
+    table.add_column("URI", style="cyan", max_width=40)
+    table.add_column("Score", style="green", max_width=8)
+    table.add_column("Semantic", max_width=10)
+    table.add_column("Hotness", max_width=10)
+
+    for i, r in enumerate(results, 1):
+        table.add_row(
+            str(i),
+            r.context.uri[:40],
+            f"{r.final_score:.3f}",
+            f"{r.semantic_score:.3f}",
+            f"{r.hotness_score:.3f}",
+        )
+    console.print(table)
+    console.print(
+        f"[dim]Candidates: {stats.total_candidates} | "
+        f"Filtered by bbox: {stats.filtered_by_bbox} | "
+        f"Convergence rounds: {stats.convergence_rounds}[/dim]"
+    )
+
+
+@context.command("stats")
+def context_stats() -> None:
+    """Show context database statistics."""
+    from geospark.context import ContextRetriever, ContextStore
+
+    store = ContextStore()
+    retriever = ContextRetriever(store)
+
+    total = store.count()
+    archived = store.count(include_archived=True) - total
+    categories = store.list_categories()
+    hottest = retriever.hottest(limit=3)
+
+    table = Table(title="Context Database")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value", style="green")
+    table.add_row("Total contexts", str(total))
+    table.add_row("Archived", str(archived))
+    table.add_row("Categories", ", ".join(categories) if categories else "none")
+    console.print(table)
+
+    if hottest:
+        hot_table = Table(title="Hottest Contexts")
+        hot_table.add_column("URI", style="cyan", max_width=50)
+        hot_table.add_column("Score", style="green", max_width=8)
+        hot_table.add_column("Accesses", max_width=8)
+        for h in hottest:
+            hot_table.add_row(h.uri[:50], f"{h.score:.3f}", str(h.access_count))
+        console.print(hot_table)
+
+
+@context.command("archive-cold")
+@click.option("--threshold", default=0.1, help="Hotness threshold")
+def context_archive_cold(threshold: float) -> None:
+    """Archive contexts with hotness below threshold."""
+    from geospark.context import ContextRetriever, ContextStore
+
+    store = ContextStore()
+    retriever = ContextRetriever(store)
+    archived = retriever.archive_cold(threshold=threshold)
+
+    if archived:
+        console.print(f"[green]Archived {len(archived)} cold contexts[/green]")
+        for uri in archived:
+            console.print(f"  - {uri}")
+    else:
+        console.print("[dim]No cold contexts to archive[/dim]")
+
+
+@main.command("multi-agent")
+@click.argument("goal")
+@click.option("--stream", is_flag=True, help="Stream progress events as they happen")
+def multi_agent(goal: str, stream: bool) -> None:
+    """Route a goal through the multi-agent coordinator.
+
+    The coordinator classifies the goal, picks the right specialist agent
+    (GeoAgent, SiteSelector, or SpatialReport), and dispatches the task.
+
+    Example:
+        geospark multi-agent "Find the best location for a cafe in Melbourne"
+    """
+    from geospark.agents import AgentCoordinator
+
+    coord = AgentCoordinator()
+
+    if stream:
+        import asyncio
+
+        async def _run_stream() -> None:
+            async for ev in coord.stream(goal):
+                icon = {
+                    "classify": "[cyan]*[/cyan]",
+                    "dispatch": "[yellow]>[/yellow]",
+                    "agent_start": "[blue]>>[/blue]",
+                    "agent_done": "[green]OK[/green]",
+                    "complete": "[bold green]DONE[/bold green]",
+                    "error": "[red]X[/red]",
+                }.get(ev.event_type, "-")
+                console.print(f"  {icon} {ev.event_type}: {ev.message}")
+
+        asyncio.run(_run_stream())
+        return
+
+    console.print(f"[bold]Coordinator[/bold]: {goal}\n")
+    result = coord.run(goal)
+
+    if result.classification:
+        console.print(
+            f"[cyan]Routed to[/cyan]: {result.agent_used} "
+            f"(score={result.classification.score:.2f})"
+        )
+        console.print(f"[dim]{result.classification.reason}[/dim]\n")
+
+    if result.error:
+        console.print(f"[red]Error:[/red] {result.error}")
+    else:
+        console.print(f"[bold]Result[/bold]: {result.summary}")
+
+    console.print(f"[dim]({result.duration_s}s)[/dim]")
+
+
+@main.command("agents")
+def agents_list() -> None:
+    """List registered specialist agents in the coordinator."""
+    from geospark.agents import AgentCoordinator
+
+    coord = AgentCoordinator()
+    cards = coord.list_agents()
+
+    if not cards:
+        console.print("[dim]No agents registered[/dim]")
+        return
+
+    table = Table(title=f"Registered Agents ({len(cards)})")
+    table.add_column("Name", style="cyan")
+    table.add_column("Description", style="green")
+    table.add_column("Capabilities", style="yellow")
+
+    for card in cards:
+        table.add_row(
+            card.name,
+            card.description[:60],
+            ", ".join(card.capabilities[:4]),
+        )
+    console.print(table)
 
 
 if __name__ == "__main__":

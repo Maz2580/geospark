@@ -755,3 +755,245 @@ async def memory_compact():
     """Compact old low-importance episodes."""
     intel = _get_intelligence()
     return intel.compact()
+
+
+# --- Geospatial Context Database (Phase 7B) Endpoints ---
+
+
+class ContextSaveRequest(BaseModel):
+    uri: str = Field(..., description="Context URI (geospark://category/path)")
+    category: str = Field(..., description="Category: missions, datasets, analysis_history")
+    name: str = Field(..., description="Human-readable name")
+    abstract: str = Field("", description="L0: short summary")
+    overview: dict[str, Any] = Field(default_factory=dict, description="L1: structured outline")
+    full_data: dict[str, Any] = Field(default_factory=dict, description="L2: complete data")
+    parent_uri: str | None = Field(None)
+    bounds_wgs84: list[float] | None = Field(None, description="[min_lon,min_lat,max_lon,max_lat]")
+    tags: list[str] = Field(default_factory=list)
+    source: str = Field("")
+
+
+class ContextQueryRequest(BaseModel):
+    query: str = Field("", description="Text query")
+    bbox: list[float] | None = Field(None, description="Spatial filter")
+    category: str | None = Field(None)
+    limit: int = Field(10)
+    tier: str = Field("L0", description="L0, L1, or L2")
+    include_archived: bool = Field(False)
+
+
+def _get_context_store():
+    """Get or create the shared ContextStore instance."""
+    from geospark.context import ContextStore
+
+    if not hasattr(_get_context_store, "_instance"):
+        _get_context_store._instance = ContextStore()
+    return _get_context_store._instance
+
+
+def _get_context_retriever():
+    """Get or create the shared ContextRetriever instance."""
+    from geospark.context import ContextRetriever
+
+    if not hasattr(_get_context_retriever, "_instance"):
+        _get_context_retriever._instance = ContextRetriever(_get_context_store())
+    return _get_context_retriever._instance
+
+
+@app.post("/api/v1/context/save", dependencies=[Depends(verify_api_key)])
+async def context_save(request: ContextSaveRequest):
+    """Save a new geospatial context."""
+    from geospark.context import GeoContext
+
+    ctx = GeoContext(
+        uri=request.uri,
+        category=request.category,
+        name=request.name,
+        abstract=request.abstract,
+        overview=request.overview,
+        full_data=request.full_data,
+        parent_uri=request.parent_uri,
+        bounds_wgs84=request.bounds_wgs84,
+        tags=request.tags,
+        source=request.source,
+    )
+    store = _get_context_store()
+    store.save(ctx)
+    return {"id": ctx.id, "uri": ctx.uri, "saved": True}
+
+
+@app.get("/api/v1/context/load")
+async def context_load(uri: str, tier: str = "L1"):
+    """Load a context by URI at a given tier."""
+    from geospark.context import ContextTier
+
+    store = _get_context_store()
+    ctx = store.load(uri, touch=True)
+    if ctx is None:
+        raise HTTPException(status_code=404, detail=f"Context not found: {uri}")
+
+    try:
+        tier_enum = ContextTier(tier)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid tier: {tier}") from None
+
+    return {
+        "uri": ctx.uri,
+        "name": ctx.name,
+        "summary": ctx.to_prompt_summary(tier_enum),
+        "access_count": ctx.access_count,
+        "is_archived": ctx.is_archived,
+        "content": ctx.get_tier(tier_enum),
+    }
+
+
+@app.post("/api/v1/context/query", dependencies=[Depends(verify_api_key)])
+async def context_query_endpoint(request: ContextQueryRequest):
+    """Query contexts with text, spatial, and category filters."""
+    from geospark.context import ContextTier
+
+    retriever = _get_context_retriever()
+    try:
+        tier = ContextTier(request.tier)
+    except ValueError:
+        tier = ContextTier.L0
+
+    results, stats = retriever.retrieve(
+        query=request.query,
+        bbox=request.bbox,
+        category=request.category,
+        limit=request.limit,
+        tier=tier,
+        include_archived=request.include_archived,
+    )
+    return {
+        "results": [
+            {
+                "uri": r.context.uri,
+                "name": r.context.name,
+                "abstract": r.context.abstract,
+                "score": r.final_score,
+                "semantic_score": r.semantic_score,
+                "hotness_score": r.hotness_score,
+                "parent_score": r.parent_score,
+                "access_count": r.context.access_count,
+                "category": r.context.category,
+                "bounds_wgs84": r.context.bounds_wgs84,
+            }
+            for r in results
+        ],
+        "stats": stats.model_dump(),
+    }
+
+
+@app.get("/api/v1/context/list")
+async def context_list_endpoint(
+    category: str | None = None, include_archived: bool = False
+):
+    """List all contexts, optionally filtered by category."""
+    store = _get_context_store()
+    contexts = store.list_all(category=category, include_archived=include_archived)
+    return {
+        "contexts": [
+            {
+                "uri": c.uri,
+                "name": c.name,
+                "category": c.category,
+                "abstract": c.abstract,
+                "access_count": c.access_count,
+                "is_archived": c.is_archived,
+                "bounds_wgs84": c.bounds_wgs84,
+            }
+            for c in contexts
+        ],
+        "count": len(contexts),
+    }
+
+
+@app.get("/api/v1/context/stats")
+async def context_stats():
+    """Context database statistics."""
+    store = _get_context_store()
+    retriever = _get_context_retriever()
+
+    total = store.count()
+    total_with_archive = store.count(include_archived=True)
+    categories = store.list_categories()
+    hottest = retriever.hottest(limit=5)
+
+    return {
+        "total_contexts": total,
+        "archived": total_with_archive - total,
+        "categories": categories,
+        "hottest": [h.model_dump() for h in hottest],
+    }
+
+
+@app.post("/api/v1/context/archive-cold", dependencies=[Depends(verify_api_key)])
+async def context_archive_cold(threshold: float = 0.1):
+    """Archive contexts with hotness below threshold."""
+    retriever = _get_context_retriever()
+    archived = retriever.archive_cold(threshold=threshold)
+    return {"archived": archived, "count": len(archived)}
+
+
+@app.delete("/api/v1/context/{uri:path}", dependencies=[Depends(verify_api_key)])
+async def context_delete(uri: str):
+    """Delete a context permanently."""
+    # URL-encoded URIs need decoding
+    if not uri.startswith("geospark://"):
+        uri = f"geospark://{uri}"
+    store = _get_context_store()
+    if store.delete(uri):
+        return {"deleted": uri}
+    raise HTTPException(status_code=404, detail=f"Context not found: {uri}")
+
+
+# --- Multi-Agent Coordinator (Phase 7C) Endpoints ---
+
+
+class CoordinateRequest(BaseModel):
+    goal: str = Field(..., description="Natural language goal")
+    parameters: dict[str, Any] = Field(
+        default_factory=dict, description="Optional structured parameters"
+    )
+
+
+def _get_coordinator():
+    """Get or create the shared AgentCoordinator instance."""
+    from geospark.agents import AgentCoordinator
+
+    if not hasattr(_get_coordinator, "_instance"):
+        _get_coordinator._instance = AgentCoordinator()
+    return _get_coordinator._instance
+
+
+@app.post("/api/v1/agent/coordinate", dependencies=[Depends(verify_api_key)])
+async def agent_coordinate(request: CoordinateRequest):
+    """Route a goal through the multi-agent coordinator.
+
+    The coordinator classifies the goal and dispatches to the right
+    specialist agent (GeoAgent, SiteSelector, or SpatialReport).
+    """
+    coord = _get_coordinator()
+    result = coord.run(request.goal, parameters=request.parameters)
+    return result.model_dump(mode="json")
+
+
+@app.get("/api/v1/agent/list")
+async def agent_list_registered():
+    """List registered specialist agents."""
+    coord = _get_coordinator()
+    return {
+        "agents": [card.model_dump(mode="json") for card in coord.list_agents()],
+    }
+
+
+@app.post("/api/v1/agent/classify", dependencies=[Depends(verify_api_key)])
+async def agent_classify(request: CoordinateRequest):
+    """Classify a goal without actually running it (for debugging routing)."""
+    from geospark.agents import classify_intent
+
+    coord = _get_coordinator()
+    classification = classify_intent(request.goal, coord.registry)
+    return classification.model_dump(mode="json")

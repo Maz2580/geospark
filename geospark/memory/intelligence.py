@@ -105,6 +105,7 @@ class IntelligenceStats(BaseModel):
     total_connections: int = 0
     contradictions_found: int = 0
     vector_store_count: int = 0
+    faiss_available: bool = False
     using_faiss: bool = False
 
 
@@ -727,6 +728,8 @@ class SpatialIntelligence:
 
     def stats(self) -> IntelligenceStats:
         """Return statistics about the intelligence store."""
+        from geospark.memory.vector_store import _FAISS_AVAILABLE
+
         active_facts = sum(1 for f in self._facts if f.is_active)
         active_episodes = sum(1 for e in self._episodes if e.is_active)
         contradictions = len(self.find_contradictions())
@@ -739,6 +742,7 @@ class SpatialIntelligence:
             total_connections=len(self._connections),
             contradictions_found=contradictions,
             vector_store_count=self._vector_store.count,
+            faiss_available=_FAISS_AVAILABLE,
             using_faiss=self._vector_store.using_faiss,
         )
 

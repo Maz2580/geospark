@@ -48,10 +48,23 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
 
 ## Key Features
 
+- **Multi-Agent Coordinator** — One command, right specialist. Intent classification routes your goal to the best agent automatically, with streaming progress and A2A messaging under the hood.
 - **Autonomous Spatial Agents** — Give a goal, get a complete analysis. No manual step-by-step. Three built-in agents:
   - `GeoAgent` — Multi-step spatial analysis from natural language ("Find hospitals near the Eiffel Tower")
   - `SpatialReport` — One-command location intelligence dossier (amenities, accessibility, elevation, narrative)
   - `SiteSelector` — Optimal location finding with multi-criteria scoring ("Best pharmacy spot in Zurich near hospitals and schools")
+- **Spatial Intelligence Memory** — Dual memory system that learns across sessions:
+  - `SpatialFact` — time-agnostic truths ("Eiffel Tower is at 48.86 N, 2.29 E")
+  - `SpatialEpisode` — timestamped observations ("PM2.5 was 120 in Delhi on 2026-04-09")
+  - Vector-based recall with FAISS acceleration or numpy fallback
+  - Automatic contradiction detection between conflicting facts
+  - Auto-linking of related memories at cosine similarity > 0.6
+- **Geospatial Context Database** — Tiered storage for missions, datasets, and analysis history:
+  - L0/L1/L2 lazy loading: abstracts in the prompt, full data on demand
+  - Hotness scoring: sigmoid(log1p(access)) * exp(-decay * age) balances frequency + recency
+  - Hierarchical URIs like `geospark://missions/melbourne_flood/analysis/2026-04`
+  - Recursive parent-child score propagation for context retrieval
+  - Spatial bbox + temporal range filters, cold-context archival
 - **Spatial Reasoning Engine** — Topology, geodesic distance, CRS transforms, buffering, area. All geometrically correct, not LLM-guessed.
 - **MCP Server** — 6 tools for Claude Desktop and any MCP-compatible AI assistant. `pip install geospark-ai[mcp] && geospark-mcp`
 - **GeoSpark Bench** — 535 benchmark questions, 5 LLM families evaluated. LLMs score 0% on distance; with GeoSpark tools, 70%. [Results →](docs/BENCHMARK_REPORT.md)
@@ -90,6 +103,62 @@ print(report.accessibility)  # Nearest hospital, school, pharmacy with distances
 selector = SiteSelector()
 result = selector.find(within="Zurich", near=["hospital", "school"], facility_type="pharmacy")
 print(result.best)  # Best-scoring location with explanation
+```
+
+### Multi-agent coordinator (Phase 7C)
+
+```python
+from geospark.agents import AgentCoordinator
+
+coord = AgentCoordinator()  # Auto-registers GeoAgent, SiteSelector, SpatialReport
+
+# One entry point for any spatial goal — coordinator picks the right specialist
+result = coord.run("Find the best location for a cafe in Melbourne CBD near schools")
+print(f"Routed to: {result.agent_used}")   # site_selector (matched pattern)
+print(result.summary)
+```
+
+### Spatial intelligence memory (Phase 7A)
+
+```python
+from geospark.memory import SpatialIntelligence
+
+intel = SpatialIntelligence()
+
+# Remember timeless facts and timestamped episodes
+intel.remember_fact("Eiffel Tower is at 48.8584 N, 2.2945 E", source="user")
+intel.remember_episode("PM2.5 was 120 in Delhi", importance=0.8, source="tool:air_quality")
+
+# Vector-based recall with automatic scoring (similarity + recency + importance)
+results = intel.recall("Paris landmarks", limit=5)
+
+# Detect contradicting facts automatically
+for c in intel.find_contradictions():
+    print(f"Conflict: {c.fact_a_content}  vs.  {c.fact_b_content}")
+```
+
+### Geospatial context database (Phase 7B)
+
+```python
+from geospark.context import ContextStore, ContextRetriever, GeoContext
+
+store = ContextStore()
+retriever = ContextRetriever(store)
+
+# Save a mission with tiered content
+store.save(GeoContext(
+    uri="geospark://missions/melbourne_flood_2024",
+    category="missions",
+    name="Melbourne Flood 2024",
+    abstract="Major flooding event in Melbourne CBD",  # L0 — always in prompt
+    overview={"severity": "high", "area_km2": 42},      # L1 — loaded for context
+    full_data={"affected_population": 15000},           # L2 — loaded on demand
+    bounds_wgs84=[144.9, -37.9, 145.1, -37.7],
+    tags=["flood", "melbourne", "disaster"],
+))
+
+# Retrieve with hierarchical scoring (semantic + hotness + parent propagation)
+results, stats = retriever.retrieve(query="flood melbourne", limit=5)
 ```
 
 ### As a Python library
@@ -154,10 +223,28 @@ Tries local Ollama first (free, fast), falls back to OpenRouter.
 ### CLI
 
 ```bash
-# Autonomous agents
+# Multi-agent coordinator (routes to the right specialist automatically)
+geospark multi-agent "Find the best cafe spot in Melbourne near schools"
+geospark multi-agent "Analyze Federation Square" --stream   # Live progress
+geospark agents                                              # List registered agents
+
+# Autonomous agents (direct access)
 geospark agent "Find all parks within 2km of Big Ben"
 geospark report "Federation Square, Melbourne"
 geospark site-select --within "Paris" --near "metro,schools" --facility restaurant
+
+# Spatial intelligence memory
+geospark memory recall "flood risk Melbourne"    # Vector-based recall
+geospark memory contradictions                   # Find conflicting facts
+geospark memory stats                            # FAISS + count info
+geospark memory compact                          # Archive old episodes
+
+# Geospatial context database
+geospark context list                            # All stored contexts
+geospark context show geospark://missions/flood  # View at L0/L1/L2
+geospark context query "flood melbourne"         # Hierarchical retrieval
+geospark context stats                           # Hottest contexts
+geospark context archive-cold                    # Move cold to _archive/
 
 # Spatial tools
 geospark geocode "Tokyo Tower, Japan"
@@ -178,7 +265,7 @@ geospark flow run distance_analysis    # Run a template
 
 ### Try the Live API (no install needed)
 
-Explore all 28 endpoints interactively at **[geospark.terrascout.app/docs](https://geospark.terrascout.app/docs)**
+Explore all 58 endpoints interactively at **[geospark.terrascout.app/docs](https://geospark.terrascout.app/docs)**
 
 ```bash
 # Quick test
@@ -207,11 +294,24 @@ python -m geospark.bench list
 │                   User / LLM                    │
 │         (Claude, ChatGPT, Ollama, ...)          │
 └──────────┬──────────────────────┬───────────────┘
-           │ MCP                  │ REST API (28 endpoints)
+           │ MCP                  │ REST API (58 endpoints)
            v                      v
+┌──────────────────────────────────────────────────┐
+│         Multi-Agent Coordinator (Phase 7C)       │
+│   Intent classification · A2A msg · Streaming    │
+└──────────┬───────────────────────────────────────┘
+           │
+           v
 ┌──────────────────────────────────────────────────┐
 │           Autonomous Agents Layer                │
 │  GeoAgent · SpatialReport · SiteSelector         │
+└──────────┬───────────────────────────────────────┘
+           │
+           v
+┌──────────────────────────────────────────────────┐
+│         Spatial Intelligence (Phase 7A/B)        │
+│  Facts + Episodes + Contradictions (VectorStore) │
+│  Tiered Context DB · Hotness · Hierarchy         │
 └──────────┬───────────────────────────────────────┘
            │
            v
@@ -289,10 +389,13 @@ GeoSpark Bench v1.0 — **535 questions** across 5 benchmarks, evaluated on **5 
 
 | Phase | Status | Tests | Description |
 |-------|--------|-------|-------------|
-| **Phase 0-3** — Foundation to Platform | **Complete** | 446 | Protocol, engine, tools, MCP, Bench, Flows, Knowledge Graph, Plugins |
+| **Phase 0-3** — Foundation to Platform | **Complete** | 441 | Protocol, engine, tools, MCP, Bench, Flows, Knowledge Graph, Plugins |
 | **Phase 4** — Deployment | **Complete** | 446 | Live API, Docker, PyPI, Ollama, API auth, 5-model benchmarks |
 | **Phase 5** — Autonomous Agents | **Complete** | 446 | GeoAgent, SpatialReport, SiteSelector |
-| **Phase 6** — Data Channels | **Complete** | 446 | Weather, Air Quality, NASA Fires — free, real-time |
+| **Phase 6** — Data Channels | **Complete** | 474 | Weather, Air Quality, NASA Fires — free, real-time |
+| **Phase 7A** — Spatial Memory | **Complete** | 540 | Facts + Episodes, VectorStore (FAISS), contradictions, auto-linking |
+| **Phase 7B** — Context Database | **Complete** | 589 | Tiered L0/L1/L2 loading, hotness scoring, hierarchical retrieval |
+| **Phase 7C** — Multi-Agent Coordination | **Complete** | **657** | Toolkit, A2A messaging, coordinator with streaming |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
 
@@ -323,7 +426,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Live API
 
-GeoSpark is deployed and accessible at **[geospark.terrascout.app](https://geospark.terrascout.app/docs)** — 28 endpoints with interactive Swagger documentation.
+GeoSpark is deployed and accessible at **[geospark.terrascout.app](https://geospark.terrascout.app/docs)** — 58 endpoints with interactive Swagger documentation.
 
 ## Author
 

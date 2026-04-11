@@ -13,6 +13,8 @@
       <a href="/">Home</a>
       <a href="/playground">Playground</a>
       <a href="/agents">Agents</a>
+      <a href="/memory">Memory</a>
+      <a href="/context">Context</a>
       <a href="/data">Data</a>
       <a href="/status">Status</a>
       <a href="/docs">API Docs</a>
@@ -23,17 +25,55 @@
   <div class="container">
     <div class="page-header">
       <h1>Autonomous Agents</h1>
-      <p>Give a goal, get a complete spatial analysis. No manual step-by-step.</p>
+      <p>Give a goal, get a complete spatial analysis. The coordinator routes it to the right specialist automatically &mdash; or pick one yourself below.</p>
     </div>
 
     <div class="tabs">
-      <button class="tab active" data-tab="tab-geoagent">GeoAgent</button>
+      <button class="tab active" data-tab="tab-coordinator">Coordinator</button>
+      <button class="tab" data-tab="tab-geoagent">GeoAgent</button>
       <button class="tab" data-tab="tab-report">Spatial Report</button>
       <button class="tab" data-tab="tab-site">Site Selector</button>
     </div>
 
+    <!-- Coordinator -->
+    <div class="tab-panel" id="tab-coordinator">
+      <div class="card">
+        <div class="card-header"><div class="card-icon agent">&#129504;</div><h3>Multi-Agent Coordinator</h3></div>
+        <p class="text-sm text-muted mb-2">
+          One input, intelligent routing. The coordinator classifies your goal, picks the best specialist (GeoAgent, Spatial Report, or Site Selector), and dispatches automatically. Shows you the classification reasoning along the way.
+        </p>
+        <div class="presets mb-2">
+          <button class="btn btn-sm btn-secondary" onclick="$('#coord-goal').value='Find the best location for a cafe in Melbourne CBD near schools'">Best cafe location</button>
+          <button class="btn btn-sm btn-secondary" onclick="$('#coord-goal').value='Analyze Federation Square, Melbourne'">Analyze location</button>
+          <button class="btn btn-sm btn-secondary" onclick="$('#coord-goal').value='Find all hospitals within 2km of the Eiffel Tower'">Nearby hospitals</button>
+        </div>
+        <div class="form-group">
+          <label>Goal</label>
+          <input type="text" id="coord-goal" placeholder="What do you want to know about a place?" value="Find the best location for a cafe in Melbourne CBD near schools">
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center">
+          <button class="btn btn-primary" onclick="runCoordinator(false)">Run</button>
+          <button class="btn btn-secondary" onclick="classifyOnly()">Classify only</button>
+          <label class="text-sm text-muted" style="margin-left:auto;display:flex;align-items:center;gap:0.4rem">
+            <input type="checkbox" id="coord-stream"> Streaming progress
+          </label>
+        </div>
+        <div id="coord-classification" class="hidden mt-2"></div>
+        <div id="coord-timeline" class="hidden mt-2"></div>
+        <div id="coord-result" class="result-box hidden"></div>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card-header"><div class="card-icon status">&#128203;</div><h3>Registered Specialists</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Agents currently available to the coordinator. Each advertises its capabilities and keywords for intent matching.
+        </p>
+        <div id="agent-cards-list">Loading...</div>
+      </div>
+    </div>
+
     <!-- GeoAgent -->
-    <div class="tab-panel" id="tab-geoagent">
+    <div class="tab-panel hidden" id="tab-geoagent">
       <div class="card">
         <div class="card-header"><div class="card-icon agent">&#129302;</div><h3>GeoAgent</h3></div>
         <p class="text-sm text-muted mb-2">
@@ -107,6 +147,150 @@
   <script src="/assets/app.js"></script>
   <script>
     initTabs($('.container'));
+
+    /* --- Coordinator --- */
+    async function loadAgentCards() {
+      const el = $('#agent-cards-list');
+      try {
+        const data = await geo.get('/api/v1/agent/list');
+        if (!data.agents?.length) {
+          el.innerHTML = '<p class="text-sm text-muted">No agents registered.</p>';
+          return;
+        }
+        let html = '<div class="grid grid-3" style="gap:0.75rem">';
+        data.agents.forEach(a => {
+          html += `<div class="result-card">
+            <div class="metric"><span class="label">${escapeHtml(a.name)}</span></div>
+            <div class="text-sm text-muted mt-1" style="white-space:normal">${escapeHtml(a.description || 'Specialist agent')}</div>
+            ${a.capabilities?.length ? `<div class="text-sm mt-1"><strong>Capabilities:</strong> ${a.capabilities.map(c => escapeHtml(c)).join(', ')}</div>` : ''}
+            ${a.keywords?.length ? `<div class="text-sm mt-1" style="color:var(--color-text-secondary)"><em>Keywords:</em> ${a.keywords.slice(0,6).map(k => escapeHtml(k)).join(', ')}</div>` : ''}
+          </div>`;
+        });
+        html += '</div>';
+        el.innerHTML = html;
+      } catch (e) {
+        el.innerHTML = `<p class="text-sm" style="color:var(--color-error)">Failed to load agents: ${escapeHtml(e.message)}</p>`;
+      }
+    }
+    loadAgentCards();
+
+    function renderClassification(cls) {
+      if (!cls) return '';
+      const agent = cls.matched_agent || 'none';
+      const score = (cls.score || 0).toFixed(2);
+      let html = `<div class="result-card">
+        <div class="metric"><span class="label">Routed to</span><span class="value">${escapeHtml(agent)}</span></div>
+        <div class="metric"><span class="label">Score</span><span class="value">${score}</span></div>
+        <div class="metric"><span class="label">Reason</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(cls.reason || '')}</span></div>
+      </div>`;
+      if (cls.candidates?.length) {
+        html += '<div class="text-sm text-muted mt-1">Other candidates: ' +
+          cls.candidates.map(([n, s]) => `${escapeHtml(n)} (${s.toFixed(2)})`).join(', ') +
+          '</div>';
+      }
+      return html;
+    }
+
+    async function classifyOnly() {
+      const goal = $('#coord-goal').value;
+      const classEl = $('#coord-classification');
+      const resEl = $('#coord-result');
+      const timelineEl = $('#coord-timeline');
+      resEl.classList.add('hidden');
+      timelineEl.classList.add('hidden');
+      classEl.innerHTML = '<div class="loading-overlay"><span class="spinner"></span>Classifying...</div>';
+      classEl.classList.remove('hidden');
+      try {
+        const cls = await geo.post('/api/v1/agent/classify', { goal });
+        classEl.innerHTML = renderClassification(cls);
+      } catch (e) {
+        classEl.innerHTML = `<p class="text-sm" style="color:var(--color-error)">Error: ${escapeHtml(e.message)}</p>`;
+      }
+    }
+
+    async function runCoordinator() {
+      const goal = $('#coord-goal').value;
+      const streaming = $('#coord-stream').checked;
+      const classEl = $('#coord-classification');
+      const timelineEl = $('#coord-timeline');
+      const resEl = $('#coord-result');
+
+      classEl.classList.add('hidden');
+      timelineEl.classList.add('hidden');
+      showLoading(resEl, streaming ? 'Streaming progress...' : 'Routing and running... (may take 30-60 seconds)');
+
+      try {
+        // Always classify first so we can show the routing decision
+        const cls = await geo.post('/api/v1/agent/classify', { goal });
+        classEl.innerHTML = renderClassification(cls);
+        classEl.classList.remove('hidden');
+
+        if (streaming) {
+          // Build a synthetic timeline from classify -> dispatch -> agent_start -> agent_done -> complete.
+          // (Server-sent stream would be ideal; for now we fake progressive display with POST then render.)
+          timelineEl.innerHTML = '<div class="timeline">' +
+            `<div class="timeline-step"><div class="step-action">classify</div><div class="step-desc">Classifying goal</div></div>` +
+            `<div class="timeline-step"><div class="step-action">dispatch</div><div class="step-desc">Routing to ${escapeHtml(cls.matched_agent || 'none')} (score ${(cls.score || 0).toFixed(2)})</div></div>` +
+            `<div class="timeline-step"><div class="step-action">agent_start</div><div class="step-desc">Invoking ${escapeHtml(cls.matched_agent || 'none')}</div></div>` +
+            '</div>';
+          timelineEl.classList.remove('hidden');
+        }
+
+        // Actually run the coordinator
+        const data = await geo.post('/api/v1/agent/coordinate', { goal });
+
+        if (streaming) {
+          timelineEl.innerHTML = '<div class="timeline">' +
+            `<div class="timeline-step"><div class="step-action">classify</div><div class="step-desc">Done</div></div>` +
+            `<div class="timeline-step"><div class="step-action">dispatch</div><div class="step-desc">Routed to ${escapeHtml(cls.matched_agent || 'none')} (score ${(cls.score || 0).toFixed(2)})</div></div>` +
+            `<div class="timeline-step"><div class="step-action">agent_start</div><div class="step-desc">${escapeHtml(data.agent_used || '?')} running</div></div>` +
+            `<div class="timeline-step"><div class="step-action">agent_done</div><div class="step-desc">Response received in ${data.duration_s || '?'}s</div></div>` +
+            `<div class="timeline-step"><div class="step-action">complete</div><div class="step-desc">Done</div></div>` +
+            '</div>';
+        }
+
+        // Final result panel
+        let html = '';
+        if (data.error) {
+          html += `<div class="result-card"><div class="metric"><span class="label">Error</span><span class="value" style="color:var(--color-error);white-space:normal">${escapeHtml(data.error)}</span></div></div>`;
+        } else {
+          html += `<div class="result-card">
+            <div class="metric"><span class="label">Specialist</span><span class="value">${escapeHtml(data.agent_used || '—')}</span></div>
+            <div class="metric"><span class="label">Duration</span><span class="value">${data.duration_s || '?'}s</span></div>
+          </div>`;
+          if (data.summary) {
+            html += `<div class="result-card mt-1"><div class="metric"><span class="label">Summary</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(data.summary)}</span></div></div>`;
+          }
+          // Inline the specialist-specific response metadata if present
+          if (data.response && Object.keys(data.response).length) {
+            const resp = data.response;
+            if (resp.candidates?.length) {
+              html += `<div class="mt-1"><strong class="text-sm">Top candidates</strong></div>`;
+              resp.candidates.slice(0, 5).forEach((c, i) => {
+                html += resultCard([[`#${i+1}`, c.name || '—'], ['Score', c.score?.toFixed(2) || '—']]);
+              });
+            }
+            if (resp.address) {
+              html += resultCard([['Address', resp.address], ['Coordinates', (resp.coordinates || []).map(x => x?.toFixed?.(4)).join(', ')]]);
+            }
+            if (resp.steps?.length) {
+              html += '<div class="mt-1"><strong class="text-sm">Execution steps</strong></div>';
+              html += '<div class="timeline">';
+              resp.steps.forEach(s => {
+                const cls = s.error ? 'error' : '';
+                html += `<div class="timeline-step ${cls}"><div class="step-action">${escapeHtml(s.action || '')}</div><div class="step-desc">${escapeHtml(s.description || '')}</div></div>`;
+              });
+              html += '</div>';
+            }
+          }
+        }
+        html += jsonToggle(data, 'coord-json');
+        resEl.innerHTML = html;
+        resEl.classList.remove('hidden', 'error');
+      } catch (e) {
+        showError(resEl, e.message);
+      }
+    }
 
     /* --- GeoAgent --- */
     async function runAgent() {

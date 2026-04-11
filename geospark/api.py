@@ -108,6 +108,16 @@ async def ui_status():
     return _serve_page("status.html")
 
 
+@app.get("/memory", response_class=HTMLResponse, include_in_schema=False)
+async def ui_memory():
+    return _serve_page("memory.html")
+
+
+@app.get("/context", response_class=HTMLResponse, include_in_schema=False)
+async def ui_context():
+    return _serve_page("context.html")
+
+
 # --- LLM Gateway Router ---
 from geospark.llm_gateway import router as llm_router  # noqa: E402
 

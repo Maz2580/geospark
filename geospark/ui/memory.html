@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory &mdash; GeoSpark</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body class="dark">
+  <nav class="nav">
+    <span class="nav-brand">GeoSpark</span>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/playground">Playground</a>
+      <a href="/agents">Agents</a>
+      <a href="/memory">Memory</a>
+      <a href="/context">Context</a>
+      <a href="/data">Data</a>
+      <a href="/status">Status</a>
+      <a href="/docs">API Docs</a>
+    </div>
+    <span class="nav-version"></span>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Spatial Intelligence Memory</h1>
+      <p>Persistent dual memory: time-agnostic facts + timestamped episodes, with automatic contradiction detection and vector-based recall.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="tab-recall">Recall</button>
+      <button class="tab" data-tab="tab-add">Add</button>
+      <button class="tab" data-tab="tab-contradictions">Contradictions</button>
+      <button class="tab" data-tab="tab-stats">Stats</button>
+    </div>
+
+    <!-- Recall -->
+    <div class="tab-panel" id="tab-recall">
+      <div class="card">
+        <div class="card-header"><div class="card-icon geo">&#128269;</div><h3>Recall Memories</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Retrieve stored facts and episodes ranked by semantic similarity, recency, and importance.
+        </p>
+        <div class="form-group">
+          <label>Query</label>
+          <input type="text" id="recall-query" placeholder="flood risk Melbourne" value="Paris">
+        </div>
+        <div class="grid grid-2" style="gap:0.75rem">
+          <div class="form-group">
+            <label>Type filter</label>
+            <select id="recall-type">
+              <option value="">Both</option>
+              <option value="fact">Facts only</option>
+              <option value="episode">Episodes only</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Limit</label>
+            <input type="number" id="recall-limit" value="10" min="1" max="50">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="runRecall()">Recall</button>
+        <div id="recall-result" class="result-box hidden"></div>
+      </div>
+    </div>
+
+    <!-- Add -->
+    <div class="tab-panel hidden" id="tab-add">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-icon geo">&#128204;</div><h3>Add a Fact</h3></div>
+          <p class="text-sm text-muted mb-2">
+            Time-agnostic spatial knowledge ("Eiffel Tower is at 48.86 N, 2.29 E").
+          </p>
+          <div class="form-group">
+            <label>Content</label>
+            <input type="text" id="fact-content" placeholder="Eiffel Tower is at 48.8584 N, 2.2945 E">
+          </div>
+          <div class="grid grid-2" style="gap:0.75rem">
+            <div class="form-group">
+              <label>Source</label>
+              <input type="text" id="fact-source" placeholder="user" value="user">
+            </div>
+            <div class="form-group">
+              <label>Confidence</label>
+              <input type="number" id="fact-confidence" value="1.0" step="0.1" min="0" max="1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Tags (comma-separated)</label>
+            <input type="text" id="fact-tags" placeholder="landmark, paris">
+          </div>
+          <button class="btn btn-primary" onclick="addFact()">Save Fact</button>
+          <div id="fact-result" class="result-box hidden"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-icon data">&#128197;</div><h3>Add an Episode</h3></div>
+          <p class="text-sm text-muted mb-2">
+            Timestamped observation ("PM2.5 was 120 in Delhi today"). Higher importance = longer retention.
+          </p>
+          <div class="form-group">
+            <label>Content</label>
+            <input type="text" id="ep-content" placeholder="PM2.5 was 120 ug/m3 in Delhi">
+          </div>
+          <div class="grid grid-2" style="gap:0.75rem">
+            <div class="form-group">
+              <label>Source</label>
+              <input type="text" id="ep-source" placeholder="tool:air_quality" value="user">
+            </div>
+            <div class="form-group">
+              <label>Importance</label>
+              <input type="number" id="ep-importance" value="0.5" step="0.1" min="0" max="1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Tags (comma-separated)</label>
+            <input type="text" id="ep-tags" placeholder="air_quality, delhi">
+          </div>
+          <button class="btn btn-primary" onclick="addEpisode()">Save Episode</button>
+          <div id="ep-result" class="result-box hidden"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contradictions -->
+    <div class="tab-panel hidden" id="tab-contradictions">
+      <div class="card">
+        <div class="card-header"><div class="card-icon agent">&#9888;</div><h3>Contradiction Detection</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Finds pairs of facts that are highly similar but claim different things &mdash; likely conflicting information about the same entity.
+        </p>
+        <button class="btn btn-primary" onclick="findContradictions()">Scan for contradictions</button>
+        <div id="contradictions-result" class="result-box hidden"></div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="tab-panel hidden" id="tab-stats">
+      <div class="card">
+        <div class="card-header"><div class="card-icon status">&#128202;</div><h3>Memory Statistics</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Current state of the spatial intelligence store. FAISS accelerates vector search when installed.
+        </p>
+        <button class="btn btn-primary" onclick="loadStats()">Refresh stats</button>
+        <div id="stats-result" class="result-box hidden"></div>
+
+        <div class="mt-2">
+          <strong class="text-sm">Memory compaction</strong>
+          <p class="text-sm text-muted">
+            Deactivates old low-importance episodes to keep the store lean. Facts are always preserved.
+          </p>
+          <button class="btn btn-secondary" onclick="runCompact()">Run compact</button>
+          <div id="compact-result" class="result-box hidden"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    initTabs($('.container'));
+
+    /* --- Recall --- */
+    async function runRecall() {
+      const el = $('#recall-result');
+      showLoading(el, 'Searching memory...');
+      try {
+        const body = {
+          query: $('#recall-query').value,
+          limit: parseInt($('#recall-limit').value || '10'),
+        };
+        const type = $('#recall-type').value;
+        if (type) body.memory_type = type;
+        const data = await geo.post('/api/v1/memory/recall', body);
+
+        if (!data.results?.length) {
+          el.innerHTML = '<p class="text-sm text-muted">No matching memories.</p>';
+          el.classList.remove('hidden', 'error');
+          return;
+        }
+
+        let html = `<p class="text-sm text-muted">${data.count} result(s) for &ldquo;${escapeHtml(data.query)}&rdquo;</p>`;
+        data.results.forEach(r => {
+          const typeBadge = r.type === 'fact' ? 'fact' : 'episode';
+          const scoreStr = (r.score ?? 0).toFixed(3);
+          const extras = [];
+          if (r.source) extras.push(`source: ${r.source}`);
+          if (r.type === 'episode' && r.importance != null) extras.push(`importance: ${r.importance}`);
+          if (r.type === 'fact' && r.confidence != null) extras.push(`confidence: ${r.confidence}`);
+          if (r.tags?.length) extras.push(`tags: ${r.tags.join(', ')}`);
+          html += `<div class="result-card">
+            <div class="metric"><span class="label">${typeBadge}</span><span class="value">score ${scoreStr}</span></div>
+            <div class="metric"><span class="label">&nbsp;</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(r.content || '')}</span></div>
+            ${extras.length ? `<div class="text-sm text-muted">${escapeHtml(extras.join(' &middot; '))}</div>` : ''}
+          </div>`;
+        });
+        html += jsonToggle(data, 'recall-json');
+        el.innerHTML = html;
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+
+    /* --- Add Fact --- */
+    async function addFact() {
+      const el = $('#fact-result');
+      showLoading(el, 'Saving fact...');
+      try {
+        const body = {
+          content: $('#fact-content').value,
+          source: $('#fact-source').value || '',
+          confidence: parseFloat($('#fact-confidence').value || '1.0'),
+          tags: $('#fact-tags').value.split(',').map(s => s.trim()).filter(Boolean),
+        };
+        const data = await geo.post('/api/v1/memory/fact', body);
+        el.innerHTML = `<p class="text-sm"><strong>Saved.</strong> ID: ${escapeHtml(data.id)}</p>` + jsonToggle(data, 'fact-json');
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+
+    /* --- Add Episode --- */
+    async function addEpisode() {
+      const el = $('#ep-result');
+      showLoading(el, 'Saving episode...');
+      try {
+        const body = {
+          content: $('#ep-content').value,
+          source: $('#ep-source').value || '',
+          importance: parseFloat($('#ep-importance').value || '0.5'),
+          tags: $('#ep-tags').value.split(',').map(s => s.trim()).filter(Boolean),
+        };
+        const data = await geo.post('/api/v1/memory/episode', body);
+        el.innerHTML = `<p class="text-sm"><strong>Saved.</strong> ID: ${escapeHtml(data.id)}</p>` + jsonToggle(data, 'ep-json');
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+
+    /* --- Contradictions --- */
+    async function findContradictions() {
+      const el = $('#contradictions-result');
+      showLoading(el, 'Scanning for contradictions...');
+      try {
+        const data = await geo.get('/api/v1/memory/contradictions');
+        if (!data.count) {
+          el.innerHTML = '<p class="text-sm" style="color:var(--color-primary)">No contradictions found.</p>';
+          el.classList.remove('hidden', 'error');
+          return;
+        }
+        let html = `<p class="text-sm text-muted">${data.count} conflict(s) detected</p>`;
+        data.contradictions.forEach(c => {
+          html += `<div class="result-card">
+            <div class="metric"><span class="label">Fact A</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(c.fact_a_content)}</span></div>
+            <div class="metric"><span class="label">Fact B</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(c.fact_b_content)}</span></div>
+            <div class="metric"><span class="label">Similarity</span><span class="value">${(c.similarity || 0).toFixed(3)}</span></div>
+          </div>`;
+        });
+        html += jsonToggle(data, 'contr-json');
+        el.innerHTML = html;
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+
+    /* --- Stats --- */
+    async function loadStats() {
+      const el = $('#stats-result');
+      showLoading(el, 'Loading stats...');
+      try {
+        const data = await geo.get('/api/v1/memory/stats');
+        const faissStatus = data.faiss_available
+          ? (data.using_faiss ? 'yes (active)' : 'yes (available, idle)')
+          : 'no (numpy fallback)';
+        el.innerHTML = resultCard([
+          ['Active facts', data.active_facts],
+          ['Total facts', data.total_facts],
+          ['Active episodes', data.active_episodes],
+          ['Total episodes', data.total_episodes],
+          ['Connections', data.total_connections],
+          ['Contradictions', data.contradictions_found],
+          ['Vector store size', data.vector_store_count],
+          ['FAISS', faissStatus],
+        ]);
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+    loadStats();
+
+    /* --- Compact --- */
+    async function runCompact() {
+      const el = $('#compact-result');
+      showLoading(el, 'Compacting...');
+      try {
+        const data = await geo.post('/api/v1/memory/compact', {});
+        el.innerHTML = resultCard([
+          ['Compacted', data.compacted],
+          ['Kept', data.kept],
+          ['Facts preserved', data.facts_preserved],
+        ]);
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+  </script>
+</body>
+</html>

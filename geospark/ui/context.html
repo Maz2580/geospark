@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Context &mdash; GeoSpark</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body class="dark">
+  <nav class="nav">
+    <span class="nav-brand">GeoSpark</span>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/playground">Playground</a>
+      <a href="/agents">Agents</a>
+      <a href="/memory">Memory</a>
+      <a href="/context">Context</a>
+      <a href="/data">Data</a>
+      <a href="/status">Status</a>
+      <a href="/docs">API Docs</a>
+    </div>
+    <span class="nav-version"></span>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Geospatial Context Database</h1>
+      <p>Hierarchical storage for missions, datasets, and analysis history. Tiered L0/L1/L2 loading minimizes LLM prompt tokens &mdash; abstracts for planning, full data on demand.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="tab-browse">Browse</button>
+      <button class="tab" data-tab="tab-query">Query</button>
+      <button class="tab" data-tab="tab-save">Save</button>
+      <button class="tab" data-tab="tab-ctx-stats">Stats</button>
+    </div>
+
+    <!-- Browse -->
+    <div class="tab-panel" id="tab-browse">
+      <div class="card">
+        <div class="card-header"><div class="card-icon geo">&#128193;</div><h3>Browse Contexts</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Filesystem-like hierarchy. Each context has a URI like <code>geospark://missions/melbourne_flood/analysis/2026-04</code>.
+        </p>
+        <div class="grid grid-2" style="gap:0.75rem">
+          <div class="form-group">
+            <label>Category filter</label>
+            <select id="browse-category">
+              <option value="">All categories</option>
+              <option value="missions">missions</option>
+              <option value="datasets">datasets</option>
+              <option value="analysis_history">analysis_history</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:0.4rem;margin-top:1.5rem">
+              <input type="checkbox" id="browse-archived"> Include archived
+            </label>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="browseContexts()">Refresh</button>
+        <div id="browse-result" class="result-box hidden"></div>
+      </div>
+
+      <div class="card mt-2 hidden" id="show-card">
+        <div class="card-header"><div class="card-icon data">&#128196;</div><h3 id="show-title">Context Detail</h3></div>
+        <div class="tabs">
+          <button class="tab active" data-tab="tab-L0">L0 (Abstract)</button>
+          <button class="tab" data-tab="tab-L1">L1 (Overview)</button>
+          <button class="tab" data-tab="tab-L2">L2 (Full data)</button>
+        </div>
+        <div class="tab-panel" id="tab-L0"><div id="show-l0" class="result-box"></div></div>
+        <div class="tab-panel hidden" id="tab-L1"><div id="show-l1" class="result-box"></div></div>
+        <div class="tab-panel hidden" id="tab-L2"><div id="show-l2" class="result-box"></div></div>
+      </div>
+    </div>
+
+    <!-- Query -->
+    <div class="tab-panel hidden" id="tab-query">
+      <div class="card">
+        <div class="card-header"><div class="card-icon geo">&#128269;</div><h3>Hierarchical Retrieval</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Scoring combines semantic similarity, hotness (frequency + recency), and recursive parent-child score propagation.
+        </p>
+        <div class="form-group">
+          <label>Text query</label>
+          <input type="text" id="query-text" placeholder="flood melbourne" value="flood melbourne">
+        </div>
+        <div class="form-group">
+          <label>Bounding box (min_lon, min_lat, max_lon, max_lat) &mdash; optional</label>
+          <input type="text" id="query-bbox" placeholder="144.0, -38.0, 146.0, -37.0">
+        </div>
+        <div class="grid grid-2" style="gap:0.75rem">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="query-category">
+              <option value="">All</option>
+              <option value="missions">missions</option>
+              <option value="datasets">datasets</option>
+              <option value="analysis_history">analysis_history</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Limit</label>
+            <input type="number" id="query-limit" value="10" min="1" max="50">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="queryContexts()">Query</button>
+        <div id="query-result" class="result-box hidden"></div>
+      </div>
+    </div>
+
+    <!-- Save -->
+    <div class="tab-panel hidden" id="tab-save">
+      <div class="card">
+        <div class="card-header"><div class="card-icon agent">&#128190;</div><h3>Save Context</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Create a new context with tiered content. The URI path controls where it lives in the hierarchy.
+        </p>
+        <div class="grid grid-2" style="gap:0.75rem">
+          <div class="form-group">
+            <label>URI</label>
+            <input type="text" id="save-uri" placeholder="geospark://missions/example" value="geospark://missions/example">
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <input type="text" id="save-category" placeholder="missions" value="missions">
+          </div>
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="save-name" placeholder="Example Mission" value="Example Mission">
+          </div>
+          <div class="form-group">
+            <label>Parent URI (optional)</label>
+            <input type="text" id="save-parent" placeholder="geospark://missions/parent">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Abstract (L0 &mdash; shown in LLM prompts)</label>
+          <input type="text" id="save-abstract" placeholder="Short 1-2 sentence summary" value="Example mission context">
+        </div>
+        <div class="form-group">
+          <label>Bounds WGS84 (min_lon, min_lat, max_lon, max_lat) &mdash; optional</label>
+          <input type="text" id="save-bbox" placeholder="144.0, -38.0, 146.0, -37.0">
+        </div>
+        <div class="form-group">
+          <label>Tags (comma-separated)</label>
+          <input type="text" id="save-tags" placeholder="flood, melbourne">
+        </div>
+        <button class="btn btn-primary" onclick="saveContext()">Save Context</button>
+        <div id="save-result" class="result-box hidden"></div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="tab-panel hidden" id="tab-ctx-stats">
+      <div class="card">
+        <div class="card-header"><div class="card-icon status">&#128293;</div><h3>Context Statistics</h3></div>
+        <p class="text-sm text-muted mb-2">
+          Hottest contexts bubble to the top of retrieval. Cold ones become candidates for archival.
+        </p>
+        <button class="btn btn-primary" onclick="loadCtxStats()">Refresh</button>
+        <div id="ctx-stats-result" class="result-box hidden"></div>
+
+        <div class="mt-2">
+          <strong class="text-sm">Archive cold contexts</strong>
+          <p class="text-sm text-muted">
+            Move contexts with hotness below the threshold to <code>_archive/</code>, preserving them but excluding from default retrieval.
+          </p>
+          <div class="form-group">
+            <label>Threshold</label>
+            <input type="number" id="archive-threshold" value="0.1" step="0.05" min="0" max="1">
+          </div>
+          <button class="btn btn-secondary" onclick="archiveCold()">Archive cold</button>
+          <div id="archive-result" class="result-box hidden"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    initTabs($('.container'));
+
+    /* --- Browse --- */
+    async function browseContexts() {
+      const el = $('#browse-result');
+      const showCard = $('#show-card');
+      showCard.classList.add('hidden');
+      showLoading(el, 'Loading contexts...');
+      try {
+        const params = new URLSearchParams();
+        const cat = $('#browse-category').value;
+        if (cat) params.set('category', cat);
+        if ($('#browse-archived').checked) params.set('include_archived', 'true');
+        const data = await geo.get('/api/v1/context/list?' + params.toString());
+
+        if (!data.count) {
+          el.innerHTML = '<p class="text-sm text-muted">No contexts stored.</p>';
+          el.classList.remove('hidden', 'error');
+          return;
+        }
+
+        let html = `<p class="text-sm text-muted">${data.count} context(s)</p>`;
+        data.contexts.forEach(c => {
+          const archivedBadge = c.is_archived ? ' &middot; <em>archived</em>' : '';
+          html += `<div class="result-card" style="cursor:pointer" onclick="showContext('${escapeHtml(c.uri)}')">
+            <div class="metric"><span class="label">URI</span><span class="value" style="font-family:var(--font-mono, monospace)">${escapeHtml(c.uri)}</span></div>
+            <div class="metric"><span class="label">${escapeHtml(c.name)}</span><span class="value">accesses: ${c.access_count}${archivedBadge}</span></div>
+            ${c.abstract ? `<div class="text-sm text-muted" style="white-space:normal">${escapeHtml(c.abstract)}</div>` : ''}
+          </div>`;
+        });
+        html += '<p class="text-sm text-muted mt-1">Click a card to view L0/L1/L2 content.</p>';
+        html += jsonToggle(data, 'browse-json');
+        el.innerHTML = html;
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+
+    async function showContext(uri) {
+      const card = $('#show-card');
+      $('#show-title').textContent = uri;
+      card.classList.remove('hidden');
+      for (const [tier, elId] of [['L0', '#show-l0'], ['L1', '#show-l1'], ['L2', '#show-l2']]) {
+        const el = $(elId);
+        el.innerHTML = '<span class="spinner"></span> Loading...';
+        try {
+          const data = await geo.get(`/api/v1/context/load?uri=${encodeURIComponent(uri)}&tier=${tier}`);
+          if (tier === 'L0') {
+            el.innerHTML = `<p style="white-space:normal">${escapeHtml(data.content || '(empty)')}</p>`;
+          } else {
+            const content = data.content;
+            if (!content || Object.keys(content).length === 0) {
+              el.innerHTML = '<p class="text-sm text-muted">(empty)</p>';
+            } else {
+              const rows = Object.entries(content).map(([k, v]) => {
+                const vStr = typeof v === 'object' ? JSON.stringify(v) : String(v);
+                return [k, vStr.length > 200 ? vStr.slice(0, 200) + '...' : vStr];
+              });
+              el.innerHTML = resultCard(rows);
+            }
+          }
+        } catch (e) {
+          el.innerHTML = `<p style="color:var(--color-error)">Error: ${escapeHtml(e.message)}</p>`;
+        }
+      }
+      // Initialize inner tabs
+      initTabs(card);
+    }
+
+    /* --- Query --- */
+    async function queryContexts() {
+      const el = $('#query-result');
+      showLoading(el, 'Querying...');
+      try {
+        const body = {
+          query: $('#query-text').value,
+          limit: parseInt($('#query-limit').value || '10'),
+          tier: 'L0',
+        };
+        const bboxStr = $('#query-bbox').value.trim();
+        if (bboxStr) {
+          body.bbox = bboxStr.split(',').map(s => parseFloat(s.trim()));
+        }
+        const cat = $('#query-category').value;
+        if (cat) body.category = cat;
+
+        const data = await geo.post('/api/v1/context/query', body);
+
+        if (!data.results?.length) {
+          el.innerHTML = '<p class="text-sm text-muted">No results.</p>';
+          el.classList.remove('hidden', 'error');
+          return;
+        }
+
+        const stats = data.stats || {};
+        let html = `<p class="text-sm text-muted">${data.results.length} result(s) &middot; ${stats.total_candidates || '?'} candidates, ${stats.filtered_by_bbox || 0} filtered by bbox, ${stats.convergence_rounds || 0} convergence round(s)</p>`;
+        data.results.forEach((r, i) => {
+          html += `<div class="result-card">
+            <div class="metric"><span class="label">#${i+1}</span><span class="value" style="font-family:var(--font-mono, monospace)">${escapeHtml(r.uri)}</span></div>
+            <div class="metric"><span class="label">${escapeHtml(r.name || '')}</span><span class="value">score ${(r.score || 0).toFixed(3)}</span></div>
+            <div class="text-sm text-muted">
+              semantic: ${(r.semantic_score || 0).toFixed(3)} &middot;
+              hotness: ${(r.hotness_score || 0).toFixed(3)} &middot;
+              parent: ${(r.parent_score || 0).toFixed(3)} &middot;
+              accesses: ${r.access_count}
+            </div>
+            ${r.abstract ? `<div class="text-sm text-muted" style="white-space:normal">${escapeHtml(r.abstract)}</div>` : ''}
+          </div>`;
+        });
+        html += jsonToggle(data, 'query-json');
+        el.innerHTML = html;
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+
+    /* --- Save --- */
+    async function saveContext() {
+      const el = $('#save-result');
+      showLoading(el, 'Saving...');
+      try {
+        const body = {
+          uri: $('#save-uri').value,
+          category: $('#save-category').value,
+          name: $('#save-name').value,
+          abstract: $('#save-abstract').value,
+        };
+        const parent = $('#save-parent').value.trim();
+        if (parent) body.parent_uri = parent;
+        const bboxStr = $('#save-bbox').value.trim();
+        if (bboxStr) body.bounds_wgs84 = bboxStr.split(',').map(s => parseFloat(s.trim()));
+        const tags = $('#save-tags').value.split(',').map(s => s.trim()).filter(Boolean);
+        if (tags.length) body.tags = tags;
+
+        const data = await geo.post('/api/v1/context/save', body);
+        el.innerHTML = `<p class="text-sm"><strong>Saved:</strong> ${escapeHtml(data.uri)}</p>` + jsonToggle(data, 'save-json');
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+
+    /* --- Stats --- */
+    async function loadCtxStats() {
+      const el = $('#ctx-stats-result');
+      showLoading(el, 'Loading stats...');
+      try {
+        const data = await geo.get('/api/v1/context/stats');
+        let html = resultCard([
+          ['Total contexts', data.total_contexts],
+          ['Archived', data.archived],
+          ['Categories', data.categories?.length ? data.categories.join(', ') : '(none)'],
+        ]);
+        if (data.hottest?.length) {
+          html += '<div class="mt-1"><strong class="text-sm">Hottest Contexts</strong></div>';
+          data.hottest.forEach((h, i) => {
+            html += resultCard([
+              [`#${i+1}`, h.uri],
+              ['Score', (h.score || 0).toFixed(3)],
+              ['Access count', h.access_count],
+              ['Age (days)', (h.age_days || 0).toFixed(1)],
+            ]);
+          });
+        }
+        html += jsonToggle(data, 'ctx-stats-json');
+        el.innerHTML = html;
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+    loadCtxStats();
+
+    /* --- Archive --- */
+    async function archiveCold() {
+      const el = $('#archive-result');
+      const threshold = parseFloat($('#archive-threshold').value || '0.1');
+      showLoading(el, 'Archiving cold contexts...');
+      try {
+        const data = await geo.post(`/api/v1/context/archive-cold?threshold=${threshold}`, {});
+        if (!data.count) {
+          el.innerHTML = '<p class="text-sm text-muted">No cold contexts to archive at this threshold.</p>';
+        } else {
+          let html = `<p class="text-sm"><strong>Archived ${data.count}:</strong></p><ul class="text-sm text-muted">`;
+          data.archived.forEach(uri => {
+            html += `<li>${escapeHtml(uri)}</li>`;
+          });
+          html += '</ul>';
+          el.innerHTML = html;
+        }
+        el.classList.remove('hidden', 'error');
+      } catch (e) { showError(el, e.message); }
+    }
+  </script>
+</body>
+</html>

@@ -15,8 +15,8 @@ WORKDIR /build
 COPY pyproject.toml README.md ./
 COPY geospark/ geospark/
 
-# Install only what the API needs: core + api deps (no geo/viz/satellite/postgis)
-RUN pip install --no-cache-dir --prefix=/install ".[api]"
+# Install core + api + intelligence deps (FAISS for vector search acceleration)
+RUN pip install --no-cache-dir --prefix=/install ".[api,intelligence]"
 
 # Stage 2: Runtime
 FROM python:3.11-slim

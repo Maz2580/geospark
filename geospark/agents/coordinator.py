@@ -23,11 +23,11 @@ from geospark.agents.messaging import AgentCard, AgentRegistry, MessageHub, Msg
 # Rule-based intent patterns: each agent advertises keywords, but we also
 # use structural patterns for common query shapes.
 _SITE_SELECT_PATTERNS = [
-    r"\bbest\s+(?:location|place|spot)\b",
+    r"\bbest\s+(?:\w+\s+)*(?:location|place|spot|site)\b",  # "best cafe spot", "best location"
     r"\bwhere\s+(?:to|should)\s+(?:put|place|open|build)\b",
     r"\bsite\s+(?:select|selection)\b",
-    r"\boptimal\s+(?:location|site|spot)\b",
-    r"\bfind\s+(?:the\s+)?(?:best|ideal)\s+(?:location|place)\b",
+    r"\boptimal\s+(?:\w+\s+)*(?:location|site|spot|place)\b",  # "optimal restaurant location"
+    r"\bfind\s+(?:the\s+)?(?:best|ideal)\s+(?:\w+\s+)*(?:location|place|spot|site)\b",
 ]
 _REPORT_PATTERNS = [
     r"\banalyze\s+(?:this\s+)?(?:location|place|area)\b",

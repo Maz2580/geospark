@@ -2,13 +2,15 @@
 Channel registry — lazy-loaded, auto-discovery for data channels.
 
 Similar to the tool registry pattern but for live data sources.
+Includes transparent LRU+TTL caching to avoid redundant API calls.
 """
 
 from __future__ import annotations
 
 from typing import Any
 
-from geospark.data_channels.base import BaseChannel, ChannelStatus
+from geospark.data_channels.base import BaseChannel, ChannelResult, ChannelStatus
+from geospark.data_channels.cache import ChannelCache
 
 # Registry of available channels: name → import path
 CHANNEL_CLASSES: dict[str, str] = {
@@ -19,10 +21,11 @@ CHANNEL_CLASSES: dict[str, str] = {
 
 
 class ChannelRegistry:
-    """Manages available data channels with lazy loading."""
+    """Manages available data channels with lazy loading and result caching."""
 
-    def __init__(self) -> None:
+    def __init__(self, cache: ChannelCache | None = None) -> None:
         self._channels: dict[str, BaseChannel] = {}
+        self._cache = cache or ChannelCache()
 
     def load_channel(self, name: str) -> BaseChannel:
         """Load a channel by name."""
@@ -77,7 +80,25 @@ class ChannelRegistry:
         self,
         channel_name: str,
         **kwargs: Any,
-    ):
-        """Search a specific channel."""
+    ) -> ChannelResult:
+        """Search a specific channel with transparent caching.
+
+        Returns cached result if available and fresh, otherwise queries
+        the channel and caches the result.
+        """
+        cached = self._cache.get(channel_name, kwargs)
+        if cached is not None:
+            return cached
+
         channel = self.load_channel(channel_name)
-        return await channel.search(**kwargs)
+        result = await channel.search(**kwargs)
+        self._cache.put(channel_name, kwargs, result)
+        return result
+
+    def cache_stats(self) -> dict[str, Any]:
+        """Return cache hit/miss statistics."""
+        return self._cache.stats()
+
+    def invalidate_cache(self, channel_name: str | None = None) -> int:
+        """Clear cached results. Returns count of entries removed."""
+        return self._cache.invalidate(channel_name)

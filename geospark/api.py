@@ -69,6 +69,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Rate limiting — sliding window per IP/API key (Phase 8A)
+from geospark.middleware.rate_limiter import RateLimitMiddleware, set_route_limit  # noqa: E402
+
+app.add_middleware(RateLimitMiddleware)
+# Agent routes get a lower limit (they're expensive, 30-60s each)
+set_route_limit("/api/v1/agent/", 20)
+
+# Audit logging — structured JSONL per day (Phase 8A)
+from geospark.middleware.audit_log import AuditLogMiddleware  # noqa: E402
+
+app.add_middleware(AuditLogMiddleware)
+
+# Usage tracking — per-endpoint and per-key counters (Phase 8A)
+from geospark.middleware.usage_tracker import UsageTrackingMiddleware  # noqa: E402
+
+app.add_middleware(UsageTrackingMiddleware)
+
 # --- Static UI ---
 _ui_dir = Path(__file__).parent / "ui"
 if _ui_dir.exists():
@@ -1012,3 +1029,52 @@ async def agent_classify(request: CoordinateRequest):
     coord = _get_coordinator()
     classification = classify_intent(request.goal, coord.registry)
     return classification.model_dump(mode="json")
+
+
+# --- Admin Endpoints (Phase 8A) ---
+
+
+@app.get("/api/v1/admin/audit", dependencies=[Depends(verify_api_key)])
+async def admin_audit(date: str | None = None, limit: int = 50):
+    """Query audit log entries for a specific date (or today)."""
+    from geospark.middleware.audit_log import get_audit_store
+
+    store = get_audit_store()
+    entries = store.read_date(date, limit=limit) if date else store.read_today(limit=limit)
+    return {"entries": entries, "count": len(entries)}
+
+
+@app.get("/api/v1/admin/audit/stats", dependencies=[Depends(verify_api_key)])
+async def admin_audit_stats(date: str | None = None):
+    """Summary statistics from the audit log."""
+    from geospark.middleware.audit_log import get_audit_store
+
+    store = get_audit_store()
+    return store.stats(date=date)
+
+
+@app.get("/api/v1/admin/audit/dates")
+async def admin_audit_dates():
+    """List all dates that have audit log files."""
+    from geospark.middleware.audit_log import get_audit_store
+
+    store = get_audit_store()
+    return {"dates": store.list_dates()}
+
+
+@app.get("/api/v1/admin/usage", dependencies=[Depends(verify_api_key)])
+async def admin_usage():
+    """Aggregated API usage statistics."""
+    from geospark.middleware.usage_tracker import get_usage_tracker
+
+    tracker = get_usage_tracker()
+    return tracker.summary()
+
+
+@app.get("/api/v1/admin/usage/keys", dependencies=[Depends(verify_api_key)])
+async def admin_usage_keys():
+    """Usage breakdown per API key."""
+    from geospark.middleware.usage_tracker import get_usage_tracker
+
+    tracker = get_usage_tracker()
+    return {"keys": tracker.all_keys()}

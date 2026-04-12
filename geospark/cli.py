@@ -1019,5 +1019,81 @@ def agents_list() -> None:
     console.print(table)
 
 
+@main.group()
+def admin() -> None:
+    """Admin tools -- audit logs, usage stats."""
+
+
+@admin.command("audit")
+@click.option("--date", default=None, help="Date (YYYY-MM-DD), defaults to today")
+@click.option("--limit", default=20, help="Max entries to show")
+def admin_audit(date: str | None, limit: int) -> None:
+    """View audit log entries."""
+    from geospark.middleware.audit_log import AuditStore
+
+    store = AuditStore()
+    entries = store.read_date(date, limit=limit) if date else store.read_today(limit=limit)
+
+    if not entries:
+        console.print("[dim]No audit entries found[/dim]")
+        return
+
+    table = Table(title=f"Audit Log ({len(entries)} entries)")
+    table.add_column("Time", style="dim", max_width=12)
+    table.add_column("Method", max_width=6)
+    table.add_column("Path", style="cyan", max_width=35)
+    table.add_column("Status", max_width=6)
+    table.add_column("Duration", max_width=8)
+    table.add_column("IP", style="dim", max_width=15)
+
+    for e in entries:
+        ts = e.get("timestamp", "")[-12:-1] if e.get("timestamp") else ""
+        status = str(e.get("status_code", ""))
+        color = "green" if status.startswith("2") else "red" if status.startswith("5") else "yellow"
+        table.add_row(
+            ts,
+            e.get("method", ""),
+            e.get("path", "")[:35],
+            f"[{color}]{status}[/{color}]",
+            f"{e.get('duration_ms', 0):.0f}ms",
+            e.get("client_ip", "")[:15],
+        )
+    console.print(table)
+
+
+@admin.command("usage")
+def admin_usage() -> None:
+    """Show API usage statistics."""
+    from geospark.middleware.usage_tracker import UsageTracker
+
+    tracker = UsageTracker()
+    summary = tracker.summary()
+
+    table = Table(title="API Usage")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value", style="green")
+    table.add_row("Total requests", str(summary["total_requests"]))
+    table.add_row("Unique API keys", str(summary["unique_keys"]))
+    table.add_row("Unique endpoints", str(summary["unique_endpoints"]))
+    table.add_row("Tracking since", summary.get("tracking_since", "?")[:19])
+    console.print(table)
+
+    if summary.get("status_codes"):
+        sc_table = Table(title="Status Codes")
+        sc_table.add_column("Code", style="cyan")
+        sc_table.add_column("Count", style="green")
+        for code, count in sorted(summary["status_codes"].items()):
+            sc_table.add_row(str(code), str(count))
+        console.print(sc_table)
+
+    if summary.get("top_endpoints"):
+        ep_table = Table(title="Top Endpoints")
+        ep_table.add_column("Path", style="cyan")
+        ep_table.add_column("Count", style="green")
+        for ep in summary["top_endpoints"][:10]:
+            ep_table.add_row(ep["path"], str(ep["count"]))
+        console.print(ep_table)
+
+
 if __name__ == "__main__":
     main()

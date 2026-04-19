@@ -97,7 +97,7 @@ def _validate_flow_dag(builder: FlowBuilder) -> list[str]:
         3. Every `route.target_step_id` references an existing step.
         4. The step graph (edges from deps) has no cycles.
     """
-    steps = list(builder._steps)  # noqa: SLF001 - internal-use by design
+    steps = list(builder._steps)
     errors: list[str] = []
 
     if not steps:
@@ -330,7 +330,7 @@ class ChatFlowSession:
                 schedule=schedule or None,
                 event_type=event_type or None,
             )
-        except Exception as err:  # noqa: BLE001 — surface any pydantic error to LLM
+        except Exception as err:
             return f"ERROR: {err}"
         return f"OK: trigger set to {trigger_type}"
 

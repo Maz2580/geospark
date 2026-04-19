@@ -16,7 +16,6 @@ from geospark.flows.flow_builder import FlowBuilder
 from geospark.flows.flow_runner import FlowRunner
 from geospark.flows.flow_schema import FlowRoute, FlowStep
 
-
 # ---------------------------------------------------------------------------
 # Fake LLM helpers
 # ---------------------------------------------------------------------------

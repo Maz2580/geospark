@@ -65,6 +65,8 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
   - Hierarchical URIs like `geospark://missions/melbourne_flood/analysis/2026-04`
   - Recursive parent-child score propagation for context retrieval
   - Spatial bbox + temporal range filters, cold-context archival
+- **Chat-to-Flow Builder** — Turn a natural-language goal into a validated Flow DAG. `ChatFlowSession` drives an LLM through incremental builder tool calls (`add_step`, `add_route`, `set_trigger`, `finish_flow`); invalid calls surface to the LLM as errors and are corrected before the Flow is emitted. Available via `geospark flow build "..."` or `POST /api/v1/flows/build`.
+- **Enterprise Middleware** — Production hardening that shipped in Phase 8A: sliding-window rate limiting (per-IP and per-API-key with `X-RateLimit-*` headers), structured JSON-Lines audit logging with daily rotation, per-endpoint usage tracking with persisted counters, and transparent LRU+TTL caching for data channels.
 - **Spatial Reasoning Engine** — Topology, geodesic distance, CRS transforms, buffering, area. All geometrically correct, not LLM-guessed.
 - **MCP Server** — 6 tools for Claude Desktop and any MCP-compatible AI assistant. `pip install geospark-ai[mcp] && geospark-mcp`
 - **GeoSpark Bench** — 535 benchmark questions, 5 LLM families evaluated. LLMs score 0% on distance; with GeoSpark tools, 70%. [Results →](docs/BENCHMARK_REPORT.md)
@@ -116,6 +118,20 @@ coord = AgentCoordinator()  # Auto-registers GeoAgent, SiteSelector, SpatialRepo
 result = coord.run("Find the best location for a cafe in Melbourne CBD near schools")
 print(f"Routed to: {result.agent_used}")   # site_selector (matched pattern)
 print(result.summary)
+```
+
+### Chat-to-flow builder (Phase 8B)
+
+```python
+from geospark.flows import ChatFlowSession, FlowRunner, make_ollama_chat_fn
+
+# LLM incrementally builds a validated Flow DAG via tool calls
+session = ChatFlowSession(llm_fn=make_ollama_chat_fn("qwen2.5:7b"))
+result = session.run("Geocode Valencia, Spain then check its elevation")
+
+if result.flow is not None:
+    print(f"Built flow with {len(result.flow.steps)} steps in {result.turns} turns")
+    FlowRunner().run(result.flow)  # Execute the generated DAG
 ```
 
 ### Spatial intelligence memory (Phase 7A)
@@ -261,17 +277,23 @@ geospark data status                             # Check all channels
 # Flow workflows
 geospark flow list                     # List templates
 geospark flow run distance_analysis    # Run a template
+geospark flow build "Monitor NDVI in Valencia; alert if it drops below 0.3" --run
 ```
 
 ### Try the Live API (no install needed)
 
-Explore all 58 endpoints interactively at **[geospark.terrascout.app/docs](https://geospark.terrascout.app/docs)**
+Explore all **62+ endpoints** interactively at **[geospark.terrascout.app/docs](https://geospark.terrascout.app/docs)**.
 
 ```bash
-# Quick test
+# Quick distance check
 curl -X POST https://geospark.terrascout.app/api/v1/distance \
   -H "Content-Type: application/json" \
   -d '{"lat_a": 48.8566, "lon_a": 2.3522, "lat_b": 51.5074, "lon_b": -0.1278}'
+
+# Build a flow from a natural-language goal (Phase 8B)
+curl -X POST https://geospark.terrascout.app/api/v1/flows/build \
+  -H "Content-Type: application/json" \
+  -d '{"goal": "Geocode Valencia then check its elevation", "max_turns": 10}'
 ```
 
 ### Run the Benchmark
@@ -294,7 +316,7 @@ python -m geospark.bench list
 │                   User / LLM                    │
 │         (Claude, ChatGPT, Ollama, ...)          │
 └──────────┬──────────────────────┬───────────────┘
-           │ MCP                  │ REST API (58 endpoints)
+           │ MCP                  │ REST API (62+ endpoints)
            v                      v
 ┌──────────────────────────────────────────────────┐
 │         Multi-Agent Coordinator (Phase 7C)       │
@@ -395,7 +417,10 @@ GeoSpark Bench v1.0 — **535 questions** across 5 benchmarks, evaluated on **5 
 | **Phase 6** — Data Channels | **Complete** | 474 | Weather, Air Quality, NASA Fires — free, real-time |
 | **Phase 7A** — Spatial Memory | **Complete** | 540 | Facts + Episodes, VectorStore (FAISS), contradictions, auto-linking |
 | **Phase 7B** — Context Database | **Complete** | 589 | Tiered L0/L1/L2 loading, hotness scoring, hierarchical retrieval |
-| **Phase 7C** — Multi-Agent Coordination | **Complete** | **657** | Toolkit, A2A messaging, coordinator with streaming |
+| **Phase 7C** — Multi-Agent Coordination | **Complete** | 657 | Toolkit, A2A messaging, coordinator with streaming |
+| **Phase 7 UI** — Guide & Pages | **Complete** | 679 | Onboarding guide, Memory/Context UI pages, Coordinator tab |
+| **Phase 8A** — Enterprise Hardening | **Complete** | 754 | Rate limiting, audit logging, usage tracking, channel cache |
+| **Phase 8B** — Chat-to-Flow Builder | **Complete** | **776** | Natural-language goal → validated Flow DAG via LLM tool calling |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
 
@@ -426,7 +451,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Live API
 
-GeoSpark is deployed and accessible at **[geospark.terrascout.app](https://geospark.terrascout.app/docs)** — 58 endpoints with interactive Swagger documentation.
+GeoSpark is deployed and accessible at **[geospark.terrascout.app](https://geospark.terrascout.app/docs)** — 62+ endpoints with interactive Swagger documentation.
 
 ## Author
 

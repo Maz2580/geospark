@@ -470,6 +470,61 @@ async def flow_run_template(template_name: str, request: TemplateRunRequest):
     }
 
 
+# --- Chat-to-Flow Builder (Phase 8B) ---
+
+
+class FlowBuildRequest(BaseModel):
+    goal: str = Field(..., description="Natural-language goal for the flow")
+    model: str = Field("qwen2.5:7b", description="Ollama model to drive the builder")
+    ollama_url: str = Field(
+        "http://localhost:11434", description="Base URL of the Ollama server"
+    )
+    max_turns: int = Field(20, ge=1, le=60, description="Max LLM turns")
+
+
+@app.post("/api/v1/flows/build", dependencies=[Depends(verify_api_key)])
+async def flow_build(request: FlowBuildRequest):
+    """Build a Flow from a natural-language goal via incremental LLM tool calling.
+
+    Uses the chat-to-flow builder (Phase 8B). Each LLM turn invokes one
+    builder method (add_step, add_route, set_trigger, finish_flow) against
+    an internal FlowBuilder; the DAG is validated before the final Flow is
+    returned. The LLM backend is Ollama by default.
+    """
+    from geospark.flows import ChatFlowSession, make_ollama_chat_fn
+
+    session = ChatFlowSession(
+        llm_fn=make_ollama_chat_fn(
+            model=request.model, base_url=request.ollama_url
+        )
+    )
+    try:
+        result = session.run(request.goal, max_turns=request.max_turns)
+    except Exception as err:
+        raise HTTPException(
+            status_code=502,
+            detail=f"LLM backend error: {type(err).__name__}: {err}",
+        ) from err
+
+    payload: dict[str, Any] = {
+        "ok": result.flow is not None,
+        "turns": result.turns,
+        "duration_s": result.duration_s,
+        "error": result.error,
+        "tool_calls": [
+            {
+                "tool": tc.tool,
+                "arguments": tc.arguments,
+                "result": tc.result,
+                "ok": tc.ok,
+            }
+            for tc in result.tool_calls
+        ],
+        "flow": result.flow.model_dump() if result.flow is not None else None,
+    }
+    return payload
+
+
 # --- Persistent Flow Endpoints ---
 
 

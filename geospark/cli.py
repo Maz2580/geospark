@@ -400,6 +400,88 @@ def flow_runs(flow_id: str) -> None:
     console.print(table)
 
 
+@flow.command("build")
+@click.argument("goal")
+@click.option("--model", default="qwen2.5:7b", help="Ollama model to use for the LLM loop")
+@click.option(
+    "--ollama-url",
+    default="http://localhost:11434",
+    help="Base URL of the Ollama server",
+)
+@click.option("--max-turns", default=20, type=int, help="Max LLM turns before giving up")
+@click.option("--run", is_flag=True, help="Execute the generated flow through FlowRunner")
+@click.option("--json-out", is_flag=True, help="Print the built flow as JSON")
+def flow_build(
+    goal: str,
+    model: str,
+    ollama_url: str,
+    max_turns: int,
+    run: bool,
+    json_out: bool,
+) -> None:
+    """Build a Flow from a natural-language goal via LLM tool calling."""
+    from geospark import Engine
+    from geospark.flows import (
+        ChatFlowSession,
+        FlowRunner,
+        make_ollama_chat_fn,
+    )
+
+    session = ChatFlowSession(
+        llm_fn=make_ollama_chat_fn(model=model, base_url=ollama_url)
+    )
+    console.print(f"[dim]Building flow with {model} via {ollama_url}…[/dim]")
+    result = session.run(goal, max_turns=max_turns)
+
+    if result.flow is None:
+        console.print(f"[red]Failed to build flow:[/red] {result.error}")
+        if result.tool_calls:
+            table = Table(title="Tool call history")
+            table.add_column("#", style="dim")
+            table.add_column("Tool", style="cyan")
+            table.add_column("OK", style="green")
+            table.add_column("Result", max_width=80)
+            for i, tc in enumerate(result.tool_calls, 1):
+                table.add_row(str(i), tc.tool, "✓" if tc.ok else "✗", tc.result[:80])
+            console.print(table)
+        return
+
+    f = result.flow
+    console.print(
+        f"[green]Built flow:[/green] [bold]{f.name}[/bold] "
+        f"({len(f.steps)} steps, {result.turns} turns, {result.duration_s:.1f}s)"
+    )
+
+    if json_out:
+        console.print_json(f.model_dump_json())
+    else:
+        table = Table(title="Steps")
+        table.add_column("#", style="dim")
+        table.add_column("Step", style="cyan")
+        table.add_column("Tool", style="magenta")
+        table.add_column("Operation", style="green")
+        table.add_column("Depends On", style="yellow")
+        for i, step in enumerate(f.steps, 1):
+            deps = ", ".join(step.depends_on) if step.depends_on else "-"
+            table.add_row(
+                str(i), step.name, step.tool or "-", step.operation or "-", deps
+            )
+        console.print(table)
+
+    if run:
+        engine = Engine(tools=["geocoder", "terrain"])
+        runner = FlowRunner(engine=engine)
+        console.print(f"[dim]Running {f.name}…[/dim]")
+        run_result = runner.run(f)
+        console.print(
+            f"[bold]Run status:[/bold] "
+            f"[{'green' if run_result.status == 'completed' else 'red'}]"
+            f"{run_result.status}[/]"
+        )
+        for err in run_result.errors:
+            console.print(f"[red]{err}[/red]")
+
+
 @main.command()
 @click.argument("goal")
 def agent(goal: str) -> None:

@@ -259,10 +259,12 @@ class Toolkit:
         """Look up a registered tool by name."""
         return self.tools.get(name)
 
-    def invoke(self, name: str, **kwargs: Any) -> Any:
+    def invoke(self, name: str, /, **kwargs: Any) -> Any:
         """Invoke a synchronous tool by name.
 
-        For async tools, use `await invoke_async()` instead.
+        The tool-name parameter is positional-only so registered tools can
+        themselves accept a keyword argument named ``name`` without colliding.
+        For async tools, use ``await invoke_async()`` instead.
         """
         tool = self.tools.get(name)
         if tool is None:
@@ -273,8 +275,12 @@ class Toolkit:
             )
         return tool.func(**kwargs)
 
-    async def invoke_async(self, name: str, **kwargs: Any) -> Any:
-        """Invoke a tool by name, awaiting if it's async."""
+    async def invoke_async(self, name: str, /, **kwargs: Any) -> Any:
+        """Invoke a tool by name, awaiting if it's async.
+
+        The tool-name parameter is positional-only; see ``invoke`` for the
+        reason.
+        """
         tool = self.tools.get(name)
         if tool is None:
             raise KeyError(f"Tool not registered: {name}")

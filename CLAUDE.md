@@ -6,7 +6,7 @@
 - **Language**: Python 3.11+
 - **Package manager**: pip (venv at `.venv/`)
 - **License**: Apache 2.0
-- **Status**: Phase 7A complete -- 540 tests passing, live at geospark.terrascout.app
+- **Status**: Phase 8A complete; Phase 8B in progress -- 776 tests passing, live at geospark.terrascout.app
 - **PyPI**: `pip install geospark-ai[mcp]` — https://pypi.org/project/geospark-ai/
 - **MCP**: `geospark-mcp` CLI command (6 tools, official MCP SDK)
 
@@ -164,22 +164,18 @@ docker compose up geospark     # Just GeoSpark API
 - **Approximate vs geodesic**: For rough estimates use degree-to-meter approximation (111,320 m/deg). For production use pyproj geodesic calculations.
 - **File locks on Windows**: Venv files can get locked by background processes. If venv is corrupted, kill python processes first then recreate.
 
-## Roadmap Phase (Current: Phase 7A complete, Phase 7B next)
+## Roadmap Phase (Current: Phase 8A complete, Phase 8B next)
 
 See `docs/ROADMAP.md` for the full roadmap with all phases and details.
 
 ### Completed Phases
-- **Phase 0**: Foundation -- protocol, engine, CRS, tools, CLI, MCP, Docker, CI/CD (50 tests)
-- **Phase 1**: Launch -- Bench v0.1, demo notebook, Git, PyPI, README (96 tests)
-- **Phase 2**: Ecosystem -- spectral indices, routing, RAG, memory, 4 LLM integrations (249 tests)
-- **Phase 3**: Platform -- Bench v1.0 (535q), Flows, Knowledge Graph, Plugin System (441 tests)
-- **Phase 4**: Deployment -- live server, Docker prod, MCP+PyPI, Ollama, CLI upgrades (446 tests)
-- **Phase 5**: Agents -- GeoAgent, SiteSelector, SpatialReport (autonomous)
-- **Phase 5.5**: LLM Gateway -- chat, generate, embeddings, 9 models
-- **Phase 6**: Data Channels -- Weather, Air Quality, NASA FIRMS, agent integration (474 tests)
-- **Phase 7A**: Spatial Intelligence -- dual memory, vector store, contradictions, auto-linking (540 tests)
+- **Phase 0-6**: Foundation through Data Channels (474 tests)
+- **Phase 7A**: Spatial Memory -- facts, episodes, vector store, contradictions (540 tests)
+- **Phase 7B**: Context Database -- tiered L0/L1/L2, hotness scoring (589 tests)
+- **Phase 7C**: Multi-Agent Coordination -- toolkit, A2A, coordinator (657 tests)
+- **Phase 7 UI**: Guide page, Memory/Context pages, Coordinator tab (679 tests)
+- **Phase 8A**: Enterprise Hardening -- rate limiting, audit logging, usage tracking, channel caching (754 tests)
 
-### Current: Phase 7B - Geospatial Context Database
-- [ ] `GeoContext` model: uri, abstract (L0), overview (L1), full data (L2)
-- [ ] Hierarchical storage, lazy loading, hotness scoring
-- [ ] Recursive directory retrieval with spatial + temporal filtering
+### Current: Phase 8B - Product Depth
+- [x] Chat-to-flow builder: natural language -> Flow DAG via LLM (776 tests)
+- [ ] Overture Maps channel: free global building/road/land-use data

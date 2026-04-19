@@ -476,8 +476,13 @@ async def flow_run_template(template_name: str, request: TemplateRunRequest):
 class FlowBuildRequest(BaseModel):
     goal: str = Field(..., description="Natural-language goal for the flow")
     model: str = Field("qwen2.5:7b", description="Ollama model to drive the builder")
-    ollama_url: str = Field(
-        "http://localhost:11434", description="Base URL of the Ollama server"
+    ollama_url: str | None = Field(
+        None,
+        description=(
+            "Base URL of the Ollama server. When omitted, uses the "
+            "OLLAMA_BASE_URL env var (set to http://172.17.0.1:11434 on the "
+            "VM so the container reaches host Ollama via the Docker bridge)."
+        ),
     )
     max_turns: int = Field(20, ge=1, le=60, description="Max LLM turns")
 

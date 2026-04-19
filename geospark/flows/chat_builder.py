@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import time
 from collections import deque
 from collections.abc import Callable
@@ -459,16 +460,26 @@ class ChatFlowSession:
 
 def make_ollama_chat_fn(
     model: str = "qwen2.5:7b",
-    base_url: str = "http://localhost:11434",
+    base_url: str | None = None,
     timeout: float = 120.0,
 ) -> ChatFn:
     """Return a ChatFn backed by a local Ollama server.
 
     Matches the shape used elsewhere in geospark.integrations.ollama_tools.
     Ollama's /api/chat endpoint is OpenAI-compatible for tool calls.
+
+    When ``base_url`` is None, falls back to the ``OLLAMA_BASE_URL`` env var
+    and finally to ``http://localhost:11434``. This matches the convention
+    used by the LLM gateway and agent modules, so the VM's Docker bridge
+    override (``http://172.17.0.1:11434``) is honoured.
     """
 
-    base = base_url.rstrip("/")
+    resolved = (
+        base_url
+        if base_url is not None
+        else os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    )
+    base = resolved.rstrip("/")
 
     def _chat(messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> ChatResponse:
         payload = {

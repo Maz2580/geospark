@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flows &mdash; GeoSpark</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body class="dark">
+  <nav class="nav">
+    <span class="nav-brand">GeoSpark</span>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/playground">Playground</a>
+      <a href="/agents">Agents</a>
+      <a href="/memory">Memory</a>
+      <a href="/context">Context</a>
+      <a href="/data">Data</a>
+      <a href="/status">Status</a>
+      <a href="/docs">API Docs</a>
+    </div>
+    <span class="nav-version"></span>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Flows</h1>
+      <p>Reusable spatial workflow templates, natural-language flow builder, and execution history. DAG-based automation with ground-truth spatial reasoning at every step.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="tab-templates">Templates</button>
+      <button class="tab" data-tab="tab-builder">Builder</button>
+      <button class="tab" data-tab="tab-saved">Saved Flows</button>
+      <button class="tab" data-tab="tab-runs">Run History</button>
+    </div>
+
+    <!-- Templates -->
+    <div class="tab-panel" id="tab-templates">
+      <div class="card">
+        <div class="card-header"><div class="card-icon geo">&#128207;</div><h3>Flow Templates</h3></div>
+        <p class="text-sm text-muted mb-2">Pre-built spatial workflows. Inspect the DAG, override parameters, and run instantly.</p>
+        <div id="templates-list">Loading templates...</div>
+      </div>
+      <div id="template-detail" class="hidden"></div>
+      <div id="template-run-result" class="result-box hidden"></div>
+    </div>
+
+    <!-- Builder -->
+    <div class="tab-panel hidden" id="tab-builder">
+      <div class="card">
+        <div class="card-header"><div class="card-icon agent">&#129302;</div><h3>Chat-to-Flow Builder</h3></div>
+        <p class="text-sm text-muted mb-2">Describe a spatial workflow in plain language. The LLM incrementally builds a validated Flow DAG via tool calls.</p>
+        <div class="presets mb-2">
+          <button class="btn btn-sm btn-secondary" onclick="$('#build-goal').value='Geocode Valencia, Spain then check its elevation'">Geocode + Elevation</button>
+          <button class="btn btn-sm btn-secondary" onclick="$('#build-goal').value='Monitor NDVI in Valencia; alert if it drops below 0.3'">NDVI Monitor</button>
+          <button class="btn btn-sm btn-secondary" onclick="$('#build-goal').value='Calculate distance from Paris to London and compare to 500 km'">Distance Check</button>
+        </div>
+        <div class="form-group">
+          <label>Goal</label>
+          <input type="text" id="build-goal" placeholder="Describe the spatial workflow you want to automate..." value="Geocode Valencia, Spain then check its elevation">
+        </div>
+        <div class="grid grid-3" style="gap:0.75rem">
+          <div class="form-group">
+            <label>Model</label>
+            <input type="text" id="build-model" placeholder="qwen2.5:7b" value="qwen2.5:7b">
+          </div>
+          <div class="form-group">
+            <label>Max Turns</label>
+            <input type="number" id="build-turns" value="20" min="5" max="50">
+          </div>
+          <div class="form-group">
+            <label>Ollama URL (optional)</label>
+            <input type="text" id="build-ollama" placeholder="http://localhost:11434">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="buildFlow()">Build Flow</button>
+        <div id="build-result" class="result-box hidden"></div>
+        <div id="built-flow-actions" class="hidden mt-2" style="display:flex;gap:0.5rem">
+          <button class="btn btn-primary" onclick="runBuiltFlow()">Run Built Flow</button>
+          <button class="btn btn-secondary" onclick="saveBuiltFlow()">Save Flow</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Saved Flows -->
+    <div class="tab-panel hidden" id="tab-saved">
+      <div class="card">
+        <div class="card-header"><div class="card-icon agent">&#128193;</div><h3>Saved Flows</h3></div>
+        <p class="text-sm text-muted mb-2">Persisted flow definitions. Requires <code>GEOSPARK_FLOW_BACKEND=supabase</code> to be configured.</p>
+        <div id="saved-flows-list">Loading saved flows...</div>
+      </div>
+      <div id="saved-flow-detail" class="hidden"></div>
+      <div id="saved-flow-run-result" class="result-box hidden"></div>
+    </div>
+
+    <!-- Run History -->
+    <div class="tab-panel hidden" id="tab-runs">
+      <div class="card">
+        <div class="card-header"><div class="card-icon status">&#128210;</div><h3>Flow Run History</h3></div>
+        <p class="text-sm text-muted mb-2">Execution records for all flow runs. Includes status, step results, and errors.</p>
+        <div id="runs-list">Loading run history...</div>
+      </div>
+      <div id="run-detail" class="hidden"></div>
+    </div>
+  </div>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    initTabs($('.container'));
+    let _currentTemplate = null;
+    let _builtFlow = null;
+    let _savedFlows = [];
+
+    /* ========== TEMPLATES ========== */
+    async function loadTemplates() {
+      const el = $('#templates-list');
+      try {
+        const data = await geo.get('/api/v1/flows/templates');
+        const names = data.templates || [];
+        if (names.length === 0) { el.innerHTML = '<p class="text-muted">No templates available.</p>'; return; }
+        el.innerHTML = '<div class="grid grid-3">' + names.map(name => `
+          <div class="dark-card" style="cursor:pointer" onclick="inspectTemplate('${name}')">
+            <h3>${escapeHtml(name.replace(/_/g, ' '))}</h3>
+            <p class="text-sm text-muted">Click to inspect DAG and run with custom parameters.</p>
+          </div>
+        `).join('') + '</div>';
+      } catch (e) { showError(el, e.message); }
+    }
+
+    async function inspectTemplate(name) {
+      const el = $('#template-detail');
+      showLoading(el, 'Loading template...');
+      el.classList.remove('hidden');
+      try {
+        const data = await geo.get(`/api/v1/flows/templates/${encodeURIComponent(name)}`);
+        _currentTemplate = data;
+        const steps = (data.steps || []).map((s, i) => `
+          <tr><td>${i+1}</td><td><code>${escapeHtml(s.id)}</code></td><td>${escapeHtml(s.name)}</td>
+          <td>${s.tool ? `<code>${escapeHtml(s.tool)}</code>` : '<span class="text-muted">LLM</span>'}</td>
+          <td>${s.operation ? `<code>${escapeHtml(s.operation)}</code>` : '<span class="text-muted">&mdash;</span>'}</td>
+          <td>${(s.depends_on || []).map(d => `<code>${escapeHtml(d)}</code>`).join(', ') || '<span class="text-muted">&mdash;</span>'}</td></tr>
+        `).join('');
+        const routes = (data.steps || []).flatMap(s => (s.routes || []).map(r => ({
+          from: s.id, condition: r.condition, to: r.target_step_id
+        })));
+        const routeHtml = routes.length ? `<table class="table-wrap"><thead><tr><th>From</th><th>Condition</th><th>To</th></tr></thead><tbody>` +
+          routes.map(r => `<tr><td><code>${escapeHtml(r.from)}</code></td><td>${escapeHtml(r.condition)}</td><td><code>${escapeHtml(r.to)}</code></td></tr>`).join('') +
+          `</tbody></table>` : '<p class="text-muted">No conditional routes.</p>';
+
+        // Parameter overrides form
+        const paramInputs = paramFieldsForTemplate(name).map(f => `
+          <div class="form-group">
+            <label>${escapeHtml(f.label)}</label>
+            <input type="${f.type}" id="tpl-param-${f.key}" value="${escapeHtml(f.default)}" step="${f.step || 'any'}">
+          </div>
+        `).join('');
+
+        el.innerHTML = `
+          <div class="card mt-2">
+            <div class="card-header"><h3>${escapeHtml(data.name || name)}</h3></div>
+            <p class="text-sm text-muted">${escapeHtml(data.description || '')}</p>
+            <h4 class="mt-2">Steps</h4>
+            <table class="table-wrap"><thead><tr><th>#</th><th>ID</th><th>Name</th><th>Tool</th><th>Operation</th><th>Depends On</th></tr></thead><tbody>${steps}</tbody></table>
+            <h4 class="mt-2">Routes</h4>${routeHtml}
+            <h4 class="mt-2">Parameters</h4>
+            <div class="grid grid-2" style="gap:0.75rem">${paramInputs}</div>
+            <div class="mt-2" style="display:flex;gap:0.5rem">
+              <button class="btn btn-primary" onclick="runTemplate('${name}')">Run Template</button>
+              <button class="btn btn-secondary" onclick="$('#template-detail').classList.add('hidden')">Close</button>
+            </div>
+          </div>`;
+      } catch (e) { showError(el, e.message); }
+    }
+
+    function paramFieldsForTemplate(name) {
+      const map = {
+        vegetation_monitor: [
+          {key:'address', label:'Address', type:'text', default:'Valencia, Spain'},
+          {key:'ndvi_threshold', label:'NDVI Threshold', type:'number', default:'0.3', step:'0.01'}
+        ],
+        distance_analysis: [
+          {key:'origin', label:'Origin', type:'text', default:'Paris, France'},
+          {key:'destination', label:'Destination', type:'text', default:'London, UK'},
+          {key:'max_distance_km', label:'Max Distance (km)', type:'number', default:'500', step:'0.1'}
+        ],
+        area_survey: [
+          {key:'address', label:'Address', type:'text', default:'Zurich, Switzerland'},
+          {key:'buffer_m', label:'Buffer (m)', type:'number', default:'1000', step:'1'}
+        ]
+      };
+      return map[name] || [];
+    }
+
+    async function runTemplate(name) {
+      const el = $('#template-run-result');
+      showLoading(el, 'Running template...');
+      try {
+        const params = {};
+        paramFieldsForTemplate(name).forEach(f => {
+          const val = $(`#tpl-param-${f.key}`).value;
+          params[f.key] = f.type === 'number' ? parseFloat(val) : val;
+        });
+        const data = await geo.post(`/api/v1/flows/templates/${encodeURIComponent(name)}/run`, { parameters: params });
+        renderRunResult(el, data);
+      } catch (e) { showError(el, e.message); }
+    }
+
+    /* ========== BUILDER ========== */
+    async function buildFlow() {
+      const el = $('#build-result');
+      showLoading(el, 'Building flow via LLM... (may take 10-30 seconds)');
+      $('#built-flow-actions').classList.add('hidden');
+      try {
+        const body = {
+          goal: $('#build-goal').value,
+          model: $('#build-model').value || 'qwen2.5:7b',
+          max_turns: parseInt($('#build-turns').value || '20')
+        };
+        const ollama = $('#build-ollama').value;
+        if (ollama) body.ollama_url = ollama;
+        const data = await geo.post('/api/v1/flows/build', body);
+        if (!data.ok || !data.flow) {
+          showError(el, data.error || 'Flow builder returned no flow. Check the goal description and try again.');
+          return;
+        }
+        _builtFlow = data.flow;
+        el.innerHTML = `
+          <div class="result-card">
+            <div class="metric"><span class="label">Flow Name</span><span class="value">${escapeHtml(data.flow.name || 'Untitled')}</span></div>
+            <div class="metric"><span class="label">Steps</span><span class="value">${(data.flow.steps || []).length}</span></div>
+            <div class="metric"><span class="label">Turns</span><span class="value">${data.turns}</span></div>
+            <div class="metric"><span class="label">Duration</span><span class="value">${data.duration_s?.toFixed(1) || '?'}s</span></div>
+          </div>
+          ${jsonToggle(data.flow, 'built-flow-json')}
+        `;
+        el.classList.remove('hidden', 'error');
+        $('#built-flow-actions').classList.remove('hidden');
+      } catch (e) { showError(el, e.message); $('#built-flow-actions').classList.add('hidden'); }
+    }
+
+    async function runBuiltFlow() {
+      if (!_builtFlow) return;
+      const el = $('#build-result');
+      showLoading(el, 'Running built flow...');
+      try {
+        const data = await geo.post('/api/v1/flows/build', {
+          goal: $('#build-goal').value,
+          model: $('#build-model').value || 'qwen2.5:7b',
+          max_turns: parseInt($('#build-turns').value || '20')
+        });
+        // Actually, the build endpoint returns the flow but doesn't run it.
+        // We need to run the flow object directly. The API doesn't have a direct "run this JSON flow" endpoint.
+        // So we'll show the flow and instruct the user to save it first, or we can run via template if it matches.
+        // For now, show a helpful message.
+        el.innerHTML = `
+          <div class="result-card">
+            <div class="metric"><span class="label">Status</span><span class="value">Flow Built</span></div>
+            <div class="metric"><span class="label">Next Step</span><span class="value" style="white-space:normal">Save the flow ( Saved Flows tab ) or copy the JSON and use the CLI: <code>geospark flow run ...</code></span></div>
+          </div>
+          ${jsonToggle(_builtFlow, 'built-flow-run-json')}
+        `;
+      } catch (e) { showError(el, e.message); }
+    }
+
+    async function saveBuiltFlow() {
+      if (!_builtFlow) return;
+      const el = $('#build-result');
+      showLoading(el, 'Saving flow...');
+      try {
+        const body = {
+          name: _builtFlow.name || 'Built Flow',
+          description: _builtFlow.description || '',
+          steps: _builtFlow.steps || [],
+          trigger: _builtFlow.trigger || { trigger_type: 'manual', schedule: null, event_type: null },
+          metadata: _builtFlow.metadata || {}
+        };
+        const data = await geo.post('/api/v1/flows', body);
+        el.innerHTML = `
+          <div class="result-card">
+            <div class="metric"><span class="label">Saved</span><span class="value" style="color:var(--color-success)">&#9989; ${escapeHtml(data.name || body.name)}</span></div>
+            <div class="metric"><span class="label">Flow ID</span><span class="value"><code>${escapeHtml(data.flow_id)}</code></span></div>
+          </div>
+        `;
+        el.classList.remove('hidden', 'error');
+        loadSavedFlows();
+      } catch (e) {
+        if (e.message && e.message.includes('503')) {
+          showError(el, 'Flow persistence is not configured. Set GEOSPARK_FLOW_BACKEND=supabase to save flows.');
+        } else {
+          showError(el, e.message);
+        }
+      }
+    }
+
+    /* ========== SAVED FLOWS ========== */
+    async function loadSavedFlows() {
+      const el = $('#saved-flows-list');
+      el.innerHTML = 'Loading saved flows...';
+      try {
+        const data = await geo.get('/api/v1/flows');
+        const flows = data.flows || [];
+        _savedFlows = flows;
+        if (flows.length === 0) { el.innerHTML = '<p class="text-muted">No saved flows yet. Build one in the Builder tab or use the CLI.</p>'; return; }
+        el.innerHTML = `<div class="grid grid-2">` + flows.map(f => `
+          <div class="dark-card">
+            <h3>${escapeHtml(f.name || 'Untitled')}</h3>
+            <p class="text-sm text-muted">${escapeHtml(f.description || '')}</p>
+            <div class="mt-1" style="display:flex;gap:0.5rem;flex-wrap:wrap">
+              <span class="badge info">${(f.steps || []).length} steps</span>
+              <span class="badge info">${f.trigger?.trigger_type || 'manual'}</span>
+            </div>
+            <div class="mt-2" style="display:flex;gap:0.5rem">
+              <button class="btn btn-sm btn-primary" onclick="runSavedFlow('${f.id}')">Run</button>
+              <button class="btn btn-sm btn-secondary" onclick="viewSavedFlow('${f.id}')">View</button>
+              <button class="btn btn-sm btn-secondary" onclick="deleteSavedFlow('${f.id}')">Delete</button>
+            </div>
+          </div>
+        `).join('') + `</div>`;
+      } catch (e) {
+        if (e.message && e.message.includes('503')) {
+          el.innerHTML = `
+            <div class="result-card" style="border-left:3px solid var(--color-warn)">
+              <div class="metric"><span class="label">Persistence Not Configured</span></div>
+              <p class="text-sm text-muted">Flow persistence requires <code>GEOSPARK_FLOW_BACKEND=supabase</code>. Templates and the Builder still work without it.</p>
+            </div>
+          `;
+        } else {
+          showError(el, e.message);
+        }
+      }
+    }
+
+    async function viewSavedFlow(id) {
+      const el = $('#saved-flow-detail');
+      showLoading(el, 'Loading flow...');
+      el.classList.remove('hidden');
+      try {
+        const data = await geo.get(`/api/v1/flows/${encodeURIComponent(id)}`);
+        const steps = (data.steps || []).map((s, i) => `
+          <tr><td>${i+1}</td><td><code>${escapeHtml(s.id)}</code></td><td>${escapeHtml(s.name)}</td>
+          <td>${s.tool ? `<code>${escapeHtml(s.tool)}</code>` : '<span class="text-muted">LLM</span>'}</td>
+          <td>${(s.depends_on || []).map(d => `<code>${escapeHtml(d)}</code>`).join(', ') || '<span class="text-muted">&mdash;</span>'}</td></tr>
+        `).join('');
+        el.innerHTML = `
+          <div class="card mt-2">
+            <div class="card-header"><h3>${escapeHtml(data.name || 'Untitled')}</h3></div>
+            <p class="text-sm text-muted">${escapeHtml(data.description || '')}</p>
+            <p class="text-sm text-muted">ID: <code>${escapeHtml(data.id)}</code> &middot; Created: ${escapeHtml(data.created_at || '?')}</p>
+            <table class="table-wrap"><thead><tr><th>#</th><th>ID</th><th>Name</th><th>Tool</th><th>Depends On</th></tr></thead><tbody>${steps}</tbody></table>
+            <div class="mt-2" style="display:flex;gap:0.5rem">
+              <button class="btn btn-primary" onclick="runSavedFlow('${data.id}')">Run Flow</button>
+              <button class="btn btn-secondary" onclick="$('#saved-flow-detail').classList.add('hidden')">Close</button>
+            </div>
+            ${jsonToggle(data, 'saved-flow-json')}
+          </div>`;
+      } catch (e) { showError(el, e.message); }
+    }
+
+    async function runSavedFlow(id) {
+      const el = $('#saved-flow-run-result');
+      showLoading(el, 'Running saved flow...');
+      try {
+        const data = await geo.post(`/api/v1/flows/${encodeURIComponent(id)}/run`);
+        renderRunResult(el, data);
+        loadRuns();
+      } catch (e) { showError(el, e.message); }
+    }
+
+    async function deleteSavedFlow(id) {
+      if (!confirm('Delete this saved flow? This will also delete its run history.')) return;
+      const el = $('#saved-flows-list');
+      try {
+        await geo.post(`/api/v1/flows/${encodeURIComponent(id)}/run`); // no DELETE via geo.post helper... use fetch directly
+      } catch (e) {}
+      try {
+        const resp = await fetch(`/api/v1/flows/${encodeURIComponent(id)}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
+        if (!resp.ok) throw new Error(`${resp.status}: ${await resp.text()}`);
+        loadSavedFlows();
+        loadRuns();
+      } catch (e) { alert('Delete failed: ' + e.message); }
+    }
+
+    /* ========== RUN HISTORY ========== */
+    async function loadRuns() {
+      const el = $('#runs-list');
+      el.innerHTML = 'Loading run history...';
+      try {
+        const data = await geo.get('/api/v1/flow-runs');
+        const runs = data.runs || [];
+        if (runs.length === 0) { el.innerHTML = '<p class="text-muted">No flow runs yet. Run a template or saved flow to see history here.</p>'; return; }
+        el.innerHTML = `<div class="grid grid-2">` + runs.map(r => {
+          const statusColor = r.status === 'completed' ? 'ok' : r.status === 'failed' ? 'error' : 'warn';
+          return `
+          <div class="dark-card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <h3 style="margin:0;font-size:1rem">${escapeHtml(r.flow_id?.slice(0,8) || 'unknown')}...</h3>
+              <span class="badge ${statusColor}">${escapeHtml(r.status)}</span>
+            </div>
+            <p class="text-sm text-muted">Run ID: <code>${escapeHtml(r.id?.slice(0,12) || '?')}...</code></p>
+            <div class="mt-1" style="display:flex;gap:0.5rem;flex-wrap:wrap">
+              <span class="badge info">${Object.keys(r.step_results || {}).length} steps</span>
+              <span class="badge info">${(r.errors || []).length} errors</span>
+            </div>
+            <div class="mt-2"><button class="btn btn-sm btn-secondary" onclick="viewRun('${r.id}')">View Details</button></div>
+          </div>
+        `;}).join('') + `</div>`;
+      } catch (e) {
+        if (e.message && e.message.includes('503')) {
+          el.innerHTML = `<p class="text-muted">Flow run history requires persistence to be configured.</p>`;
+        } else {
+          showError(el, e.message);
+        }
+      }
+    }
+
+    async function viewRun(id) {
+      const el = $('#run-detail');
+      showLoading(el, 'Loading run details...');
+      el.classList.remove('hidden');
+      try {
+        const data = await geo.get(`/api/v1/flow-runs/${encodeURIComponent(id)}`);
+        const statusColor = data.status === 'completed' ? 'ok' : data.status === 'failed' ? 'error' : 'warn';
+        const stepKeys = Object.keys(data.step_results || {});
+        const stepHtml = stepKeys.length ? `<table class="table-wrap"><thead><tr><th>Step</th><th>Status</th></tr></thead><tbody>` +
+          stepKeys.map(k => `<tr><td><code>${escapeHtml(k)}</code></td><td>${jsonToggle(data.step_results[k], `run-step-${k}`)}</td></tr>`).join('') +
+          `</tbody></table>` : '<p class="text-muted">No step results recorded.</p>';
+        const errorsHtml = (data.errors || []).length ? `<ul style="color:var(--color-error)">` + data.errors.map(e => `<li>${escapeHtml(e)}</li>`).join('') + `</ul>` : '<p class="text-muted">No errors.</p>';
+        el.innerHTML = `
+          <div class="card mt-2">
+            <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+              <h3>Run Details</h3>
+              <span class="badge ${statusColor}">${escapeHtml(data.status)}</span>
+            </div>
+            <p class="text-sm text-muted">Run ID: <code>${escapeHtml(data.id)}</code></p>
+            <p class="text-sm text-muted">Flow ID: <code>${escapeHtml(data.flow_id)}</code></p>
+            <p class="text-sm text-muted">Started: ${escapeHtml(data.started_at || '?')} &middot; Completed: ${escapeHtml(data.completed_at || '?')}</p>
+            <h4 class="mt-2">Step Results</h4>${stepHtml}
+            <h4 class="mt-2">Errors</h4>${errorsHtml}
+            <div class="mt-2"><button class="btn btn-secondary" onclick="$('#run-detail').classList.add('hidden')">Close</button></div>
+            ${jsonToggle(data, 'run-detail-json')}
+          </div>`;
+      } catch (e) { showError(el, e.message); }
+    }
+
+    /* ========== SHARED RENDERERS ========== */
+    function renderRunResult(el, data) {
+      const statusColor = data.status === 'completed' ? 'ok' : data.status === 'failed' ? 'error' : 'warn';
+      el.innerHTML = `
+        <div class="result-card">
+          <div class="metric"><span class="label">Status</span><span class="value"><span class="badge ${statusColor}">${escapeHtml(data.status)}</span></span></div>
+          <div class="metric"><span class="label">Flow</span><span class="value">${escapeHtml(data.flow_name || data.flow_id || '')}</span></div>
+          <div class="metric"><span class="label">Steps Completed</span><span class="value">${data.steps_completed ?? '?'}</span></div>
+          <div class="metric"><span class="label">Run ID</span><span class="value"><code>${escapeHtml(data.run_id || data.id || '')}</code></span></div>
+        </div>
+        ${jsonToggle(data, 'run-result-json')}
+      `;
+      el.classList.remove('hidden', 'error');
+    }
+
+    /* ========== INIT ========== */
+    loadTemplates();
+    loadSavedFlows();
+    loadRuns();
+  </script>
+</body>
+</html>

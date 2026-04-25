@@ -140,6 +140,11 @@ async def ui_guide():
     return _serve_page("guide.html")
 
 
+@app.get("/flows", response_class=HTMLResponse, include_in_schema=False)
+async def ui_flows():
+    return _serve_page("flows.html")
+
+
 # --- LLM Gateway Router ---
 from geospark.llm_gateway import router as llm_router  # noqa: E402
 

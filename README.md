@@ -13,7 +13,7 @@
 
 ---
 
-Current LLMs fail at spatial reasoning — achieving 0% on geodesic distance computation and ~48% (random chance) on topological reasoning across five model families in our benchmarks. **GeoSpark fixes this.**
+Whether your LLM can compute distances depends heavily on which one you picked. Across 9 models we measured, the smallest open-weight ones (3.8B–9B) get distance questions wrong almost 95% of the time. The picture at the top of the market is not the rescue you'd expect either: among contemporary frontier APIs, accuracy ranges from 25% (Gemini 2.5 Pro) through 74% (Claude Sonnet 4.5) up to 95% (GPT-5.4) on the same set of questions. Surprisingly, gpt-oss 20B — open-weight and free to self-host — clocks in at 93.8%, essentially matching GPT-5.4. **GeoSpark backstops every model that can call a tool to a 76–96% answer rate**, which collapses that 70-point spread between frontier vendors and lets a 7B model running on your own CPU answer the same questions as well as a paid frontier API.
 
 ## The Problem
 
@@ -69,7 +69,7 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
 - **Enterprise Middleware** — Production hardening that shipped in Phase 8A: sliding-window rate limiting (per-IP and per-API-key with `X-RateLimit-*` headers), structured JSON-Lines audit logging with daily rotation, per-endpoint usage tracking with persisted counters, and transparent LRU+TTL caching for data channels.
 - **Spatial Reasoning Engine** — Topology, geodesic distance, CRS transforms, buffering, area. All geometrically correct, not LLM-guessed.
 - **MCP Server** — 6 tools for Claude Desktop and any MCP-compatible AI assistant. `pip install geospark-ai[mcp] && geospark-mcp`
-- **GeoSpark Bench** — 535 benchmark questions, 5 LLM families evaluated. LLMs score 0% on distance; with GeoSpark tools, 70%. [Results →](docs/BENCHMARK_REPORT.md)
+- **GeoSpark Bench** — 535 questions, five categories. The v2 evaluation runs each of 9 models (Qwen / Llama / Gemma / Mistral / Phi at ≤9B, gpt-oss at 20B, and three frontier APIs) under three protocols: bare baseline, structured Chain-of-Thought, and tool-augmented. Outcome: a 7B model with our tools answers numeric distance questions about as well as Gemini 2.5 Pro does, at zero per-call cost. [Results →](docs/BENCHMARK_REPORT.md) | [Paper summary](docs/PAPER.md)
 - **GeoSpark Protocol (GSP)** — Standardized JSON protocol for spatial queries and results.
 - **Live Data Channels** — Pluggable real-time data sources:
   - Weather (Open-Meteo) — current conditions + forecast for any location
@@ -368,44 +368,86 @@ python -m geospark.bench list
 
 ## Benchmark Results
 
-GeoSpark Bench v1.0 — **535 questions** across 5 benchmarks, evaluated on **5 LLM families** (Qwen, Llama, Gemma, Mistral, Phi) via Ollama.
+What follows is a quick read of the v2 numbers; for the full prose, theory, and limitations discussion see the [paper summary](docs/PAPER.md).
 
-### Baseline: LLM Alone (No Tools)
+The v2 sweep covered 9 models in 3 buckets:
+- 5 small open-weight (3.8B–9B): Qwen 2.5 7B, Llama 3.1 8B, Gemma 2 9B, Mistral 7B, Phi-3.5 3.8B
+- 1 mid open-weight: gpt-oss 20B
+- 3 frontier APIs: GPT-5.4 (`gpt-5.4-2026-03-05`), Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`), Gemini 2.5 Pro
 
-| Benchmark | Qwen 2.5 7B | Llama 3.1 8B | Gemma 2 9B | Mistral 7B | Phi-3.5 3.8B | Mean |
-|-----------|:-----------:|:-----------:|:----------:|:----------:|:-----------:|:----:|
-| GeoDistance | **0%** | **0%** | 30% | **0%** | **0%** | **6%** |
-| GeoTopo | 45% | 50% | 50% | 50% | 45% | 48% |
-| GeoChange | 90% | 65% | 80% | 85% | 75% | 79% |
-| GeoReason | 85% | 65% | 90% | 75% | 70% | 77% |
-| GeoMultimodal | 30% | 35% | 30% | 35% | 35% | 33% |
+Each model ran the suite three times: just the question, then a step-by-step prompt where the model writes a short reasoning trace and tags its conclusion `FINAL ANSWER:`, and finally the same question with our MCP tools attached. We report Wilson 95% intervals throughout. The per-call cost ledger is checked in (~$41 of API spend; the open tier is free).
 
-### With GeoSpark Tool Augmentation
+### Numeric distance — the headline cell (`distance_absolute`, n=80 per model)
 
-| Benchmark | Qwen 2.5 7B | Llama 3.1 8B | Mistral 7B | Improvement (best) |
-|-----------|:-----------:|:-----------:|:----------:|:------------------:|
-| GeoDistance | **70%** | 10% | 0% | **+70%** |
-| GeoReason | **100%** | 65% | 80% | **+15%** |
-| GeoTopo | 50% | 50% | 50% | +5% |
+These are "what's the distance from X to Y?" questions in metres, with ground truth from `pyproj.Geod.inv()` on WGS84. A response counts as correct if it lands within 10% of the true geodesic.
 
-**Key findings**:
-- **0% on distance** across 4/5 models — LLMs cannot compute geodesic distances from coordinates
-- **48% on topology** — random chance on binary questions, confirming no spatial predicate capability
-- **79% on change detection** — knowledge-based spatial reasoning works; the deficit is strictly computational
-- **70% with tools** (Qwen 2.5 7B) — tool augmentation fixes the computational gap
-- **100% on reasoning** (Qwen 2.5 7B) — structured prompting solves multi-step spatial chains
+| Model | Tier | Bare LLM | Step-by-step (CoT) | + GeoSpark tools |
+|---|---|:---:|:---:|:---:|
+| Qwen 2.5 7B | open ≤9B | 5.0% | 20.0% | **76.2%** |
+| Llama 3.1 8B | open ≤9B | 5.0% | 21.2% | 7.5% (a) |
+| Gemma 2 9B | open ≤9B | 37.5% (b) | 6.2% (c) | — |
+| Mistral 7B | open ≤9B | 2.5% | 2.5% | 0.0% (a) |
+| Phi-3.5 3.8B | open ≤9B | 1.2% | 6.2% | — |
+| **gpt-oss 20B** | open mid | **93.8%** | 93.8% | 91.2% |
+| OpenAI GPT-5.4 | frontier | 95.0% | 90.0% (c) | 95.0% |
+| Anthropic Claude Sonnet 4.5 | frontier | 73.8% | 92.5% | **96.2%** |
+| Google Gemini 2.5 Pro | frontier | 25.0% | 55.0% | 85.0% |
 
-> Full results: [Benchmark Report](docs/BENCHMARK_REPORT.md) | Run your own: `python -m geospark.bench run`
+Annotations:
+- (a) Tools were available but the model didn't use them properly. Llama emitted tool calls but mangled the coordinates it got back — a classic kilometres-vs-metres mix-up appears repeatedly. Mistral skipped the tool layer entirely and tried to answer in plain text.
+- (b) Gemma's 37.5% looks decent but it's not actually computing — when we trace the right answers, they all land on famous long-distance pairs whose approximate great-circle distance is the kind of trivia LLMs pick up in training. On shorter or less-prominent routes, errors are random.
+- (c) Step-by-step prompting was a regression for these two models. Forcing Gemma to reason step-by-step routes it away from its memorisation strategy and into computation, where it falls apart. GPT-5.4 starts at the ceiling and CoT just adds format noise.
+
+### Where the tools matter most
+
+The bare-LLM range across the 9 models spans 1.2% to 95% — basically the full available stretch on a percentage scale. Plug the tools in and every model that emits valid tool calls finishes between 76% and 96%. Largest jump: Qwen (+71 points). Smallest: GPT-5.4 (zero — its baseline was already 95%).
+
+For practical deployment this means two different pictures depending on which LLM you've already chosen:
+- **Self-hosting on commodity hardware?** Qwen 7B + GeoSpark gets you to 76% on numeric distance, comparable to Gemini 2.5 Pro + GeoSpark (85%) at zero marginal cost per call.
+- **Already paying for a frontier API?** Tools rarely improve absolute accuracy at the top of the market — but they replace probabilistic guessing with a deterministic engine call, so you get an auditable trace of how each answer was computed.
+
+### What aggregate scores hide — the per-predicate split
+
+GeoTopo aggregate scores look unremarkable across the open-weight tier (Qwen 56%, Llama 60%, Gemma 72%). The decomposition tells a different story. Here's Qwen 2.5 7B's bare-LLM accuracy, by predicate, on n=210:
+
+| Predicate | n | Bare-LLM accuracy | What's going on |
+|---|---|:---:|---|
+| `intersects` | 30 | **93%** | dataset skews `True` here, model defaults `True` |
+| `within` | 45 | 89% | same pattern |
+| `contains` | 54 | 56% | mixed labels, model is guessing |
+| `contains_with_hole` | 24 | 54% | mixed labels, model is guessing |
+| `touches` | 27 | 22% | dataset skews `False`, model still says `True` |
+| `disjoint` | 30 | **3%** | dataset skews `False`, model says `True` anyway |
+
+The model isn't reasoning about topology at all — it's defaulting to "yes" and the dataset's predicate distribution disguises that as competence. With GeoSpark in the loop, every predicate hits 100% because the engine just calls Shapely. The same pattern shows up at the frontier with different specifics: GPT-5.4 hits 100% on `intersects` and `disjoint` but **0% on `touches`** at n=27.
+
+### What we learned (one-line each)
+
+- The "LLMs can't compute distances" framing is too coarse — vendor matters as much as scale at the top of the market
+- gpt-oss 20B is the unexpected open-weight datapoint of the study; it ties GPT-5.4 on numeric distance baseline at zero cost
+- Tools are a leveller: they erase the ~70-point bare-LLM gap between top and bottom of the frontier tier
+- Step-by-step prompting helps some models, hurts others — there's no universal recipe
+- Aggregate accuracy on multi-class benchmarks can miss the actual failure mode entirely; you need per-class numbers to see model bias
+- Knowledge questions ("did the Amazon experience deforestation between 2015 and 2023?") are unaffected by tools — they're already solved by training data at every scale
+
+> Per-cell JSONs and the cost ledger live alongside this README. To re-run the bench yourself: `python -m geospark.bench run`. For the full paper-form discussion: [docs/PAPER.md](docs/PAPER.md).
 
 ## Why GeoSpark?
 
-| Problem | Without GeoSpark | With GeoSpark |
-|---|---|---|
-| "Is point A inside region B?" | LLM guesses (30% accuracy) | Ground-truth topology check (100%) |
-| "How far is A from B?" | LLM can't compute (0% accuracy) | Geodesic calculation in meters (100%) |
-| "What changed here since 2020?" | LLM hallucinates | Real satellite change detection |
-| CRS confusion | Silent errors | Automatic detection & transformation |
-| "Which landmark is closest?" | LLM guesses wrong (0%) | Exact nearest-neighbor computation (100%) |
+GeoSpark's value proposition depends on which LLM you're using. The table below maps each capability to the gap GeoSpark fills, with v2-paper-verified numbers.
+
+| Problem | Without GeoSpark (open ≤9B) | Without GeoSpark (frontier) | With GeoSpark (any tier) |
+|---|---|---|---|
+| "How far is A from B?" (numeric) | 0–5% — model emits implausible numbers or refuses | 25–95% (vendor-dependent) | **76–96%** geodesic computation |
+| "Is point A inside region B?" | 56% aggregate, but `disjoint` only 3% (yes-bias) | 60–82% baseline | **100%** ground-truth predicate |
+| "Did region X change since 2020?" | 65–90% (already works at all tiers) | 78–92% | tools add no value here — knowledge tasks work without GeoSpark |
+| CRS confusion | Silent errors | Silent errors | Automatic detection & transformation |
+| "Which landmark is closest?" | 0–46% baseline | varies | Exact nearest-neighbor + verifiable trace |
+| Audit trail / verifiability | None — model just emits a number | None at baseline | Per-call tool trace, deterministic engine, reproducible |
+
+**Where GeoSpark adds the most value**: small open-weight models that need to compute (Qwen + tools = 76% on numeric distance, vs 5% baseline) and frontier deployments where you need verifiability rather than additional accuracy (GPT-5.4 baseline = augmented = 95%, but augmented gives you a deterministic tool trace).
+
+**Where GeoSpark adds the least value**: knowledge-based spatial questions ("did the Amazon experience deforestation"). All models above 65% at baseline; tools are unnecessary overhead.
 
 ## Project Status
 

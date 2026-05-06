@@ -8,7 +8,7 @@ packages = ["geospark"]
 [project]
 name = "geospark-ai"
 version = "0.5.1"
-description = "The Open-Source Geospatial Intelligence Protocol & Engine. Give any AI model a spatial mind."
+description = "Ground-truth spatial reasoning and tool augmentation for LLMs. Open-source Geospatial Intelligence Protocol & Engine."
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"

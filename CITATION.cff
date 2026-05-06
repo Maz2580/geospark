@@ -1,6 +1,6 @@
 cff-version: 1.2.0
-message: "If you use GeoSpark in your research, please cite it as below."
-title: "GeoSpark: The Open-Source Geospatial Intelligence Protocol & Engine"
+message: "If you use GeoSpark or GeoSpark Bench, please cite:"
+title: "GeoSpark: Ground-Truth Spatial Tool Augmentation for Large Language Models"
 type: software
 authors:
   - family-names: "Ghasemi Tootkaboni"
@@ -8,22 +8,31 @@ authors:
     email: "M.GhasemiTootkaboni@unimelb.edu.au"
     affiliation: "University of Melbourne"
     orcid: "https://orcid.org/0000-0001-8084-5270"
+version: "0.5.1"
+date-released: "2026-03-29"
+url: "https://github.com/Maz2580/geospark"
 repository-code: "https://github.com/Maz2580/geospark"
-url: "https://geospark.terrascout.app"
 license: Apache-2.0
-version: "0.4.0"
-date-released: "2026-04-04"
 keywords:
-  - geospatial
   - spatial-reasoning
-  - llm
-  - ai
-  - gis
-  - mcp
-  - protocol
+  - LLM-evaluation
+  - geospatial-AI
+  - tool-augmentation
+  - benchmark
+  - MCP
 abstract: >-
-  GeoSpark is an open-source Geospatial Intelligence Protocol and Engine
-  that gives AI models genuine spatial reasoning capabilities. LLMs achieve
-  0% on geodesic distance computation across 4/5 model families tested;
-  GeoSpark provides ground-truth spatial computation via a standardized
-  protocol, autonomous agents, and MCP server integration.
+  GeoSpark wires ground-truth spatial tools into LLMs via the Model Context
+  Protocol, and ships GeoSpark Bench (535 questions across topology, distance,
+  change detection, multi-step reasoning, and multimodal sensor interpretation)
+  to measure how much that wiring matters. The v2 study evaluates nine models
+  in three buckets and finds that bare-LLM accuracy on numeric distance
+  questions varies dramatically by model and vendor (1-95 percent) rather than
+  being uniformly broken. The smallest open-weight tier 3.8B-9B mostly fails
+  outright; one open-weight 20B model performs comparably to frontier; the
+  three frontier APIs themselves disagree by 70 percentage points on identical
+  questions. With GeoSpark tools attached, every model that can orchestrate a
+  tool call lands in a 76-96 percent band, which collapses the vendor lottery
+  into a deterministic engine call. Two further findings of independent
+  interest: per-predicate decomposition reveals model bias that aggregate
+  topology accuracy hides, and Chain-of-Thought is not a free intervention
+  (helps some models, hurts others, by significant margins).

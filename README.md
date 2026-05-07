@@ -69,7 +69,7 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
 - **Enterprise Middleware** — Production hardening that shipped in Phase 8A: sliding-window rate limiting (per-IP and per-API-key with `X-RateLimit-*` headers), structured JSON-Lines audit logging with daily rotation, per-endpoint usage tracking with persisted counters, and transparent LRU+TTL caching for data channels.
 - **Spatial Reasoning Engine** — Topology, geodesic distance, CRS transforms, buffering, area. All geometrically correct, not LLM-guessed.
 - **MCP Server** — 6 tools for Claude Desktop and any MCP-compatible AI assistant. `pip install geospark-ai[mcp] && geospark-mcp`
-- **GeoSpark Bench** — 535 questions, five categories. The v2 evaluation runs each of 9 models (Qwen / Llama / Gemma / Mistral / Phi at ≤9B, gpt-oss at 20B, and three frontier APIs) under three protocols: bare baseline, structured Chain-of-Thought, and tool-augmented. Outcome: a 7B model with our tools answers numeric distance questions about as well as Gemini 2.5 Pro does, at zero per-call cost. [Results →](docs/BENCHMARK_REPORT.md) | [Paper summary](docs/PAPER.md)
+- **GeoSpark Bench** — 535 questions, five categories. The v2 evaluation runs each of 9 models (Qwen / Llama / Gemma / Mistral / Phi at ≤9B, gpt-oss at 20B, and three frontier APIs) under three protocols: bare baseline, structured Chain-of-Thought, and tool-augmented. Outcome: a 7B model with our tools answers numeric distance questions about as well as Gemini 2.5 Pro does, at zero per-call cost. [Results →](docs/BENCHMARK_REPORT.md)
 - **GeoSpark Protocol (GSP)** — Standardized JSON protocol for spatial queries and results.
 - **Live Data Channels** — Pluggable real-time data sources:
   - Weather (Open-Meteo) — current conditions + forecast for any location
@@ -368,7 +368,7 @@ python -m geospark.bench list
 
 ## Benchmark Results
 
-What follows is a quick read of the v2 numbers; for the full prose, theory, and limitations discussion see the [paper summary](docs/PAPER.md).
+What follows is a quick read of the v2 numbers; the underlying paper, theory, and limitations discussion are part of a separate manuscript currently undergoing peer review.
 
 The v2 sweep covered 9 models in 3 buckets:
 - 5 small open-weight (3.8B–9B): Qwen 2.5 7B, Llama 3.1 8B, Gemma 2 9B, Mistral 7B, Phi-3.5 3.8B
@@ -430,7 +430,7 @@ The model isn't reasoning about topology at all — it's defaulting to "yes" and
 - Aggregate accuracy on multi-class benchmarks can miss the actual failure mode entirely; you need per-class numbers to see model bias
 - Knowledge questions ("did the Amazon experience deforestation between 2015 and 2023?") are unaffected by tools — they're already solved by training data at every scale
 
-> Per-cell JSONs and the cost ledger live alongside this README. To re-run the bench yourself: `python -m geospark.bench run`. For the full paper-form discussion: [docs/PAPER.md](docs/PAPER.md).
+> Per-cell JSONs and the cost ledger live alongside this README in the repository. To re-run the bench yourself: `python -m geospark.bench run`. The full paper-form discussion accompanies the manuscript currently under peer review and will be linked here once the venue is announced.
 
 ## Why GeoSpark?
 

@@ -20,6 +20,7 @@ from typing import Any
 import httpx
 
 from geospark.integrations.openrouter import GEOSPARK_SYSTEM_PROMPT, SpatialAnswer
+from geospark.integrations.tool_parser import parse_fallback_tool_calls
 from geospark.mcp_servers.launcher import MCPServerLauncher
 
 logger = logging.getLogger(__name__)
@@ -78,7 +79,15 @@ class OllamaClient:
         for _ in range(max_rounds):
             tool_calls = message.get("tool_calls")
             if not tool_calls:
-                break
+                # Plain-text fallback. Some open-weight models (Llama 3.1 8B,
+                # Mistral 7B, Gemma 2 9B) emit calls as text instead of via
+                # Ollama's structured tool_calls field. Without this the v2
+                # benchmark cells silently lost most of their tool augmentation.
+                recovered = parse_fallback_tool_calls(message.get("content", ""))
+                if not recovered:
+                    break
+                tool_calls = recovered
+                message = dict(message, tool_calls=recovered)
 
             messages.append(message)
 

@@ -26,6 +26,7 @@ from typing import Any
 import httpx
 
 from geospark.integrations.mcp_server import MCP_TOOLS, GeoSparkMCPHandler
+from geospark.integrations.tool_parser import parse_fallback_tool_calls
 
 # Best free models ranked by quality for geospatial tasks
 FREE_MODELS = {
@@ -243,53 +244,13 @@ class OpenRouterClient:
 
     @staticmethod
     def _parse_fallback_tool_calls(text: str) -> list[dict] | None:
+        """Parse plain-text tool calls. Delegates to the shared parser.
+
+        Kept as a static method so existing tests and callers keep working.
+        See ``geospark.integrations.tool_parser`` for the variant list and
+        v2-failure-mode rationale.
         """
-        Parse tool calls from plain text when models don't use structured format.
-
-        Some free models write tool calls as text like:
-            geocode("Paris, France")
-            I'll call geocode with query "Paris"
-            {"name": "geocode", "arguments": {"query": "Paris"}}
-
-        Returns a list of synthetic tool_call dicts, or None if no calls found.
-        """
-        tool_names = {t["name"] for t in MCP_TOOLS}
-        calls = []
-
-        # Pattern 1: function_name("arg") or function_name(key="value")
-        fn_pattern = re.compile(
-            r'\b(' + '|'.join(re.escape(n) for n in tool_names) + r')\s*\(\s*["\']([^"\']+)["\']\s*\)'
-        )
-        for match in fn_pattern.finditer(text):
-            name, arg = match.group(1), match.group(2)
-            # Infer the first required param
-            tool_def = next(t for t in MCP_TOOLS if t["name"] == name)
-            required = [p for p in tool_def["inputSchema"].get("required", []) if p != "explanation"]
-            param_name = required[0] if required else "query"
-            calls.append({
-                "id": f"fallback_{name}",
-                "function": {
-                    "name": name,
-                    "arguments": {param_name: arg, "explanation": "parsed from plain text"},
-                },
-            })
-
-        # Pattern 2: JSON object in text {"name": "...", "arguments": {...}}
-        json_pattern = re.compile(r'\{[^{}]*"name"\s*:\s*"(\w+)"[^{}]*"arguments"\s*:\s*(\{[^{}]*\})[^{}]*\}')
-        for match in json_pattern.finditer(text):
-            name = match.group(1)
-            if name in tool_names:
-                try:
-                    args = json.loads(match.group(2))
-                    args.setdefault("explanation", "parsed from JSON in text")
-                    calls.append({
-                        "id": f"fallback_{name}",
-                        "function": {"name": name, "arguments": args},
-                    })
-                except json.JSONDecodeError:
-                    pass
-
-        return calls if calls else None
+        return parse_fallback_tool_calls(text)
 
     def list_free_models(self) -> dict[str, str]:
         """Return available free models."""

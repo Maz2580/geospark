@@ -3,6 +3,7 @@ name: Deploy
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -17,7 +18,7 @@ jobs:
       - name: Rebuild and restart containers
         run: |
           cd /mnt/geospark
-          sudo docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+          sudo docker compose -f docker-compose.prod.yml -f docker-compose.override.yml up -d --build --remove-orphans
 
       - name: Wait for healthy
         run: |

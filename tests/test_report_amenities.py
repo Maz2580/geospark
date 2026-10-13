@@ -49,7 +49,7 @@ class TestOverpassLoader:
         assert [e.name for e in found["school"]] == ["Lismore Public School"]
         assert found["police"] == []
 
-    def test_falls_back_to_the_second_endpoint(self) -> None:
+    def test_tries_again_after_a_gateway_timeout(self) -> None:
         replies = [_response(504), _response(200, OVERPASS_REPLY)]
         with patch("geospark.knowledge.loaders.httpx.post", side_effect=replies) as post:
             found = OverpassLoader().load_amenities(BBOX, "hospital")
@@ -74,7 +74,7 @@ class TestReportDoesNotInventAbsence:
         reporter._model = "test"
         return reporter
 
-    def test_prompt_marks_failed_lookups_as_not_available(self) -> None:
+    def test_gaps_are_kept_out_of_the_prompt_and_stated_in_fixed_words(self) -> None:
         report = LocationReport(
             query="Lismore", address="Lismore, NSW", elevation_m=11.7, radius_m=2000,
             data_gaps=["nearby services", "weather", "air quality"],
@@ -85,24 +85,29 @@ class TestReportDoesNotInventAbsence:
         def fake_post(url, json, timeout):
             captured["prompt"] = json["messages"][0]["content"]
             reply = MagicMock()
-            reply.json.return_value = {"message": {"content": "ok"}}
+            reply.json.return_value = {"message": {"content": "Lismore sits at 11.7 m."}}
             return reply
 
         with patch("httpx.post", side_effect=fake_post):
-            self._reporter()._generate_narrative(report)
+            text = self._reporter()._generate_narrative(report)
 
         prompt = captured["prompt"]
-        assert "hospital: NOT AVAILABLE (lookup failed)" in prompt
+        # Nothing about the missing topics reaches the model...
+        assert "hospital" not in prompt.split("Summary:")[0].split("Location:")[1]
         assert "none within search radius" not in prompt
-        assert "Weather: NOT AVAILABLE" in prompt
-        assert "Air quality: NOT AVAILABLE" in prompt
+        assert "Weather:" not in prompt and "Air quality" not in prompt.split("Location:")[1]
         assert "Use ONLY the facts listed below" in prompt
         assert "Search radius: 2000m" in prompt
+        # ...and the gaps are appended in wording the model cannot change.
+        assert text == (
+            "Lismore sits at 11.7 m. Not included because the data could not be "
+            "retrieved: nearby services, weather, air quality."
+        )
 
-    def test_fallback_text_says_services_could_not_be_checked(self) -> None:
+    def test_fallback_text_names_the_gap(self) -> None:
         report = LocationReport(query="Lismore", address="Lismore, NSW", data_gaps=["nearby services"])
         with patch("httpx.post", side_effect=httpx.ConnectError("no llm")):
             text = self._reporter()._generate_narrative(report)
 
-        assert "could not be checked" in text
+        assert "could not be retrieved: nearby services" in text
         assert "Found 0 amenities" not in text

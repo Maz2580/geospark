@@ -308,14 +308,14 @@ class SpatialReport:
         access_lines = []
         for a in report.accessibility:
             if not a.checked:
-                access_lines.append(f"  {a.service}: NOT AVAILABLE (lookup failed)")
-            elif a.available:
+                continue
+            if a.available:
                 access_lines.append(f"  {a.service}: {a.nearest_name} ({a.distance_m}m)")
             else:
                 access_lines.append(f"  {a.service}: none within search radius")
         amenities_known = "nearby services" not in report.data_gaps
 
-        weather_line = "Weather: NOT AVAILABLE\n"
+        weather_line = ""
         if report.weather:
             w = report.weather
             weather_line = (
@@ -325,7 +325,7 @@ class SpatialReport:
                 f"precipitation {w.precipitation_mm} mm\n"
             )
 
-        air_line = "Air quality: NOT AVAILABLE\n"
+        air_line = ""
         if report.air_quality:
             aq = report.air_quality
             parts = []
@@ -348,16 +348,25 @@ class SpatialReport:
             + (
                 f"Total nearby amenities found: {len(report.nearby)}\n"
                 f"By type: {json.dumps(amenity_counts)}\n"
+                f"Accessibility (nearest of each service type):\n" + "\n".join(access_lines)
                 if amenities_known
-                else "Nearby amenities: NOT AVAILABLE (lookup failed)\n"
+                else ""
             )
-            + "Accessibility (nearest of each service type):\n" + "\n".join(access_lines)
         )
+        # Missing data is stated in fixed wording after the model's text, so it
+        # can never be phrased as "there are no hospitals here".
+        gap_note = ""
+        if report.data_gaps:
+            gap_note = (
+                " Not included because the data could not be retrieved: "
+                + ", ".join(report.data_gaps)
+                + "."
+            )
 
         prompt = f"""Write a 3-5 sentence spatial intelligence summary for this location.
 Use ONLY the facts listed below and be specific with their numbers.
 Do not add typical values, climate norms, general knowledge about the place, or anything else that is not listed.
-Where a line says NOT AVAILABLE, either leave that topic out or say the data could not be retrieved; never describe it as absent, good, or normal.
+Do not mention any topic that has no line below (for example weather, air quality, or nearby services).
 
 {data}
 
@@ -374,7 +383,7 @@ Summary:"""
                 timeout=60,
             )
             resp.raise_for_status()
-            return resp.json().get("message", {}).get("content", "").strip()
+            return resp.json().get("message", {}).get("content", "").strip() + gap_note
         except Exception:
             # Fallback
             parts = [f"Location: {report.address}."]
@@ -390,9 +399,7 @@ Summary:"""
                     f"Air quality: PM2.5 {report.air_quality.pm25} "
                     f"({report.air_quality.pm25_category})."
                 )
-            if "nearby services" in report.data_gaps:
-                parts.append("Nearby services could not be checked.")
-            else:
+            if "nearby services" not in report.data_gaps:
                 parts.append(f"Found {len(report.nearby)} amenities within search radius.")
             accessible = [a for a in report.accessibility if a.available]
             if accessible:
@@ -401,4 +408,4 @@ Summary:"""
                     f"Nearest service: {nearest.service} "
                     f"({nearest.nearest_name}, {nearest.distance_m}m away)."
                 )
-            return " ".join(parts)
+            return " ".join(parts) + gap_note

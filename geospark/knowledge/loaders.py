@@ -109,15 +109,18 @@ class OverpassLoader:
     """
 
     OVERPASS_URL = "https://overpass-api.de/api/interpreter"
-    # Tried in order; the public servers are often busy or briefly down.
+    # Tried in order. The public servers answer 504 to a large share of
+    # requests when busy, and a second try usually succeeds, so the main one is
+    # listed twice before the mirror.
     OVERPASS_URLS = (
         OVERPASS_URL,
-        "https://overpass.openstreetmap.fr/api/interpreter",
+        OVERPASS_URL,
+        "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
     )
     # The public Overpass servers answer 406/403 to the default httpx user agent.
     USER_AGENT = "GeoSpark (https://github.com/Maz2580/geospark)"
 
-    def _query(self, overpass_ql: str, timeout: float = 30.0) -> dict[str, Any]:
+    def _query(self, overpass_ql: str, timeout: float = 20.0) -> dict[str, Any]:
         """Execute an Overpass QL query and return the JSON response.
 
         Each endpoint in ``OVERPASS_URLS`` is tried in turn; the error from the

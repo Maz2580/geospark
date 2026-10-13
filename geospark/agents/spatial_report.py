@@ -39,6 +39,8 @@ class AccessibilityScore(BaseModel):
     nearest_name: str = ""
     distance_m: float = -1
     available: bool = False
+    # False when the lookup failed, so "available" says nothing either way
+    checked: bool = True
 
 
 class WeatherSnapshot(BaseModel):
@@ -74,6 +76,9 @@ class LocationReport(BaseModel):
     air_quality: AirQualitySnapshot | None = None
     nearby: list[NearbyItem] = Field(default_factory=list)
     accessibility: list[AccessibilityScore] = Field(default_factory=list)
+    # What could not be looked up, e.g. "nearby services", "weather"
+    data_gaps: list[str] = Field(default_factory=list)
+    radius_m: float = 0.0
     admin_area: str = ""
     summary: str = ""
     duration_s: float = 0.0
@@ -125,7 +130,7 @@ class SpatialReport:
             LocationReport with all findings.
         """
         start = time.time()
-        report = LocationReport(query=location)
+        report = LocationReport(query=location, radius_m=radius_m)
         check_services = services or DEFAULT_SERVICES
 
         # Step 1: Geocode
@@ -173,20 +178,30 @@ class SpatialReport:
         bbox = (lat - delta, lon - delta, lat + delta, lon + delta)
         all_nearby: list[NearbyItem] = []
 
-        for svc in check_services:
-            try:
-                entities = self._overpass.load_amenities(bbox, svc)
-                for ent in entities:
-                    dist = SpatialReasoner.calculate_distance(center, ent.geometry)
-                    if dist <= radius_m:
-                        all_nearby.append(NearbyItem(
-                            name=ent.name,
-                            amenity_type=svc,
-                            distance_m=round(dist),
-                            coordinates=ent.geometry.get("coordinates", []),
-                        ))
-            except Exception:
-                continue
+        # A failed lookup must not be reported as "no services nearby"
+        amenities_checked = True
+        try:
+            by_type = self._overpass.load_amenities_by_type(bbox, check_services)
+        except Exception:
+            by_type = {}
+            amenities_checked = False
+            report.data_gaps.append("nearby services")
+
+        for svc, entities in by_type.items():
+            for ent in entities:
+                dist = SpatialReasoner.calculate_distance(center, ent.geometry)
+                if dist <= radius_m:
+                    all_nearby.append(NearbyItem(
+                        name=ent.name,
+                        amenity_type=svc,
+                        distance_m=round(dist),
+                        coordinates=ent.geometry.get("coordinates", []),
+                    ))
+
+        if report.weather is None:
+            report.data_gaps.append("weather")
+        if report.air_quality is None:
+            report.data_gaps.append("air quality")
 
         all_nearby.sort(key=lambda x: x.distance_m)
         report.nearby = all_nearby[:50]  # Cap at 50
@@ -194,7 +209,13 @@ class SpatialReport:
         # Step 4: Accessibility scoring (nearest of each type)
         for svc in check_services:
             svc_items = [n for n in all_nearby if n.amenity_type == svc]
-            if svc_items:
+            if not amenities_checked:
+                report.accessibility.append(AccessibilityScore(
+                    service=svc,
+                    available=False,
+                    checked=False,
+                ))
+            elif svc_items:
                 nearest = svc_items[0]
                 report.accessibility.append(AccessibilityScore(
                     service=svc,
@@ -286,12 +307,15 @@ class SpatialReport:
 
         access_lines = []
         for a in report.accessibility:
-            if a.available:
+            if not a.checked:
+                access_lines.append(f"  {a.service}: NOT AVAILABLE (lookup failed)")
+            elif a.available:
                 access_lines.append(f"  {a.service}: {a.nearest_name} ({a.distance_m}m)")
             else:
                 access_lines.append(f"  {a.service}: none within search radius")
+        amenities_known = "nearby services" not in report.data_gaps
 
-        weather_line = ""
+        weather_line = "Weather: NOT AVAILABLE\n"
         if report.weather:
             w = report.weather
             weather_line = (
@@ -301,7 +325,7 @@ class SpatialReport:
                 f"precipitation {w.precipitation_mm} mm\n"
             )
 
-        air_line = ""
+        air_line = "Air quality: NOT AVAILABLE\n"
         if report.air_quality:
             aq = report.air_quality
             parts = []
@@ -320,15 +344,20 @@ class SpatialReport:
             f"Elevation: {report.elevation_m}m\n"
             f"{weather_line}"
             f"{air_line}"
-            f"Search radius: {report.query} (analyzed within the search area)\n"
-            f"Total nearby amenities found: {len(report.nearby)}\n"
-            f"By type: {json.dumps(amenity_counts)}\n"
-            f"Accessibility (nearest of each service type):\n" + "\n".join(access_lines)
+            f"Search radius: {round(report.radius_m)}m\n"
+            + (
+                f"Total nearby amenities found: {len(report.nearby)}\n"
+                f"By type: {json.dumps(amenity_counts)}\n"
+                if amenities_known
+                else "Nearby amenities: NOT AVAILABLE (lookup failed)\n"
+            )
+            + "Accessibility (nearest of each service type):\n" + "\n".join(access_lines)
         )
 
         prompt = f"""Write a 3-5 sentence spatial intelligence summary for this location.
-Include key facts about accessibility, nearby services, terrain, weather conditions, and air quality where available.
-Be specific with numbers.
+Use ONLY the facts listed below and be specific with their numbers.
+Do not add typical values, climate norms, general knowledge about the place, or anything else that is not listed.
+Where a line says NOT AVAILABLE, either leave that topic out or say the data could not be retrieved; never describe it as absent, good, or normal.
 
 {data}
 
@@ -361,7 +390,10 @@ Summary:"""
                     f"Air quality: PM2.5 {report.air_quality.pm25} "
                     f"({report.air_quality.pm25_category})."
                 )
-            parts.append(f"Found {len(report.nearby)} amenities within search radius.")
+            if "nearby services" in report.data_gaps:
+                parts.append("Nearby services could not be checked.")
+            else:
+                parts.append(f"Found {len(report.nearby)} amenities within search radius.")
             accessible = [a for a in report.accessibility if a.available]
             if accessible:
                 nearest = min(accessible, key=lambda a: a.distance_m)

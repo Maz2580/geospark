@@ -10,6 +10,7 @@ Usage:
 
 from __future__ import annotations
 
+import asyncio
 import os
 import time
 from contextlib import asynccontextmanager
@@ -741,7 +742,12 @@ async def agent_report(request: ReportRequest):
     from geospark.agents import SpatialReport
 
     reporter = SpatialReport(engine=get_engine())
-    report = reporter.analyze(request.location, radius_m=request.radius_m)
+    # analyze() is synchronous and starts its own event loop for the weather
+    # and air-quality channels, which fails inside this one. A worker thread
+    # also keeps the server responsive during the ~20 s it takes.
+    report = await asyncio.to_thread(
+        reporter.analyze, request.location, radius_m=request.radius_m
+    )
     return report.model_dump()
 
 

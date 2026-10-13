@@ -109,25 +109,39 @@ class OverpassLoader:
     """
 
     OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+    # Tried in order; the public servers are often busy or briefly down.
+    OVERPASS_URLS = (
+        OVERPASS_URL,
+        "https://overpass.openstreetmap.fr/api/interpreter",
+    )
+    # The public Overpass servers answer 406/403 to the default httpx user agent.
+    USER_AGENT = "GeoSpark (https://github.com/Maz2580/geospark)"
 
     def _query(self, overpass_ql: str, timeout: float = 30.0) -> dict[str, Any]:
-        """Execute an Overpass QL query and return the JSON response."""
-        try:
-            response = httpx.post(
-                self.OVERPASS_URL,
-                data={"data": overpass_ql},
-                timeout=timeout,
-            )
-            response.raise_for_status()
-        except httpx.HTTPStatusError:
-            raise
-        except httpx.HTTPError as err:
-            raise RuntimeError(f"Overpass API request failed: {err}") from err
+        """Execute an Overpass QL query and return the JSON response.
 
-        try:
-            return response.json()
-        except Exception as err:
-            raise RuntimeError(f"Failed to parse Overpass response: {err}") from err
+        Each endpoint in ``OVERPASS_URLS`` is tried in turn; the error from the
+        last one is raised if none of them answers.
+        """
+        last_error: Exception | None = None
+        for url in self.OVERPASS_URLS:
+            try:
+                response = httpx.post(
+                    url,
+                    data={"data": overpass_ql},
+                    headers={"User-Agent": self.USER_AGENT},
+                    timeout=timeout,
+                )
+                response.raise_for_status()
+                return response.json()
+            except httpx.HTTPStatusError as err:
+                last_error = err
+            except httpx.HTTPError as err:
+                last_error = RuntimeError(f"Overpass API request failed: {err}")
+            except ValueError as err:
+                last_error = RuntimeError(f"Failed to parse Overpass response: {err}")
+        assert last_error is not None
+        raise last_error
 
     @staticmethod
     def _element_to_entity(
@@ -166,6 +180,11 @@ class OverpassLoader:
             elif len(outer_coords) > 1:
                 geometry = {"type": "MultiPolygon", "coordinates": [[r] for r in outer_coords]}
 
+        # "out center" gives ways and relations a single representative point
+        center = element.get("center")
+        if geometry is None and center and "lat" in center and "lon" in center:
+            geometry = {"type": "Point", "coordinates": [center["lon"], center["lat"]]}
+
         if geometry is None:
             return None
 
@@ -198,21 +217,50 @@ class OverpassLoader:
         Returns:
             List of ``SpatialEntity`` objects.
         """
+        return self.load_amenities_by_type(bbox, [amenity_type])[amenity_type]
+
+    def load_amenities_by_type(
+        self,
+        bbox: tuple[float, float, float, float],
+        amenity_types: list[str],
+    ) -> dict[str, list[SpatialEntity]]:
+        """Fetch several amenity types in one Overpass request.
+
+        Hospitals, schools and the like are often mapped as building outlines
+        (ways) rather than points, so nodes, ways and relations are all
+        queried and each is reduced to a single point.
+
+        Args:
+            bbox: Bounding box as ``(min_lat, min_lon, max_lat, max_lon)``.
+            amenity_types: OSM amenity values (e.g. ``["hospital", "school"]``).
+
+        Returns:
+            Entities grouped by amenity type; every requested type has a key.
+
+        Raises:
+            Exception: if no Overpass endpoint answers. Callers must treat that
+                as "unknown", never as "nothing there".
+        """
         south, west, north, east = bbox
+        wanted = [t for t in amenity_types if t.replace("_", "").isalnum()]
+        pattern = "|".join(wanted)
         query = (
             f"[out:json][timeout:25];"
-            f'node["amenity"="{amenity_type}"]'
+            f'nwr["amenity"~"^({pattern})$"]'
             f"({south},{west},{north},{east});"
-            f"out body;"
+            f"out center;"
         )
         data = self._query(query)
 
-        entities: list[SpatialEntity] = []
+        grouped: dict[str, list[SpatialEntity]] = {t: [] for t in amenity_types}
         for element in data.get("elements", []):
-            ent = self._element_to_entity(element, amenity_type, ["cuisine"])
+            amenity = element.get("tags", {}).get("amenity")
+            if amenity not in grouped:
+                continue
+            ent = self._element_to_entity(element, amenity, ["cuisine"])
             if ent:
-                entities.append(ent)
-        return entities
+                grouped[amenity].append(ent)
+        return grouped
 
     def load_admin_boundary(
         self,

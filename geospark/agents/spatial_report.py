@@ -14,6 +14,7 @@ Usage:
 from __future__ import annotations
 
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 from pydantic import BaseModel, Field
 
@@ -21,6 +22,10 @@ from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.knowledge.loaders import OverpassLoader
 from geospark.mcp_servers.launcher import MCPServerLauncher
+
+# The local model usually writes the summary in well under this; if it is
+# busy, the report uses its plain summary rather than keep the caller waiting.
+NARRATIVE_TIMEOUT_S = 30
 
 
 class NearbyItem(BaseModel):
@@ -158,34 +163,38 @@ class SpatialReport:
         lon, lat = coords[0], coords[1]
         center = {"type": "Point", "coordinates": [lon, lat]}
 
-        # Step 2: Elevation
-        elev = self._launcher.handle_tool_call("get_elevation", {
-            "explanation": f"Elevation at {location}",
-            "latitude": lat,
-            "longitude": lon,
-        })
-        if elev.get("status") == "success" and elev.get("result"):
-            report.elevation_m = elev["result"].get("elevation_m")
-
-        # Step 2b: Weather (Tier 0 — always available, no key needed)
-        report.weather = self._fetch_weather(lat, lon)
-
-        # Step 2c: Air quality (Tier 1 — graceful if OPENAQ_API_KEY not set)
-        report.air_quality = self._fetch_air_quality(lat, lon)
-
-        # Step 3: Nearby amenities (all service types)
+        # Steps 2-3: elevation, weather, air quality and nearby amenities are
+        # independent, so they are fetched at the same time. Amenities (the
+        # public Overpass servers) usually take longest.
         delta = radius_m / 111320
         bbox = (lat - delta, lon - delta, lat + delta, lon + delta)
-        all_nearby: list[NearbyItem] = []
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            elev_job = pool.submit(self._launcher.handle_tool_call, "get_elevation", {
+                "explanation": f"Elevation at {location}",
+                "latitude": lat,
+                "longitude": lon,
+            })
+            weather_job = pool.submit(self._fetch_weather, lat, lon)
+            air_job = pool.submit(self._fetch_air_quality, lat, lon)
+            amenities_job = pool.submit(self._overpass.load_amenities_by_type, bbox, check_services)
 
-        # A failed lookup must not be reported as "no services nearby"
-        amenities_checked = True
-        try:
-            by_type = self._overpass.load_amenities_by_type(bbox, check_services)
-        except Exception:
-            by_type = {}
-            amenities_checked = False
-            report.data_gaps.append("nearby services")
+            elev = elev_job.result()
+            if elev.get("status") == "success" and elev.get("result"):
+                report.elevation_m = elev["result"].get("elevation_m")
+            # Weather is Tier 0 (no key); air quality is skipped without OPENAQ_API_KEY
+            report.weather = weather_job.result()
+            report.air_quality = air_job.result()
+
+            # A failed lookup must not be reported as "no services nearby"
+            amenities_checked = True
+            try:
+                by_type = amenities_job.result()
+            except Exception:
+                by_type = {}
+                amenities_checked = False
+                report.data_gaps.append("nearby services")
+
+        all_nearby: list[NearbyItem] = []
 
         for svc, entities in by_type.items():
             for ent in entities:
@@ -380,7 +389,8 @@ Summary:"""
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,
                 },
-                timeout=60,
+                # Past this the plain summary below is used instead of waiting
+                timeout=NARRATIVE_TIMEOUT_S,
             )
             resp.raise_for_status()
             return resp.json().get("message", {}).get("content", "").strip() + gap_note

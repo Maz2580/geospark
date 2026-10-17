@@ -3,11 +3,19 @@
 from unittest.mock import MagicMock, patch
 
 import httpx
+import pytest
 
 from geospark.agents.spatial_report import AccessibilityScore, LocationReport, SpatialReport
 from geospark.knowledge.loaders import OverpassLoader
 
 BBOX = (-28.83, 153.25, -28.79, 153.30)
+
+
+@pytest.fixture(autouse=True)
+def _fresh_cache():
+    OverpassLoader._cache.clear()
+    yield
+    OverpassLoader._cache.clear()
 
 OVERPASS_REPLY = {
     "elements": [
@@ -111,3 +119,33 @@ class TestReportDoesNotInventAbsence:
 
         assert "could not be retrieved: nearby services" in text
         assert "Found 0 amenities" not in text
+
+
+class TestOverpassSpeed:
+    def test_endpoints_are_raced_and_a_slow_one_is_not_waited_for(self) -> None:
+        import threading
+        import time as _time
+
+        release = threading.Event()
+
+        def fake_post(url, data, headers, timeout):
+            if "mail.ru" in url:
+                return _response(200, OVERPASS_REPLY)
+            release.wait(5)  # the main server is busy
+            return _response(200, {"elements": []})
+
+        with patch("geospark.knowledge.loaders.httpx.post", side_effect=fake_post):
+            start = _time.monotonic()
+            found = OverpassLoader().load_amenities_by_type(BBOX, ["hospital"])
+            elapsed = _time.monotonic() - start
+        release.set()
+        assert [e.name for e in found["hospital"]] == ["Lismore Base Hospital"]
+        assert elapsed < 2
+
+    def test_repeat_question_is_answered_from_memory(self) -> None:
+        with patch("geospark.knowledge.loaders.httpx.post", return_value=_response(200, OVERPASS_REPLY)) as post:
+            OverpassLoader().load_amenities_by_type(BBOX, ["school"])
+            first_calls = post.call_count
+            again = OverpassLoader().load_amenities_by_type(BBOX, ["school"])
+        assert post.call_count == first_calls
+        assert [e.name for e in again["school"]] == ["Lismore Public School"]

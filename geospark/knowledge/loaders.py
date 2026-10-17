@@ -8,7 +8,11 @@ from __future__ import annotations
 
 import hashlib
 import json
-from typing import Any
+import threading
+import time
+from collections import OrderedDict
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from typing import Any, ClassVar
 
 import httpx
 
@@ -109,42 +113,110 @@ class OverpassLoader:
     """
 
     OVERPASS_URL = "https://overpass-api.de/api/interpreter"
-    # Tried in order. The public servers answer 504 to a large share of
-    # requests when busy, and a second try usually succeeds, so the main one is
-    # listed twice before the mirror.
+    # Asked at the same time; the first good answer is used. The public
+    # servers often take 15-30 s and answer 504 when busy, so waiting on one
+    # and then trying the next made a report take a minute or more.
     OVERPASS_URLS = (
-        OVERPASS_URL,
         OVERPASS_URL,
         "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
     )
     # The public Overpass servers answer 406/403 to the default httpx user agent.
     USER_AGENT = "GeoSpark (https://github.com/Maz2580/geospark)"
 
-    def _query(self, overpass_ql: str, timeout: float = 20.0) -> dict[str, Any]:
+    # Answers are kept for a while: OpenStreetMap changes slowly and the same
+    # town is often asked about repeatedly.
+    CACHE_TTL_S = 6 * 3600
+    CACHE_SIZE = 256
+    _cache: ClassVar[OrderedDict[str, tuple[float, dict[str, Any]]]] = OrderedDict()
+    _cache_lock: ClassVar[threading.Lock] = threading.Lock()
+
+    def _query(self, overpass_ql: str, timeout: float = 40.0) -> dict[str, Any]:
         """Execute an Overpass QL query and return the JSON response.
 
-        Each endpoint in ``OVERPASS_URLS`` is tried in turn; the error from the
-        last one is raised if none of them answers.
+        Every endpoint in ``OVERPASS_URLS`` is asked at once and the first
+        good answer wins. If they all fail quickly (a busy server answers 504
+        at once) they are asked again while time remains. ``timeout`` bounds
+        the whole call; the last error is raised if no endpoint answers.
         """
-        last_error: Exception | None = None
-        for url in self.OVERPASS_URLS:
+        key = hashlib.sha256(overpass_ql.encode()).hexdigest()
+        cached = self._cached(key)
+        if cached is not None:
+            return cached
+
+        deadline = time.monotonic() + timeout
+        last_error: Exception = RuntimeError("Overpass API request timed out")
+        for _ in range(2):
+            remaining = deadline - time.monotonic()
+            if remaining < 2:
+                break
             try:
-                response = httpx.post(
-                    url,
-                    data={"data": overpass_ql},
-                    headers={"User-Agent": self.USER_AGENT},
-                    timeout=timeout,
-                )
-                response.raise_for_status()
-                return response.json()
-            except httpx.HTTPStatusError as err:
+                data = self._race(overpass_ql, remaining)
+            except Exception as err:
                 last_error = err
-            except httpx.HTTPError as err:
-                last_error = RuntimeError(f"Overpass API request failed: {err}")
-            except ValueError as err:
-                last_error = RuntimeError(f"Failed to parse Overpass response: {err}")
-        assert last_error is not None
+                continue
+            self._remember(key, data)
+            return data
         raise last_error
+
+    def _race(self, overpass_ql: str, timeout: float) -> dict[str, Any]:
+        """Ask every endpoint at once; return the first good answer."""
+        pool = ThreadPoolExecutor(max_workers=len(self.OVERPASS_URLS))
+        pending = {pool.submit(self._post, url, overpass_ql, timeout) for url in self.OVERPASS_URLS}
+        last_error: Exception = RuntimeError("Overpass API request timed out")
+        deadline = time.monotonic() + timeout
+        try:
+            while pending:
+                done, pending = wait(
+                    pending,
+                    timeout=max(deadline - time.monotonic(), 0),
+                    return_when=FIRST_COMPLETED,
+                )
+                if not done:
+                    break
+                for future in done:
+                    try:
+                        return future.result()
+                    except Exception as err:
+                        last_error = err
+            raise last_error
+        finally:
+            # Slower requests finish on their own; nobody waits for them
+            pool.shutdown(wait=False, cancel_futures=True)
+
+    def _post(self, url: str, overpass_ql: str, timeout: float) -> dict[str, Any]:
+        try:
+            response = httpx.post(
+                url,
+                data={"data": overpass_ql},
+                headers={"User-Agent": self.USER_AGENT},
+                timeout=timeout,
+            )
+            response.raise_for_status()
+            result: dict[str, Any] = response.json()
+            return result
+        except httpx.HTTPStatusError:
+            raise
+        except httpx.HTTPError as err:
+            raise RuntimeError(f"Overpass API request failed: {err}") from err
+        except ValueError as err:
+            raise RuntimeError(f"Failed to parse Overpass response: {err}") from err
+
+    @classmethod
+    def _cached(cls, key: str) -> dict[str, Any] | None:
+        with cls._cache_lock:
+            entry = cls._cache.get(key)
+            if entry is None or time.monotonic() - entry[0] > cls.CACHE_TTL_S:
+                return None
+            cls._cache.move_to_end(key)
+            return entry[1]
+
+    @classmethod
+    def _remember(cls, key: str, data: dict[str, Any]) -> None:
+        with cls._cache_lock:
+            cls._cache[key] = (time.monotonic(), data)
+            cls._cache.move_to_end(key)
+            while len(cls._cache) > cls.CACHE_SIZE:
+                cls._cache.popitem(last=False)
 
     @staticmethod
     def _element_to_entity(

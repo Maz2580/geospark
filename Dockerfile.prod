@@ -21,9 +21,11 @@ RUN pip install --no-cache-dir --prefix=/install ".[api,intelligence,terrain]"
 # Stage 2: Runtime
 FROM python:3.11-slim
 
+# libexpat1: the rasterio wheel links the system expat (Copernicus DEM reads)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgeos-dev \
     libproj-dev \
+    libexpat1 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 

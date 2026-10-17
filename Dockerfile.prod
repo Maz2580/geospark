@@ -16,7 +16,7 @@ COPY pyproject.toml README.md ./
 COPY geospark/ geospark/
 
 # Install core + api + intelligence deps (FAISS for vector search acceleration)
-RUN pip install --no-cache-dir --prefix=/install ".[api,intelligence]"
+RUN pip install --no-cache-dir --prefix=/install ".[api,intelligence,terrain]"
 
 # Stage 2: Runtime
 FROM python:3.11-slim

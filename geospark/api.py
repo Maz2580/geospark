@@ -395,15 +395,29 @@ async def elevation(request: ElevationRequest):
         operation=SpatialOperation.ELEVATION,
         geometry=Point.from_latlon(request.latitude, request.longitude),
     )
-    result = engine.execute(query)
+    # The lookup is network-bound and synchronous; run it off the event loop
+    # so one slow elevation read does not stall every other request.
+    result = await asyncio.to_thread(engine.execute, query)
     if result.errors:
         raise HTTPException(status_code=502, detail=result.errors[0])
-    return {
+    props = result.features[0].properties if result.features else {}
+    response = {
         "latitude": request.latitude,
         "longitude": request.longitude,
-        "elevation_m": result.features[0].properties.get("elevation_m") if result.features else None,
-        "source": "Open Elevation API",
+        "elevation_m": props.get("elevation_m"),
+        "source": _ELEVATION_SOURCE_NAMES.get(result.sources[0] if result.sources else "", "unknown"),
+        "vertical_datum": props.get("vertical_datum"),
     }
+    for key in ("attribution", "fallback_note"):
+        if props.get(key):
+            response[key] = props[key]
+    return response
+
+
+_ELEVATION_SOURCE_NAMES = {
+    "copernicus-dem": "Copernicus DEM GLO-30",
+    "open-elevation-api": "Open Elevation API",
+}
 
 
 @app.get("/api/v1/tools")

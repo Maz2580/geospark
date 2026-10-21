@@ -105,7 +105,7 @@ def _resolve_adapter(model: str):
             from geospark.integrations.openrouter import OpenRouterClient  # noqa: F401
             return _OpenRouterAdapter(model.replace("openrouter:", ""))
         except ImportError:
-            console.print("[red]OpenRouter integration not available. Install with: pip install geospark[llm][/red]")
+            console.print("[red]OpenRouter integration not available. Install with: pip install geospark-ai[llm][/red]")
             sys.exit(1)
 
     # Default to mock with warning

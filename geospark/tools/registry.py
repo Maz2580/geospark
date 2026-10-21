@@ -20,6 +20,11 @@ TOOL_CLASSES: dict[str, str] = {
     "router": "geospark.tools.routing.osrm.OSRMRouteTool",
 }
 
+# Optional-dependency extra that each tool needs (tools not listed need only the core install)
+TOOL_EXTRAS: dict[str, str] = {
+    "satellite": "satellite",
+}
+
 
 class ToolRegistry:
     """Registry for discovering and loading GeoSpark tools."""
@@ -52,9 +57,10 @@ class ToolRegistry:
             for op in tool.supported_operations:
                 self._operation_map[op] = name
         except ImportError as e:
+            extra = TOOL_EXTRAS.get(name)
+            hint = f"pip install geospark-ai[{extra}]" if extra else "pip install geospark-ai"
             raise ImportError(
-                f"Could not load tool '{name}': {e}. "
-                f"Install required dependencies: pip install geospark[{name}]"
+                f"Could not load tool '{name}': {e}. Install required dependencies: {hint}"
             ) from e
 
     def get_tool(self, name: str) -> BaseTool | None:

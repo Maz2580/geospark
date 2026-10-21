@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev,api]"
+          pip install -e ".[dev,api,mcp]"
 
       - name: Lint with ruff
         run: |
@@ -34,6 +34,11 @@ jobs:
         run: |
           mypy geospark/ --ignore-missing-imports
         continue-on-error: true
+
+      - name: Check the [all] extra resolves to geospark-ai, not the unrelated geospark package
+        run: |
+          pip install --dry-run -e ".[all]" | tee /tmp/all-extra.txt
+          ! grep -qiE "(pyspark|[^-]geospark-[0-9])" /tmp/all-extra.txt
 
       - name: Run tests
         run: |

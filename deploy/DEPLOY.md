@@ -62,7 +62,8 @@ curl -sSL https://raw.githubusercontent.com/Maz2580/geospark/main/deploy/setup.s
 # Edit your environment
 cd ~/geospark
 nano .env
-# Set OPENROUTER_API_KEY and CLOUDFLARE_TUNNEL_TOKEN
+# Set OPENROUTER_API_KEY and CLOUDFLARE_TUNNEL_TOKEN, plus GEOSPARK_ENV=production and
+# GEOSPARK_ADMIN_TOKEN (required in production, see "Security" below)
 
 # Start with tunnel
 docker compose -f docker-compose.prod.yml --profile tunnel up -d
@@ -137,3 +138,27 @@ Fits comfortably on a 1GB VM. On Oracle's 24GB ARM, you'll have plenty of headro
 **API returns 503?**
 - Check: `docker logs geospark-api`
 - Likely missing API key in `.env`
+
+## Security
+
+The public API is open by design: anyone can geocode, measure, query, ask and run agents
+without a key. In production (`GEOSPARK_ENV=production`) the server **refuses to start
+without `GEOSPARK_ADMIN_TOKEN`**, which protects:
+
+| Needs the admin token | Examples |
+|---|---|
+| Operator data | `/api/v1/admin/*` (audit log, usage) |
+| Flow storage | `POST /api/v1/flows`, `DELETE /api/v1/flows/{id}` |
+| LLM gateway | `/api/v1/llm/chat`, `/generate`, `/embeddings`; partners can instead use a key from `GEOSPARK_GATEWAY_KEYS` |
+
+Send the token as `X-Admin-Token: <token>` or `Authorization: Bearer <token>`.
+
+Visitors get a private, size-capped, auto-expiring sandbox for the Memory and Context
+demos. Public callers may choose only the local Ollama model or free OpenRouter models, so
+nobody can spend paid API credit. Expensive routes are rate-limited per client IP and
+capped by `GEOSPARK_MAX_LLM_CONCURRENCY`. All the settings are listed in `.env.example`.
+
+```bash
+# Generate a token, then add GEOSPARK_ADMIN_TOKEN=<token> to .env
+python3 -c "import secrets; print(secrets.token_urlsafe(32))"
+```

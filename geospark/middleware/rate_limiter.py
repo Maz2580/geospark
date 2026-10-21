@@ -23,6 +23,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+from geospark.security import client_ip, is_admin
+
 # Paths exempt from rate limiting (health checks, docs, static pages)
 _EXEMPT_PREFIXES = (
     "/health",
@@ -41,6 +43,7 @@ _EXEMPT_PAGES = frozenset({
     "/data",
     "/status",
     "/guide",
+    "/flows",
 })
 
 
@@ -52,24 +55,12 @@ def _is_exempt(path: str) -> bool:
 
 
 def _get_client_key(request: Request) -> str:
-    """Extract a rate-limit key from the request.
+    """Rate-limit bucket for a request: the real client IP.
 
-    Uses API key (from Authorization header) if present, otherwise
-    falls back to client IP. This means authenticated clients get their
-    own rate-limit bucket, while anonymous clients share per-IP buckets.
+    Unverified headers (a made-up Bearer token, a spoofed X-Forwarded-For) never create
+    a fresh bucket; see ``geospark.security.client_ip`` for when proxy headers are trusted.
     """
-    auth = request.headers.get("authorization", "")
-    if auth.startswith("Bearer ") and len(auth) > 10:
-        # Use a hash prefix of the API key, not the key itself
-        return f"key:{auth[7:15]}"
-    # Client IP — check X-Forwarded-For for proxied requests (Cloudflare)
-    forwarded = request.headers.get("x-forwarded-for", "")
-    if forwarded:
-        return f"ip:{forwarded.split(',')[0].strip()}"
-    client = request.client
-    if client:
-        return f"ip:{client.host}"
-    return "ip:unknown"
+    return f"ip:{client_ip(request)}"
 
 
 class SlidingWindowCounter:
@@ -84,6 +75,7 @@ class SlidingWindowCounter:
         self.window_seconds = window_seconds
         self.max_requests = max_requests
         self._requests: dict[str, list[float]] = defaultdict(list)
+        self._checks_since_sweep = 0
 
     def is_allowed(self, key: str) -> tuple[bool, int, int]:
         """Check if a request from this key is allowed.
@@ -96,6 +88,7 @@ class SlidingWindowCounter:
         """
         now = time.time()
         cutoff = now - self.window_seconds
+        self._maybe_sweep(cutoff)
 
         # Evict old entries
         timestamps = self._requests[key]
@@ -114,6 +107,15 @@ class SlidingWindowCounter:
         # Allowed — record this request
         timestamps.append(now)
         return True, remaining - 1, 0
+
+    def _maybe_sweep(self, cutoff: float) -> None:
+        """Drop keys with no requests left in the window, so memory stays bounded."""
+        self._checks_since_sweep += 1
+        if self._checks_since_sweep < 1000:
+            return
+        self._checks_since_sweep = 0
+        for key in [k for k, ts in self._requests.items() if not ts or ts[-1] <= cutoff]:
+            del self._requests[key]
 
     def get_usage(self, key: str) -> dict[str, int]:
         """Get current usage for a key."""
@@ -181,7 +183,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     def _get_counter(self, path: str) -> SlidingWindowCounter:
         """Get the rate limit counter for a path, checking overrides."""
-        for prefix, rpm in _ROUTE_OVERRIDES.items():
+        for prefix, rpm in sorted(_ROUTE_OVERRIDES.items(), key=lambda kv: -len(kv[0])):
             if path.startswith(prefix):
                 if prefix not in self._route_counters:
                     self._route_counters[prefix] = SlidingWindowCounter(
@@ -193,7 +195,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):  # type: ignore[no-untyped-def]
         """Check rate limit before processing the request."""
-        if not self.enabled or _is_exempt(request.url.path):
+        if not self.enabled or _is_exempt(request.url.path) or is_admin(request):
             return await call_next(request)
 
         client_key = _get_client_key(request)

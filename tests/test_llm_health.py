@@ -233,7 +233,8 @@ class TestHealthEndpoint:
             "load_average_15m",
             "ollama_reachable",
             "reason",
-            "ollama_url",
         ]
         for field in extras:
             assert field in data
+        # The internal Ollama address is server configuration, not public information.
+        assert "ollama_url" not in data

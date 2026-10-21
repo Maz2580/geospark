@@ -6,7 +6,9 @@ enabling any app to use free local inference by changing one URL.
 
 Usage:
     # Instead of: client = OpenAI(api_key="sk-...")
-    client = OpenAI(base_url="https://geospark.terrascout.app/api/v1/llm", api_key="any")
+    # chat/generate/embeddings need a partner key from GEOSPARK_GATEWAY_KEYS (or the
+    # operator token); /models and /health are public.
+    client = OpenAI(base_url="https://geospark.terrascout.app/api/v1/llm", api_key="<gateway key>")
     response = client.chat.completions.create(model="qwen2.5:7b", messages=[...])
 """
 
@@ -18,8 +20,10 @@ import time
 from typing import Any
 
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
+
+from geospark.security import verify_gateway
 
 router = APIRouter(prefix="/api/v1/llm", include_in_schema=False)
 
@@ -97,10 +101,10 @@ async def list_models():
 
         return {"object": "list", "data": models}
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Ollama unreachable: {e}") from e
+        raise HTTPException(status_code=502, detail=f"Ollama unreachable ({type(e).__name__})") from e
 
 
-@router.post("/chat")
+@router.post("/chat", dependencies=[Depends(verify_gateway)])
 async def chat_completion(request: ChatRequest):
     """OpenAI-compatible chat completion via local Ollama.
 
@@ -153,7 +157,7 @@ async def chat_completion(request: ChatRequest):
     }
 
 
-@router.post("/generate")
+@router.post("/generate", dependencies=[Depends(verify_gateway)])
 async def generate(request: GenerateRequest):
     """Simple text generation."""
     payload: dict[str, Any] = {
@@ -182,7 +186,7 @@ async def generate(request: GenerateRequest):
     }
 
 
-@router.post("/embeddings")
+@router.post("/embeddings", dependencies=[Depends(verify_gateway)])
 async def embeddings(request: EmbeddingRequest):
     """Generate text embeddings via Ollama.
 
@@ -300,7 +304,7 @@ async def llm_health():
                     "expires_at": m.get("expires_at", ""),
                 })
     except Exception as e:
-        error = str(e)
+        error = type(e).__name__  # not str(e): it would reveal the internal Ollama URL
 
     status, reason = _compute_status(load_1m, queue_depth, ollama_reachable)
 
@@ -314,7 +318,6 @@ async def llm_health():
         "queue_depth": queue_depth,
         "ollama_reachable": ollama_reachable,
         "reason": reason,
-        "ollama_url": OLLAMA_URL,
         "loaded_models_detail": loaded_models,
     }
     if error:

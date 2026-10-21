@@ -28,6 +28,9 @@ from typing import Any
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
+from geospark.security import client_ip as real_client_ip
+from geospark.security import hash_ip
+
 # Paths to skip in audit log (static assets, noisy health checks)
 _SKIP_PREFIXES = (
     "/assets/",
@@ -249,11 +252,8 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         duration_ms = (time.time() - t0) * 1000
 
-        # Extract client IP (prefer X-Forwarded-For for Cloudflare)
-        forwarded = request.headers.get("x-forwarded-for", "")
-        client_ip = forwarded.split(",")[0].strip() if forwarded else ""
-        if not client_ip and request.client:
-            client_ip = request.client.host
+        # Real client IP behind the tunnel, stored only as a salted hash (no raw IPs on disk)
+        client_ip = hash_ip(real_client_ip(request))
 
         api_key = _extract_api_key(request)
 

@@ -2,10 +2,27 @@
 
 const API = window.location.origin;
 
+/* --- Visitor session ---
+ * A random id kept in this browser. The server uses it to give each visitor a private
+ * sandbox for the Memory and Context demos. If storage is blocked, a per-page id is used. */
+const SESSION_ID = (() => {
+  const fresh = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now());
+  try {
+    let id = localStorage.getItem('geospark-session');
+    if (!id || !/^[A-Za-z0-9-]{16,64}$/.test(id)) {
+      id = fresh();
+      localStorage.setItem('geospark-session', id);
+    }
+    return id;
+  } catch (e) {
+    return fresh();
+  }
+})();
+
 /* --- API Client --- */
 const geo = {
   async get(path) {
-    const resp = await fetch(`${API}${path}`);
+    const resp = await fetch(`${API}${path}`, { headers: { 'X-GeoSpark-Session': SESSION_ID } });
     if (!resp.ok) throw new Error(`${resp.status}: ${await resp.text()}`);
     return resp.json();
   },
@@ -13,7 +30,7 @@ const geo = {
   async post(path, body) {
     const resp = await fetch(`${API}${path}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-GeoSpark-Session': SESSION_ID },
       body: JSON.stringify(body),
     });
     if (!resp.ok) throw new Error(`${resp.status}: ${await resp.text()}`);

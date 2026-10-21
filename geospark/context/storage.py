@@ -13,15 +13,28 @@ from geospark.context.geo_context import ContextRelation, ContextTier, GeoContex
 _URI_PATTERN = re.compile(r"^geospark://([^/]+)/(.+)$")
 
 
+_SEGMENT_PATTERN = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_.-]*$")
+
+
 def parse_uri(uri: str) -> tuple[str, str]:
     """Parse a geospark:// URI into (category, path).
+
+    Every segment must be a plain name (letters, digits, ``_``, ``.``, ``-``, not
+    starting with ``.``), so a URI can never address a file outside the store.
 
     Raises ValueError on malformed URI.
     """
     match = _URI_PATTERN.match(uri)
     if not match:
         raise ValueError(f"Invalid GeoSpark URI: {uri}. Expected geospark://<category>/<path>")
-    return match.group(1), match.group(2)
+    category, path = match.group(1), match.group(2)
+    for segment in [category, *path.split("/")]:
+        if not _SEGMENT_PATTERN.match(segment):
+            raise ValueError(
+                f"Invalid GeoSpark URI: {uri}. Segments may only contain letters, digits, "
+                "'_', '.' and '-', and may not start with '.'"
+            )
+    return category, path
 
 
 def build_uri(category: str, name: str, subpath: str = "") -> str:
@@ -73,15 +86,21 @@ class ContextStore:
     # Path helpers
     # -------------------------------------------------------------------
 
+    def _contained(self, path: Path) -> Path:
+        """Defence in depth: refuse any path that resolves outside the storage root."""
+        if not path.resolve().is_relative_to(self._root.resolve()):
+            raise ValueError("Context path escapes the storage root")
+        return path
+
     def _uri_to_dir(self, uri: str) -> Path:
         """Convert a URI to a filesystem path under the storage root."""
         category, path = parse_uri(uri)
-        return self._root / category / path
+        return self._contained(self._root / category / path)
 
     def _archive_dir_for(self, uri: str) -> Path:
         """Return the archive location for a given URI."""
         category, path = parse_uri(uri)
-        return self._root / category / self.ARCHIVE_DIR / path
+        return self._contained(self._root / category / self.ARCHIVE_DIR / path)
 
     # -------------------------------------------------------------------
     # Save / Load

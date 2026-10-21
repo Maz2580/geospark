@@ -11,21 +11,23 @@ Usage:
 from __future__ import annotations
 
 import asyncio
+import hmac
 import os
+import re
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, HTTPException, Security
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from geospark import __version__
+from geospark import __version__, security
 from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.protocol.schema import (
@@ -34,6 +36,13 @@ from geospark.protocol.schema import (
     SpatialQuery,
     SpatialResult,
 )
+from geospark.sandbox import (
+    check_context_quota,
+    check_memory_quota,
+    namespace_for,
+    sandboxes,
+)
+from geospark.security import check_model, llm_slot, verify_admin
 
 load_dotenv()
 
@@ -51,7 +60,8 @@ def get_engine() -> Engine:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Initialize engine on startup."""
+    """Validate security config and initialize the engine on startup."""
+    security.check_startup_config()
     get_engine()
     yield
 
@@ -63,19 +73,23 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["GET", "POST", "DELETE"],
-    allow_headers=["*"],
-)
-
 # Rate limiting — sliding window per IP/API key (Phase 8A)
 from geospark.middleware.rate_limiter import RateLimitMiddleware, set_route_limit  # noqa: E402
 
 app.add_middleware(RateLimitMiddleware)
-# Agent routes get a lower limit (they're expensive, 30-60s each)
-set_route_limit("/api/v1/agent/", 20)
+# Expensive routes (LLM calls, agents, embeddings, upstream fan-out) get lower limits
+for _prefix in (
+    "/api/v1/agent/",
+    "/api/v1/ask",
+    "/api/v1/flows/build",
+    "/api/v1/flows/templates/",
+    "/api/v1/memory/",
+    "/api/v1/data/status",
+):
+    set_route_limit(_prefix, int(os.getenv("GEOSPARK_RATE_LIMIT_EXPENSIVE_RPM", "12")))
+# Cheap listings under those prefixes keep the normal limit (longest prefix wins)
+for _prefix in ("/api/v1/agent/list", "/api/v1/memory/stats"):
+    set_route_limit(_prefix, int(os.getenv("GEOSPARK_RATE_LIMIT_RPM", "60")) + 10)
 
 # Audit logging — structured JSONL per day (Phase 8A)
 from geospark.middleware.audit_log import AuditLogMiddleware  # noqa: E402
@@ -86,6 +100,19 @@ app.add_middleware(AuditLogMiddleware)
 from geospark.middleware.usage_tracker import UsageTrackingMiddleware  # noqa: E402
 
 app.add_middleware(UsageTrackingMiddleware)
+
+# Request body cap (default 1 MB)
+from geospark.middleware.body_limit import BodySizeLimitMiddleware  # noqa: E402
+
+app.add_middleware(BodySizeLimitMiddleware)
+
+# CORS last = outermost, so every response (including 413/429) carries CORS headers
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST", "DELETE"],
+    allow_headers=["*"],
+)
 
 # --- Static UI ---
 _ui_dir = Path(__file__).parent / "ui"
@@ -167,8 +194,14 @@ async def verify_api_key(
     api_key = os.getenv("GEOSPARK_API_KEY")
     if not api_key:
         return  # No key configured — open access
-    if credentials is None or credentials.credentials != api_key:
-        raise HTTPException(status_code=401, detail="Invalid or missing API key")
+    presented = credentials.credentials if credentials is not None else ""
+    admin = os.getenv("GEOSPARK_ADMIN_TOKEN", "")
+    if presented and (
+        hmac.compare_digest(presented.encode(), api_key.encode())
+        or (admin and hmac.compare_digest(presented.encode(), admin.encode()))
+    ):
+        return
+    raise HTTPException(status_code=401, detail="Invalid or missing API key")
 
 
 # --- Request/Response Models ---
@@ -181,15 +214,15 @@ class HealthResponse(BaseModel):
 
 
 class GeocodeRequest(BaseModel):
-    query: str = Field(..., description="Address or place name to geocode")
-    limit: int = Field(5, description="Max results")
+    query: str = Field(..., min_length=1, max_length=500, description="Address or place name to geocode")
+    limit: int = Field(5, ge=1, le=40, description="Max results")
 
 
 class SpatialQueryRequest(BaseModel):
     operation: str = Field(..., description="Spatial operation to perform")
-    latitude: float | None = Field(None, description="Latitude")
-    longitude: float | None = Field(None, description="Longitude")
-    radius_m: float | None = Field(None, description="Radius in meters")
+    latitude: float | None = Field(None, ge=-90, le=90, description="Latitude")
+    longitude: float | None = Field(None, ge=-180, le=180, description="Longitude")
+    radius_m: float | None = Field(None, ge=0, le=50_000, description="Radius in meters")
     category: str | None = Field(None, description="Feature category filter")
 
 
@@ -210,10 +243,10 @@ class RelationshipResponse(BaseModel):
 
 
 class DistanceRequest(BaseModel):
-    lat_a: float = Field(..., description="Latitude of point A")
-    lon_a: float = Field(..., description="Longitude of point A")
-    lat_b: float = Field(..., description="Latitude of point B")
-    lon_b: float = Field(..., description="Longitude of point B")
+    lat_a: float = Field(..., ge=-90, le=90, description="Latitude of point A")
+    lon_a: float = Field(..., ge=-180, le=180, description="Longitude of point A")
+    lat_b: float = Field(..., ge=-90, le=90, description="Latitude of point B")
+    lon_b: float = Field(..., ge=-180, le=180, description="Longitude of point B")
 
 
 class DistanceResponse(BaseModel):
@@ -223,13 +256,13 @@ class DistanceResponse(BaseModel):
 
 
 class ElevationRequest(BaseModel):
-    latitude: float = Field(..., description="Latitude")
-    longitude: float = Field(..., description="Longitude")
+    latitude: float = Field(..., ge=-90, le=90, description="Latitude")
+    longitude: float = Field(..., ge=-180, le=180, description="Longitude")
 
 
 class AskRequest(BaseModel):
-    question: str = Field(..., description="Natural language spatial question")
-    model: str | None = Field(None, description="Override LLM model")
+    question: str = Field(..., min_length=1, max_length=2000, description="Natural language spatial question")
+    model: str | None = Field(None, max_length=200, description="Override LLM model")
 
 
 class AskResponse(BaseModel):
@@ -354,13 +387,18 @@ async def check_relationship(request: RelationshipRequest):
         raise HTTPException(status_code=400, detail=str(e)) from e
 
 
-@app.post("/api/v1/ask", response_model=AskResponse, dependencies=[Depends(verify_api_key)])
-async def ask(request: AskRequest):
+@app.post(
+    "/api/v1/ask",
+    response_model=AskResponse,
+    dependencies=[Depends(verify_api_key), Depends(llm_slot)],
+)
+async def ask(request: AskRequest, http: Request):
     """
     Ask a natural language spatial question.
 
     Tries local Ollama (Qwen 2.5 7B) first, falls back to OpenRouter.
     """
+    check_model(http, request.model)
     engine = get_engine()
     result = engine.ask(request.question, model=request.model)
 
@@ -466,7 +504,7 @@ async def flow_get_template(template_name: str):
         raise HTTPException(status_code=404, detail=f"Template not found: {template_name}") from None
 
 
-@app.post("/api/v1/flows/templates/{template_name}/run", dependencies=[Depends(verify_api_key)])
+@app.post("/api/v1/flows/templates/{template_name}/run", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
 async def flow_run_template(template_name: str, request: TemplateRunRequest):
     """Run a flow template with optional parameter overrides."""
     from geospark.flows import FlowRunner, get_template
@@ -494,21 +532,15 @@ async def flow_run_template(template_name: str, request: TemplateRunRequest):
 
 
 class FlowBuildRequest(BaseModel):
-    goal: str = Field(..., description="Natural-language goal for the flow")
-    model: str = Field("qwen2.5:7b", description="Ollama model to drive the builder")
-    ollama_url: str | None = Field(
-        None,
-        description=(
-            "Base URL of the Ollama server. When omitted, uses the "
-            "OLLAMA_BASE_URL env var (set to http://172.17.0.1:11434 on the "
-            "VM so the container reaches host Ollama via the Docker bridge)."
-        ),
+    goal: str = Field(..., min_length=1, max_length=2000, description="Natural-language goal for the flow")
+    model: str | None = Field(
+        None, max_length=200, description="Ollama model to drive the builder (default: server model)"
     )
-    max_turns: int = Field(20, ge=1, le=60, description="Max LLM turns")
+    max_turns: int = Field(20, ge=1, le=20, description="Max LLM turns")
 
 
-@app.post("/api/v1/flows/build", dependencies=[Depends(verify_api_key)])
-async def flow_build(request: FlowBuildRequest):
+@app.post("/api/v1/flows/build", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
+async def flow_build(request: FlowBuildRequest, http: Request):
     """Build a Flow from a natural-language goal via incremental LLM tool calling.
 
     Uses the chat-to-flow builder (Phase 8B). Each LLM turn invokes one
@@ -518,17 +550,18 @@ async def flow_build(request: FlowBuildRequest):
     """
     from geospark.flows import ChatFlowSession, make_ollama_chat_fn
 
+    check_model(http, request.model)
+    # The Ollama URL is server configuration only: accepting it from callers would let
+    # anyone make this server fetch arbitrary internal URLs (SSRF).
     session = ChatFlowSession(
-        llm_fn=make_ollama_chat_fn(
-            model=request.model, base_url=request.ollama_url
-        )
+        llm_fn=make_ollama_chat_fn(model=request.model or security.default_ollama_model())
     )
     try:
         result = session.run(request.goal, max_turns=request.max_turns)
     except Exception as err:
         raise HTTPException(
             status_code=502,
-            detail=f"LLM backend error: {type(err).__name__}: {err}",
+            detail=f"LLM backend error ({type(err).__name__})",
         ) from err
 
     payload: dict[str, Any] = {
@@ -582,7 +615,7 @@ async def flow_list():
     return {"flows": [f.model_dump() for f in flows]}
 
 
-@app.post("/api/v1/flows", dependencies=[Depends(verify_api_key)])
+@app.post("/api/v1/flows", dependencies=[Depends(verify_admin)])
 async def flow_save(request: SaveFlowRequest):
     """Save a flow definition (requires persistence backend)."""
     from geospark.flows.flow_schema import Flow, FlowStep, FlowTrigger
@@ -611,7 +644,7 @@ async def flow_get(flow_id: str):
     return flow.model_dump()
 
 
-@app.delete("/api/v1/flows/{flow_id}", dependencies=[Depends(verify_api_key)])
+@app.delete("/api/v1/flows/{flow_id}", dependencies=[Depends(verify_admin)])
 async def flow_delete(flow_id: str):
     """Delete a saved flow and its runs."""
     store = _get_store()
@@ -621,7 +654,7 @@ async def flow_delete(flow_id: str):
     return {"deleted": flow_id}
 
 
-@app.post("/api/v1/flows/{flow_id}/run", dependencies=[Depends(verify_api_key)])
+@app.post("/api/v1/flows/{flow_id}/run", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
 async def flow_run_saved(flow_id: str):
     """Run a saved flow."""
     from geospark.flows import FlowRunner
@@ -665,9 +698,9 @@ async def flow_run_get(run_id: str):
 
 
 class DataChannelRequest(BaseModel):
-    location: str | None = Field(None, description="Location name to geocode")
-    lat: float | None = Field(None, description="Latitude")
-    lon: float | None = Field(None, description="Longitude")
+    location: str | None = Field(None, max_length=500, description="Location name to geocode")
+    lat: float | None = Field(None, ge=-90, le=90, description="Latitude")
+    lon: float | None = Field(None, ge=-180, le=180, description="Longitude")
     start_date: str | None = Field(None, description="Start date (YYYY-MM-DD)")
     end_date: str | None = Field(None, description="End date (YYYY-MM-DD)")
     filters: dict[str, Any] = Field(default_factory=dict)
@@ -724,23 +757,23 @@ async def data_query(channel_name: str, request: DataChannelRequest):
 
 
 class AgentRunRequest(BaseModel):
-    goal: str = Field(..., description="Natural language spatial goal")
+    goal: str = Field(..., min_length=1, max_length=2000, description="Natural language spatial goal")
 
 
 class ReportRequest(BaseModel):
-    location: str = Field(..., description="Location to analyze")
-    radius_m: float = Field(2000, description="Search radius in meters")
+    location: str = Field(..., min_length=1, max_length=500, description="Location to analyze")
+    radius_m: float = Field(2000, gt=0, le=10_000, description="Search radius in meters")
 
 
 class SiteSelectRequest(BaseModel):
-    within: str = Field(..., description="Search area (city/neighborhood)")
-    near: list[str] = Field(default_factory=list, description="Amenity types to be near")
-    avoid: list[str] = Field(default_factory=list, description="Amenity types to avoid")
-    facility_type: str = Field("restaurant", description="Facility type to place")
-    radius_m: float = Field(5000, description="Search radius in meters")
+    within: str = Field(..., min_length=1, max_length=500, description="Search area (city/neighborhood)")
+    near: list[str] = Field(default_factory=list, max_length=10, description="Amenity types to be near")
+    avoid: list[str] = Field(default_factory=list, max_length=10, description="Amenity types to avoid")
+    facility_type: str = Field("restaurant", max_length=100, description="Facility type to place")
+    radius_m: float = Field(5000, gt=0, le=10_000, description="Search radius in meters")
 
 
-@app.post("/api/v1/agent/run", dependencies=[Depends(verify_api_key)])
+@app.post("/api/v1/agent/run", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
 async def agent_run(request: AgentRunRequest):
     """Run the autonomous spatial agent with a goal."""
     from geospark.agents import GeoAgent
@@ -750,7 +783,7 @@ async def agent_run(request: AgentRunRequest):
     return result.model_dump()
 
 
-@app.post("/api/v1/agent/report", dependencies=[Depends(verify_api_key)])
+@app.post("/api/v1/agent/report", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
 async def agent_report(request: ReportRequest):
     """Generate a spatial intelligence report for a location."""
     from geospark.agents import SpatialReport
@@ -765,7 +798,7 @@ async def agent_report(request: ReportRequest):
     return report.model_dump()
 
 
-@app.post("/api/v1/agent/site-select", dependencies=[Depends(verify_api_key)])
+@app.post("/api/v1/agent/site-select", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
 async def agent_site_select(request: SiteSelectRequest):
     """Find optimal locations based on spatial criteria."""
     from geospark.agents import SiteSelector
@@ -785,48 +818,46 @@ async def agent_site_select(request: SiteSelectRequest):
 
 
 class MemoryRecallRequest(BaseModel):
-    query: str = Field(..., description="Search query for spatial memories")
-    limit: int = Field(10, description="Max results")
+    query: str = Field(..., max_length=1000, description="Search query for spatial memories")
+    limit: int = Field(10, ge=1, le=50, description="Max results")
     memory_type: str | None = Field(None, description="Filter: 'fact' or 'episode'")
 
 
 class MemoryFactRequest(BaseModel):
-    content: str = Field(..., description="Spatial fact to remember")
-    source: str = Field("", description="Source attribution")
-    confidence: float = Field(1.0, description="Confidence 0.0 to 1.0")
-    tags: list[str] = Field(default_factory=list)
+    content: str = Field(..., min_length=1, max_length=2000, description="Spatial fact to remember")
+    source: str = Field("", max_length=200, description="Source attribution")
+    confidence: float = Field(1.0, ge=0, le=1, description="Confidence 0.0 to 1.0")
+    tags: list[str] = Field(default_factory=list, max_length=20)
 
 
 class MemoryEpisodeRequest(BaseModel):
-    content: str = Field(..., description="Spatial observation to remember")
-    source: str = Field("", description="Source attribution")
-    importance: float = Field(0.5, description="Importance 0.0 to 1.0")
-    tags: list[str] = Field(default_factory=list)
+    content: str = Field(..., min_length=1, max_length=2000, description="Spatial observation to remember")
+    source: str = Field("", max_length=200, description="Source attribution")
+    importance: float = Field(0.5, ge=0, le=1, description="Importance 0.0 to 1.0")
+    tags: list[str] = Field(default_factory=list, max_length=20)
 
 
-def _get_intelligence():
-    """Get or create the shared SpatialIntelligence instance."""
-    from geospark.memory.intelligence import SpatialIntelligence
-
-    if not hasattr(_get_intelligence, "_instance"):
-        _get_intelligence._instance = SpatialIntelligence()
-    return _get_intelligence._instance
+def _memory(http: Request):
+    """The caller's memory space: a private sandbox, or the shared one for the operator."""
+    namespace = namespace_for(http)
+    return namespace, sandboxes.memory(namespace)
 
 
-@app.post("/api/v1/memory/recall", dependencies=[Depends(verify_api_key)])
-async def memory_recall(request: MemoryRecallRequest):
+@app.post("/api/v1/memory/recall", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
+async def memory_recall(request: MemoryRecallRequest, http: Request):
     """Recall spatial memories matching a query."""
-    intel = _get_intelligence()
+    _, intel = _memory(http)
     results = intel.recall(
         request.query, limit=request.limit, memory_type=request.memory_type
     )
     return {"query": request.query, "results": results, "count": len(results)}
 
 
-@app.post("/api/v1/memory/fact", dependencies=[Depends(verify_api_key)])
-async def memory_add_fact(request: MemoryFactRequest):
+@app.post("/api/v1/memory/fact", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
+async def memory_add_fact(request: MemoryFactRequest, http: Request):
     """Store a new spatial fact."""
-    intel = _get_intelligence()
+    namespace, intel = _memory(http)
+    check_memory_quota(namespace, intel)
     fact = intel.remember_fact(
         content=request.content,
         source=request.source,
@@ -836,10 +867,11 @@ async def memory_add_fact(request: MemoryFactRequest):
     return {"id": fact.id, "content": fact.content, "type": "fact"}
 
 
-@app.post("/api/v1/memory/episode", dependencies=[Depends(verify_api_key)])
-async def memory_add_episode(request: MemoryEpisodeRequest):
+@app.post("/api/v1/memory/episode", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
+async def memory_add_episode(request: MemoryEpisodeRequest, http: Request):
     """Store a timestamped spatial observation."""
-    intel = _get_intelligence()
+    namespace, intel = _memory(http)
+    check_memory_quota(namespace, intel)
     episode = intel.remember_episode(
         content=request.content,
         source=request.source,
@@ -850,9 +882,9 @@ async def memory_add_episode(request: MemoryEpisodeRequest):
 
 
 @app.get("/api/v1/memory/contradictions", dependencies=[Depends(verify_api_key)])
-async def memory_contradictions():
+async def memory_contradictions(http: Request):
     """Find contradicting spatial facts."""
-    intel = _get_intelligence()
+    _, intel = _memory(http)
     contradictions = intel.find_contradictions()
     return {
         "contradictions": [c.model_dump(mode="json") for c in contradictions],
@@ -861,16 +893,16 @@ async def memory_contradictions():
 
 
 @app.get("/api/v1/memory/stats")
-async def memory_stats():
+async def memory_stats(http: Request):
     """Spatial intelligence statistics."""
-    intel = _get_intelligence()
+    _, intel = _memory(http)
     return intel.stats().model_dump()
 
 
 @app.post("/api/v1/memory/compact", dependencies=[Depends(verify_api_key)])
-async def memory_compact():
+async def memory_compact(http: Request):
     """Compact old low-importance episodes."""
-    intel = _get_intelligence()
+    _, intel = _memory(http)
     return intel.compact()
 
 
@@ -894,58 +926,58 @@ class ContextQueryRequest(BaseModel):
     query: str = Field("", description="Text query")
     bbox: list[float] | None = Field(None, description="Spatial filter")
     category: str | None = Field(None)
-    limit: int = Field(10)
+    limit: int = Field(10, ge=1, le=50)
     tier: str = Field("L0", description="L0, L1, or L2")
     include_archived: bool = Field(False)
 
 
-def _get_context_store():
-    """Get or create the shared ContextStore instance."""
-    from geospark.context import ContextStore
-
-    if not hasattr(_get_context_store, "_instance"):
-        _get_context_store._instance = ContextStore()
-    return _get_context_store._instance
+def _contexts(http: Request):
+    """(namespace, store, retriever) for the caller's context space."""
+    namespace = namespace_for(http)
+    store, retriever = sandboxes.contexts(namespace)
+    return namespace, store, retriever
 
 
-def _get_context_retriever():
-    """Get or create the shared ContextRetriever instance."""
-    from geospark.context import ContextRetriever
-
-    if not hasattr(_get_context_retriever, "_instance"):
-        _get_context_retriever._instance = ContextRetriever(_get_context_store())
-    return _get_context_retriever._instance
+def _bad_uri(err: ValueError) -> HTTPException:
+    return HTTPException(status_code=400, detail=str(err))
 
 
 @app.post("/api/v1/context/save", dependencies=[Depends(verify_api_key)])
-async def context_save(request: ContextSaveRequest):
+async def context_save(request: ContextSaveRequest, http: Request):
     """Save a new geospatial context."""
     from geospark.context import GeoContext
 
-    ctx = GeoContext(
-        uri=request.uri,
-        category=request.category,
-        name=request.name,
-        abstract=request.abstract,
-        overview=request.overview,
-        full_data=request.full_data,
-        parent_uri=request.parent_uri,
-        bounds_wgs84=request.bounds_wgs84,
-        tags=request.tags,
-        source=request.source,
-    )
-    store = _get_context_store()
-    store.save(ctx)
+    namespace, store, _ = _contexts(http)
+    check_context_quota(namespace, store)
+    try:
+        ctx = GeoContext(
+            uri=request.uri,
+            category=request.category,
+            name=request.name,
+            abstract=request.abstract,
+            overview=request.overview,
+            full_data=request.full_data,
+            parent_uri=request.parent_uri,
+            bounds_wgs84=request.bounds_wgs84,
+            tags=request.tags,
+            source=request.source,
+        )
+        store.save(ctx)
+    except ValueError as err:
+        raise _bad_uri(err) from None
     return {"id": ctx.id, "uri": ctx.uri, "saved": True}
 
 
 @app.get("/api/v1/context/load")
-async def context_load(uri: str, tier: str = "L1"):
+async def context_load(http: Request, uri: str, tier: str = "L1"):
     """Load a context by URI at a given tier."""
     from geospark.context import ContextTier
 
-    store = _get_context_store()
-    ctx = store.load(uri, touch=True)
+    _, store, _ = _contexts(http)
+    try:
+        ctx = store.load(uri, touch=True)
+    except ValueError as err:
+        raise _bad_uri(err) from None
     if ctx is None:
         raise HTTPException(status_code=404, detail=f"Context not found: {uri}")
 
@@ -965,11 +997,11 @@ async def context_load(uri: str, tier: str = "L1"):
 
 
 @app.post("/api/v1/context/query", dependencies=[Depends(verify_api_key)])
-async def context_query_endpoint(request: ContextQueryRequest):
+async def context_query_endpoint(request: ContextQueryRequest, http: Request):
     """Query contexts with text, spatial, and category filters."""
     from geospark.context import ContextTier
 
-    retriever = _get_context_retriever()
+    _, _, retriever = _contexts(http)
     try:
         tier = ContextTier(request.tier)
     except ValueError:
@@ -1005,11 +1037,14 @@ async def context_query_endpoint(request: ContextQueryRequest):
 
 @app.get("/api/v1/context/list")
 async def context_list_endpoint(
-    category: str | None = None, include_archived: bool = False
+    http: Request, category: str | None = None, include_archived: bool = False
 ):
     """List all contexts, optionally filtered by category."""
-    store = _get_context_store()
-    contexts = store.list_all(category=category, include_archived=include_archived)
+    _, store, _ = _contexts(http)
+    try:
+        contexts = store.list_all(category=category, include_archived=include_archived)
+    except ValueError as err:
+        raise _bad_uri(err) from None
     return {
         "contexts": [
             {
@@ -1028,10 +1063,9 @@ async def context_list_endpoint(
 
 
 @app.get("/api/v1/context/stats")
-async def context_stats():
+async def context_stats(http: Request):
     """Context database statistics."""
-    store = _get_context_store()
-    retriever = _get_context_retriever()
+    _, store, retriever = _contexts(http)
 
     total = store.count()
     total_with_archive = store.count(include_archived=True)
@@ -1047,21 +1081,25 @@ async def context_stats():
 
 
 @app.post("/api/v1/context/archive-cold", dependencies=[Depends(verify_api_key)])
-async def context_archive_cold(threshold: float = 0.1):
+async def context_archive_cold(http: Request, threshold: float = Query(0.1, ge=0, le=1)):
     """Archive contexts with hotness below threshold."""
-    retriever = _get_context_retriever()
+    _, _, retriever = _contexts(http)
     archived = retriever.archive_cold(threshold=threshold)
     return {"archived": archived, "count": len(archived)}
 
 
 @app.delete("/api/v1/context/{uri:path}", dependencies=[Depends(verify_api_key)])
-async def context_delete(uri: str):
+async def context_delete(uri: str, http: Request):
     """Delete a context permanently."""
     # URL-encoded URIs need decoding
     if not uri.startswith("geospark://"):
         uri = f"geospark://{uri}"
-    store = _get_context_store()
-    if store.delete(uri):
+    _, store, _ = _contexts(http)
+    try:
+        deleted = store.delete(uri)
+    except ValueError as err:
+        raise _bad_uri(err) from None
+    if deleted:
         return {"deleted": uri}
     raise HTTPException(status_code=404, detail=f"Context not found: {uri}")
 
@@ -1070,7 +1108,7 @@ async def context_delete(uri: str):
 
 
 class CoordinateRequest(BaseModel):
-    goal: str = Field(..., description="Natural language goal")
+    goal: str = Field(..., min_length=1, max_length=2000, description="Natural language goal")
     parameters: dict[str, Any] = Field(
         default_factory=dict, description="Optional structured parameters"
     )
@@ -1085,7 +1123,7 @@ def _get_coordinator():
     return _get_coordinator._instance
 
 
-@app.post("/api/v1/agent/coordinate", dependencies=[Depends(verify_api_key)])
+@app.post("/api/v1/agent/coordinate", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
 async def agent_coordinate(request: CoordinateRequest):
     """Route a goal through the multi-agent coordinator.
 
@@ -1119,9 +1157,15 @@ async def agent_classify(request: CoordinateRequest):
 # --- Admin Endpoints (Phase 8A) ---
 
 
-@app.get("/api/v1/admin/audit", dependencies=[Depends(verify_api_key)])
-async def admin_audit(date: str | None = None, limit: int = 50):
+def _check_audit_date(date: str | None) -> None:
+    if date is not None and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date):
+        raise HTTPException(status_code=400, detail="date must be YYYY-MM-DD")
+
+
+@app.get("/api/v1/admin/audit", dependencies=[Depends(verify_admin)])
+async def admin_audit(date: str | None = None, limit: int = Query(50, ge=1, le=1000)):
     """Query audit log entries for a specific date (or today)."""
+    _check_audit_date(date)
     from geospark.middleware.audit_log import get_audit_store
 
     store = get_audit_store()
@@ -1129,16 +1173,17 @@ async def admin_audit(date: str | None = None, limit: int = 50):
     return {"entries": entries, "count": len(entries)}
 
 
-@app.get("/api/v1/admin/audit/stats", dependencies=[Depends(verify_api_key)])
+@app.get("/api/v1/admin/audit/stats", dependencies=[Depends(verify_admin)])
 async def admin_audit_stats(date: str | None = None):
     """Summary statistics from the audit log."""
+    _check_audit_date(date)
     from geospark.middleware.audit_log import get_audit_store
 
     store = get_audit_store()
     return store.stats(date=date)
 
 
-@app.get("/api/v1/admin/audit/dates")
+@app.get("/api/v1/admin/audit/dates", dependencies=[Depends(verify_admin)])
 async def admin_audit_dates():
     """List all dates that have audit log files."""
     from geospark.middleware.audit_log import get_audit_store
@@ -1147,7 +1192,7 @@ async def admin_audit_dates():
     return {"dates": store.list_dates()}
 
 
-@app.get("/api/v1/admin/usage", dependencies=[Depends(verify_api_key)])
+@app.get("/api/v1/admin/usage", dependencies=[Depends(verify_admin)])
 async def admin_usage():
     """Aggregated API usage statistics."""
     from geospark.middleware.usage_tracker import get_usage_tracker
@@ -1156,7 +1201,7 @@ async def admin_usage():
     return tracker.summary()
 
 
-@app.get("/api/v1/admin/usage/keys", dependencies=[Depends(verify_api_key)])
+@app.get("/api/v1/admin/usage/keys", dependencies=[Depends(verify_admin)])
 async def admin_usage_keys():
     """Usage breakdown per API key."""
     from geospark.middleware.usage_tracker import get_usage_tracker

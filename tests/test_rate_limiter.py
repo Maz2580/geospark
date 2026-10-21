@@ -184,28 +184,40 @@ class TestClientKey:
         key = _get_client_key(request)
         assert key == "ip:1.2.3.4"  # First IP in chain
 
-    def test_extracts_api_key_prefix(self) -> None:
+    @staticmethod
+    def _request(headers: list[tuple[bytes, bytes]], client: tuple[str, int]):
         from starlette.requests import Request
 
-        scope = {
+        return Request({
             "type": "http",
             "method": "GET",
             "path": "/test",
-            "headers": [(b"authorization", b"Bearer sk-abc123xyz456")],
+            "headers": headers,
             "query_string": b"",
             "root_path": "",
-            "client": ("127.0.0.1", 12345),
+            "client": client,
+        })
+
+    def test_random_bearer_tokens_share_the_ip_bucket(self) -> None:
+        """A made-up token must not buy a fresh rate-limit bucket."""
+        keys = {
+            _get_client_key(self._request([(b"authorization", f"Bearer junk{n}".encode())], ("127.0.0.1", 1)))
+            for n in range(5)
         }
-        request = Request(scope)
-        key = _get_client_key(request)
-        assert key.startswith("key:")
-        assert "sk-abc12" not in key or len(key) < 20  # Should be truncated
+        assert keys == {"ip:127.0.0.1"}
 
+    def test_cloudflare_header_preferred_from_local_proxy(self) -> None:
+        request = self._request(
+            [(b"cf-connecting-ip", b"9.9.9.9"), (b"x-forwarded-for", b"1.2.3.4")], ("172.18.0.5", 1)
+        )
+        assert _get_client_key(request) == "ip:9.9.9.9"
 
-# ======================================================================
-# Integration tests with TestClient
-# ======================================================================
-
+    def test_proxy_headers_ignored_from_public_peer(self) -> None:
+        """A client connecting directly can't spoof its IP with headers."""
+        request = self._request(
+            [(b"cf-connecting-ip", b"9.9.9.9"), (b"x-forwarded-for", b"1.2.3.4")], ("8.8.8.8", 1)
+        )
+        assert _get_client_key(request) == "ip:8.8.8.8"
 
 class TestRateLimitMiddleware:
     """Integration tests for rate limiting on the real API."""
@@ -239,3 +251,21 @@ class TestRateLimitMiddleware:
         allowed, _, retry_after = counter.is_allowed("test")
         assert allowed is False
         assert retry_after >= 1
+
+
+class TestRouteOverridePrecedence:
+    def test_longest_prefix_wins(self) -> None:
+        """A cheap listing under an expensive prefix gets its own, looser counter."""
+        from geospark.middleware import rate_limiter as rl
+
+        saved = dict(rl._ROUTE_OVERRIDES)
+        try:
+            rl._ROUTE_OVERRIDES.clear()
+            rl.set_route_limit("/api/v1/agent/", 12)
+            rl.set_route_limit("/api/v1/agent/list", 70)
+            mw = rl.RateLimitMiddleware(app=None)
+            assert mw._get_counter("/api/v1/agent/list").max_requests == 70
+            assert mw._get_counter("/api/v1/agent/run").max_requests == 12
+        finally:
+            rl._ROUTE_OVERRIDES.clear()
+            rl._ROUTE_OVERRIDES.update(saved)

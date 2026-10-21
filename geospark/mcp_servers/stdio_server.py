@@ -11,7 +11,8 @@ Usage:
     # As Python module:
     python -m geospark.mcp_servers
 
-    # Claude Desktop config (~/.claude/claude_desktop_config.json):
+    # Claude Desktop config (macOS: ~/Library/Application Support/Claude/claude_desktop_config.json,
+    # Windows: %APPDATA%\\Claude\\claude_desktop_config.json):
     {
       "mcpServers": {
         "geospark": {

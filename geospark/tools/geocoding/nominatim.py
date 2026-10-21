@@ -18,6 +18,7 @@ from geospark.protocol.schema import (
     SpatialResult,
 )
 from geospark.tools.base import BaseTool
+from geospark.utils import USER_AGENT
 
 
 class NominatimGeocoder(BaseTool):
@@ -31,7 +32,7 @@ class NominatimGeocoder(BaseTool):
     ]
 
     BASE_URL: ClassVar[str] = "https://nominatim.openstreetmap.org"
-    HEADERS: ClassVar[dict[str, str]] = {"User-Agent": "GeoSpark/0.1 (https://github.com/geospark/geospark)"}
+    HEADERS: ClassVar[dict[str, str]] = {"User-Agent": USER_AGENT}
 
     def execute(self, query: SpatialQuery) -> SpatialResult:
         """Execute geocoding operation."""

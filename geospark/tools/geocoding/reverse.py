@@ -19,6 +19,7 @@ from geospark.protocol.schema import (
     SpatialResult,
 )
 from geospark.tools.base import BaseTool
+from geospark.utils import USER_AGENT
 
 
 class ReverseGeocoder(BaseTool):
@@ -37,7 +38,7 @@ class ReverseGeocoder(BaseTool):
     supported_operations: ClassVar[list[str]] = [SpatialOperation.REVERSE_GEOCODE.value]
 
     BASE_URL: ClassVar[str] = "https://nominatim.openstreetmap.org/reverse"
-    HEADERS: ClassVar[dict[str, str]] = {"User-Agent": "GeoSpark/0.1 (https://github.com/geospark/geospark)"}
+    HEADERS: ClassVar[dict[str, str]] = {"User-Agent": USER_AGENT}
 
     def execute(self, query: SpatialQuery) -> SpatialResult:
         """Execute reverse geocoding.

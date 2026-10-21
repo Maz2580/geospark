@@ -84,7 +84,8 @@ postgis = [
     "geoalchemy2>=0.14",
 ]
 mcp = [
-    "mcp>=1.0",
+    # mcp 2.x removed the decorator API used by mcp_servers/stdio_server.py
+    "mcp>=1.0,<2",
 ]
 # Copernicus DEM GLO-30 elevation (reads the public cloud-optimised tiles)
 terrain = [
@@ -94,7 +95,7 @@ intelligence = [
     "faiss-cpu>=1.7",
 ]
 all = [
-    "geospark[geo,api,llm,viz,satellite,postgis,mcp,intelligence]",
+    "geospark-ai[geo,api,llm,supabase,viz,satellite,postgis,mcp,terrain,intelligence]",
 ]
 dev = [
     "pytest>=8.0",

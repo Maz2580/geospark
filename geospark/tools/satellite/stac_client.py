@@ -52,7 +52,7 @@ class STACTool(BaseTool):
             from pystac_client import Client
         except ImportError:
             return SpatialResult(
-                errors=["pystac-client required: pip install geospark[satellite]"]
+                errors=["pystac-client required: pip install geospark-ai[satellite]"]
             )
 
         # Build search parameters

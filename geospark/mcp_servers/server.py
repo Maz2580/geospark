@@ -51,6 +51,10 @@ GeoJSONGeometry = Annotated[
 Latitude = Annotated[float, Field(ge=-90, le=90, description="Latitude in degrees (WGS84)")]
 Longitude = Annotated[float, Field(ge=-180, le=180, description="Longitude in degrees (WGS84)")]
 
+FilePath = Annotated[str, Field(min_length=1, max_length=1000,
+                                description="Path to a GeoJSON/GeoPackage/Shapefile/GeoParquet/CSV file")]
+CrsArg = Annotated[str | None, Field(description="The file's CRS if it doesn't declare one, e.g. EPSG:28355")]
+
 READ_ONLY_LOCAL = ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True,
                                   open_world_hint=False)
 READ_ONLY_WEB = ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True,
@@ -152,8 +156,12 @@ async def _heavy(fn: Any, *args: Any, **kwargs: Any) -> Any:
 # --- the server -----------------------------------------------------------------------------------
 
 
-def create_server() -> MCPServer:
-    """Build the GeoSpark MCP server with all tools registered."""
+def create_server(local_files: bool = False) -> MCPServer:
+    """Build the GeoSpark MCP server with all tools registered.
+
+    ``local_files=True`` adds tools that read files from this machine (your own layers). Only
+    the stdio server (running on your computer) enables it; the hosted HTTP endpoint never does.
+    """
     mcp = MCPServer(
         "geospark",
         title="GeoSpark",
@@ -380,12 +388,49 @@ def create_server() -> MCPServer:
         spatial.spatial_context.summary = result.summary
         return FeatureCollection(**spatial.to_geojson())
 
+    if local_files:
+        _add_local_file_tools(mcp)
     return mcp
 
 
+def _add_local_file_tools(mcp: MCPServer) -> None:
+    """Tools that read the user's own files. stdio (local) only."""
+    from geospark.io import layers
+
+    def load(path: str, crs: str | None, repair: bool) -> Any:
+        try:
+            return layers.load_layer(path, crs=crs, repair=repair)
+        except layers.LayerError as e:
+            raise ToolError(str(e)) from e
+
+    @mcp.tool(title="Describe a local data file", annotations=READ_ONLY_LOCAL)
+    async def layer_info(path: FilePath, crs: CrsArg = None, repair: bool = False) -> FeatureCollection:
+        """Read one of the user's vector files and report features, fields, geometry types, its CRS
+        (never guessed), bbox and total geodesic area/length."""
+        layer = await _blocking(load, path, crs, repair)
+        return FeatureCollection(**layer.summary().to_geojson())
+
+    @mcp.tool(title="Count points in polygons (local files)", annotations=READ_ONLY_LOCAL)
+    async def layer_count_within(points_path: FilePath, polygons_path: FilePath, crs: CrsArg = None,
+                                 repair: bool = False) -> FeatureCollection:
+        """For each polygon in one file, count the points from another file inside it (exact), with
+        density per km²."""
+        pts = await _blocking(load, points_path, crs, repair)
+        polys = await _blocking(load, polygons_path, crs, repair)
+        return FeatureCollection(**(await _blocking(layers.count_within, pts, polys)).to_geojson())
+
+    @mcp.tool(title="Nearest feature (local files)", annotations=READ_ONLY_LOCAL)
+    async def layer_nearest(sources_path: FilePath, targets_path: FilePath, crs: CrsArg = None,
+                            repair: bool = False) -> FeatureCollection:
+        """For each feature in one file, the nearest feature in another and the geodesic distance."""
+        src = await _blocking(load, sources_path, crs, repair)
+        dst = await _blocking(load, targets_path, crs, repair)
+        return FeatureCollection(**(await _blocking(layers.nearest, src, dst)).to_geojson())
+
+
 def run() -> None:
-    """Entry point for ``geospark-mcp``: serve over stdio."""
-    create_server().run()
+    """Entry point for ``geospark-mcp``: serve over stdio, with local-file tools."""
+    create_server(local_files=True).run()
 
 
 if __name__ == "__main__":

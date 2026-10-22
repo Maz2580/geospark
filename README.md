@@ -170,6 +170,27 @@ no key. Results report the Overture release and the licence of the records retur
 available from the CLI (`geospark overture places -37.818 144.969 --category cafe`), the REST API
 (`POST /api/v1/overture/{theme}`) and the MCP tool `overture_features`.
 
+### Your own data
+
+```bash
+pip install "geospark-ai[io]"
+geospark layer info suburbs.gpkg                            # features, fields, CRS, geodesic area
+geospark layer count-within crashes.csv suburbs.gpkg --geojson counts.geojson
+geospark layer nearest schools.shp hospitals.geojson
+geospark layer intersect parcels.gpkg flood_zones.geojson
+```
+
+Formats: GeoJSON, GeoPackage, Shapefile (or a .zip), GeoParquet, CSV with longitude/latitude
+columns, FlatGeobuf, KML, GML, File Geodatabase. **The CRS is never guessed**:
+- a projected file (e.g. MGA zone 55) is reprojected, and its original CRS is reported;
+- a Shapefile without `.prj` is refused until you pass `--crs EPSG:28355`;
+- invalid shapes are refused until you pass `--repair`.
+
+Results carry each file's SHA-256, so an analysis can be reproduced against exactly that data. In
+Python, use `geospark.io.layers` (`load_layer`, `count_within`, `nearest`, `intersect`). The local
+MCP server (`geospark-mcp`) offers the same as `layer_*` tools; the hosted `/mcp` endpoint never reads
+files.
+
 ### Natural-language questions
 
 ```python

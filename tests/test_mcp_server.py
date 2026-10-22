@@ -206,3 +206,18 @@ def test_mcp_http_is_off_unless_enabled(monkeypatch) -> None:
     assert api.mcp_http_enabled() is False
     monkeypatch.setenv("GEOSPARK_MCP_HTTP", "true")
     assert api.mcp_http_enabled() is True
+
+
+def test_public_http_endpoint_never_reads_files(mcp) -> None:
+    """File-reading tools exist only on the local stdio server (the user's own machine)."""
+    names = {t["name"] for t in mcp("tools/list")["result"]["tools"]}
+    assert not any(n.startswith("layer_") for n in names)
+
+
+def test_stdio_server_has_local_file_tools() -> None:
+    import asyncio
+
+    from geospark.mcp_servers.server import create_server
+
+    names = {t.name for t in asyncio.run(create_server(local_files=True).list_tools())}
+    assert {"layer_info", "layer_count_within", "layer_nearest"} <= names

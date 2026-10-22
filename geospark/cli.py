@@ -516,6 +516,93 @@ def flow_build(
             console.print(f"[red]{err}[/red]")
 
 
+@main.group()
+def layer() -> None:
+    """Analyse your own files: GeoJSON, GeoPackage, Shapefile, GeoParquet, CSV, ... (needs [io])."""
+
+
+_crs_option = click.option("--crs", default=None, help="The file's CRS if it doesn't declare one, e.g. EPSG:28355")
+_repair_option = click.option("--repair", is_flag=True, help="Fix invalid geometries instead of refusing the file")
+
+
+def _load(path: str, crs: str | None, repair: bool):  # type: ignore[no-untyped-def]
+    from geospark.io.layers import LayerError, load_layer
+
+    try:
+        return load_layer(path, crs=crs, repair=repair)
+    except LayerError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise SystemExit(1) from None
+
+
+@layer.command("info")
+@click.argument("path", type=click.Path(exists=True))
+@_crs_option
+@_repair_option
+def layer_info(path: str, crs: str | None, repair: bool) -> None:
+    """Feature count, geometry types, fields, CRS, bbox and total geodesic area/length."""
+    result = _load(path, crs, repair).summary()
+    table = Table(title=result.spatial_context.summary)
+    table.add_column("Property", style="cyan")
+    table.add_column("Value", style="green")
+    for key, value in result.features[0].properties.items():
+        table.add_row(key, str(value))
+    console.print(table)
+    _print_caveats(result)
+
+
+@layer.command("count-within")
+@click.argument("points", type=click.Path(exists=True))
+@click.argument("polygons", type=click.Path(exists=True))
+@_crs_option
+@_repair_option
+@geojson_option
+def layer_count_within(points: str, polygons: str, crs: str | None, repair: bool, geojson_path: str | None) -> None:
+    """How many POINTS fall in each of POLYGONS (exact), with density per km²."""
+    from geospark.io.layers import count_within
+
+    result = count_within(_load(points, crs, repair), _load(polygons, crs, repair))
+    for feature in result.features[:30]:
+        props = feature.properties
+        label = next((str(v) for k, v in props.items() if k not in ("count", "area_sq_km", "count_per_sq_km")), "")
+        console.print(f"{label[:40]:40} {props['count']:>6}  ({props['count_per_sq_km']}/km²)")
+    _print_caveats(result)
+    _save_geojson(geojson_path, result.to_geojson())
+
+
+@layer.command("nearest")
+@click.argument("sources", type=click.Path(exists=True))
+@click.argument("targets", type=click.Path(exists=True))
+@_crs_option
+@_repair_option
+@geojson_option
+def layer_nearest(sources: str, targets: str, crs: str | None, repair: bool, geojson_path: str | None) -> None:
+    """For each feature in SOURCES, the nearest feature in TARGETS and the geodesic distance."""
+    from geospark.io.layers import nearest
+
+    result = nearest(_load(sources, crs, repair), _load(targets, crs, repair))
+    for i, feature in enumerate(result.features[:30]):
+        console.print(f"#{i:<5} nearest target #{feature.properties['nearest_index']:<6} {feature.properties['nearest_distance_m']:>12} m")
+    _print_caveats(result)
+    _save_geojson(geojson_path, result.to_geojson())
+
+
+@layer.command("intersect")
+@click.argument("a", type=click.Path(exists=True))
+@click.argument("b", type=click.Path(exists=True))
+@_crs_option
+@_repair_option
+@geojson_option
+def layer_intersect(a: str, b: str, crs: str | None, repair: bool, geojson_path: str | None) -> None:
+    """Overlap pieces between two layers, with both sides' attributes and geodesic area."""
+    from geospark.io.layers import intersect
+
+    result = intersect(_load(a, crs, repair), _load(b, crs, repair))
+    console.print(result.spatial_context.summary)
+    _print_caveats(result)
+    _save_geojson(geojson_path, result.to_geojson())
+
+
 # Negative coordinates (southern/western hemispheres) must parse as values, not options
 @main.command(context_settings={"ignore_unknown_options": True})
 @click.argument("lat", type=float)

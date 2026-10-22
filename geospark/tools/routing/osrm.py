@@ -18,7 +18,7 @@ from geospark.protocol.schema import (
     SpatialQuery,
     SpatialResult,
 )
-from geospark.tools.base import BaseTool
+from geospark.tools.base import BaseTool, not_implemented
 
 
 class OSRMRouteTool(BaseTool):
@@ -178,9 +178,4 @@ class OSRMRouteTool(BaseTool):
 
     def _isochrone_stub(self, query: SpatialQuery) -> SpatialResult:
         """Isochrone analysis placeholder."""
-        return SpatialResult(
-            spatial_context=SpatialContext(
-                summary="Isochrone analysis (coming in Phase 2B). "
-                "Will calculate reachable area from a point within a time limit.",
-            ),
-        )
+        return not_implemented("Isochrone analysis")

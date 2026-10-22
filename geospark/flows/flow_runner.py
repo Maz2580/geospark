@@ -13,7 +13,7 @@ import operator
 import re
 import time
 from collections import deque
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from geospark.engine.core import Engine
@@ -70,7 +70,7 @@ class FlowRunner:
             A FlowRun recording status, results, and errors.
         """
         flow_run = FlowRun(flow_id=flow.id, status="running")
-        flow_run.started_at = datetime.utcnow()
+        flow_run.started_at = datetime.now(timezone.utc)
         self._persist_run(flow_run)
 
         context: dict[str, Any] = {}
@@ -80,7 +80,7 @@ class FlowRunner:
         except FlowRunnerError as err:
             flow_run.status = "failed"
             flow_run.errors.append(str(err))
-            flow_run.completed_at = datetime.utcnow()
+            flow_run.completed_at = datetime.now(timezone.utc)
             self._persist_run(flow_run)
             return flow_run
 
@@ -100,13 +100,13 @@ class FlowRunner:
             except Exception as err:
                 flow_run.status = "failed"
                 flow_run.errors.append(f"Step '{step.id}' failed: {err}")
-                flow_run.completed_at = datetime.utcnow()
+                flow_run.completed_at = datetime.now(timezone.utc)
                 flow_run.current_step_id = None
                 self._persist_run(flow_run)
                 return flow_run
 
         flow_run.status = "completed"
-        flow_run.completed_at = datetime.utcnow()
+        flow_run.completed_at = datetime.now(timezone.utc)
         flow_run.current_step_id = None
         self._persist_run(flow_run)
         return flow_run

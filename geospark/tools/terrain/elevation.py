@@ -17,7 +17,7 @@ from geospark.protocol.schema import (
     SpatialQuery,
     SpatialResult,
 )
-from geospark.tools.base import BaseTool
+from geospark.tools.base import BaseTool, not_implemented
 from geospark.tools.terrain import copernicus
 from geospark.tools.terrain.vertical_datum import infer_datum
 
@@ -127,18 +127,8 @@ class ElevationTool(BaseTool):
 
     def _calculate_slope(self, query: SpatialQuery) -> SpatialResult:
         """Calculate slope from DEM data."""
-        # TODO: Implement slope calculation from raster DEM
-        return SpatialResult(
-            spatial_context=SpatialContext(
-                summary="Slope calculation (coming in Phase 1)",
-            ),
-        )
+        return not_implemented("Slope calculation")
 
     def _viewshed(self, query: SpatialQuery) -> SpatialResult:
         """Calculate viewshed from an observation point."""
-        # TODO: Implement viewshed analysis
-        return SpatialResult(
-            spatial_context=SpatialContext(
-                summary="Viewshed analysis (coming in Phase 2)",
-            ),
-        )
+        return not_implemented("Viewshed analysis")

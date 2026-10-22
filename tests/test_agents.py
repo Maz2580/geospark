@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from geospark.agents.geo_agent import AgentResult, AgentStep, GeoAgent
 from geospark.agents.spatial_report import (
@@ -141,7 +141,7 @@ class TestSpatialReportWeather:
             }
         ]
 
-        with patch("asyncio.run", return_value=mock_result), patch("geospark.data_channels.weather.WeatherChannel"):
+        with patch("geospark.data_channels.weather.WeatherChannel", **{"return_value.search": AsyncMock(return_value=mock_result)}):
             result = report._fetch_weather(48.8566, 2.3522)
 
         assert result is not None
@@ -156,7 +156,7 @@ class TestSpatialReportWeather:
         mock_result.errors = ["API error"]
         mock_result.is_empty = False
 
-        with patch("asyncio.run", return_value=mock_result), patch("geospark.data_channels.weather.WeatherChannel"):
+        with patch("geospark.data_channels.weather.WeatherChannel", **{"return_value.search": AsyncMock(return_value=mock_result)}):
             result = report._fetch_weather(48.8566, 2.3522)
 
         assert result is None
@@ -165,7 +165,7 @@ class TestSpatialReportWeather:
         """Weather channel throws → returns None gracefully."""
         report = SpatialReport.__new__(SpatialReport)
 
-        with patch("asyncio.run", side_effect=Exception("boom")):
+        with patch("geospark.data_channels.weather.WeatherChannel", **{"return_value.search": AsyncMock(side_effect=Exception("boom"))}):
             result = report._fetch_weather(48.8566, 2.3522)
 
         assert result is None
@@ -192,7 +192,7 @@ class TestSpatialReportAirQuality:
             }
         ]
 
-        with patch("asyncio.run", return_value=mock_result), patch("geospark.data_channels.air_quality.AirQualityChannel"):
+        with patch("geospark.data_channels.air_quality.AirQualityChannel", **{"return_value.search": AsyncMock(return_value=mock_result)}):
             result = report._fetch_air_quality(48.8566, 2.3522)
 
         assert result is not None
@@ -208,7 +208,7 @@ class TestSpatialReportAirQuality:
         mock_result.errors = ["OPENAQ_API_KEY not set"]
         mock_result.is_empty = False
 
-        with patch("asyncio.run", return_value=mock_result), patch("geospark.data_channels.air_quality.AirQualityChannel"):
+        with patch("geospark.data_channels.air_quality.AirQualityChannel", **{"return_value.search": AsyncMock(return_value=mock_result)}):
             result = report._fetch_air_quality(48.8566, 2.3522)
 
         assert result is None
@@ -327,7 +327,7 @@ class TestGeoAgentChannelMethods:
             {"type": "daily_forecast", "date": "2026-04-06", "temp_max_c": 18.0},
         ]
 
-        with patch("asyncio.run", return_value=mock_ch_result), patch("geospark.data_channels.weather.WeatherChannel"):
+        with patch("geospark.data_channels.weather.WeatherChannel", **{"return_value.search": AsyncMock(return_value=mock_ch_result)}):
             agent._get_weather(result, geocoded)
 
         assert "weather" in result.findings
@@ -344,7 +344,7 @@ class TestGeoAgentChannelMethods:
         mock_ch_result = MagicMock()
         mock_ch_result.errors = ["API timeout"]
 
-        with patch("asyncio.run", return_value=mock_ch_result), patch("geospark.data_channels.weather.WeatherChannel"):
+        with patch("geospark.data_channels.weather.WeatherChannel", **{"return_value.search": AsyncMock(return_value=mock_ch_result)}):
             agent._get_weather(result, geocoded)
 
         assert "weather" not in result.findings
@@ -364,7 +364,7 @@ class TestGeoAgentChannelMethods:
             {"type": "active_fire", "coordinates": [-59.8, -3.1], "confidence": 72},
         ]
 
-        with patch("asyncio.run", return_value=mock_ch_result), patch("geospark.data_channels.fires.FiresChannel"):
+        with patch("geospark.data_channels.fires.FiresChannel", **{"return_value.search": AsyncMock(return_value=mock_ch_result)}):
             agent._detect_fires(result, geocoded)
 
         assert "fires" in result.findings

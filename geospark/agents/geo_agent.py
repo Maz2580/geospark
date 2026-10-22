@@ -23,6 +23,8 @@ from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.knowledge.graph import SpatialKnowledgeGraph
 from geospark.knowledge.loaders import OverpassLoader
 from geospark.mcp_servers.launcher import MCPServerLauncher
+from geospark.utils.aio import run_sync
+from geospark.utils.geo import overpass_bbox
 
 
 class AgentStep(BaseModel):
@@ -257,9 +259,7 @@ Intent guide:
 
             t0 = time.time()
             lon, lat = coords[0], coords[1]
-            # Create bbox around the point
-            delta = radius / 111320  # Approximate degrees
-            bbox = (lat - delta, lon - delta, lat + delta, lon + delta)
+            bbox = overpass_bbox(lat, lon, radius)
 
             try:
                 entities = self._overpass.load_amenities(bbox, amenity)
@@ -412,7 +412,6 @@ Intent guide:
         geocoded: dict[str, dict],
     ) -> None:
         """Fetch weather data for geocoded locations."""
-        import asyncio
 
         from geospark.data_channels.weather import WeatherChannel
 
@@ -428,7 +427,7 @@ Intent guide:
                     ch = WeatherChannel()
                     return await ch.search(lat=_lat, lon=_lon, filters={"forecast_days": 3})
 
-                ch_result = asyncio.run(_run())
+                ch_result = run_sync(_run())
                 if ch_result.errors:
                     result.steps.append(AgentStep(
                         action="weather",
@@ -477,7 +476,6 @@ Intent guide:
         geocoded: dict[str, dict],
     ) -> None:
         """Fetch air quality data for geocoded locations."""
-        import asyncio
 
         from geospark.data_channels.air_quality import AirQualityChannel
 
@@ -493,7 +491,7 @@ Intent guide:
                     ch = AirQualityChannel()
                     return await ch.search(lat=_lat, lon=_lon, filters={"limit": 5})
 
-                ch_result = asyncio.run(_run())
+                ch_result = run_sync(_run())
                 if ch_result.errors:
                     result.steps.append(AgentStep(
                         action="air_quality",
@@ -533,7 +531,6 @@ Intent guide:
         geocoded: dict[str, dict],
     ) -> None:
         """Check for active fires near geocoded locations."""
-        import asyncio
 
         from geospark.data_channels.fires import FiresChannel
 
@@ -549,7 +546,7 @@ Intent guide:
                     ch = FiresChannel()
                     return await ch.search(lat=_lat, lon=_lon, filters={"days": 2})
 
-                ch_result = asyncio.run(_run())
+                ch_result = run_sync(_run())
                 if ch_result.errors:
                     result.steps.append(AgentStep(
                         action="fire_detection",

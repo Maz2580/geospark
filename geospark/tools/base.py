@@ -9,7 +9,19 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, ClassVar
 
-from geospark.protocol.schema import SpatialQuery, SpatialResult
+from geospark.protocol.schema import SpatialContext, SpatialQuery, SpatialResult
+
+
+def not_implemented(feature: str) -> SpatialResult:
+    """Result for an operation that is declared but not built yet.
+
+    It is an *error*, not an empty success: an LLM reading an empty success would treat
+    "coming soon" as the answer.
+    """
+    return SpatialResult(
+        errors=[f"{feature} is not implemented yet in GeoSpark."],
+        spatial_context=SpatialContext(summary=f"{feature}: not implemented yet"),
+    )
 
 
 class BaseTool(ABC):

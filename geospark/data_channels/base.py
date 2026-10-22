@@ -10,7 +10,7 @@ Inspired by Agent-Reach's modular channel architecture.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Protocol
 
 from pydantic import BaseModel, Field
@@ -24,7 +24,7 @@ class ChannelResult(BaseModel):
     features: list[dict[str, Any]] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
     source: str = ""
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     total_results: int = 0
     errors: list[str] = Field(default_factory=list)
 

@@ -9,7 +9,7 @@ Coordinate assumptions:
     - All geometries are assumed WGS84 (EPSG:4326) unless CRS is specified.
     - Distances use pyproj Geod on the WGS84 ellipsoid (geodesic, not planar).
     - Areas use pyproj geometry_area_perimeter (geodesic on WGS84).
-    - Buffers use 64-point geodesic sampling via Geod.fwd().
+    - Buffers are computed in a local azimuthal equidistant projection (exact for points).
     - Topology checks use Shapely (planar predicates on projected coordinates).
 
 Limitations:
@@ -53,6 +53,7 @@ class SpatialReasoner:
             SpatialOperation.BUFFER: self._buffer,
             SpatialOperation.DISTANCE: self._distance,
             SpatialOperation.AREA: self._area,
+            SpatialOperation.LENGTH: self._length,
             SpatialOperation.CENTROID: self._centroid,
             SpatialOperation.CONVEX_HULL: self._convex_hull,
             SpatialOperation.CONTAINS: self._topology_check,
@@ -75,30 +76,43 @@ class SpatialReasoner:
 
         return handler(query)
 
+    @staticmethod
+    def geodesic_buffer(geom: Any, radius_m: float) -> Any:
+        """Buffer a WGS84 geometry by ``radius_m`` metres, keeping its shape.
+
+        The geometry is projected into an azimuthal equidistant CRS centred on it (distances
+        from the centre are exact, and nearly exact for anything local), buffered there,
+        and projected back. Buffering a point gives a geodesic circle; buffering a polygon
+        or line grows its real outline instead of drawing a circle round its centroid.
+        ``radius_m=0`` returns the geometry unchanged; a negative radius shrinks polygons.
+        Not suited to geometries spanning thousands of km or crossing the antimeridian.
+        """
+        if radius_m == 0:
+            return geom
+        from pyproj import CRS, Transformer
+
+        center = geom.centroid
+        local = CRS.from_proj4(
+            f"+proj=aeqd +lat_0={center.y} +lon_0={center.x} +datum=WGS84 +units=m +no_defs"
+        )
+        from geospark.engine.crs_handler import reproject
+
+        to_local = Transformer.from_crs("EPSG:4326", local, always_xy=True)
+        to_wgs84 = Transformer.from_crs(local, "EPSG:4326", always_xy=True)
+        return reproject(reproject(geom, to_local).buffer(radius_m, quad_segs=16), to_wgs84)
+
     def _buffer(self, query: SpatialQuery) -> SpatialResult:
         """Create a geodesic buffer around a geometry."""
         if query.geometry is None:
             return SpatialResult(errors=["Buffer requires a geometry"])
 
         geom = shape(query.geometry.model_dump())
-        radius = query.radius_m or 1000  # Default 1km
+        radius = 1000.0 if query.radius_m is None else float(query.radius_m)  # Default 1 km
 
-        # Geodesic buffer: sample 64 points at exact distance from centroid
-        geod = Geod(ellps="WGS84")
-        center = geom.centroid
-        n_points = 64
-        coords = []
-        for i in range(n_points):
-            az = 360.0 * i / n_points
-            lon, lat, _ = geod.fwd(center.x, center.y, az, radius)
-            coords.append((lon, lat))
-        coords.append(coords[0])  # Close the ring
-
-        from shapely.geometry import Polygon as ShapelyPolygon
-
-        buffered = ShapelyPolygon(coords)
+        buffered = self.geodesic_buffer(geom, radius)
 
         # Geodesic area
+        geod = Geod(ellps="WGS84")
         area_sq_m, _ = geod.geometry_area_perimeter(buffered)
         area_sq_m = abs(area_sq_m)
 
@@ -150,6 +164,33 @@ class SpatialReasoner:
             ],
             spatial_context=SpatialContext(
                 summary=f"Geodesic distance: {distance_m:,.1f} m ({distance_m / 1000:,.2f} km)",
+            ),
+        )
+
+    def _length(self, query: SpatialQuery) -> SpatialResult:
+        """Geodesic length of a line (or the perimeter of a polygon) on WGS84."""
+        if query.geometry is None:
+            return SpatialResult(errors=["Length requires a geometry"])
+
+        geom = shape(query.geometry.model_dump())
+        length_m = Geod(ellps="WGS84").geometry_length(geom)
+
+        return SpatialResult(
+            features=[
+                SpatialFeature(
+                    geometry=mapping(geom),
+                    properties={
+                        "operation": "length",
+                        "length_m": round(length_m, 2),
+                        "length_km": round(length_m / 1000, 4),
+                        "length_method": "geodesic (WGS84 ellipsoid)",
+                    },
+                )
+            ],
+            spatial_context=SpatialContext(
+                crs="EPSG:4326",
+                total_features=1,
+                summary=f"Geodesic length: {length_m / 1000:.3f} km",
             ),
         )
 

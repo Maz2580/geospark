@@ -1,7 +1,7 @@
 """Tests for the GeoSpark Flows module."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import MagicMock
 
 import pytest
@@ -145,12 +145,12 @@ class TestFlowRun:
         assert run.status == "pending"
 
         run.status = "running"
-        run.started_at = datetime.utcnow()
+        run.started_at = datetime.now(timezone.utc)
         assert run.status == "running"
         assert run.started_at is not None
 
         run.status = "completed"
-        run.completed_at = datetime.utcnow()
+        run.completed_at = datetime.now(timezone.utc)
         assert run.status == "completed"
         assert run.completed_at is not None
 

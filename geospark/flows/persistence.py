@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Protocol
 
 from geospark.flows.flow_schema import Flow, FlowRun
@@ -75,7 +75,7 @@ class SupabaseFlowStore:
             "trigger_type": flow.trigger.trigger_type,
             "metadata": json.loads(json.dumps(flow.metadata, default=str)),
             "definition": json.loads(flow.model_dump_json()),
-            "updated_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
         }
         resp = self._client.post(
             "/flows",

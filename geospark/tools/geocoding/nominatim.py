@@ -50,18 +50,26 @@ class NominatimGeocoder(BaseTool):
         if not search_text:
             return SpatialResult(errors=["Geocode requires metadata.query"])
 
-        with httpx.Client(timeout=10) as client:
-            response = client.get(
-                f"{self.BASE_URL}/search",
-                params={
-                    "q": search_text,
-                    "format": "geojson",
-                    "limit": query.limit,
-                },
-                headers=self.HEADERS,
+        try:
+            with httpx.Client(timeout=10) as client:
+                response = client.get(
+                    f"{self.BASE_URL}/search",
+                    params={
+                        "q": search_text,
+                        "format": "geojson",
+                        "limit": query.limit,
+                    },
+                    headers=self.HEADERS,
+                )
+                response.raise_for_status()
+                data = response.json()
+        except (httpx.HTTPError, ValueError) as e:
+            # Upstream outage or bad response: report it instead of raising (which the API
+            # would turn into an opaque 500)
+            return SpatialResult(
+                errors=[f"Geocoding service unavailable ({type(e).__name__}). Try again shortly."],
+                sources=["openstreetmap-nominatim"],
             )
-            response.raise_for_status()
-            data = response.json()
 
         features = [
             SpatialFeature(
@@ -92,18 +100,24 @@ class NominatimGeocoder(BaseTool):
         coords = query.geometry.coordinates  # type: ignore
         lon, lat = coords[0], coords[1]
 
-        with httpx.Client(timeout=10) as client:
-            response = client.get(
-                f"{self.BASE_URL}/reverse",
-                params={
-                    "lat": lat,
-                    "lon": lon,
-                    "format": "geojson",
-                },
-                headers=self.HEADERS,
+        try:
+            with httpx.Client(timeout=10) as client:
+                response = client.get(
+                    f"{self.BASE_URL}/reverse",
+                    params={
+                        "lat": lat,
+                        "lon": lon,
+                        "format": "geojson",
+                    },
+                    headers=self.HEADERS,
+                )
+                response.raise_for_status()
+                data = response.json()
+        except (httpx.HTTPError, ValueError) as e:
+            return SpatialResult(
+                errors=[f"Geocoding service unavailable ({type(e).__name__}). Try again shortly."],
+                sources=["openstreetmap-nominatim"],
             )
-            response.raise_for_status()
-            data = response.json()
 
         features = []
         if "features" in data:

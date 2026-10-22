@@ -22,6 +22,8 @@ from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.knowledge.loaders import OverpassLoader
 from geospark.mcp_servers.launcher import MCPServerLauncher
+from geospark.utils.aio import run_sync
+from geospark.utils.geo import overpass_bbox
 
 # The local model usually writes the summary in well under this; if it is
 # busy, the report uses its plain summary rather than keep the caller waiting.
@@ -166,8 +168,7 @@ class SpatialReport:
         # Steps 2-3: elevation, weather, air quality and nearby amenities are
         # independent, so they are fetched at the same time. Amenities (the
         # public Overpass servers) usually take longest.
-        delta = radius_m / 111320
-        bbox = (lat - delta, lon - delta, lat + delta, lon + delta)
+        bbox = overpass_bbox(lat, lon, radius_m)
         with ThreadPoolExecutor(max_workers=4) as pool:
             elev_job = pool.submit(self._launcher.handle_tool_call, "get_elevation", {
                 "explanation": f"Elevation at {location}",
@@ -245,7 +246,6 @@ class SpatialReport:
 
     def _fetch_weather(self, lat: float, lon: float) -> WeatherSnapshot | None:
         """Fetch current weather via the weather data channel."""
-        import asyncio
 
         try:
             from geospark.data_channels.weather import WeatherChannel
@@ -254,7 +254,7 @@ class SpatialReport:
                 ch = WeatherChannel()
                 return await ch.search(lat=lat, lon=lon, filters={"forecast_days": 1})
 
-            result = asyncio.run(_run())
+            result = run_sync(_run())
             if result.errors or result.is_empty:
                 return None
 
@@ -277,7 +277,6 @@ class SpatialReport:
 
     def _fetch_air_quality(self, lat: float, lon: float) -> AirQualitySnapshot | None:
         """Fetch nearest air quality station via the air quality data channel."""
-        import asyncio
 
         try:
             from geospark.data_channels.air_quality import AirQualityChannel
@@ -286,7 +285,7 @@ class SpatialReport:
                 ch = AirQualityChannel()
                 return await ch.search(lat=lat, lon=lon, filters={"limit": 1})
 
-            result = asyncio.run(_run())
+            result = run_sync(_run())
             if result.errors or result.is_empty:
                 return None
 

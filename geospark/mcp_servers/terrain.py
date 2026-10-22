@@ -52,7 +52,17 @@ class TerrainServer(BaseMCPServer):
         if result.features:
             return {
                 "result": result.features[0].properties,
-                "metadata": {"crs": "EPSG:4326", "source": "open-elevation"},
+                # Report the dataset that actually answered (Copernicus GLO-30 first,
+                # Open Elevation as fallback), with its attribution, not a hard-coded name.
+                "metadata": {
+                    "crs": "EPSG:4326",
+                    "source": result.sources[0] if result.sources else "unknown",
+                    **(
+                        {"attribution": result.features[0].properties["attribution"]}
+                        if "attribution" in result.features[0].properties
+                        else {}
+                    ),
+                },
             }
         return {
             "result": None,

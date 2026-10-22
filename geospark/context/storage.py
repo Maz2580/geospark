@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from geospark.context.geo_context import ContextRelation, ContextTier, GeoContext
+from geospark.utils import data_dir
 
 _URI_PATTERN = re.compile(r"^geospark://([^/]+)/(.+)$")
 
@@ -74,7 +75,7 @@ class ContextStore:
 
     def __init__(self, storage_dir: str | Path | None = None) -> None:
         if storage_dir is None:
-            storage_dir = Path.home() / ".geospark" / "contexts"
+            storage_dir = data_dir() / "contexts"
         self._root = Path(storage_dir)
         self._root.mkdir(parents=True, exist_ok=True)
 

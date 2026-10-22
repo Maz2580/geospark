@@ -332,7 +332,7 @@ Elevation results include an `attribution` field you can copy directly. The full
 git clone https://github.com/Maz2580/geospark && cd geospark
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,api,mcp]"
-pytest                       # 955 tests; offline, never touch ~/.geospark
+pytest                       # 1003 tests; offline, never touch ~/.geospark
 ruff check geospark tests
 ```
 

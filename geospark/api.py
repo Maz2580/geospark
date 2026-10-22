@@ -11,6 +11,7 @@ Usage:
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import hmac
 import os
 import re
@@ -213,11 +214,34 @@ if _ui_dir.exists():
     app.mount("/assets", StaticFiles(directory=str(_ui_dir / "assets")), name="assets")
 
 
+def _asset_version() -> str:
+    """A short hash of every file in ui/assets, so a deploy that changes any of them changes it."""
+    digest = hashlib.sha256()
+    assets = _ui_dir / "assets"
+    for f in sorted(assets.rglob("*")) if assets.exists() else []:
+        if f.is_file():
+            digest.update(f.name.encode())
+            digest.update(f.read_bytes())
+    return digest.hexdigest()[:12]
+
+
+_ASSET_VERSION = _asset_version()
+# Local asset links in the pages: "/assets/styles.css" -> "/assets/styles.css?v=<hash>"
+_ASSET_LINK = re.compile(r"""(["'])(/assets/[\w./-]+\.(?:css|js|svg|png|woff2))\1""")
+
+
 def _serve_page(page: str) -> HTMLResponse:
-    """Serve an HTML page from the ui/ directory."""
+    """Serve an HTML page from the ui/ directory.
+
+    Asset links get a version tag. Browsers and Cloudflare cache /assets for hours, so without it
+    returning visitors would mix new pages with the old stylesheet and scripts after a deploy.
+    The HTML itself is sent with ``no-cache`` so the new tags are seen straight away.
+    """
     path = _ui_dir / page
     if path.exists():
-        return HTMLResponse(path.read_text(encoding="utf-8"))
+        html = _ASSET_LINK.sub(lambda m: f"{m.group(1)}{m.group(2)}?v={_ASSET_VERSION}{m.group(1)}",
+                               path.read_text(encoding="utf-8"))
+        return HTMLResponse(html, headers={"Cache-Control": "no-cache"})
     raise HTTPException(status_code=404, detail="Page not found")
 
 

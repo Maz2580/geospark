@@ -121,6 +121,11 @@ than guesses, exports QGIS-ready GeoJSON, and its MCP server is rebuilt on SDK 2
 The focus of this release is that what GeoSpark says it does, it does: it installs cleanly,
 it's safe to host publicly, and its answers are geometrically correct.
 
+### Fixed: website
+- After a deploy, returning visitors could get the new pages with the old cached stylesheet and
+  scripts (Cloudflare caches `/assets` for 4 hours), so pages looked broken. Asset links now carry a
+  content hash (`/assets/styles.css?v=…`) and the pages are sent with `Cache-Control: no-cache`.
+
 ### Fixed: install and packaging
 - `pip install geospark-ai[mcp]` then `geospark-mcp` crashed on start, because mcp 2.x removed the
   decorator API. `mcp` is now pinned `<2`, and CI runs a real stdio handshake.

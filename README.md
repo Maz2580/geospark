@@ -493,7 +493,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Live API
 
-GeoSpark is deployed and accessible at **[geospark.terrascout.app](https://geospark.terrascout.app/docs)** — 62+ endpoints with interactive Swagger documentation.
+GeoSpark is deployed and accessible at **[geospark.terrascout.app](https://geospark.terrascout.app/docs)**: 49 documented API operations with interactive Swagger documentation. The public API is open without a key; see [deploy/DEPLOY.md](deploy/DEPLOY.md#security) for the access model and limits.
 
 ## Author
 
@@ -501,6 +501,18 @@ Created by **Mazdak Ghasemi Tootkaboni** ([University of Melbourne](https://www.
 
 - ORCID: [0000-0001-8084-5270](https://orcid.org/0000-0001-8084-5270)
 - GitHub: [@Maz2580](https://github.com/Maz2580)
+
+## Data attribution
+
+GeoSpark computes geometry locally but fetches data from public services. Results built on
+them keep the providers' licences, so please credit them when you publish:
+
+- **OpenStreetMap** (geocoding, amenities, map tiles): © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright)
+- **Copernicus DEM GLO-30** (elevation): © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018, provided under COPERNICUS by the European Union and ESA
+- **Open-Meteo** (weather): [CC BY 4.0](https://open-meteo.com/)
+- **OpenAQ** (air quality) and **NASA FIRMS** (active fires): see each provider's terms
+
+Elevation results include an `attribution` field you can copy directly. The full list is in [NOTICE](NOTICE).
 
 ## License
 

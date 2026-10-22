@@ -6,7 +6,7 @@ Licensed under the Apache License, Version 2.0.
 This product was created by Mazdak Ghasemi Tootkaboni at the
 University of Melbourne (M.GhasemiTootkaboni@unimelb.edu.au).
 
-This product includes the following third-party software:
+Third-party software (installed as dependencies, not bundled):
 - Shapely (BSD 3-Clause) - Geometry operations
 - PyProj (MIT) - CRS transformations
 - Pydantic (MIT) - Data validation
@@ -14,9 +14,30 @@ This product includes the following third-party software:
 - FastAPI (MIT) - REST API framework
 - Click (BSD 3-Clause) - CLI framework
 - Rich (MIT) - Terminal formatting
+- NumPy (BSD 3-Clause) - Numerical arrays
+- MCP Python SDK (MIT) - Model Context Protocol server
 
-Geospatial data services used:
-- OpenStreetMap/Nominatim (ODbL) - Geocoding
-- Open Elevation API - Elevation data
-- OSRM (BSD 2-Clause) - Routing
-- SpatioTemporal Asset Catalogs (STAC) - Satellite data discovery
+Third-party assets loaded by the web UI from the unpkg CDN (not bundled):
+- Leaflet 1.9.4 (BSD 2-Clause) - Interactive maps
+- globe.gl 2.33.0 and three-globe 2.33.0 example textures (MIT) - Landing-page globe
+
+Data services queried at runtime. Results derived from them carry the
+providers' licences and attribution requirements:
+- OpenStreetMap data via Nominatim (geocoding), Overpass API (amenities)
+  and map tiles: (c) OpenStreetMap contributors, ODbL 1.0
+  https://www.openstreetmap.org/copyright
+- Copernicus DEM GLO-30 (elevation): produced using Copernicus WorldDEM-30
+  (c) DLR e.V. 2010-2014 and (c) Airbus Defence and Space GmbH 2014-2018,
+  provided under COPERNICUS by the European Union and ESA; all rights reserved
+- Open Elevation API (elevation fallback): SRTM-derived data
+- Open-Meteo (weather and geocoding): CC BY 4.0, https://open-meteo.com/
+- OpenAQ (air quality): data from the original providers listed by OpenAQ,
+  https://openaq.org/
+- NASA FIRMS (active fires): NASA LANCE FIRMS, https://firms.modaps.eosdis.nasa.gov/
+- OSRM public demo server (routing): OSRM (BSD 2-Clause) over OpenStreetMap data
+- Element 84 Earth Search and Microsoft Planetary Computer (STAC satellite
+  catalogues): each collection carries its own licence, e.g. Sentinel-2
+  (Copernicus Sentinel data, free and open)
+
+GeoSpark Bench datasets (geospark/bench/datasets) are part of this product
+and are licensed under Apache 2.0; see geospark/bench/datasets/README.md.

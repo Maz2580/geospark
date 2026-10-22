@@ -86,7 +86,7 @@ class LLMOnlyAdapter:
             base_url=self._base_url,
             headers={
                 "Authorization": f"Bearer {self._api_key}",
-                "HTTP-Referer": "https://geospark.dev",
+                "HTTP-Referer": "https://github.com/Maz2580/geospark",
                 "X-Title": "GeoSpark Bench",
             },
             timeout=60,

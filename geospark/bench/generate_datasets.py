@@ -2,7 +2,7 @@
 Generate benchmark datasets for GeoSpark Bench v1.0.
 
 Run with:
-    .venv/Scripts/python.exe -m geospark.bench.generate_datasets
+    python -m geospark.bench.generate_datasets
 
 Generates:
 - geotopo.json       (200+ topological reasoning questions)
@@ -803,7 +803,7 @@ def generate_geochange() -> list[dict]:
         point = _make_point(scenario["coords"])
         questions.append({
             "id": f"geochange_{qid:03d}",
-            "benchmark": BenchmarkName.GEOCHANAGE.value,
+            "benchmark": BenchmarkName.GEOCHANGE.value,
             "category": "change_detection",
             "difficulty": scenario["difficulty"],
             "prompt_natural": (
@@ -837,7 +837,7 @@ def generate_geochange() -> list[dict]:
                            "vegetation_recovery"]
             questions.append({
                 "id": f"geochange_{qid:03d}",
-                "benchmark": BenchmarkName.GEOCHANAGE.value,
+                "benchmark": BenchmarkName.GEOCHANGE.value,
                 "category": "change_type",
                 "difficulty": "hard",
                 "prompt_natural": (
@@ -1564,7 +1564,7 @@ def generate_all() -> None:
             "version": "1.0.0",
             "generator": generate_geodistance,
         },
-        BenchmarkName.GEOCHANAGE: {
+        BenchmarkName.GEOCHANGE: {
             "name": "GeoChange",
             "description": "Temporal change detection (text-based v0.1)",
             "version": "0.1.0",

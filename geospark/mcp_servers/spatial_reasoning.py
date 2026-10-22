@@ -64,8 +64,10 @@ class SpatialReasoningServer(BaseMCPServer):
         {
             "name": "calculate_distance",
             "description": (
-                "Calculate the geodesic distance between two points in meters. "
-                "Use when the user asks how far apart two locations are. "
+                "Calculate the geodesic distance in meters between two places or points. "
+                "For NAMED places, pass place_a and place_b as names (e.g. 'Adelaide Oval'); "
+                "the server geocodes them, so never type coordinates for a named place. "
+                "Use point_a/point_b only for coordinates the user gave you or a tool returned. "
                 "Returns exact distance on the WGS84 ellipsoid. "
                 "Do NOT use for topology checks (use check_spatial_relationship)."
             ),
@@ -76,16 +78,26 @@ class SpatialReasoningServer(BaseMCPServer):
                         "type": "string",
                         "description": "One sentence explaining WHY you need this distance.",
                     },
+                    "place_a": {
+                        "type": "string",
+                        "description": "First place by NAME, geocoded on the server. Preferred.",
+                    },
+                    "place_b": {
+                        "type": "string",
+                        "description": "Second place by NAME, geocoded on the server. Preferred.",
+                    },
                     "point_a": {
                         "type": "object",
-                        "description": 'First point as GeoJSON: {"type": "Point", "coordinates": [lon, lat]}',
+                        "description": 'First point as GeoJSON {"type": "Point", "coordinates": [lon, lat]}; '
+                                       "only for coordinates the user gave or a tool returned.",
                     },
                     "point_b": {
                         "type": "object",
-                        "description": 'Second point as GeoJSON: {"type": "Point", "coordinates": [lon, lat]}',
+                        "description": 'Second point as GeoJSON {"type": "Point", "coordinates": [lon, lat]}; '
+                                       "only for coordinates the user gave or a tool returned.",
                     },
                 },
-                "required": ["explanation", "point_a", "point_b"],
+                "required": ["explanation"],
             },
         },
         {
@@ -119,6 +131,7 @@ class SpatialReasoningServer(BaseMCPServer):
 
     def __init__(self) -> None:
         self.engine = Engine()
+        self._geocoder: Engine | None = None  # created on first use of a place name
 
     def _get_handlers(self) -> dict[str, Any]:
         return {
@@ -137,14 +150,48 @@ class SpatialReasoningServer(BaseMCPServer):
             "metadata": {"method": "ground_truth_topology", "crs": "EPSG:4326", **verification(checked)},
         }
 
+    def _geocode(self, name: str) -> SpatialResult:
+        if self._geocoder is None:
+            self._geocoder = Engine(tools=["geocoder"])
+        return self._geocoder.execute(SpatialQuery(operation=SpatialOperation.GEOCODE, metadata={"query": name}))
+
     def _handle_distance(self, args: dict[str, Any]) -> dict[str, Any]:
-        distance = SpatialReasoner.calculate_distance(args["point_a"], args["point_b"])
+        """Distance between two places. Named places are geocoded here, so the model never has to
+        supply (and possibly invent) coordinates for them."""
+        points: dict[str, dict[str, Any]] = {}
+        places: list[dict[str, Any]] = []
+        lookups: list[SpatialResult] = []
+        for side in ("a", "b"):
+            name, point = args.get(f"place_{side}"), args.get(f"point_{side}")
+            if isinstance(name, str) and name.strip():
+                found = self._geocode(name.strip())
+                if not found.features:
+                    reason = found.errors[0] if found.errors else f"No place called '{name}' was found."
+                    return {"result": None, "errors": [reason],
+                            "suggestion": "Add the city or country to the place name, or call geocode first."}
+                best = found.features[0]
+                points[side] = best.geometry if isinstance(best.geometry, dict) else best.geometry.model_dump()
+                places.append({"query": name, "display_name": best.properties.get("display_name"),
+                               "coordinates": points[side]["coordinates"]})
+                lookups.append(found)
+            elif isinstance(point, dict):
+                points[side] = point
+            else:
+                return {"result": None, "errors": [f"Give place_{side} (a name) or point_{side} (GeoJSON)."],
+                        "suggestion": "For named places pass place_a and place_b; the server geocodes them."}
+        distance = SpatialReasoner.calculate_distance(points["a"], points["b"])
         values = {"distance_m": distance, "distance_km": distance / 1000}
         checked = enrich(
-            SpatialResult(features=[SpatialFeature(geometry=args["point_a"], properties=values)]), "distance"
+            SpatialResult(features=[SpatialFeature(geometry=points["a"], properties=values)]), "distance"
         )
+        for found in lookups:  # where the places came from, and any ambiguity, travel with the distance
+            checked.provenance = [*found.provenance, *checked.provenance]
+            checked.warnings.extend(w for w in found.warnings if w not in checked.warnings)
+        result: dict[str, Any] = dict(values)
+        if places:
+            result["places"] = places
         return {
-            "result": values,
+            "result": result,
             "metadata": {"method": "geodesic_wgs84", "crs": "EPSG:4326", **verification(checked)},
         }
 

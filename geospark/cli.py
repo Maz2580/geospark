@@ -198,14 +198,17 @@ def ask(question: str, provider: str, model: str | None) -> None:
 @main.command()
 def tools() -> None:
     """List available tools."""
-    from geospark.tools.registry import TOOL_CLASSES
+    from geospark.tools.registry import TOOL_CLASSES, TOOL_STATUS
 
-    table = Table(title="Available GeoSpark Tools")
+    table = Table(title="GeoSpark Tools")
     table.add_column("Name", style="cyan")
-    table.add_column("Module", style="dim")
+    table.add_column("Status")
+    table.add_column("What it does")
 
-    for name, path in TOOL_CLASSES.items():
-        table.add_row(name, path)
+    for name in TOOL_CLASSES:
+        state, text = TOOL_STATUS.get(name, ("ready", ""))
+        colour = {"ready": "green", "partial": "yellow", "planned": "dim"}[state]
+        table.add_row(name, f"[{colour}]{state}[/{colour}]", text)
 
     console.print(table)
 

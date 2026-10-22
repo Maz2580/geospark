@@ -51,7 +51,7 @@
 
     <!-- Tools -->
     <div class="card mt-2">
-      <div class="card-header"><div class="card-icon geo">&#128295;</div><h3>Available Tools</h3></div>
+      <div class="card-header"><div class="card-icon geo">&#128295;</div><h3>Tools</h3></div>
       <div id="tools-info" class="text-sm text-muted">Loading...</div>
     </div>
 
@@ -114,10 +114,18 @@
 
       // Tools
       if (tools) {
-        let html = '<div class="table-wrap"><table><thead><tr><th>Tool</th><th>Status</th></tr></thead><tbody>';
-        (tools.available || []).forEach(t => {
-          const loaded = tools.loaded?.includes(t);
-          html += `<tr><td class="mono">${t}</td><td><span class="badge ${loaded ? 'badge-ok' : 'badge-info'}">${loaded ? 'loaded' : 'available'}</span></td></tr>`;
+        // What each tool really does today: ready, partial (less than the name suggests) or planned
+        const details = tools.details || {};
+        const names = Object.keys(details).length ? Object.keys(details) : (tools.available || []);
+        const badge = (t) => {
+          const state = details[t]?.status || 'ready';
+          if (state === 'planned') return '<span class="badge">planned</span>';
+          if (state === 'partial') return '<span class="badge badge-warn">partial</span>';
+          return tools.loaded?.includes(t) ? '<span class="badge badge-ok">loaded</span>' : '<span class="badge badge-info">ready</span>';
+        };
+        let html = '<div class="table-wrap"><table><thead><tr><th>Tool</th><th>Status</th><th>What it does today</th></tr></thead><tbody>';
+        names.forEach(t => {
+          html += `<tr><td class="mono">${escapeHtml(t)}</td><td>${badge(t)}</td><td>${escapeHtml(details[t]?.description || '')}</td></tr>`;
         });
         html += '</tbody></table></div>';
         $('#tools-info').innerHTML = html;

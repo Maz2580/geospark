@@ -7,6 +7,7 @@ The central orchestrator that connects spatial reasoning, tools, and LLM integra
 from __future__ import annotations
 
 import contextlib
+import re
 import time
 from typing import Any
 
@@ -15,10 +16,74 @@ from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.protocol.schema import SpatialContext, SpatialQuery, SpatialResult
 from geospark.tools.registry import ToolRegistry
 
+_NUMBER = re.compile(r"[-+]?\d+(?:\.\d+)?")
+_COORD_TOLERANCE_DEG = 1e-3  # about 100 m: a coordinate "matches" a trusted one within this
 
-def answer_to_result(answer: Any, model_source: str) -> SpatialResult:
+
+def _point_coords(value: Any) -> tuple[float, float] | None:
+    """(lon, lat) of a GeoJSON Point, else None."""
+    if isinstance(value, dict) and value.get("type") == "Point":
+        c = value.get("coordinates")
+        if isinstance(c, (list, tuple)) and len(c) >= 2 and all(isinstance(v, (int, float)) for v in c[:2]):
+            return float(c[0]), float(c[1])
+    return None
+
+
+def _coordinates_supplied_by_model(tool: str, args: dict[str, Any]) -> list[tuple[float, float]]:
+    """The (lon, lat) inputs a tool call received from the model itself (not looked up by the server)."""
+    out: list[tuple[float, float]] = []
+    if tool == "calculate_distance":
+        for side in ("a", "b"):
+            if not args.get(f"place_{side}"):
+                pt = _point_coords(args.get(f"point_{side}"))
+                if pt:
+                    out.append(pt)
+    elif tool == "check_spatial_relationship":
+        out.extend(pt for pt in (_point_coords(args.get("geometry_a")), _point_coords(args.get("geometry_b"))) if pt)
+    elif tool in ("get_elevation", "spatial_operation", "reverse_geocode"):
+        lat, lon = args.get("latitude"), args.get("longitude")
+        if isinstance(lat, (int, float)) and isinstance(lon, (int, float)):
+            out.append((float(lon), float(lat)))
+    return out
+
+
+def _from_tool_reply(tool: str, body: Any) -> list[tuple[float, float]]:
+    """(lon, lat) of places a tool looked up: geocode results and server-geocoded distance places."""
+    out: list[tuple[float, float]] = []
+    if not isinstance(body, dict):
+        return out
+    if tool in ("geocode", "reverse_geocode"):
+        for f in body.get("features") or []:
+            pt = _point_coords((f or {}).get("geometry"))
+            if pt:
+                out.append(pt)
+    for place in body.get("places") or []:
+        c = (place or {}).get("coordinates")
+        if isinstance(c, (list, tuple)) and len(c) >= 2:
+            out.append((float(c[0]), float(c[1])))
+    return out
+
+
+def _matches(pt: tuple[float, float], trusted: list[tuple[float, float]]) -> bool:
+    return any(abs(pt[0] - t[0]) <= _COORD_TOLERANCE_DEG and abs(pt[1] - t[1]) <= _COORD_TOLERANCE_DEG for t in trusted)
+
+
+def _in_question(pt: tuple[float, float], numbers: list[float]) -> bool:
+    def present(v: float) -> bool:
+        return any(abs(v - n) <= _COORD_TOLERANCE_DEG for n in numbers)
+
+    return present(pt[0]) and present(pt[1])
+
+
+def answer_to_result(answer: Any, model_source: str, question: str = "") -> SpatialResult:
     """Turn an LLM answer into a checkable result: the tools' provenance, units, caveats and
-    the places they found travel with the answer, so a reader can see where each number came from."""
+    the places they found travel with the answer, so a reader can see where each number came from.
+
+    It also checks the model's inputs. Coordinates a tool received that no lookup in this run
+    produced, and that are not in the question, may have been recalled (or invented) by the model.
+    The tool then computed correctly from possibly wrong points, so the answer is marked as not
+    fully checked (``quality["unverified_coordinates"]``) and the reason is given as a caveat.
+    """
     from geospark.protocol.provenance import Provenance
     from geospark.protocol.schema import SpatialFeature
 
@@ -28,12 +93,28 @@ def answer_to_result(answer: Any, model_source: str) -> SpatialResult:
     warnings: list[str] = []
     quality: dict[str, Any] = {}
     features: list[SpatialFeature] = []
+    trusted: list[tuple[float, float]] = []
+    numbers = [float(n) for n in _NUMBER.findall(question or "")]
+    failed_tools = unverified = 0
     for call in answer.tool_calls:
+        tool = str(call.get("tool"))
+        args = call.get("args") if isinstance(call.get("args"), dict) else {}
         reply = call.get("result") if isinstance(call.get("result"), dict) else {}
+        suspicious = [pt for pt in _coordinates_supplied_by_model(tool, args)
+                      if not _matches(pt, trusted) and not _in_question(pt, numbers)]
+        if suspicious:
+            unverified += len(suspicious)
+            shown = ", ".join(f"[{lon:.4f}, {lat:.4f}]" for lon, lat in suspicious)
+            warnings.append(
+                f"{tool} was given coordinates {shown} that no geocode call in this answer produced and that "
+                "are not in the question, so the model may have supplied them from memory. The result is "
+                "computed exactly, but possibly for the wrong places."
+            )
         if reply.get("status") == "error" or (reply.get("errors") and not reply.get("result")):
             err = reply.get("error") or {}
             message = err.get("message") if isinstance(err, dict) else None
-            warnings.append(f"Tool {call.get('tool')} failed: {message or (reply.get('errors') or ['unknown error'])[0]}")
+            failed_tools += 1
+            warnings.append(f"Tool {tool} failed: {message or (reply.get('errors') or ['unknown error'])[0]}")
             continue
         meta = reply.get("metadata") or {}
         for item in meta.get("provenance") or []:
@@ -48,10 +129,21 @@ def answer_to_result(answer: Any, model_source: str) -> SpatialResult:
         warnings.extend(w for w in meta.get("warnings") or [] if w not in warnings)
         quality.update(meta.get("quality") or {})
         body = reply.get("result")
+        trusted.extend(_from_tool_reply(tool, body))
         found = (body.get("features") or []) if isinstance(body, dict) else []
-        if call.get("tool") in ("geocode", "reverse_geocode") and found:
+        if tool in ("geocode", "reverse_geocode") and found:
             with contextlib.suppress(Exception):
                 features.append(SpatialFeature(**found[0]))  # the best match is the one the model used
+        for place in (body.get("places") or []) if isinstance(body, dict) else []:
+            with contextlib.suppress(Exception):
+                features.append(SpatialFeature(
+                    geometry={"type": "Point", "coordinates": place["coordinates"]},
+                    properties={"display_name": place.get("display_name") or place.get("query")},
+                ))
+    if failed_tools:
+        quality["failed_tools"] = failed_tools
+    if unverified:
+        quality["unverified_coordinates"] = unverified
     return SpatialResult(
         features=features,
         spatial_context=SpatialContext(summary=answer.answer, total_features=len(answer.tool_calls), units=units),
@@ -194,7 +286,7 @@ class Engine:
                 errors=[f"Ollama call failed: {e}"],
             )
 
-        return answer_to_result(answer, f"ollama:{answer.model}")
+        return answer_to_result(answer, f"ollama:{answer.model}", question)
 
     def _ask_openrouter(
         self,
@@ -225,7 +317,7 @@ class Engine:
                 errors=[f"OpenRouter call failed: {e}"],
             )
 
-        return answer_to_result(answer, f"openrouter:{answer.model}")
+        return answer_to_result(answer, f"openrouter:{answer.model}", question)
 
     def chain(self, steps: list[dict[str, Any]]) -> QueryChain:
         """Create a chain of spatial operations."""

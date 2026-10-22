@@ -121,6 +121,21 @@ than guesses, exports QGIS-ready GeoJSON, and its MCP server is rebuilt on SDK 2
 The focus of this release is that what GeoSpark says it does, it does: it installs cleanly,
 it's safe to host publicly, and its answers are geometrically correct.
 
+### Fixed: Ask could answer from coordinates the model made up
+- Reported by a tester: "How far is Adelaide Oval from Glenelg beach?" gave 12.25, 14.44 and 15.76 km
+  on three runs (correct: 10.63 km), each with status `ok`. The 7B model skipped geocoding and passed
+  coordinates from memory to `calculate_distance`, which computed exactly, but between wrong points.
+- `calculate_distance` now takes place names (`place_a`, `place_b`) and geocodes them on the server.
+  The places, their provenance (Nominatim, ODbL) and any ambiguity warning come back with the
+  distance. With the same model the question now gives 10.63 km on every run.
+- Backstop: if a tool is given coordinates that no geocode call in the same answer produced and that
+  are not in the question, the answer's status is `partial`, with a caveat saying why.
+- The homepage now quotes the README's benchmark figures (1–95% for models alone, 76–96% with
+  GeoSpark's tools for models that made valid tool calls) instead of "0%" and "100%".
+- The status page, `/api/v1/tools` and `geospark tools` say what each tool does today: change
+  detection is listed as planned (not available), and NDVI and spectral indices as partial (they
+  find satellite scenes but don't compute index values yet).
+
 ### Fixed: website
 - After a deploy, returning visitors could get the new pages with the old cached stylesheet and
   scripts (Cloudflare caches `/assets` for 4 hours), so pages looked broken. Asset links now carry a

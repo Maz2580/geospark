@@ -66,6 +66,9 @@ class Engine:
 
         # Add execution metadata
         result.execution_time_ms = (time.time() - start_time) * 1000
+        from geospark.runs import record
+
+        record("compute", query.operation.value, query, result)
         return result
 
     def ask(

@@ -75,6 +75,15 @@ def tile_url(lat: float, lon: float) -> str:
 
 
 def read_height(lat: float, lon: float) -> float:
+    """Surface height in metres at a point (recorded in an active run record)."""
+    from geospark.runs import record
+
+    height = _read_height(lat, lon)
+    record("data", "copernicus/height", {"lat": lat, "lon": lon}, height, SOURCE_ID)
+    return height
+
+
+def _read_height(lat: float, lon: float) -> float:
     """Surface height in metres at a point.
 
     Raises:

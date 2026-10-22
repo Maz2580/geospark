@@ -17,6 +17,14 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
     pre-installs DuckDB's extensions.
   - One DuckDB query at a time (`GEOSPARK_OVERTURE_CONCURRENCY`), so concurrent requests can't
     exceed a small container's memory.
+- **Reproducible runs** (`geospark.runs`, CLI `geospark record …` / `geospark replay FILE`):
+  - A run record has the environment versions plus every data request (Nominatim, Overpass,
+    Overture, Valhalla, data channels, Copernicus/Open Elevation) and every engine computation,
+    fingerprinted with SHA-256 over canonical JSON (timings and retrieval times ignored), plus
+    the result's fingerprint.
+  - Replay reruns the analysis and answers **reproduced**, **data changed** (naming the source
+    and request) or **code changed** (naming the library versions).
+  - Recording follows work into GeoSpark's thread pools and async helpers.
 - **Bring your own data** (`geospark-ai[io]`):
   - Formats: GeoJSON, GeoPackage, Shapefile (also zipped), GeoParquet, CSV with lon/lat,
     FlatGeobuf, KML, GML, File Geodatabase.

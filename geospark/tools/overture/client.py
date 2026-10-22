@@ -172,6 +172,17 @@ def query(
     """
     if theme not in _THEMES:
         raise ValueError(f"Unknown Overture theme '{theme}'. Choose from: {sorted(_THEMES)}")
+    from geospark.runs import record
+
+    request = {"theme": theme, "lat": lat, "lon": lon, "radius_m": radius_m, "category": category, "limit": limit}
+    result = _query_cached(theme, lat, lon, radius_m, category, limit)
+    record("data", f"overture/{theme}", request, result.features, "overture-maps")
+    return result
+
+
+def _query_cached(
+    theme: str, lat: float, lon: float, radius_m: float, category: str | None, limit: int | None,
+) -> SpatialResult:
     key = (theme, round(lat, 5), round(lon, 5), radius_m, (category or "").lower(), limit)
     with _lock:
         hit = _results.get(key)

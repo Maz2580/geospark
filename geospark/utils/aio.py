@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import concurrent.futures
+import contextvars
 from collections.abc import Coroutine
 from typing import Any, TypeVar
 
@@ -22,4 +23,5 @@ def run_sync(coro: Coroutine[Any, Any, T]) -> T:
     except RuntimeError:
         return asyncio.run(coro)
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-        return pool.submit(asyncio.run, coro).result()
+        # copy the context so run records (geospark.runs) see steps made in the coroutine
+        return pool.submit(contextvars.copy_context().run, asyncio.run, coro).result()

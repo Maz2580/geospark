@@ -83,6 +83,9 @@ class ElevationTool(BaseTool):
                 response.raise_for_status()
                 data = response.json()
             elevation = data["results"][0]["elevation"]
+            from geospark.runs import record
+
+            record("data", "open-elevation/lookup", {"lat": lat, "lon": lon}, elevation, "open-elevation-api")
         except Exception as e:
             return SpatialResult(errors=[f"Elevation query failed: {e}"])
 

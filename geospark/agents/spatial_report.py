@@ -24,6 +24,7 @@ from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.knowledge.loaders import OverpassLoader
 from geospark.mcp_servers.launcher import MCPServerLauncher
 from geospark.protocol.provenance import Provenance, engine_provenance, source_provenance
+from geospark.runs import in_context
 from geospark.utils.aio import run_sync
 from geospark.utils.geo import overpass_bbox
 
@@ -215,14 +216,14 @@ class SpatialReport:
         # public Overpass servers) usually take longest.
         bbox = overpass_bbox(lat, lon, radius_m)
         with ThreadPoolExecutor(max_workers=4) as pool:
-            elev_job = pool.submit(self._launcher.handle_tool_call, "get_elevation", {
+            elev_job = pool.submit(in_context(self._launcher.handle_tool_call), "get_elevation", {
                 "explanation": f"Elevation at {location}",
                 "latitude": lat,
                 "longitude": lon,
             })
-            weather_job = pool.submit(self._fetch_weather, lat, lon)
-            air_job = pool.submit(self._fetch_air_quality, lat, lon)
-            amenities_job = pool.submit(self._overpass.load_amenities_by_type, bbox, check_services)
+            weather_job = pool.submit(in_context(self._fetch_weather), lat, lon)
+            air_job = pool.submit(in_context(self._fetch_air_quality), lat, lon)
+            amenities_job = pool.submit(in_context(self._overpass.load_amenities_by_type), bbox, check_services)
 
             elev = elev_job.result()
             if elev.get("status") == "success" and elev.get("result"):

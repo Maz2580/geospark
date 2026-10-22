@@ -120,6 +120,7 @@ SOURCES: dict[str, dict[str, Any]] = {
                        "contributors (ODbL) and other sources. See https://docs.overturemaps.org/attribution/",
         "method": "DuckDB spatial query of Overture GeoParquet",
     },
+    "user-data": {"name": "Your data", "licence": None, "attribution": None},
     "geospark-engine": {
         "name": "GeoSpark spatial engine",
         "url": "https://github.com/Maz2580/geospark",

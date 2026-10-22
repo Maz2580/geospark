@@ -17,6 +17,19 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
     pre-installs DuckDB's extensions.
   - One DuckDB query at a time (`GEOSPARK_OVERTURE_CONCURRENCY`), so concurrent requests can't
     exceed a small container's memory.
+- **Bring your own data** (`geospark-ai[io]`):
+  - Formats: GeoJSON, GeoPackage, Shapefile (also zipped), GeoParquet, CSV with lon/lat,
+    FlatGeobuf, KML, GML, File Geodatabase.
+  - The CRS is never guessed: declared CRSs are reprojected and reported, files without one are
+    refused until `crs=` is given, GeoParquet follows its spec default, and CSV lon/lat is accepted
+    with a warning.
+  - Invalid geometries are refused, or repaired with `repair=True`.
+  - Analysis, all geodesic: `count_within` (exact point-in-polygon with density), `nearest` (exact
+    at any latitude; checked against brute force at 70°N) and `intersect` (overlap pieces with
+    both sides' attributes and area).
+  - Provenance includes each file's SHA-256.
+  - Available from Python, the CLI (`geospark layer info|count-within|nearest|intersect`) and
+    local-only MCP tools (`layer_*`, never on the hosted endpoint).
 - **Real isochrones and travel-time matrices** (Valhalla over OpenStreetMap) for walking, cycling and
   driving:
   - Reachable-area polygons per contour (up to 4, 1–60 min), validated and repaired, with geodesic

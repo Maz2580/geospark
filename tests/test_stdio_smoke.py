@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import time
 
 import pytest
 
@@ -24,46 +25,55 @@ EXPECTED_TOOLS = {
 }
 
 
-def _rpc(msg_id: int | None, method: str, params: dict | None = None) -> str:
-    msg: dict = {"jsonrpc": "2.0", "method": method}
-    if msg_id is not None:
-        msg["id"] = msg_id
-    if params is not None:
-        msg["params"] = params
-    return json.dumps(msg) + "\n"
+def _send(proc: subprocess.Popen, msg: dict) -> None:
+    proc.stdin.write(json.dumps({"jsonrpc": "2.0", **msg}) + "\n")
+    proc.stdin.flush()
+
+
+def _reply(proc: subprocess.Popen, msg_id: int, timeout_s: float = 60) -> dict:
+    """Read stdout until the response with ``msg_id`` arrives."""
+    deadline = time.time() + timeout_s
+    while time.time() < deadline:
+        line = proc.stdout.readline()
+        if not line:
+            break  # server exited
+        if line.startswith("{"):
+            msg = json.loads(line)
+            if msg.get("id") == msg_id:
+                return msg
+    raise AssertionError(f"no response to request {msg_id}; stderr:\n{proc.stderr.read()[-2000:]}")
 
 
 def test_stdio_server_handshake_lists_tools() -> None:
-    stdin = (
-        _rpc(
-            1,
-            "initialize",
-            {
+    # Wait for each reply before sending the next message, like a real MCP client.
+    # Closing stdin early makes the server exit before it answers (seen on slow CI runners).
+    proc = subprocess.Popen(
+        [sys.executable, "-m", "geospark.mcp_servers"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    try:
+        _send(proc, {
+            "id": 1,
+            "method": "initialize",
+            "params": {
                 "protocolVersion": "2025-06-18",
                 "capabilities": {},
                 "clientInfo": {"name": "smoke-test", "version": "0"},
             },
-        )
-        + _rpc(None, "notifications/initialized")
-        + _rpc(2, "tools/list", {})
-    )
-    proc = subprocess.run(
-        [sys.executable, "-m", "geospark.mcp_servers"],
-        input=stdin,
-        capture_output=True,
-        text=True,
-        timeout=60,
-    )
-    responses = {}
-    for line in proc.stdout.splitlines():
-        line = line.strip()
-        if line.startswith("{"):
-            msg = json.loads(line)
-            if "id" in msg:
-                responses[msg["id"]] = msg
+        })
+        init = _reply(proc, 1)
+        assert init["result"]["serverInfo"]["name"] == "geospark"
 
-    assert 1 in responses, f"no initialize response; stderr:\n{proc.stderr[-2000:]}"
-    assert responses[1]["result"]["serverInfo"]["name"] == "geospark"
-    assert 2 in responses, f"no tools/list response; stderr:\n{proc.stderr[-2000:]}"
-    names = {tool["name"] for tool in responses[2]["result"]["tools"]}
-    assert names >= EXPECTED_TOOLS
+        _send(proc, {"method": "notifications/initialized"})
+        _send(proc, {"id": 2, "method": "tools/list", "params": {}})
+        names = {tool["name"] for tool in _reply(proc, 2)["result"]["tools"]}
+        assert names >= EXPECTED_TOOLS
+    finally:
+        proc.stdin.close()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            proc.kill()

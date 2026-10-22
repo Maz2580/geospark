@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Maz2580/geospark",
+  "title": "GeoSpark",
+  "description": "Verifiable geospatial tools: distances, topology, isochrones, Overture Maps, with sources.",
+  "repository": {
+    "url": "https://github.com/Maz2580/geospark",
+    "source": "github"
+  },
+  "websiteUrl": "https://geospark.terrascout.app",
+  "version": "0.8.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://geospark.terrascout.app/mcp"
+    }
+  ]
+}

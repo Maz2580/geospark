@@ -90,8 +90,8 @@ postgis = [
     "geoalchemy2>=0.14",
 ]
 mcp = [
-    # mcp 2.x removed the decorator API used by mcp_servers/stdio_server.py
-    "mcp>=1.0,<2",
+    # SDK 2.x: MCPServer, protocol 2026-07-28 (still negotiates older handshakes)
+    "mcp>=2.3,<3",
 ]
 # Copernicus DEM GLO-30 elevation (reads the public cloud-optimised tiles)
 terrain = [
@@ -116,7 +116,7 @@ dev = [
 
 [project.scripts]
 geospark = "geospark.cli:main"
-geospark-mcp = "geospark.mcp_servers.stdio_server:run"
+geospark-mcp = "geospark.mcp_servers.server:run"
 
 [project.urls]
 Homepage = "https://github.com/Maz2580/geospark"

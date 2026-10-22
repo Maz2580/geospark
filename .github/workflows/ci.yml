@@ -46,6 +46,13 @@ jobs:
           pip install --dry-run -e ".[all]" | tee /tmp/all-extra.txt
           ! grep -qiE "(pyspark|[^-]geospark-[0-9])" /tmp/all-extra.txt
 
+      - name: MCP server works with only the [mcp] extra (what Claude Desktop users install)
+        run: |
+          python -m venv /tmp/mcp-only
+          /tmp/mcp-only/bin/pip install -q ".[mcp]" pytest
+          /tmp/mcp-only/bin/python -c "import importlib.util as u; assert u.find_spec('fastapi') is None, 'fastapi leaked into [mcp]'"
+          /tmp/mcp-only/bin/python -m pytest -q -p no:cacheprovider tests/test_stdio_smoke.py
+
       - name: Run tests
         run: |
           pytest tests/ -v --cov=geospark --cov-report=xml --cov-report=term --cov-fail-under=70

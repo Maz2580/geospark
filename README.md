@@ -51,9 +51,16 @@ Add GeoSpark to your MCP client's config. For Claude Desktop that's
 { "mcpServers": { "geospark": { "command": "geospark-mcp" } } }
 ```
 
-That gives the model six tools: `calculate_distance`, `check_spatial_relationship`,
-`spatial_operation` (buffer, area, length, centroid, union, …), `geocode`, `reverse_geocode` and
-`get_elevation`.
+That gives the model twelve read-only tools. **Computation:** `calculate_distance`,
+`check_spatial_relationship` and `spatial_operation` (buffer, area, length, centroid, convex hull).
+**Places and data:** `geocode`, `reverse_geocode`, `get_elevation`, `route`, `get_weather`,
+`get_air_quality` and `get_active_fires`. **Analysis:** `location_report` and `select_site`.
+
+Results come back as structured content with output schemas, usually GeoJSON. They carry
+provenance (source, licence, attribution), units and warnings. When GeoSpark can't answer reliably
+(invalid geometry, unknown place, a data source down), the tool returns an error that says why, so
+the model can tell the user instead of estimating. The server uses MCP SDK 2.x (protocol
+2026-07-28) and still works with clients on older protocol versions.
 
 **As a Python library**
 

@@ -227,3 +227,32 @@ def test_rest_elevation_includes_accuracy_and_provenance(api) -> None:
     assert body["quality"]["vertical_accuracy_le90_m"] == 4.0
     assert body["provenance"][0]["source"] == "copernicus-dem"
     assert body["units"] == {"elevation_m": "metre"}
+
+
+def _geocode_result(candidates):
+    from geospark.protocol.provenance import enrich
+
+    features = [SpatialFeature(geometry={"type": "Point", "coordinates": list(lonlat)},
+                               properties={"display_name": name, "importance": imp})
+                for name, lonlat, imp in candidates]
+    return enrich(SpatialResult(features=features, sources=["openstreetmap-nominatim"]), "geocode")
+
+
+def test_same_name_same_country_far_apart_is_ambiguous() -> None:
+    """Real Nominatim scores for 'Springfield' (2026-10-22): five US cities within 0.12."""
+    result = _geocode_result([
+        ("Springfield, Sangamon County, Illinois, United States", (-89.6501, 39.7990), 0.613),
+        ("Springfield, Hampden County, Massachusetts, United States", (-72.5898, 42.1015), 0.611),
+        ("Springfield, Greene County, Missouri, United States", (-93.2923, 37.2090), 0.596),
+    ])
+    assert result.quality["ambiguous"] is True
+    assert "Illinois" in result.warnings[0] and "Massachusetts" in result.warnings[0]
+
+
+def test_near_equal_candidates_close_together_are_not_ambiguous() -> None:
+    """Two entries for the same square (e.g. the plaza and its precinct) are one place."""
+    result = _geocode_result([
+        ("Federation Square, Melbourne", (144.9691, -37.8177), 0.41),
+        ("Federation Square precinct, Melbourne", (144.9700, -37.8170), 0.40),
+    ])
+    assert not result.warnings and "ambiguous" not in result.quality

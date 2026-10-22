@@ -127,6 +127,25 @@ buffered = engine.execute(SpatialQuery(operation=SpatialOperation.BUFFER,
 print(buffered.features[0].properties["area_sq_m"])  # ≈ 31,365
 ```
 
+### Every answer is checkable, and opens in QGIS
+
+```python
+result = engine.execute(SpatialQuery(operation=SpatialOperation.GEOCODE, metadata={"query": "Springfield"}))
+result.status        # "ok" | "partial" | "cannot_answer"
+result.warnings      # ["Ambiguous place name: 'Springfield, …, Illinois…'; '…Massachusetts…' …"]
+result.provenance    # source, licence (ODbL-1.0), attribution, retrieved_at, method
+result.spatial_context.units  # {"distance_m": "metre", ...}
+
+import json
+json.dump(result.to_geojson(), open("springfield.geojson", "w"))  # RFC 7946, drag into QGIS
+```
+
+GeoSpark refuses rather than guesses. A self-intersecting polygon, out-of-range coordinates or a
+likely [lat, lon] swap gets `cannot_answer` with the reason, not a confident wrong number. From
+the API, add `?format=geojson` (or `Accept: application/geo+json`). From the CLI, add
+`--geojson out.geojson` to `geocode`, `elevation`, `query` or `report`. A location report becomes a
+map layer: the place plus every nearby amenity, with distances.
+
 ### Natural-language questions
 
 ```python

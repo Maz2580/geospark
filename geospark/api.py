@@ -22,7 +22,7 @@ from typing import Any
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, Security
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -334,11 +334,25 @@ async def info():
     }
 
 
+# --- GeoJSON output (QGIS-ready): ?format=geojson or Accept: application/geo+json ---
+
+GEOJSON_MEDIA_TYPE = "application/geo+json"
+FormatParam = Query(None, pattern="^(json|geojson)$", description="'geojson' returns an RFC 7946 FeatureCollection")
+
+
+def _wants_geojson(http: Request, fmt: str | None) -> bool:
+    return fmt == "geojson" or (fmt is None and GEOJSON_MEDIA_TYPE in http.headers.get("accept", ""))
+
+
+def _geojson(collection: dict[str, Any]) -> JSONResponse:
+    return JSONResponse(collection, media_type=GEOJSON_MEDIA_TYPE)
+
+
 # Handlers that do blocking work (HTTP to Nominatim/Overpass/Ollama, LLM tool loops) are
 # plain ``def``: FastAPI runs them in its thread pool, so one slow request can't freeze the
 # event loop for everyone else (the API runs a single uvicorn worker).
 @app.post("/api/v1/geocode", response_model=SpatialResult, dependencies=[Depends(verify_api_key)])
-def geocode(request: GeocodeRequest):
+def geocode(request: GeocodeRequest, http: Request, format: str | None = FormatParam):
     """Geocode an address or place name."""
     engine = get_engine()
     query = SpatialQuery(
@@ -346,11 +360,12 @@ def geocode(request: GeocodeRequest):
         metadata={"query": request.query},
         limit=request.limit,
     )
-    return engine.execute(query)
+    result = engine.execute(query)
+    return _geojson(result.to_geojson()) if _wants_geojson(http, format) else result
 
 
 @app.post("/api/v1/query", response_model=SpatialResult, dependencies=[Depends(verify_api_key)])
-def spatial_query(request: SpatialQueryRequest):
+def spatial_query(request: SpatialQueryRequest, http: Request, format: str | None = FormatParam):
     """Execute a spatial query."""
     engine = get_engine()
 
@@ -373,7 +388,8 @@ def spatial_query(request: SpatialQueryRequest):
         radius_m=request.radius_m,
         filters=SpatialFilter(category=request.category) if request.category else None,
     )
-    return engine.execute(query)
+    result = engine.execute(query)
+    return _geojson(result.to_geojson()) if _wants_geojson(http, format) else result
 
 
 @app.post("/api/v1/check-relationship", response_model=RelationshipResponse, dependencies=[Depends(verify_api_key)])
@@ -448,7 +464,7 @@ async def distance(request: DistanceRequest):
 
 
 @app.post("/api/v1/elevation", dependencies=[Depends(verify_api_key)])
-async def elevation(request: ElevationRequest):
+async def elevation(request: ElevationRequest, http: Request, format: str | None = FormatParam):
     """Get elevation at a point (meters above sea level)."""
     engine = get_engine()
     query = SpatialQuery(
@@ -460,6 +476,8 @@ async def elevation(request: ElevationRequest):
     result = await asyncio.to_thread(engine.execute, query)
     if result.errors:
         raise HTTPException(status_code=502, detail=result.errors[0])
+    if _wants_geojson(http, format):
+        return _geojson(result.to_geojson())
     props = result.features[0].properties if result.features else {}
     response = {
         "latitude": request.latitude,
@@ -821,7 +839,7 @@ def agent_run(request: AgentRunRequest):
 
 
 @app.post("/api/v1/agent/report", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
-async def agent_report(request: ReportRequest):
+async def agent_report(request: ReportRequest, http: Request, format: str | None = FormatParam):
     """Generate a spatial intelligence report for a location."""
     from geospark.agents import SpatialReport
 
@@ -832,6 +850,8 @@ async def agent_report(request: ReportRequest):
     report = await asyncio.to_thread(
         reporter.analyze, request.location, radius_m=request.radius_m
     )
+    if _wants_geojson(http, format):
+        return _geojson(report.to_geojson())
     return report.model_dump()
 
 

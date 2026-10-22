@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import time
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -93,6 +94,45 @@ class LocationReport(BaseModel):
     provenance: list[Provenance] = Field(
         default_factory=list, description="Every data source this report is built on, with licence and attribution"
     )
+
+    def to_geojson(self) -> dict[str, Any]:
+        """The report as a GeoJSON FeatureCollection: the location plus each nearby amenity.
+
+        Opens directly in QGIS: a point for the place (address, elevation, weather, air
+        quality), and a point per amenity with its type and distance in metres.
+        """
+        from geospark.protocol.schema import (
+            SpatialContext,
+            SpatialFeature,
+            SpatialResult,
+            feature_collection,
+        )
+
+        features: list[SpatialFeature] = []
+        if len(self.coordinates) >= 2:
+            place: dict[str, Any] = {"kind": "location", "name": self.address or self.query,
+                                     "elevation_m": self.elevation_m}
+            if self.weather:
+                place.update({f"weather_{k}": v for k, v in self.weather.model_dump().items()})
+            if self.air_quality:
+                place.update({f"air_{k}": v for k, v in self.air_quality.model_dump().items()})
+            features.append(SpatialFeature(geometry={"type": "Point", "coordinates": self.coordinates[:2]},
+                                           properties=place))
+        for item in self.nearby:
+            if len(item.coordinates) >= 2:
+                features.append(SpatialFeature(
+                    geometry={"type": "Point", "coordinates": item.coordinates[:2]},
+                    properties={"kind": "amenity", "name": item.name, "amenity_type": item.amenity_type,
+                                "distance_m": item.distance_m},
+                ))
+        result = SpatialResult(
+            features=features,
+            spatial_context=SpatialContext(summary=self.summary, total_features=len(features),
+                                           units={"distance_m": "metre", "elevation_m": "metre"}),
+            provenance=self.provenance,
+            warnings=[f"No data: {gap}" for gap in self.data_gaps],
+        )
+        return feature_collection(result, extra={"query": self.query, "radius_m": self.radius_m})
 
 
 # Services to check for accessibility scoring

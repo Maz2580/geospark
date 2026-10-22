@@ -136,6 +136,7 @@ for _prefix in (
     "/api/v1/flows/templates/",
     "/api/v1/memory/",
     "/api/v1/data/status",
+    "/api/v1/overture/",
 ):
     set_route_limit(_prefix, int(os.getenv("GEOSPARK_RATE_LIMIT_EXPENSIVE_RPM", "12")))
 # Cheap listings under those prefixes keep the normal limit (longest prefix wins)
@@ -862,6 +863,34 @@ async def data_query(channel_name: str, request: DataChannelRequest):
         raise HTTPException(status_code=404, detail=str(e)) from None
     except Exception as e:
         raise HTTPException(status_code=502, detail=str(e)) from e
+
+
+# --- Overture Maps (v0.8): places, buildings, roads, admin areas; no API key ---
+
+
+class OvertureRequest(BaseModel):
+    lat: float = Field(..., ge=-90, le=90, description="Latitude")
+    lon: float = Field(..., ge=-180, le=180, description="Longitude")
+    radius_m: float = Field(500, gt=0, le=2000, description="Search radius in metres (ignored for divisions)")
+    category: str | None = Field(None, max_length=100, description="Places only: e.g. 'cafe', 'pharmacy'")
+    limit: int | None = Field(None, ge=1, le=2000)
+
+
+@app.post("/api/v1/overture/{theme}", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
+def overture(theme: str, request: OvertureRequest, http: Request, format: str | None = FormatParam):
+    """Overture Maps features near a point: places, buildings, transportation, or the
+    administrative divisions containing it. Distances, areas and lengths are geodesic."""
+    from geospark.tools.overture.client import OvertureError
+    from geospark.tools.overture.client import query as overture_query
+
+    try:
+        result = overture_query(theme, request.lat, request.lon, radius_m=request.radius_m,
+                                category=request.category, limit=request.limit)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from None
+    except OvertureError as e:
+        raise HTTPException(status_code=502, detail=str(e)) from None
+    return _geojson(result.to_geojson()) if _wants_geojson(http, format) else result
 
 
 # --- Agent Endpoints ---

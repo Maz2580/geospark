@@ -2,6 +2,20 @@
 
 All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
+## [Unreleased] - 0.8.0: more data, more analysis
+
+### Added
+- **Overture Maps with no API key** (`geospark-ai[overture]`):
+  - Themes: places (with categories), buildings (height, floors, geodesic footprint area),
+    transportation segments (geodesic length), and the administrative divisions containing a point.
+  - Queried in place on S3 with DuckDB, reading only the files whose STAC bbox covers the area.
+  - Results are nearest first in geodesic metres and capped at 2 km. Answers are cached for 24 h.
+  - Provenance names the Overture release and the actual licences of the returned records.
+  - Available from Python, the CLI (`geospark overture`), REST (`POST /api/v1/overture/{theme}`,
+    GeoJSON with `?format=geojson`) and the MCP tool `overture_features`.
+  - DuckDB is capped per query (4 threads, 512 MB) so it can't starve a shared host. The Docker image
+    pre-installs DuckDB's extensions.
+
 ## [0.7.0] - 2026-10-22: verifiable answers
 
 Every answer now shows its work: where the data came from and under what licence, how a value was

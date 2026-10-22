@@ -285,6 +285,30 @@ def create_server() -> MCPServer:
         """Satellite active-fire detections near a point (NASA FIRMS; the server needs a FIRMS_MAP_KEY)."""
         return await _channel("fires", lat=latitude, lon=longitude, filters={"days": days})
 
+    @mcp.tool(title="Overture Maps features", annotations=READ_ONLY_WEB)
+    async def overture_features(
+        theme: Literal["places", "buildings", "transportation", "divisions"],
+        latitude: Latitude,
+        longitude: Longitude,
+        radius_m: Annotated[float, Field(gt=0, le=2000, description="Search radius in metres")] = 300,
+        category: Annotated[str | None, Field(max_length=100, description="Places only, e.g. 'cafe'")] = None,
+        limit: Annotated[int | None, Field(ge=1, le=2000)] = None,
+    ) -> FeatureCollection:
+        """Open global map data from Overture Maps, no API key: points of interest (with
+        categories), building footprints (height, floors, geodesic footprint area), road and path
+        segments (geodesic length), or `divisions`, the administrative areas containing the point
+        (country, region, city, neighbourhood). Results are nearest first, with distances in metres.
+        Can take 5-20 s on a cold cache."""
+        from geospark.tools.overture.client import OvertureError
+        from geospark.tools.overture.client import query as overture_query
+
+        try:
+            result = await _heavy(overture_query, theme, latitude, longitude, radius_m=radius_m,
+                                  category=category, limit=limit)
+        except OvertureError as e:
+            raise ToolError(str(e)) from e
+        return _collection(result)
+
     @mcp.tool(title="Location report", annotations=READ_ONLY_WEB)
     async def location_report(
         location: Annotated[str, Field(min_length=1, max_length=500, description="Place to analyse")],

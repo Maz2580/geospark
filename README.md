@@ -51,10 +51,10 @@ Add GeoSpark to your MCP client's config. For Claude Desktop that's
 { "mcpServers": { "geospark": { "command": "geospark-mcp" } } }
 ```
 
-That gives the model twelve read-only tools. **Computation:** `calculate_distance`,
+That gives the model thirteen read-only tools. **Computation:** `calculate_distance`,
 `check_spatial_relationship` and `spatial_operation` (buffer, area, length, centroid, convex hull).
 **Places and data:** `geocode`, `reverse_geocode`, `get_elevation`, `route`, `get_weather`,
-`get_air_quality` and `get_active_fires`. **Analysis:** `location_report` and `select_site`.
+`get_air_quality`, `get_active_fires` and `overture_features`. **Analysis:** `location_report` and `select_site`.
 
 Results come back as structured content with output schemas, usually GeoJSON. They carry
 provenance (source, licence, attribution), units and warnings. When GeoSpark can't answer reliably
@@ -87,7 +87,7 @@ public server, add `-e GEOSPARK_ENV=production -e GEOSPARK_ADMIN_TOKEN=<secret>`
 |---|---|
 | **Spatial engine** | Geodesic distance, area and length (pyproj on WGS84); topology checks (contains, within, intersects, touches, crosses, overlaps, disjoint) via Shapely; shape-preserving buffers; union, intersection, difference, centroid, convex hull; CRS transformation of every input geometry |
 | **Places and terrain** | Geocoding and reverse geocoding (OpenStreetMap Nominatim, following its usage policy: ≤ 1 request/s and cached); elevation from Copernicus GLO-30 with Open Elevation fallback and vertical-datum awareness (NAVD88 / EGM96 / WGS84); routing (OSRM) |
-| **Live data** | Weather and forecasts (Open-Meteo, no key); air quality (OpenAQ v3, free key); active fires (NASA FIRMS, free key); satellite scene search (STAC) |
+| **Live data** | Overture Maps places, buildings, roads and admin areas (no key, via DuckDB); weather and forecasts (Open-Meteo, no key); air quality (OpenAQ v3, free key); active fires (NASA FIRMS, free key); satellite scene search (STAC) |
 | **Agents** | `GeoAgent` (multi-step analysis from a plain-English goal), `SpatialReport` (a location dossier: amenities, accessibility, elevation, weather), `SiteSelector` (multi-criteria site ranking), and a coordinator that routes a goal to the right one |
 | **Interfaces** | Python library, CLI (`geospark …`), REST API (49 documented operations), MCP server (`geospark-mcp`), web playground |
 | **Memory and workflows** | Spatial memory with facts, episodes and contradiction detection; a tiered context store; Flows (DAG workflows, buildable from a natural-language goal) |
@@ -152,6 +152,23 @@ likely [lat, lon] swap gets `cannot_answer` with the reason, not a confident wro
 the API, add `?format=geojson` (or `Accept: application/geo+json`). From the CLI, add
 `--geojson out.geojson` to `geocode`, `elevation`, `query` or `report`. A location report becomes a
 map layer: the place plus every nearby amenity, with distances.
+
+### Open map data with no API key: Overture Maps
+
+```python
+from geospark.tools.overture.client import query   # pip install "geospark-ai[overture]"
+
+query("divisions", 48.8606, 2.3376)   # the Louvre is in: France › Île-de-France › Paris › Paris 1er Arrondissement
+query("places", -37.8180, 144.9691, radius_m=200, category="cafe")  # nearest first, geodesic metres
+query("buildings", -37.8180, 144.9691, radius_m=150)  # footprints, height, geodesic footprint area
+query("transportation", -37.8180, 144.9691, radius_m=150)  # road/path segments, geodesic length
+```
+
+GeoSpark queries [Overture Maps](https://overturemaps.org) GeoParquet directly on S3 with DuckDB. It
+uses the release's STAC index to read only the files covering your area, so there's no download and
+no key. Results report the Overture release and the licence of the records returned. The same data is
+available from the CLI (`geospark overture places -37.818 144.969 --category cafe`), the REST API
+(`POST /api/v1/overture/{theme}`) and the MCP tool `overture_features`.
 
 ### Natural-language questions
 

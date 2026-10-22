@@ -516,6 +516,40 @@ def flow_build(
             console.print(f"[red]{err}[/red]")
 
 
+# Negative coordinates (southern/western hemispheres) must parse as values, not options
+@main.command(context_settings={"ignore_unknown_options": True})
+@click.argument("theme", type=click.Choice(["places", "buildings", "transportation", "divisions"]))
+@click.argument("lat", type=float)
+@click.argument("lon", type=float)
+@click.option("--radius", default=300.0, help="Search radius in metres (max 2000)")
+@click.option("--category", default=None, help="Places only, e.g. cafe, pharmacy")
+@click.option("--limit", default=None, type=int, help="Max features")
+@geojson_option
+def overture(theme: str, lat: float, lon: float, radius: float, category: str | None,
+             limit: int | None, geojson_path: str | None) -> None:
+    """Overture Maps features near LAT LON (no API key; needs geospark-ai[overture])."""
+    from geospark.tools.overture.client import OvertureError
+    from geospark.tools.overture.client import query as overture_query
+
+    try:
+        result = overture_query(theme, lat, lon, radius_m=radius, category=category, limit=limit)
+    except (ValueError, OvertureError) as e:
+        console.print(f"[red]Error:[/red] {e}")
+        return
+    table = Table(title=result.spatial_context.summary)
+    columns = {"places": ["name", "category", "distance_m"],
+               "buildings": ["name", "height_m", "footprint_area_sq_m", "distance_m"],
+               "transportation": ["name", "class", "length_m", "distance_m"],
+               "divisions": ["subtype", "name", "country"]}[theme]
+    for column in columns:
+        table.add_column(column)
+    for feature in result.features[:40]:
+        table.add_row(*[str(feature.properties.get(c, "")) for c in columns])
+    console.print(table)
+    _print_caveats(result)
+    _save_geojson(geojson_path, result.to_geojson())
+
+
 @main.command()
 @click.argument("goal")
 def agent(goal: str) -> None:

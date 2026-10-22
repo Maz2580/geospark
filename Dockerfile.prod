@@ -15,8 +15,8 @@ WORKDIR /build
 COPY pyproject.toml README.md ./
 COPY geospark/ geospark/
 
-# Install core + api + intelligence (FAISS) + terrain + mcp (for the optional hosted /mcp endpoint)
-RUN pip install --no-cache-dir --prefix=/install ".[api,intelligence,terrain,mcp]"
+# Install core + api + intelligence (FAISS) + terrain + mcp (optional hosted /mcp) + overture (DuckDB)
+RUN pip install --no-cache-dir --prefix=/install ".[api,intelligence,terrain,mcp,overture]"
 
 # Stage 2: Runtime
 FROM python:3.11-slim
@@ -46,6 +46,10 @@ RUN groupadd -g ${APP_GID} geospark \
     && mkdir -p /app/data \
     && chown -R geospark:geospark /app
 USER geospark
+
+# DuckDB extensions for Overture queries, installed at build time so requests never
+# download code at runtime
+RUN python -c "import duckdb; c = duckdb.connect(); [c.install_extension(e) for e in ('httpfs', 'spatial')]"
 
 # All persistent state (audit log, usage counters, memory/context sandboxes) lives here;
 # docker-compose.prod.yml mounts ./data on it.

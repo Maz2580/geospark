@@ -22,7 +22,7 @@ BOWTIE = {"type": "Polygon", "coordinates": [[[0, 0], [1, 1], [1, 0], [0, 1], [0
 EXPECTED_TOOLS = {
     "calculate_distance", "check_spatial_relationship", "spatial_operation", "geocode",
     "reverse_geocode", "get_elevation", "route", "get_weather", "get_air_quality",
-    "get_active_fires", "location_report", "select_site",
+    "get_active_fires", "location_report", "select_site", "overture_features",
 }
 
 

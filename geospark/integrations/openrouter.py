@@ -110,7 +110,7 @@ class OpenRouterClient:
             base_url=self.base_url,
             headers={
                 "Authorization": f"Bearer {self.api_key}",
-                "HTTP-Referer": "https://geospark.dev",
+                "HTTP-Referer": "https://github.com/Maz2580/geospark",
                 "X-Title": "GeoSpark",
             },
             timeout=60,

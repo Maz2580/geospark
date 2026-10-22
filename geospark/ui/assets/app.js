@@ -102,8 +102,10 @@ function createMap(containerId, lat = 0, lon = 0, zoom = 2) {
     _maps[containerId].remove();
   }
   const map = L.map(containerId).setView([lat, lon], zoom);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors',
+  // OSM tile usage policy: single tile host (the a/b/c subdomains are deprecated) and a
+  // visible attribution linking to the copyright page.
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19,
   }).addTo(map);
   _maps[containerId] = map;

@@ -191,6 +191,26 @@ Python, use `geospark.io.layers` (`load_layer`, `count_within`, `nearest`, `inte
 MCP server (`geospark-mcp`) offers the same as `layer_*` tools; the hosted `/mcp` endpoint never reads
 files.
 
+### Reproducible analyses
+
+```bash
+geospark record report "Federation Square, Melbourne" --out fedsq.json
+geospark replay fedsq.json
+# REPRODUCED: Same result as recorded.
+# ... or DATA CHANGED: openstreetmap-overpass returned different data for the same request (step 6 ...)
+# ... or CODE CHANGED: versions changed: {'shapely': ('2.0.0', '2.2.0')}
+```
+
+A run record lists:
+- the environment: GeoSpark, Python, pyproj/PROJ and Shapely/GEOS versions
+- every data request (Nominatim, Overpass, Overture, Valhalla, weather, elevation) and every engine
+  computation, each with a fingerprint of its input and output
+- a fingerprint of the final result
+
+`geospark replay` reruns the analysis and says whether it reproduced. If not, it says which source
+returned different data, or that the code or a library version changed. In Python, use
+`geospark.runs.record_run(...)` and `replay(...)`.
+
 ### Natural-language questions
 
 ```python

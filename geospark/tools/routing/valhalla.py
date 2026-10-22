@@ -65,6 +65,9 @@ def _call(action: str, payload: dict[str, Any]) -> Any:
         hit = _cache.get(key)
         if hit and time.time() - hit[0] < _CACHE_TTL_S:
             _cache.move_to_end(key)
+            from geospark.runs import record
+
+            record("data", f"valhalla/{action}", payload, hit[1], "valhalla")
             return hit[1]
         if public:  # be gentle with a volunteer-run service
             wait = _last_request + 1.0 - time.monotonic()
@@ -86,7 +89,10 @@ def _call(action: str, payload: dict[str, Any]) -> Any:
         _cache[key] = (time.time(), data)
         while len(_cache) > 256:
             _cache.popitem(last=False)
-        return data
+    from geospark.runs import record
+
+    record("data", f"valhalla/{action}", payload, data, "valhalla")
+    return data
 
 
 def _provenance(method: str) -> Any:

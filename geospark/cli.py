@@ -516,6 +516,64 @@ def flow_build(
             console.print(f"[red]{err}[/red]")
 
 
+@main.command("record")
+@click.argument("command", type=click.Choice(["report", "agent", "isochrone", "overture"]))
+@click.argument("args", nargs=-1)
+@click.option("--out", "out_path", required=True, type=click.Path(dir_okay=False), help="Where to save the run record")
+@click.option("--radius", default=1000.0, help="report/overture: radius in metres")
+@click.option("--minutes", default="10", help="isochrone: comma-separated minutes")
+@click.option("--mode", default="walk", help="isochrone: walk, bike or drive")
+def record_command(command: str, args: tuple[str, ...], out_path: str, radius: float, minutes: str, mode: str) -> None:
+    """Run an analysis and save a run record for reproducing it later.
+
+    \b
+    geospark record report "Federation Square, Melbourne" --out fedsq.json
+    geospark record agent "Find hospitals within 2km of the Eiffel Tower" --out run.json
+    geospark record isochrone -- -37.818 144.969 --minutes 10,20 --out iso.json
+    geospark record overture -- places -37.818 144.969 --radius 300 --out cafes.json
+    """
+    from geospark.runs import run_and_record
+
+    try:
+        if command == "report":
+            arguments = {"location": " ".join(args), "radius_m": radius}
+        elif command == "agent":
+            arguments = {"goal": " ".join(args)}
+        elif command == "isochrone":
+            arguments = {"lat": float(args[0]), "lon": float(args[1]),
+                         "minutes": [int(m) for m in minutes.split(",")], "mode": mode}
+        else:
+            arguments = {"theme": args[0], "lat": float(args[1]), "lon": float(args[2]), "radius_m": radius}
+    except (IndexError, ValueError):
+        console.print("[red]Error:[/red] missing or invalid arguments (see --help)")
+        raise SystemExit(2) from None
+    result, run = run_and_record(command, **arguments)
+    run.save(out_path)
+    data = sum(1 for s in run.steps if s["kind"] == "data")
+    console.print(f"Recorded {len(run.steps)} steps ({data} data, {len(run.steps) - data} compute) "
+                  f"to {out_path}; result fingerprint {run.result_fingerprint}")
+    summary = getattr(result, "summary", None) or getattr(getattr(result, "spatial_context", None), "summary", None)
+    if summary:
+        console.print(f"[dim]{summary}[/dim]")
+
+
+@main.command("replay")
+@click.argument("manifest", type=click.Path(exists=True, dir_okay=False))
+def replay_command(manifest: str) -> None:
+    """Re-run a recorded analysis and say whether it reproduces, and if not, why."""
+    from geospark.runs import replay
+
+    report = replay(manifest)
+    colour = {"reproduced": "green", "data changed": "yellow", "code changed": "yellow"}.get(report["verdict"], "red")
+    console.print(f"[bold {colour}]{report['verdict'].upper()}[/bold {colour}]: {report['explanation']}")
+    if report["environment_changes"]:
+        for name, (old, new) in report["environment_changes"].items():
+            console.print(f"  {name}: {old} -> {new}")
+    console.print(f"[dim]steps {report['steps'][0]} -> {report['steps'][1]}; data steps changed: "
+                  f"{report['data_steps_changed'] or 'none'}; compute steps changed: "
+                  f"{report['compute_steps_changed'] or 'none'}; replay took {report['replay_seconds']} s[/dim]")
+
+
 @main.group()
 def layer() -> None:
     """Analyse your own files: GeoJSON, GeoPackage, Shapefile, GeoParquet, CSV, ... (needs [io])."""

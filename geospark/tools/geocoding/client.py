@@ -55,10 +55,13 @@ def get_json(path: str, params: dict[str, Any], timeout: float = 10) -> Any:
     key = (url, tuple(sorted((k, str(v)) for k, v in params.items())))
     now = time.monotonic()
 
+    from geospark.runs import record
+
     with _lock:
         hit = _cache.get(key)
         if hit is not None and now - hit[0] < _ttl():
             _cache.move_to_end(key)
+            record("data", f"nominatim/{path}", {"url": url, "params": params}, hit[1], "openstreetmap-nominatim")
             return hit[1]
 
         # Hold the lock while waiting, so concurrent callers queue up one second apart
@@ -76,7 +79,8 @@ def get_json(path: str, params: dict[str, Any], timeout: float = 10) -> Any:
         _cache[key] = (time.monotonic(), data)
         while len(_cache) > _CACHE_MAX:
             _cache.popitem(last=False)
-        return data
+    record("data", f"nominatim/{path}", {"url": url, "params": params}, data, "openstreetmap-nominatim")
+    return data
 
 
 def reset() -> None:

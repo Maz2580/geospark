@@ -131,6 +131,14 @@ class OverpassLoader:
     _cache_lock: ClassVar[threading.Lock] = threading.Lock()
 
     def _query(self, overpass_ql: str, timeout: float = 40.0) -> dict[str, Any]:
+        """Overpass query, recorded in an active run record (see geospark.runs)."""
+        from geospark.runs import record
+
+        data = self._query_uncached_or_cached(overpass_ql, timeout)
+        record("data", "overpass", overpass_ql, data, "openstreetmap-overpass")
+        return data
+
+    def _query_uncached_or_cached(self, overpass_ql: str, timeout: float = 40.0) -> dict[str, Any]:
         """Execute an Overpass QL query and return the JSON response.
 
         Every endpoint in ``OVERPASS_URLS`` is asked at once and the first

@@ -39,6 +39,9 @@ class ChannelResult(BaseModel):
         so a cached answer still says how old it is."""
         if self.source and not self.provenance and (self.features or self.total_results == 0):
             self.provenance = [source_provenance(self.source, retrieved_at=self.timestamp)]
+            from geospark.runs import record
+
+            record("data", f"channel/{self.channel}", self.query, self.features, self.source)
         return self
 
     @property

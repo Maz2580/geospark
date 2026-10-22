@@ -37,6 +37,8 @@ GeoSpark computes spatial answers instead of guessing them. Use it for distances
 other topology, buffers and areas, geocoding, elevation, routing, weather, air quality, active
 fires, location reports and site selection.
 - Coordinates are GeoJSON order: [longitude, latitude], WGS84.
+- For distances between named places, give calculate_distance the names (place_a, place_b): the
+  server geocodes them. Never type coordinates for a place from memory.
 - Every result carries provenance (source, licence, attribution) and units; cite the
   attribution when you present data from OpenStreetMap, Copernicus, Open-Meteo etc.
 - Read `warnings` (e.g. an ambiguous place name) before answering.
@@ -47,6 +49,15 @@ fires, location reports and site selection.
 GeoJSONGeometry = Annotated[
     dict[str, Any],
     Field(description='A GeoJSON geometry, e.g. {"type": "Point", "coordinates": [lon, lat]}'),
+]
+OptionalGeometry = Annotated[
+    dict[str, Any] | None,
+    Field(description='A GeoJSON geometry, e.g. {"type": "Point", "coordinates": [lon, lat]}; only for '
+                      "coordinates the user gave or a tool returned"),
+]
+PlaceName = Annotated[
+    str | None,
+    Field(max_length=500, description="A place NAME, e.g. 'Adelaide Oval'; geocoded on the server (preferred)"),
 ]
 Latitude = Annotated[float, Field(ge=-90, le=90, description="Latitude in degrees (WGS84)")]
 Longitude = Annotated[float, Field(ge=-180, le=180, description="Longitude in degrees (WGS84)")]
@@ -78,6 +89,10 @@ class Checkable(BaseModel):
 class DistanceResult(Checkable):
     distance_m: float = Field(description="Geodesic distance in metres (WGS84 ellipsoid)")
     distance_km: float
+    places: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description="Named places as geocoded on the server: query, display_name, coordinates [lon, lat]",
+    )
 
 
 class RelationshipResult(Checkable):
@@ -171,17 +186,51 @@ def create_server(local_files: bool = False) -> MCPServer:
     )
     engine = Engine(tools=["geocoder", "reverse_geocoder", "terrain", "router"])
 
-    @mcp.tool(title="Geodesic distance", annotations=READ_ONLY_LOCAL)
-    async def calculate_distance(point_a: GeoJSONGeometry, point_b: GeoJSONGeometry) -> DistanceResult:
-        """Exact geodesic distance between two geometries on the WGS84 ellipsoid.
+    @mcp.tool(title="Geodesic distance", annotations=READ_ONLY_WEB)
+    async def calculate_distance(
+        place_a: PlaceName = None,
+        place_b: PlaceName = None,
+        point_a: OptionalGeometry = None,
+        point_b: OptionalGeometry = None,
+    ) -> DistanceResult:
+        """Exact geodesic distance between two places or geometries on the WGS84 ellipsoid.
 
-        Use for any "how far" question instead of estimating. For lines and polygons the
-        distance is between their nearest points. Returns metres and kilometres.
+        Use for any "how far" question instead of estimating. For NAMED places pass place_a and
+        place_b; the server geocodes them, so never type coordinates for a place yourself. Use
+        point_a/point_b only for coordinates the user gave or another tool returned. For lines
+        and polygons the distance is between their nearest points. Returns metres and kilometres.
         """
-        distance = await _blocking(SpatialReasoner.calculate_distance, point_a, point_b)
+        geometries: dict[str, dict[str, Any]] = {}
+        places: list[dict[str, Any]] = []
+        lookups: list[SpatialResult] = []
+        for side, name, geometry in (("a", place_a, point_a), ("b", place_b, point_b)):
+            if name and name.strip():
+                q = SpatialQuery(operation=SpatialOperation.GEOCODE, metadata={"query": name.strip()}, limit=1)
+                found = _require_answer(await _blocking(engine.execute, q))
+                if not found.features:
+                    raise ToolError(f"No place found for '{name}'. Try a more specific name or add a country.")
+                best = found.features[0]
+                geom = best.geometry if isinstance(best.geometry, dict) else best.geometry.model_dump()
+                geometries[side] = geom
+                places.append({"query": name.strip(), "display_name": best.properties.get("display_name"),
+                               "coordinates": geom.get("coordinates")})
+                lookups.append(found)
+            elif geometry is not None:
+                geometries[side] = geometry
+            else:
+                raise ToolError(f"Give place_{side} (a place name) or point_{side} (a GeoJSON geometry).")
+        distance = await _blocking(SpatialReasoner.calculate_distance, geometries["a"], geometries["b"])
         checked = enrich(SpatialResult(features=[SpatialFeature(
-            geometry=point_a, properties={"distance_m": distance, "distance_km": distance / 1000})]), "distance")
-        return DistanceResult(distance_m=distance, distance_km=distance / 1000, **_checkable(checked))
+            geometry=geometries["a"], properties={"distance_m": distance, "distance_km": distance / 1000})]),
+            "distance")
+        for found in lookups:  # where the places came from, and any ambiguity, travel with the distance
+            checked.provenance = [*found.provenance, *checked.provenance]
+            checked.warnings.extend(w for w in found.warnings if w not in checked.warnings)
+        unique: dict[tuple[str, str | None], Any] = {}
+        for p in checked.provenance:  # one entry per source and method, however many lookups used it
+            unique.setdefault((p.source, p.method), p)
+        checked.provenance = list(unique.values())
+        return DistanceResult(distance_m=distance, distance_km=distance / 1000, places=places, **_checkable(checked))
 
     @mcp.tool(title="Topological relationship", annotations=READ_ONLY_LOCAL)
     async def check_spatial_relationship(

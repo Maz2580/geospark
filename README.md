@@ -41,7 +41,18 @@ curl -X POST https://geospark.terrascout.app/api/v1/distance \
 # {"distance_m": 3172.01, "distance_km": 3.172, "note": "Geodesic distance on WGS84 ellipsoid"}
 ```
 
-**In Claude Desktop or any MCP client**
+**In Claude or any MCP client, with no install: the hosted MCP server**
+
+Add a custom connector with this URL (in Claude: Settings → Connectors → Add custom connector):
+
+```
+https://geospark.terrascout.app/mcp
+```
+
+It is open, with no key, and has the same fifteen tools as the local server below, with the same
+rate limits as the hosted API. It never reads files; for your own files, run the server locally.
+
+**In Claude Desktop or any MCP client, running on your computer**
 
 ```bash
 pip install "geospark-ai[mcp]"
@@ -55,7 +66,8 @@ Add GeoSpark to your MCP client's config. For Claude Desktop that's
 { "mcpServers": { "geospark": { "command": "geospark-mcp" } } }
 ```
 
-That gives the model fifteen read-only tools. **Computation:** `calculate_distance`,
+That gives the model fifteen read-only tools. **Computation:** `calculate_distance` (between
+place names, which the server geocodes, or coordinates),
 `check_spatial_relationship` and `spatial_operation` (buffer, area, length, centroid, convex hull).
 **Places and data:** `geocode`, `reverse_geocode`, `get_elevation`, `route`, `get_weather`,
 `get_air_quality`, `get_active_fires` and `overture_features`. **Analysis:** `isochrone`, `travel_time_matrix`, `location_report` and `select_site`.

@@ -163,6 +163,25 @@ capped by `GEOSPARK_MAX_LLM_CONCURRENCY`. All the settings are listed in `.env.e
 python3 -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
 
+## Optional: public MCP endpoint (`/mcp`)
+
+The same fifteen read-only tools as `geospark-mcp`, over Streamable HTTP, so anyone can add
+`https://<your-host>/mcp` to Claude or another MCP client as a custom connector. It never reads
+files on the server, uses the normal rate limits (`GEOSPARK_RATE_LIMIT_MCP_RPM`, default 60 per
+minute per visitor), and the visitor's own model does the reasoning, so it adds no LLM load.
+
+To turn it on, change only the GeoSpark API container:
+
+```bash
+cd /mnt/geospark && cp .env .env.bak-$(date +%F)-mcp
+grep -q '^GEOSPARK_MCP_HTTP' .env || printf '\nGEOSPARK_MCP_HTTP=true\n' >> .env
+sudo env BUILDX_CONFIG=/mnt/geospark/.buildx docker compose -f docker-compose.prod.yml \
+  -f docker-compose.override.yml up -d --no-deps --no-build geospark
+```
+
+`--no-deps` restarts only this service and `--no-build` reuses the current image. Check it with an
+MCP `initialize` request to `/mcp`. To turn it off, remove the line and run the last command again.
+
 ## Optional: self-hosted Valhalla (isochrones and travel times)
 
 `/api/v1/isochrone` and `/api/v1/travel-time` need a Valhalla routing server. Production refuses to

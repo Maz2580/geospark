@@ -1,520 +1,332 @@
+<!-- mcp-name: io.github.maz2580/geospark -->
 <p align="center">
   <h1 align="center">GeoSpark</h1>
-  <p align="center"><strong>The Open-Source Geospatial Intelligence Protocol & Engine</strong></p>
-  <p align="center"><em>Give any AI model a spatial mind. Open source. Run anywhere.</em></p>
+  <p align="center"><strong>Verifiable spatial reasoning for any LLM.</strong></p>
+  <p align="center"><em>Distances, topology and CRS computed by a geometry engine, not guessed by a language model. Open source, runs anywhere, works with any model that can call a tool.</em></p>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Maz2580/geospark/actions"><img src="https://img.shields.io/github/actions/workflow/status/Maz2580/geospark/ci.yml?branch=main&label=tests" alt="CI"></a>
+  <a href="https://github.com/Maz2580/geospark/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Maz2580/geospark/ci.yml?branch=main&label=tests" alt="Tests"></a>
   <a href="https://pypi.org/project/geospark-ai/"><img src="https://img.shields.io/pypi/v/geospark-ai?color=blue" alt="PyPI"></a>
   <a href="https://pypi.org/project/geospark-ai/"><img src="https://img.shields.io/pypi/pyversions/geospark-ai" alt="Python"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
+  <a href="https://github.com/Maz2580/geospark/pkgs/container/geospark"><img src="https://img.shields.io/badge/docker-ghcr.io-2496ED?logo=docker&logoColor=white" alt="Docker"></a>
+  <a href="https://github.com/Maz2580/geospark/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
 </p>
 
 ---
 
-Whether your LLM can compute distances depends heavily on which one you picked. Across 9 models we measured, the smallest open-weight ones (3.8B–9B) get distance questions wrong almost 95% of the time. The picture at the top of the market is not the rescue you'd expect either: among contemporary frontier APIs, accuracy ranges from 25% (Gemini 2.5 Pro) through 74% (Claude Sonnet 4.5) up to 95% (GPT-5.4) on the same set of questions. Surprisingly, gpt-oss 20B — open-weight and free to self-host — clocks in at 93.8%, essentially matching GPT-5.4. **GeoSpark backstops every model that can call a tool to a 76–96% answer rate**, which collapses that 70-point spread between frontier vendors and lets a 7B model running on your own CPU answer the same questions as well as a paid frontier API.
+Ask an LLM *"How far is the Eiffel Tower from the Louvre?"* or *"Is this point inside that polygon?"*
+and the answer depends on which model you picked. Across 9 models we benchmarked, small open-weight
+models (3.8B–9B) got numeric distance questions wrong about 95% of the time. Frontier APIs ranged
+from 25% (Gemini 2.5 Pro) to 95% (GPT-5.4) correct.
 
-## The Problem
+GeoSpark gives the model tools that **compute** the answer: geodesic distances on the WGS84
+ellipsoid, exact topology, CRS transformations, geocoding, elevation and live environmental data.
+With them, every model that made valid tool calls answered 76–96% of the same questions correctly.
+A 7B model on your own CPU then performs like a paid frontier API, and every answer comes with a
+deterministic trace you can check.
 
-Ask any LLM: *"Is the Louvre inside the 7th arrondissement of Paris?"*
+## Try it
 
-It will confidently guess — and get it wrong most of the time. LLMs have no geometric engine, no coordinate system awareness, and no way to verify spatial claims. They hallucinate distances, confuse containment with proximity, and silently swap lat/lon.
+**No install: the hosted API** (open, no key needed; [interactive docs](https://geospark.terrascout.app/docs))
 
-## The Solution
+```bash
+curl -X POST https://geospark.terrascout.app/api/v1/distance \
+  -H "Content-Type: application/json" \
+  -d '{"lat_a": 48.8584, "lon_a": 2.2945, "lat_b": 48.8606, "lon_b": 2.3376}'
+# {"distance_m": 3172.01, "distance_km": 3.172, "note": "Geodesic distance on WGS84 ellipsoid"}
+```
 
-GeoSpark gives AI models **ground-truth spatial reasoning** through a standardized protocol:
+**In Claude Desktop or any MCP client**
+
+```bash
+pip install "geospark-ai[mcp]"
+```
+
+Add GeoSpark to your MCP client's config. For Claude Desktop that's
+`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS, or
+`%APPDATA%\Claude\claude_desktop_config.json` on Windows:
+
+```json
+{ "mcpServers": { "geospark": { "command": "geospark-mcp" } } }
+```
+
+That gives the model six tools: `calculate_distance`, `check_spatial_relationship`,
+`spatial_operation` (buffer, area, length, centroid, union, …), `geocode`, `reverse_geocode` and
+`get_elevation`.
+
+**As a Python library**
+
+```bash
+pip install geospark-ai              # core
+pip install "geospark-ai[api,mcp]"   # + REST server and MCP server
+pip install "geospark-ai[all]"       # everything
+```
+
+**Run your own server with Docker**
+
+```bash
+docker run -p 8000:8000 ghcr.io/maz2580/geospark:latest
+# then open http://localhost:8000
+```
+
+That runs in development mode, where operator routes are open: fine on your own machine. For a
+public server, add `-e GEOSPARK_ENV=production -e GEOSPARK_ADMIN_TOKEN=<secret>` (see
+[Self-hosting](#self-hosting)).
+
+## What it does
+
+| | |
+|---|---|
+| **Spatial engine** | Geodesic distance, area and length (pyproj on WGS84); topology checks (contains, within, intersects, touches, crosses, overlaps, disjoint) via Shapely; shape-preserving buffers; union, intersection, difference, centroid, convex hull; CRS transformation of every input geometry |
+| **Places and terrain** | Geocoding and reverse geocoding (OpenStreetMap Nominatim, following its usage policy: ≤ 1 request/s and cached); elevation from Copernicus GLO-30 with Open Elevation fallback and vertical-datum awareness (NAVD88 / EGM96 / WGS84); routing (OSRM) |
+| **Live data** | Weather and forecasts (Open-Meteo, no key); air quality (OpenAQ v3, free key); active fires (NASA FIRMS, free key); satellite scene search (STAC) |
+| **Agents** | `GeoAgent` (multi-step analysis from a plain-English goal), `SpatialReport` (a location dossier: amenities, accessibility, elevation, weather), `SiteSelector` (multi-criteria site ranking), and a coordinator that routes a goal to the right one |
+| **Interfaces** | Python library, CLI (`geospark …`), REST API (49 documented operations), MCP server (`geospark-mcp`), web playground |
+| **Memory and workflows** | Spatial memory with facts, episodes and contradiction detection; a tiered context store; Flows (DAG workflows, buildable from a natural-language goal) |
+| **GeoSpark Bench** | 535 reproducible questions across topology, distance, multi-step reasoning, change and multimodal tasks, with computed ground truth |
+
+**Planned, not built yet:** slope, viewshed, isochrones, raster band math and change detection. These
+operations exist in the protocol, but today they return a clear "not implemented yet" error rather
+than an answer. See the [roadmap](#roadmap).
+
+## Quick start
+
+### Ground-truth geometry
 
 ```python
-from geospark import Engine
-from geospark.protocol import SpatialQuery, SpatialOperation
-
-engine = Engine(tools=["geocoder", "terrain"])
-
-# Geocode a location (not guessing — real coordinates)
-result = engine.execute(SpatialQuery(
-    operation=SpatialOperation.GEOCODE,
-    metadata={"query": "Eiffel Tower, Paris"}
-))
-
-# Check spatial relationships (100% accurate, not LLM guessing)
 from geospark.engine.spatial_reasoner import SpatialReasoner
 
 park = {"type": "Polygon", "coordinates": [[[2.29, 48.85], [2.30, 48.85], [2.30, 48.86], [2.29, 48.86], [2.29, 48.85]]]}
-point = {"type": "Point", "coordinates": [2.295, 48.855]}
+point = {"type": "Point", "coordinates": [2.295, 48.855]}  # GeoJSON order: [lon, lat]
 
-SpatialReasoner.check_relationship(park, point, "contains")  # True — ground truth
+SpatialReasoner.check_relationship(park, point, "contains")  # True
+
+SpatialReasoner.calculate_distance(
+    {"type": "Point", "coordinates": [2.2945, 48.8584]},  # Eiffel Tower
+    {"type": "Point", "coordinates": [2.3376, 48.8606]},  # Louvre
+)  # 3172.01 (metres, geodesic)
 ```
 
-## Key Features
-
-- **Multi-Agent Coordinator** — One command, right specialist. Intent classification routes your goal to the best agent automatically, with streaming progress and A2A messaging under the hood.
-- **Autonomous Spatial Agents** — Give a goal, get a complete analysis. No manual step-by-step. Three built-in agents:
-  - `GeoAgent` — Multi-step spatial analysis from natural language ("Find hospitals near the Eiffel Tower")
-  - `SpatialReport` — One-command location intelligence dossier (amenities, accessibility, elevation, narrative)
-  - `SiteSelector` — Optimal location finding with multi-criteria scoring ("Best pharmacy spot in Zurich near hospitals and schools")
-- **Spatial Intelligence Memory** — Dual memory system that learns across sessions:
-  - `SpatialFact` — time-agnostic truths ("Eiffel Tower is at 48.86 N, 2.29 E")
-  - `SpatialEpisode` — timestamped observations ("PM2.5 was 120 in Delhi on 2026-04-09")
-  - Vector-based recall with FAISS acceleration or numpy fallback
-  - Automatic contradiction detection between conflicting facts
-  - Auto-linking of related memories at cosine similarity > 0.6
-- **Geospatial Context Database** — Tiered storage for missions, datasets, and analysis history:
-  - L0/L1/L2 lazy loading: abstracts in the prompt, full data on demand
-  - Hotness scoring: sigmoid(log1p(access)) * exp(-decay * age) balances frequency + recency
-  - Hierarchical URIs like `geospark://missions/melbourne_flood/analysis/2026-04`
-  - Recursive parent-child score propagation for context retrieval
-  - Spatial bbox + temporal range filters, cold-context archival
-- **Chat-to-Flow Builder** — Turn a natural-language goal into a validated Flow DAG. `ChatFlowSession` drives an LLM through incremental builder tool calls (`add_step`, `add_route`, `set_trigger`, `finish_flow`); invalid calls surface to the LLM as errors and are corrected before the Flow is emitted. Available via `geospark flow build "..."` or `POST /api/v1/flows/build`.
-- **Safe to run in public** — The hosted API is open without a key, with guard rails: an admin token for operator routes, a model allowlist so callers can't spend paid API credit, private per-visitor sandboxes for the memory/context demos, rate limits on the real client IP (`X-RateLimit-*` headers), a concurrency cap on LLM work, input bounds, hashed IPs in the JSON-Lines audit log, per-endpoint usage counters, and LRU+TTL caching for data channels. Geocoding follows the Nominatim usage policy (≤ 1 request/s, cached). See [deploy/DEPLOY.md](deploy/DEPLOY.md#security).
-- **Spatial Reasoning Engine** — Topology, geodesic distance, CRS transforms, buffering, area. All geometrically correct, not LLM-guessed.
-- **MCP Server** — 6 tools for Claude Desktop and any MCP-compatible AI assistant. `pip install geospark-ai[mcp] && geospark-mcp`
-- **GeoSpark Bench** — 535 questions, five categories. The v2 evaluation runs each of 9 models (Qwen / Llama / Gemma / Mistral / Phi at ≤9B, gpt-oss at 20B, and three frontier APIs) under three protocols: bare baseline, structured Chain-of-Thought, and tool-augmented. Outcome: a 7B model with our tools answers numeric distance questions about as well as Gemini 2.5 Pro does, at zero per-call cost. [Results →](docs/BENCHMARK_REPORT.md)
-- **GeoSpark Protocol (GSP)** — Standardized JSON protocol for spatial queries and results.
-- **Live Data Channels** — Pluggable real-time data sources:
-  - Weather (Open-Meteo) — current conditions + forecast for any location
-  - Air Quality (OpenAQ v3, free API key) — PM2.5, NO2, O3 from government stations with WHO health categories and each station's data licence
-  - Active Fires (NASA FIRMS, free map key) — near-real-time satellite fire detections
-- **Pluggable Tools** — Geocoding, satellite imagery search (STAC), terrain/elevation (Copernicus GLO-30, with vertical datum awareness: NAVD88/EGM96/WGS84), routing, spectral indices. *Planned, not built yet:* slope, viewshed, isochrones, raster band math and change detection. These operations return a clear "not implemented yet" error today.
-- **GeoSpark Flows** — DAG-based workflow automation with persistence (Supabase), CLI, and REST API.
-- **Spatial Knowledge Graph** — Entity-relation graph with OSM admin boundaries, BFS traversal, and natural language queries.
-- **Zero-Cost Stack** — Local Ollama (primary, no limits) + OpenRouter free tier (fallback) + Supabase free tier. All inference on your hardware.
-
-## Quick Start
-
-```bash
-pip install geospark-ai
-```
-
-### Autonomous Agents (the fastest way to use GeoSpark)
+### Queries through the engine
 
 ```python
-from geospark.agents import GeoAgent, SpatialReport, SiteSelector
+from geospark import Engine
+from geospark.protocol import SpatialOperation, SpatialQuery
 
-# Autonomous spatial analysis — plans and executes multi-step workflows
-agent = GeoAgent()
-result = agent.run("Find all hospitals within 2km of the Eiffel Tower")
-print(result.summary)  # "Within 2km of the Eiffel Tower, there are 3 hospitals..."
+engine = Engine(tools=["geocoder", "terrain"])
 
-# Location intelligence dossier — one command, complete analysis
-reporter = SpatialReport()
-report = reporter.analyze("Federation Square, Melbourne")
-print(report.accessibility)  # Nearest hospital, school, pharmacy with distances
+place = engine.execute(SpatialQuery(operation=SpatialOperation.GEOCODE,
+                                    metadata={"query": "Federation Square, Melbourne"}))
+print(place.features[0].geometry)  # {'type': 'Point', 'coordinates': [144.969..., -37.817...]}
 
-# Optimal site selection — multi-criteria spatial scoring
-selector = SiteSelector()
-result = selector.find(within="Zurich", near=["hospital", "school"], facility_type="pharmacy")
-print(result.best)  # Best-scoring location with explanation
+# Inputs in another CRS are transformed to WGS84 first, including the second geometry
+buffered = engine.execute(SpatialQuery(operation=SpatialOperation.BUFFER,
+                                       geometry={"type": "Point", "coordinates": [2.2945, 48.8584]},
+                                       radius_m=100))
+print(buffered.features[0].properties["area_sq_m"])  # ≈ 31,365
 ```
 
-### Multi-agent coordinator (Phase 7C)
+### Natural-language questions
 
 ```python
-from geospark.agents import AgentCoordinator
-
-coord = AgentCoordinator()  # Auto-registers GeoAgent, SiteSelector, SpatialReport
-
-# One entry point for any spatial goal — coordinator picks the right specialist
-result = coord.run("Find the best location for a cafe in Melbourne CBD near schools")
-print(f"Routed to: {result.agent_used}")   # site_selector (matched pattern)
-print(result.summary)
+result = engine.ask("How far is the Eiffel Tower from Big Ben?")
+print(result.spatial_context.summary)
+print(result.sources)  # the model, then each tool it called
 ```
 
-### Chat-to-flow builder (Phase 8B)
+`ask` uses a local [Ollama](https://ollama.com) model first and falls back to free OpenRouter models
+if `OPENROUTER_API_KEY` is set.
+
+### Agents
 
 ```python
-from geospark.flows import ChatFlowSession, FlowRunner, make_ollama_chat_fn
+from geospark.agents import AgentCoordinator, GeoAgent, SiteSelector, SpatialReport
 
-# LLM incrementally builds a validated Flow DAG via tool calls
-session = ChatFlowSession(llm_fn=make_ollama_chat_fn("qwen2.5:7b"))
-result = session.run("Geocode Valencia, Spain then check its elevation")
+GeoAgent().run("Find all hospitals within 2km of the Eiffel Tower").findings["nearby"]
 
-if result.flow is not None:
-    print(f"Built flow with {len(result.flow.steps)} steps in {result.turns} turns")
-    FlowRunner().run(result.flow)  # Execute the generated DAG
+report = SpatialReport().analyze("Federation Square, Melbourne", radius_m=1000)
+print(report.weather, report.accessibility, report.data_gaps)
+
+best = SiteSelector().find(within="Zurich", near=["hospital", "school"], facility_type="pharmacy").best
+
+AgentCoordinator().run("Find the best location for a cafe in Melbourne CBD near schools")
 ```
 
-### Spatial intelligence memory (Phase 7A)
+Agents use an LLM to read the goal. Without one, a rule-based parser still handles requests like
+the one above: multi-word place names, radii such as "2km", and amenity types.
+
+### Memory, context and flows
 
 ```python
 from geospark.memory import SpatialIntelligence
 
 intel = SpatialIntelligence()
-
-# Remember timeless facts and timestamped episodes
 intel.remember_fact("Eiffel Tower is at 48.8584 N, 2.2945 E", source="user")
 intel.remember_episode("PM2.5 was 120 in Delhi", importance=0.8, source="tool:air_quality")
-
-# Vector-based recall with automatic scoring (similarity + recency + importance)
-results = intel.recall("Paris landmarks", limit=5)
-
-# Detect contradicting facts automatically
-for c in intel.find_contradictions():
-    print(f"Conflict: {c.fact_a_content}  vs.  {c.fact_b_content}")
+intel.recall("Where is the Eiffel Tower?", limit=5)  # semantic with Ollama embeddings, keyword match without
+intel.find_contradictions()
 ```
-
-### Geospatial context database (Phase 7B)
 
 ```python
-from geospark.context import ContextStore, ContextRetriever, GeoContext
+from geospark.flows import ChatFlowSession, FlowRunner, make_ollama_chat_fn
 
-store = ContextStore()
-retriever = ContextRetriever(store)
-
-# Save a mission with tiered content
-store.save(GeoContext(
-    uri="geospark://missions/melbourne_flood_2024",
-    category="missions",
-    name="Melbourne Flood 2024",
-    abstract="Major flooding event in Melbourne CBD",  # L0 — always in prompt
-    overview={"severity": "high", "area_km2": 42},      # L1 — loaded for context
-    full_data={"affected_population": 15000},           # L2 — loaded on demand
-    bounds_wgs84=[144.9, -37.9, 145.1, -37.7],
-    tags=["flood", "melbourne", "disaster"],
-))
-
-# Retrieve with hierarchical scoring (semantic + hotness + parent propagation)
-results, stats = retriever.retrieve(query="flood melbourne", limit=5)
+session = ChatFlowSession(llm_fn=make_ollama_chat_fn("qwen2.5:7b"))
+result = session.run("Geocode Valencia, Spain then check its elevation")
+if result.flow:
+    FlowRunner().run(result.flow)  # a validated DAG, built one tool call at a time
 ```
 
-### As a Python library
-
-```python
-from geospark.engine.spatial_reasoner import SpatialReasoner
-
-# Distance calculation (geodesic on WGS84 ellipsoid, not Euclidean)
-SpatialReasoner.calculate_distance(
-    {"type": "Point", "coordinates": [2.2945, 48.8584]},   # Eiffel Tower
-    {"type": "Point", "coordinates": [2.3376, 48.8606]},   # Louvre
-)
-# Returns: ~3,172 meters (geodesic distance on the WGS84 ellipsoid)
-
-# Spatial relationship check (ground-truth, not LLM-guessed)
-SpatialReasoner.check_relationship(polygon_a, polygon_b, "intersects")
-```
-
-### Vertical Datum Awareness
-
-```python
-from geospark.tools.terrain.vertical_datum import infer_datum, format_elevation_warning
-
-# Infer vertical datum from elevation source
-info = infer_datum("3dep")  # USGS 3DEP → NAVD88
-print(info.datum, info.height_type)  # "NAVD88", "orthometric"
-
-# Warn when mixing datums (NAVD88 vs EGM96 = ~17m difference in Colorado)
-warning = format_elevation_warning("3dep", "srtm", "Denver, CO")
-# "WARNING: Comparing elevations from '3dep' (NAVD88) and 'srtm' (EGM96)..."
-```
-
-### As an MCP Server (for Claude Desktop)
+## Command line
 
 ```bash
-pip install geospark-ai[mcp]
-geospark-mcp  # Starts stdio MCP server with 6 spatial tools
-```
-
-Add to your Claude Desktop config (`~/.claude/claude_desktop_config.json`):
-```json
-{
-  "mcpServers": {
-    "geospark": { "command": "geospark-mcp" }
-  }
-}
-```
-
-### Natural language spatial questions
-
-```python
-from geospark import Engine
-
-engine = Engine(tools=["geocoder", "terrain"])
-result = engine.ask("How far is the Eiffel Tower from Big Ben?")
-print(result.spatial_context.summary)
-# Automatically geocodes both locations + computes geodesic distance
-```
-
-Tries local Ollama first (free, fast), falls back to OpenRouter.
-
-### CLI
-
-```bash
-# Multi-agent coordinator (routes to the right specialist automatically)
-geospark multi-agent "Find the best cafe spot in Melbourne near schools"
-geospark multi-agent "Analyze Federation Square" --stream   # Live progress
-geospark agents                                              # List registered agents
-
-# Autonomous agents (direct access)
-geospark agent "Find all parks within 2km of Big Ben"
-geospark report "Federation Square, Melbourne"
-geospark site-select --within "Paris" --near "metro,schools" --facility restaurant
-
-# Spatial intelligence memory
-geospark memory recall "flood risk Melbourne"    # Vector-based recall
-geospark memory contradictions                   # Find conflicting facts
-geospark memory stats                            # FAISS + count info
-geospark memory compact                          # Archive old episodes
-
-# Geospatial context database
-geospark context list                            # All stored contexts
-geospark context show geospark://missions/flood  # View at L0/L1/L2
-geospark context query "flood melbourne"         # Hierarchical retrieval
-geospark context stats                           # Hottest contexts
-geospark context archive-cold                    # Move cold to _archive/
-
-# Spatial tools
+geospark distance -37.8136 144.9631 -33.8688 151.2093   # Melbourne → Sydney: 713.86 km
+geospark check contains '<geojson A>' '<geojson B>'
 geospark geocode "Tokyo Tower, Japan"
-geospark elevation 35.6586 139.7454
-geospark distance 48.8566 2.3522 51.5074 -- -0.1278  # Paris → London
+geospark elevation -37.8177 144.9691
 geospark ask "Is Tokyo closer to Seoul or Beijing?"
 
-# Live data channels
-geospark data weather "Melbourne, Australia"     # Weather + forecast
-geospark data air-quality "Delhi"                # PM2.5, NO2, O3
-geospark data fires "Amazon Rainforest"          # Active fire detections
-geospark data status                             # Check all channels
+geospark agent "Find all parks within 2km of Big Ben"
+geospark report "Federation Square, Melbourne"
+geospark site-select --within "Paris" --near "school,hospital" --facility pharmacy
+geospark multi-agent "Analyze Federation Square" --stream
 
-# Flow workflows
-geospark flow list                     # List templates
-geospark flow run distance_analysis    # Run a template
-geospark flow build "Monitor NDVI in Valencia; alert if it drops below 0.3" --run
+geospark data weather "Melbourne, Australia"
+geospark data air-quality "Delhi"        # needs OPENAQ_API_KEY
+geospark data fires "Amazon Rainforest"  # needs FIRMS_MAP_KEY
+
+geospark flow list
+geospark flow build "Geocode Valencia then check its elevation" --run
+geospark info                            # versions and optional extras
 ```
 
-### Try the Live API (no install needed)
+## Benchmark results
 
-Explore all **49 documented API operations** interactively at **[geospark.terrascout.app/docs](https://geospark.terrascout.app/docs)**.
+GeoSpark Bench v2 ran 9 models under three protocols: the bare question, step-by-step reasoning
+(CoT), and the question with GeoSpark's MCP tools attached. The models were five open-weight ≤9B
+(Qwen 2.5 7B, Llama 3.1 8B, Gemma 2 9B, Mistral 7B, Phi-3.5 3.8B), gpt-oss 20B, and three
+frontier APIs (GPT-5.4, Claude Sonnet 4.5, Gemini 2.5 Pro). Intervals are Wilson 95%, and the
+per-call cost ledger (~$41) is checked in. The full analysis is in a manuscript currently under peer
+review.
 
-```bash
-# Quick distance check
-curl -X POST https://geospark.terrascout.app/api/v1/distance \
-  -H "Content-Type: application/json" \
-  -d '{"lat_a": 48.8566, "lon_a": 2.3522, "lat_b": 51.5074, "lon_b": -0.1278}'
+**Numeric distance** (`distance_absolute`, n = 80 per model; correct = within 10% of the
+`pyproj.Geod.inv()` geodesic):
 
-# Build a flow from a natural-language goal (Phase 8B)
-curl -X POST https://geospark.terrascout.app/api/v1/flows/build \
-  -H "Content-Type: application/json" \
-  -d '{"goal": "Geocode Valencia then check its elevation", "max_turns": 10}'
-```
-
-### Run the Benchmark
-
-```bash
-# Run GeoSpark Bench on topological reasoning
-python -m geospark.bench run --benchmark geotopo
-
-# Run all benchmarks
-python -m geospark.bench run
-
-# List available benchmarks
-python -m geospark.bench list
-```
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────┐
-│                   User / LLM                    │
-│         (Claude, ChatGPT, Ollama, ...)          │
-└──────────┬──────────────────────┬───────────────┘
-           │ MCP                  │ REST API (49 operations)
-           v                      v
-┌──────────────────────────────────────────────────┐
-│         Multi-Agent Coordinator (Phase 7C)       │
-│   Intent classification · A2A msg · Streaming    │
-└──────────┬───────────────────────────────────────┘
-           │
-           v
-┌──────────────────────────────────────────────────┐
-│           Autonomous Agents Layer                │
-│  GeoAgent · SpatialReport · SiteSelector         │
-└──────────┬───────────────────────────────────────┘
-           │
-           v
-┌──────────────────────────────────────────────────┐
-│         Spatial Intelligence (Phase 7A/B)        │
-│  Facts + Episodes + Contradictions (VectorStore) │
-│  Tiered Context DB · Hotness · Hierarchy         │
-└──────────┬───────────────────────────────────────┘
-           │
-           v
-┌──────────────────────────────────────────────────┐
-│              GeoSpark Protocol (GSP)             │
-│         Standardized JSON query/result           │
-└──────────┬───────────────────────────────────────┘
-           │
-           v
-┌──────────────────────────────────────────────────┐
-│             Spatial Reasoning Engine              │
-│  Topology · Distance · CRS · Buffer · Centroid   │
-│  Planner · Cache · Temporal · Aggregator         │
-└──────────┬───────────────────────────────────────┘
-           │
-    ┌──────┴──────┬──────────┬──────────┬──────────┐
-    v             v          v          v          v
-┌────────┐ ┌──────────┐ ┌────────┐ ┌────────┐ ┌────────┐
-│Geocoder│ │Satellite │ │Terrain │ │Routing │ │Spectral│
-│        │ │(STAC)    │ │+ Datum │ │(OSRM)  │ │Indices │
-│        │ │          │ │Aware.  │ │        │ │        │
-└────────┘ └──────────┘ └────────┘ └────────┘ └────────┘
-           │
-    ┌──────┴──────┬──────────┬──────────┐
-    v             v          v          v
-┌────────┐ ┌──────────┐ ┌────────┐ ┌────────┐
-│ Flows  │ │Knowledge │ │Plugins │ │Spatial │
-│+ Persist│ │Graph+OSM │ │        │ │RAG     │
-│(Supa.) │ │(Admin)   │ │        │ │(Embed) │
-└────────┘ └──────────┘ └────────┘ └────────┘
-```
-
-## Benchmark Results
-
-What follows is a quick read of the v2 numbers; the underlying paper, theory, and limitations discussion are part of a separate manuscript currently undergoing peer review.
-
-The v2 sweep covered 9 models in 3 buckets:
-- 5 small open-weight (3.8B–9B): Qwen 2.5 7B, Llama 3.1 8B, Gemma 2 9B, Mistral 7B, Phi-3.5 3.8B
-- 1 mid open-weight: gpt-oss 20B
-- 3 frontier APIs: GPT-5.4 (`gpt-5.4-2026-03-05`), Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`), Gemini 2.5 Pro
-
-Each model ran the suite three times: just the question, then a step-by-step prompt where the model writes a short reasoning trace and tags its conclusion `FINAL ANSWER:`, and finally the same question with our MCP tools attached. We report Wilson 95% intervals throughout. The per-call cost ledger is checked in (~$41 of API spend; the open tier is free).
-
-### Numeric distance — the headline cell (`distance_absolute`, n=80 per model)
-
-These are "what's the distance from X to Y?" questions in metres, with ground truth from `pyproj.Geod.inv()` on WGS84. A response counts as correct if it lands within 10% of the true geodesic.
-
-| Model | Tier | Bare LLM | Step-by-step (CoT) | + GeoSpark tools |
+| Model | Tier | Bare LLM | Step-by-step | + GeoSpark tools |
 |---|---|:---:|:---:|:---:|
 | Qwen 2.5 7B | open ≤9B | 5.0% | 20.0% | **76.2%** |
-| Llama 3.1 8B | open ≤9B | 5.0% | 21.2% | 7.5% (a) |
-| Gemma 2 9B | open ≤9B | 37.5% (b) | 6.2% (c) | — |
-| Mistral 7B | open ≤9B | 2.5% | 2.5% | 0.0% (a) |
+| Llama 3.1 8B | open ≤9B | 5.0% | 21.2% | 7.5% ᵃ |
+| Gemma 2 9B | open ≤9B | 37.5% ᵇ | 6.2% | — |
+| Mistral 7B | open ≤9B | 2.5% | 2.5% | 0.0% ᵃ |
 | Phi-3.5 3.8B | open ≤9B | 1.2% | 6.2% | — |
-| **gpt-oss 20B** | open mid | **93.8%** | 93.8% | 91.2% |
-| OpenAI GPT-5.4 | frontier | 95.0% | 90.0% (c) | 95.0% |
-| Anthropic Claude Sonnet 4.5 | frontier | 73.8% | 92.5% | **96.2%** |
-| Google Gemini 2.5 Pro | frontier | 25.0% | 55.0% | 85.0% |
+| gpt-oss 20B | open mid | **93.8%** | 93.8% | 91.2% |
+| GPT-5.4 | frontier | 95.0% | 90.0% | 95.0% |
+| Claude Sonnet 4.5 | frontier | 73.8% | 92.5% | **96.2%** |
+| Gemini 2.5 Pro | frontier | 25.0% | 55.0% | 85.0% |
 
-Annotations:
-- (a) Tools were available but the model didn't use them properly. Llama emitted tool calls but mangled the coordinates it got back — a classic kilometres-vs-metres mix-up appears repeatedly. Mistral skipped the tool layer entirely and tried to answer in plain text.
-- (b) Gemma's 37.5% looks decent but it's not actually computing — when we trace the right answers, they all land on famous long-distance pairs whose approximate great-circle distance is the kind of trivia LLMs pick up in training. On shorter or less-prominent routes, errors are random.
-- (c) Step-by-step prompting was a regression for these two models. Forcing Gemma to reason step-by-step routes it away from its memorisation strategy and into computation, where it falls apart. GPT-5.4 starts at the ceiling and CoT just adds format noise.
+ᵃ The tools were available but not used properly: Llama mixed up km and m in the coordinates it got
+back, and Mistral answered in plain text. ᵇ Gemma's correct answers are well-known long-distance
+pairs, which is recall of training data, not computation. — means not evaluated with tools.
 
-### Where the tools matter most
+**What we learned**
 
-The bare-LLM range across the 9 models spans 1.2% to 95% — basically the full available stretch on a percentage scale. Plug the tools in and every model that emits valid tool calls finishes between 76% and 96%. Largest jump: Qwen (+71 points). Smallest: GPT-5.4 (zero — its baseline was already 95%).
+- **Tools are a leveller.** The bare-LLM range spans 1–95%. With tools, every model that makes valid
+  tool calls lands between 76% and 96%. Qwen gained 71 points; GPT-5.4 gained nothing, because it
+  was already at 95%.
+- **Aggregate scores hide bias.** Qwen's 56% on topology comes from saying "yes": it scores 93% on
+  `intersects` (where the data skews true) and 3% on `disjoint`. GPT-5.4 scores 0% on `touches`.
+  With GeoSpark, every predicate is 100%, because the engine computes it.
+- **Step-by-step prompting is not a universal fix.** It helps some models and hurts others.
+- **Knowledge questions don't need tools.** "Did the Amazon lose forest between 2015 and 2023?"
+  is answered well at every scale without them.
 
-For practical deployment this means two different pictures depending on which LLM you've already chosen:
-- **Self-hosting on commodity hardware?** Qwen 7B + GeoSpark gets you to 76% on numeric distance, comparable to Gemini 2.5 Pro + GeoSpark (85%) at zero marginal cost per call.
-- **Already paying for a frontier API?** Tools rarely improve absolute accuracy at the top of the market — but they replace probabilistic guessing with a deterministic engine call, so you get an auditable trace of how each answer was computed.
+Re-run it yourself with `python -m geospark.bench run`. The datasets regenerate identically from
+`python -m geospark.bench.generate_datasets`; see the
+[datasets README](https://github.com/Maz2580/geospark/blob/main/geospark/bench/datasets/README.md)
+for provenance, and the
+[benchmark report](https://github.com/Maz2580/geospark/blob/main/docs/BENCHMARK_REPORT.md) for
+every table.
 
-### What aggregate scores hide — the per-predicate split
-
-GeoTopo aggregate scores look unremarkable across the open-weight tier (Qwen 56%, Llama 60%, Gemma 72%). The decomposition tells a different story. Here's Qwen 2.5 7B's bare-LLM accuracy, by predicate, on n=210:
-
-| Predicate | n | Bare-LLM accuracy | What's going on |
-|---|---|:---:|---|
-| `intersects` | 30 | **93%** | dataset skews `True` here, model defaults `True` |
-| `within` | 45 | 89% | same pattern |
-| `contains` | 54 | 56% | mixed labels, model is guessing |
-| `contains_with_hole` | 24 | 54% | mixed labels, model is guessing |
-| `touches` | 27 | 22% | dataset skews `False`, model still says `True` |
-| `disjoint` | 30 | **3%** | dataset skews `False`, model says `True` anyway |
-
-The model isn't reasoning about topology at all — it's defaulting to "yes" and the dataset's predicate distribution disguises that as competence. With GeoSpark in the loop, every predicate hits 100% because the engine just calls Shapely. The same pattern shows up at the frontier with different specifics: GPT-5.4 hits 100% on `intersects` and `disjoint` but **0% on `touches`** at n=27.
-
-### What we learned (one-line each)
-
-- The "LLMs can't compute distances" framing is too coarse — vendor matters as much as scale at the top of the market
-- gpt-oss 20B is the unexpected open-weight datapoint of the study; it ties GPT-5.4 on numeric distance baseline at zero cost
-- Tools are a leveller: they erase the ~70-point bare-LLM gap between top and bottom of the frontier tier
-- Step-by-step prompting helps some models, hurts others — there's no universal recipe
-- Aggregate accuracy on multi-class benchmarks can miss the actual failure mode entirely; you need per-class numbers to see model bias
-- Knowledge questions ("did the Amazon experience deforestation between 2015 and 2023?") are unaffected by tools — they're already solved by training data at every scale
-
-> Per-cell JSONs and the cost ledger live alongside this README in the repository. To re-run the bench yourself: `python -m geospark.bench run`. The full paper-form discussion accompanies the manuscript currently under peer review and will be linked here once the venue is announced.
-
-## Why GeoSpark?
-
-GeoSpark's value proposition depends on which LLM you're using. The table below maps each capability to the gap GeoSpark fills, with v2-paper-verified numbers.
-
-| Problem | Without GeoSpark (open ≤9B) | Without GeoSpark (frontier) | With GeoSpark (any tier) |
-|---|---|---|---|
-| "How far is A from B?" (numeric) | 0–5% — model emits implausible numbers or refuses | 25–95% (vendor-dependent) | **76–96%** geodesic computation |
-| "Is point A inside region B?" | 56% aggregate, but `disjoint` only 3% (yes-bias) | 60–82% baseline | **100%** ground-truth predicate |
-| "Did region X change since 2020?" | 65–90% (already works at all tiers) | 78–92% | tools add no value here — knowledge tasks work without GeoSpark |
-| CRS confusion | Silent errors | Silent errors | Automatic detection & transformation |
-| "Which landmark is closest?" | 0–46% baseline | varies | Exact nearest-neighbor + verifiable trace |
-| Audit trail / verifiability | None — model just emits a number | None at baseline | Per-call tool trace, deterministic engine, reproducible |
-
-**Where GeoSpark adds the most value**: small open-weight models that need to compute (Qwen + tools = 76% on numeric distance, vs 5% baseline) and frontier deployments where you need verifiability rather than additional accuracy (GPT-5.4 baseline = augmented = 95%, but augmented gives you a deterministic tool trace).
-
-**Where GeoSpark adds the least value**: knowledge-based spatial questions ("did the Amazon experience deforestation"). All models above 65% at baseline; tools are unnecessary overhead.
-
-## Project Status
-
-| Phase | Status | Tests | Description |
-|-------|--------|-------|-------------|
-| **Phase 0-3** — Foundation to Platform | **Complete** | 441 | Protocol, engine, tools, MCP, Bench, Flows, Knowledge Graph, Plugins |
-| **Phase 4** — Deployment | **Complete** | 446 | Live API, Docker, PyPI, Ollama, API auth, 5-model benchmarks |
-| **Phase 5** — Autonomous Agents | **Complete** | 446 | GeoAgent, SpatialReport, SiteSelector |
-| **Phase 6** — Data Channels | **Complete** | 474 | Weather, Air Quality, NASA Fires — free, real-time |
-| **Phase 7A** — Spatial Memory | **Complete** | 540 | Facts + Episodes, VectorStore (FAISS), contradictions, auto-linking |
-| **Phase 7B** — Context Database | **Complete** | 589 | Tiered L0/L1/L2 loading, hotness scoring, hierarchical retrieval |
-| **Phase 7C** — Multi-Agent Coordination | **Complete** | 657 | Toolkit, A2A messaging, coordinator with streaming |
-| **Phase 7 UI** — Guide & Pages | **Complete** | 679 | Onboarding guide, Memory/Context UI pages, Coordinator tab |
-| **Phase 8A** — Operational middleware | **Complete** | 754 | Rate limiting, audit logging, usage tracking, channel cache |
-| **Phase 8B** — Chat-to-Flow Builder | **Complete** | 776 | Natural-language goal → validated Flow DAG via LLM tool calling |
-| **v0.6** — Trustworthy release | **Complete** | **955** | Fixed install, public-API security, correct buffers/bboxes/CRS, data no longer silently dropped, offline test suite (79% coverage), reproducible benchmark, data attribution |
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
-
-## Development
+## Self-hosting
 
 ```bash
-# Clone and setup
-git clone https://github.com/Maz2580/geospark.git
-cd geospark
-python -m venv .venv
-source .venv/bin/activate  # or .venv\Scripts\activate on Windows
-pip install -e ".[dev]"
-
-# Run tests
-pytest tests/ -v
-
-# Lint & format
-ruff check geospark/ tests/
-ruff format geospark/ tests/
-
-# Type check
-mypy geospark/
+git clone https://github.com/Maz2580/geospark && cd geospark
+cp .env.example .env     # set GEOSPARK_ENV=production and GEOSPARK_ADMIN_TOKEN
+docker compose -f docker-compose.prod.yml up -d
 ```
 
-## Contributing
+The hosted API is designed to stay **open** without a key, with guard rails:
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+- An admin token protects operator routes (audit, usage, flow storage). The LLM gateway needs it or
+  a revocable partner key.
+- Public callers can only choose the local model or free models, so nobody can spend your paid
+  API credit.
+- Each visitor gets a private, size-capped, auto-expiring sandbox for the memory and context demos.
+- Rate limits use the real client IP, and LLM work has a concurrency cap.
+- Inputs are bounded, and the audit log stores hashed IPs.
 
-## Live API
+All state lives under `GEOSPARK_DATA_DIR`. To lift Nominatim's public limits, point
+`GEOSPARK_NOMINATIM_URL` at your own server. Details are in
+[deploy/DEPLOY.md](https://github.com/Maz2580/geospark/blob/main/deploy/DEPLOY.md#security) and
+[`.env.example`](https://github.com/Maz2580/geospark/blob/main/.env.example).
 
-GeoSpark is deployed and accessible at **[geospark.terrascout.app](https://geospark.terrascout.app/docs)**: 49 documented API operations with interactive Swagger documentation. The public API is open without a key; see [deploy/DEPLOY.md](deploy/DEPLOY.md#security) for the access model and limits.
+## Roadmap
 
-## Author
-
-Created by **Mazdak Ghasemi Tootkaboni** ([University of Melbourne](https://www.unimelb.edu.au/))
-
-- ORCID: [0000-0001-8084-5270](https://orcid.org/0000-0001-8084-5270)
-- GitHub: [@Maz2580](https://github.com/Maz2580)
+- **v0.7: verifiable answers.**
+  - Every result carries its source, licence, timestamp, CRS and units.
+  - A "cannot answer" response instead of a guess.
+  - Data-quality flags, such as geocoder confidence and DEM accuracy.
+  - GeoJSON FeatureCollections that load straight into QGIS.
+  - The MCP server updated to the 2026 spec, with structured GeoJSON output and a hosted HTTP
+    endpoint.
+- **v0.8: more data, more analysis.**
+  - Overture Maps buildings, places and roads through DuckDB, with no key.
+  - Real isochrones and travel-time matrices.
+  - Bring your own GeoJSON, GeoPackage or GeoParquet.
+  - Reproducible run manifests.
+- **Ongoing:** external benchmarks (GPSBench, GeoBenchX), a QGIS bridge, and more MCP tools.
 
 ## Data attribution
 
-GeoSpark computes geometry locally but fetches data from public services. Results built on
-them keep the providers' licences, so please credit them when you publish:
+GeoSpark computes geometry locally, but it fetches data from public services. Results built on them
+keep the providers' licences, so please credit them when you publish:
 
 - **OpenStreetMap** (geocoding, amenities, map tiles): © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright)
 - **Copernicus DEM GLO-30** (elevation): © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018, provided under COPERNICUS by the European Union and ESA
 - **Open-Meteo** (weather): [CC BY 4.0](https://open-meteo.com/)
-- **OpenAQ** (air quality) and **NASA FIRMS** (active fires): see each provider's terms
+- **OpenAQ** (air quality) and **NASA FIRMS** (active fires): see each provider's terms. Air-quality
+  results include each station's licence.
 
-Elevation results include an `attribution` field you can copy directly. The full list is in [NOTICE](NOTICE).
+Elevation results include an `attribution` field you can copy directly. The full list is in
+[NOTICE](https://github.com/Maz2580/geospark/blob/main/NOTICE).
+
+## Development
+
+```bash
+git clone https://github.com/Maz2580/geospark && cd geospark
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev,api,mcp]"
+pytest                       # 955 tests; offline, never touch ~/.geospark
+ruff check geospark tests
+```
+
+Contributions are welcome. See
+[CONTRIBUTING.md](https://github.com/Maz2580/geospark/blob/main/CONTRIBUTING.md), and report
+security issues privately as described in
+[SECURITY.md](https://github.com/Maz2580/geospark/blob/main/SECURITY.md). The architecture overview
+is in [docs/ARCHITECTURE.md](https://github.com/Maz2580/geospark/blob/main/docs/ARCHITECTURE.md),
+and release notes are in [CHANGELOG.md](https://github.com/Maz2580/geospark/blob/main/CHANGELOG.md).
+
+## Citing
+
+If GeoSpark or GeoSpark Bench helps your research, please cite it. GitHub's **"Cite this
+repository"** button uses [CITATION.cff](https://github.com/Maz2580/geospark/blob/main/CITATION.cff).
+
+## Author
+
+Created by **Mazdak Ghasemi Tootkaboni** ([University of Melbourne](https://www.unimelb.edu.au/))
+· ORCID [0000-0001-8084-5270](https://orcid.org/0000-0001-8084-5270) · GitHub [@Maz2580](https://github.com/Maz2580)
 
 ## License
 
-[Apache 2.0](LICENSE) — Copyright 2024-2026 Mazdak Ghasemi Tootkaboni
+[Apache 2.0](https://github.com/Maz2580/geospark/blob/main/LICENSE). Copyright 2024-2026 Mazdak Ghasemi Tootkaboni.

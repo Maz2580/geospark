@@ -107,6 +107,13 @@ SOURCES: dict[str, dict[str, Any]] = {
         "attribution": "NASA LANCE FIRMS (MODIS/VIIRS active fire detections)",
         "method": "FIRMS area API, near-real-time detections",
     },
+    "overture-maps": {
+        "name": "Overture Maps", "url": "https://overturemaps.org",
+        "licence": "Per theme: CDLA-Permissive-2.0 (places), ODbL-1.0 (buildings, transportation, divisions)",
+        "attribution": "© Overture Maps Foundation, overturemaps.org; includes data from OpenStreetMap "
+                       "contributors (ODbL) and other sources. See https://docs.overturemaps.org/attribution/",
+        "method": "DuckDB spatial query of Overture GeoParquet",
+    },
     "geospark-engine": {
         "name": "GeoSpark spatial engine",
         "url": "https://github.com/Maz2580/geospark",

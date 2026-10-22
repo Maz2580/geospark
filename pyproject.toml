@@ -100,8 +100,12 @@ terrain = [
 intelligence = [
     "faiss-cpu>=1.7",
 ]
+# Overture Maps (places, buildings, roads, admin areas) queried on S3 with DuckDB, no key
+overture = [
+    "duckdb>=1.1",
+]
 all = [
-    "geospark-ai[geo,api,llm,supabase,viz,satellite,postgis,mcp,terrain,intelligence]",
+    "geospark-ai[geo,api,llm,supabase,viz,satellite,postgis,mcp,terrain,intelligence,overture]",
 ]
 dev = [
     "pytest>=8.0",

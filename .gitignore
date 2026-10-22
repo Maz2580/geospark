@@ -78,3 +78,8 @@ docs/FLOW_PERSISTENCE_PLAN.md
 valhalla/
 .buildx/
 *.bak-*
+
+# Copies of .env (e.g. .env.backup) hold the same secrets: never commit them.
+# .env.example is the secret-free template and stays tracked.
+.env.*
+!.env.example

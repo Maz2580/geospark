@@ -6,7 +6,7 @@
 - **Language**: Python 3.11+
 - **Package manager**: pip (venv at `.venv/`)
 - **License**: Apache 2.0
-- **Status**: Phase 8A complete; Phase 8B in progress -- 776 tests passing, live at geospark.terrascout.app
+- **Status**: v0.6.0 -- 955 tests passing (offline; 79% coverage), live at geospark.terrascout.app
 - **PyPI**: `pip install geospark-ai[mcp]` — https://pypi.org/project/geospark-ai/
 - **MCP**: `geospark-mcp` CLI command (6 tools, official MCP SDK)
 
@@ -79,6 +79,7 @@ geospark/
 
 ```bash
 # Activate venv (ALWAYS use this - never install globally)
+source .venv/bin/activate        # macOS/Linux
 source .venv/Scripts/activate    # Windows/Git Bash
 # or: .venv\Scripts\activate     # Windows CMD
 

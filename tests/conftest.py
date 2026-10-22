@@ -18,6 +18,8 @@ _DATA_DIR = tempfile.mkdtemp(prefix="geospark-tests-")
 os.environ["GEOSPARK_DATA_DIR"] = _DATA_DIR
 os.environ["GEOSPARK_AUDIT_DIR"] = os.path.join(_DATA_DIR, "audit")
 os.environ["GEOSPARK_USAGE_DIR"] = os.path.join(_DATA_DIR, "usage")
+# No 1 req/s Nominatim spacing in tests (nothing reaches the real server anyway)
+os.environ["GEOSPARK_NOMINATIM_MIN_INTERVAL"] = "0"
 
 _LOCAL_HOSTS = {"127.0.0.1", "::1", "localhost", "0.0.0.0"}
 _real_connect = socket.socket.connect
@@ -41,3 +43,12 @@ def pytest_configure(config: pytest.Config) -> None:
 def _block_network(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) -> None:
     if request.node.get_closest_marker("network") is None:
         monkeypatch.setattr(socket.socket, "connect", _guarded_connect)
+
+
+@pytest.fixture(autouse=True)
+def _fresh_geocoding_cache():
+    from geospark.tools.geocoding import client
+
+    client.reset()
+    yield
+    client.reset()

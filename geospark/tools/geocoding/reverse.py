@@ -9,8 +9,6 @@ from __future__ import annotations
 
 from typing import Any, ClassVar
 
-import httpx
-
 from geospark.protocol.schema import (
     SpatialContext,
     SpatialFeature,
@@ -19,6 +17,7 @@ from geospark.protocol.schema import (
     SpatialResult,
 )
 from geospark.tools.base import BaseTool
+from geospark.tools.geocoding import client as nominatim_client
 from geospark.utils import USER_AGENT
 
 
@@ -59,14 +58,7 @@ class ReverseGeocoder(BaseTool):
         params = self._build_params(lat, lon, query)
 
         try:
-            with httpx.Client(timeout=10) as client:
-                response = client.get(
-                    self.BASE_URL,
-                    params=params,
-                    headers=self.HEADERS,
-                )
-                response.raise_for_status()
-                data = response.json()
+            data = nominatim_client.get_json("reverse", params)
         except Exception as e:
             return SpatialResult(errors=[f"Reverse geocoding failed: {e}"])
 

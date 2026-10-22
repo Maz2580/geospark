@@ -56,8 +56,13 @@ class Engine:
         ):
             query = self._normalize_crs(query)
 
-        # Route to appropriate handler
+        # Route to appropriate handler. Reasoning operations enrich their own results
+        # (provenance, units, quality); tool results are enriched here.
         result = self._route_query(query)
+        if not self.spatial_reasoner_handles(query):
+            from geospark.protocol.provenance import enrich
+
+            enrich(result, query.operation.value)
 
         # Add execution metadata
         result.execution_time_ms = (time.time() - start_time) * 1000
@@ -213,6 +218,15 @@ class Engine:
             metadata["geometry_b"] = dict(mapping(reproject(shape(geom_b), transformer)))
             update["metadata"] = metadata
         return query.model_copy(update=update)
+
+    _REASONING_OPS = frozenset({
+        "contains", "intersects", "touches", "crosses", "overlaps", "within", "disjoint",
+        "distance", "area", "length", "buffer", "union", "intersection", "difference",
+        "convex_hull", "centroid",
+    })
+
+    def spatial_reasoner_handles(self, query: SpatialQuery) -> bool:
+        return query.operation.value in self._REASONING_OPS
 
     def _route_query(self, query: SpatialQuery) -> SpatialResult:
         """Route a query to the appropriate handler."""

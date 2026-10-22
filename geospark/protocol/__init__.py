@@ -1,5 +1,6 @@
 """GeoSpark Protocol (GSP) - The standard for spatial queries and results."""
 
+from geospark.protocol.provenance import Provenance
 from geospark.protocol.schema import (
     BBox,
     Geometry,
@@ -25,6 +26,7 @@ __all__ = [
     "MultiPolygon",
     "Point",
     "Polygon",
+    "Provenance",
     "SpatialContext",
     "SpatialFeature",
     "SpatialFilter",

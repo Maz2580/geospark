@@ -10,9 +10,11 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any
+from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
+
+from geospark.protocol.provenance import Provenance
 
 # --- Geometry Types ---
 
@@ -195,10 +197,18 @@ class SpatialContext(BaseModel):
     total_features: int = 0
     topology: dict[str, Any] | None = None
     summary: str | None = None
+    units: dict[str, str] = Field(
+        default_factory=dict, description="Unit of each numeric property, e.g. {'distance_m': 'metre'}"
+    )
 
 
 class SpatialResult(BaseModel):
-    """A GeoSpark Protocol result."""
+    """A GeoSpark Protocol result.
+
+    Besides the answer itself (``features``), a result says where it came from
+    (``provenance``), what its numbers mean (``spatial_context.units``), how good it is
+    (``quality``, ``warnings``) and whether it is an answer at all (``status``).
+    """
 
     features: list[SpatialFeature] = Field(default_factory=list)
     spatial_context: SpatialContext = Field(default_factory=SpatialContext)
@@ -206,10 +216,25 @@ class SpatialResult(BaseModel):
     sources: list[str] = Field(default_factory=list)
     execution_time_ms: float | None = None
     errors: list[str] = Field(default_factory=list)
+    provenance: list[Provenance] = Field(
+        default_factory=list, description="Source, licence, attribution and method of each part of the answer"
+    )
+    warnings: list[str] = Field(default_factory=list, description="Caveats a careful analyst should know")
+    quality: dict[str, Any] = Field(
+        default_factory=dict, description="Machine-readable quality flags, e.g. vertical_accuracy_le90_m"
+    )
 
     @property
     def is_empty(self) -> bool:
         return len(self.features) == 0
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def status(self) -> Literal["ok", "partial", "cannot_answer"]:
+        """``cannot_answer``: errors and nothing to show; ``partial``: an answer with errors."""
+        if self.errors:
+            return "partial" if self.features else "cannot_answer"
+        return "ok"
 
     def to_geojson(self) -> dict[str, Any]:
         """Convert result to GeoJSON FeatureCollection."""

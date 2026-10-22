@@ -13,7 +13,9 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any, Protocol
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+
+from geospark.protocol.provenance import Provenance, source_provenance
 
 
 class ChannelResult(BaseModel):
@@ -27,6 +29,17 @@ class ChannelResult(BaseModel):
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     total_results: int = 0
     errors: list[str] = Field(default_factory=list)
+    provenance: list[Provenance] = Field(
+        default_factory=list, description="Source, licence and attribution of this data"
+    )
+
+    @model_validator(mode="after")
+    def _attach_provenance(self) -> ChannelResult:
+        """Describe the provider of the data; retrieved_at is when it was actually fetched,
+        so a cached answer still says how old it is."""
+        if self.source and not self.provenance and (self.features or self.total_results == 0):
+            self.provenance = [source_provenance(self.source, retrieved_at=self.timestamp)]
+        return self
 
     @property
     def is_empty(self) -> bool:

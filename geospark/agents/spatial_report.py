@@ -22,6 +22,7 @@ from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.knowledge.loaders import OverpassLoader
 from geospark.mcp_servers.launcher import MCPServerLauncher
+from geospark.protocol.provenance import Provenance, engine_provenance, source_provenance
 from geospark.utils.aio import run_sync
 from geospark.utils.geo import overpass_bbox
 
@@ -89,6 +90,9 @@ class LocationReport(BaseModel):
     admin_area: str = ""
     summary: str = ""
     duration_s: float = 0.0
+    provenance: list[Provenance] = Field(
+        default_factory=list, description="Every data source this report is built on, with licence and attribution"
+    )
 
 
 # Services to check for accessibility scoring
@@ -139,6 +143,7 @@ class SpatialReport:
         start = time.time()
         report = LocationReport(query=location, radius_m=radius_m)
         check_services = services or DEFAULT_SERVICES
+        used_sources: list[str] = ["openstreetmap-nominatim"]  # geocoding, below
 
         # Step 1: Geocode
         geo = self._launcher.handle_tool_call("geocode", {
@@ -182,6 +187,9 @@ class SpatialReport:
             elev = elev_job.result()
             if elev.get("status") == "success" and elev.get("result"):
                 report.elevation_m = elev["result"].get("elevation_m")
+                elevation_source = (elev.get("metadata") or {}).get("source")
+                if elevation_source:
+                    used_sources.append(elevation_source)
             # Weather is Tier 0 (no key); air quality is skipped without OPENAQ_API_KEY
             report.weather = weather_job.result()
             report.air_quality = air_job.result()
@@ -238,6 +246,20 @@ class SpatialReport:
                     service=svc,
                     available=False,
                 ))
+
+        # Which providers this report actually relied on (cite them when sharing it)
+        if report.weather is not None:
+            used_sources.append("open-meteo")
+        if report.air_quality is not None:
+            used_sources.append("openaq")
+        if amenities_checked:
+            used_sources.append("openstreetmap-overpass")
+        seen: set[str] = set()
+        for source in used_sources:
+            if source not in seen:
+                seen.add(source)
+                report.provenance.append(source_provenance(source))
+        report.provenance.append(engine_provenance("distance"))
 
         # Step 5: Generate narrative summary
         report.summary = self._generate_narrative(report)

@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Any, ClassVar
 
 from geospark.engine.core import Engine
-from geospark.mcp_servers.base import BaseMCPServer
+from geospark.mcp_servers.base import BaseMCPServer, verification
 from geospark.protocol.schema import Point, SpatialOperation, SpatialQuery
 
 
@@ -55,6 +55,7 @@ class TerrainServer(BaseMCPServer):
                 # Report the dataset that actually answered (Copernicus GLO-30 first,
                 # Open Elevation as fallback), with its attribution, not a hard-coded name.
                 "metadata": {
+                    **verification(result),
                     "crs": "EPSG:4326",
                     "source": result.sources[0] if result.sources else "unknown",
                     **(

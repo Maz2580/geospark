@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Any, ClassVar
 
 from geospark.engine.core import Engine
-from geospark.mcp_servers.base import BaseMCPServer
+from geospark.mcp_servers.base import BaseMCPServer, verification
 from geospark.protocol.schema import Point, SpatialOperation, SpatialQuery
 
 
@@ -95,7 +95,7 @@ class GeocodingServer(BaseMCPServer):
                 "features": [f.model_dump() for f in result.features],
                 "summary": result.spatial_context.summary,
             },
-            "metadata": {"source": "Nominatim", "crs": "EPSG:4326"},
+            "metadata": {"source": "Nominatim", "crs": "EPSG:4326", **verification(result)},
         }
 
     def _handle_reverse_geocode(self, args: dict[str, Any]) -> dict[str, Any]:
@@ -121,5 +121,5 @@ class GeocodingServer(BaseMCPServer):
                 "features": [f.model_dump() for f in result.features],
                 "summary": result.spatial_context.summary,
             },
-            "metadata": {"source": "Nominatim", "crs": "EPSG:4326"},
+            "metadata": {"source": "Nominatim", "crs": "EPSG:4326", **verification(result)},
         }

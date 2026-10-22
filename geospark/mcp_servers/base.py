@@ -64,3 +64,22 @@ class BaseMCPServer:
     def _get_handlers(self) -> dict[str, Any]:
         """Override in subclass to map tool names to handler methods."""
         return {}
+
+
+def verification(result: Any) -> dict[str, Any]:
+    """The checkable part of an answer, for tool replies: status, provenance, units, quality.
+
+    An LLM (or the person reading its answer) can cite the source and licence, see how a
+    value was computed, and know the caveats.
+    """
+    out: dict[str, Any] = {
+        "status": result.status,
+        "provenance": [p.model_dump(mode="json", exclude_none=True) for p in result.provenance],
+    }
+    if result.spatial_context.units:
+        out["units"] = result.spatial_context.units
+    if result.warnings:
+        out["warnings"] = result.warnings
+    if result.quality:
+        out["quality"] = result.quality
+    return out

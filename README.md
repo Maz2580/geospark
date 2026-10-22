@@ -51,10 +51,10 @@ Add GeoSpark to your MCP client's config. For Claude Desktop that's
 { "mcpServers": { "geospark": { "command": "geospark-mcp" } } }
 ```
 
-That gives the model thirteen read-only tools. **Computation:** `calculate_distance`,
+That gives the model fifteen read-only tools. **Computation:** `calculate_distance`,
 `check_spatial_relationship` and `spatial_operation` (buffer, area, length, centroid, convex hull).
 **Places and data:** `geocode`, `reverse_geocode`, `get_elevation`, `route`, `get_weather`,
-`get_air_quality`, `get_active_fires` and `overture_features`. **Analysis:** `location_report` and `select_site`.
+`get_air_quality`, `get_active_fires` and `overture_features`. **Analysis:** `isochrone`, `travel_time_matrix`, `location_report` and `select_site`.
 
 Results come back as structured content with output schemas, usually GeoJSON. They carry
 provenance (source, licence, attribution), units and warnings. When GeoSpark can't answer reliably
@@ -86,14 +86,14 @@ public server, add `-e GEOSPARK_ENV=production -e GEOSPARK_ADMIN_TOKEN=<secret>`
 | | |
 |---|---|
 | **Spatial engine** | Geodesic distance, area and length (pyproj on WGS84); topology checks (contains, within, intersects, touches, crosses, overlaps, disjoint) via Shapely; shape-preserving buffers; union, intersection, difference, centroid, convex hull; CRS transformation of every input geometry |
-| **Places and terrain** | Geocoding and reverse geocoding (OpenStreetMap Nominatim, following its usage policy: ≤ 1 request/s and cached); elevation from Copernicus GLO-30 with Open Elevation fallback and vertical-datum awareness (NAVD88 / EGM96 / WGS84); routing (OSRM) |
+| **Places and terrain** | Geocoding and reverse geocoding (OpenStreetMap Nominatim, following its usage policy: ≤ 1 request/s and cached); elevation from Copernicus GLO-30 with Open Elevation fallback and vertical-datum awareness (NAVD88 / EGM96 / WGS84); routing (OSRM); **isochrones** (where can I reach in N minutes on foot, by bike or by car) and travel-time matrices (Valhalla) |
 | **Live data** | Overture Maps places, buildings, roads and admin areas (no key, via DuckDB); weather and forecasts (Open-Meteo, no key); air quality (OpenAQ v3, free key); active fires (NASA FIRMS, free key); satellite scene search (STAC) |
 | **Agents** | `GeoAgent` (multi-step analysis from a plain-English goal), `SpatialReport` (a location dossier: amenities, accessibility, elevation, weather), `SiteSelector` (multi-criteria site ranking), and a coordinator that routes a goal to the right one |
 | **Interfaces** | Python library, CLI (`geospark …`), REST API (49 documented operations), MCP server (`geospark-mcp`), web playground |
 | **Memory and workflows** | Spatial memory with facts, episodes and contradiction detection; a tiered context store; Flows (DAG workflows, buildable from a natural-language goal) |
 | **GeoSpark Bench** | 535 reproducible questions across topology, distance, multi-step reasoning, change and multimodal tasks, with computed ground truth |
 
-**Planned, not built yet:** slope, viewshed, isochrones, raster band math and change detection. These
+**Planned, not built yet:** slope, viewshed, raster band math and change detection. These
 operations exist in the protocol, but today they return a clear "not implemented yet" error rather
 than an answer. See the [roadmap](#roadmap).
 
@@ -227,6 +227,7 @@ geospark distance -37.8136 144.9631 -33.8688 151.2093   # Melbourne → Sydney: 
 geospark check contains '<geojson A>' '<geojson B>'
 geospark geocode "Tokyo Tower, Japan"
 geospark elevation -37.8177 144.9691
+geospark isochrone -37.8180 144.9691 --minutes 5,10,15 --mode walk
 geospark ask "Is Tokyo closer to Seoul or Beijing?"
 
 geospark agent "Find all parks within 2km of Big Ben"

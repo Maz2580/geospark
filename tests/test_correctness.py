@@ -138,7 +138,6 @@ def test_length_operation_is_geodesic() -> None:
     [
         ("geospark.tools.terrain.elevation.ElevationTool", SpatialOperation.SLOPE),
         ("geospark.tools.terrain.elevation.ElevationTool", SpatialOperation.VIEWSHED),
-        ("geospark.tools.routing.osrm.OSRMRouteTool", SpatialOperation.ISOCHRONE),
         ("geospark.tools.change_detection.pixel_change.PixelChangeTool", SpatialOperation.CHANGE_DETECTION),
     ],
 )

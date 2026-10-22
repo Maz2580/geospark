@@ -420,11 +420,11 @@ class TestOSRMRouteURL:
         result = tool.execute(query)
         assert len(result.errors) > 0
 
-    def test_isochrone_stub(self):
+    def test_isochrone_needs_a_point(self):
+        """Isochrones are real now (Valhalla); without a point there's nothing to compute."""
         tool = OSRMRouteTool()
-        query = SpatialQuery(operation=SpatialOperation.ISOCHRONE)
-        result = tool.execute(query)
-        assert "Isochrone" in result.spatial_context.summary
+        result = tool.execute(SpatialQuery(operation=SpatialOperation.ISOCHRONE))
+        assert result.status == "cannot_answer" and "Point" in result.errors[0]
 
 
 # ---- NDVI Execute (Mocked) ----

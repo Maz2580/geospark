@@ -37,7 +37,9 @@ class BaseMCPServer:
             }
         try:
             result = handler(arguments)
-            return {"status": "success", "tool": tool_name, **result}
+            # A handler that reports errors failed, even though it returned normally
+            status = "error" if result.get("errors") else "success"
+            return {"status": status, "tool": tool_name, **result}
         except ValueError as e:
             return {
                 "status": "error",

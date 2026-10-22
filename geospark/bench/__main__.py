@@ -127,7 +127,7 @@ class _OpenRouterAdapter:
 
     def complete(self, prompt: str) -> str:
         answer = self._client.ask(prompt)
-        return answer.text
+        return answer.answer
 
 
 if __name__ == "__main__":

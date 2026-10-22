@@ -11,6 +11,7 @@ Source: https://openaq.org/
 
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
 import httpx
@@ -133,18 +134,26 @@ class AirQualityChannel:
                 errors=[f"OpenAQ API error: {e}"],
             )
 
-        features = []
-        for result in data.get("results", []):
-            station_name = result.get("location", "Unknown station")
-            coords = result.get("coordinates", {})
+        locations = data.get("results", [])
+        # OpenAQ v3: /locations lists stations and their sensors; current values come from
+        # /locations/{id}/latest, keyed by sensor id. Fetch those in parallel.
+        latest_by_location = await self._latest_for(locations)
 
+        features = []
+        for result in locations:
+            coords = result.get("coordinates") or {}
+            sensors = {
+                s.get("id"): (s.get("parameter") or {}) for s in result.get("sensors", [])
+            }
             measurements = {}
-            for m in result.get("measurements", []):
-                param_name = m.get("parameter", "")
-                measurements[param_name] = {
-                    "value": m.get("value"),
-                    "unit": m.get("unit", ""),
-                    "last_updated": m.get("lastUpdated", ""),
+            for reading in latest_by_location.get(result.get("id"), []):
+                parameter = sensors.get(reading.get("sensorsId"))
+                if not parameter or not parameter.get("name"):
+                    continue
+                measurements[parameter["name"]] = {
+                    "value": reading.get("value"),
+                    "unit": parameter.get("units", ""),
+                    "last_updated": (reading.get("datetime") or {}).get("utc", ""),
                 }
 
             # Calculate AQI category for PM2.5 if available
@@ -153,15 +162,26 @@ class AirQualityChannel:
             if pm25 is not None:
                 aqi_category = self._pm25_category(pm25)
 
+            country = result.get("country") or {}
             features.append({
                 "type": "air_quality_station",
-                "station_name": station_name,
+                "station_name": result.get("name") or "Unknown station",
                 "coordinates": [coords.get("longitude"), coords.get("latitude")],
-                "country": result.get("country", ""),
-                "city": result.get("city", ""),
+                "country": country.get("name", "") if isinstance(country, dict) else country,
+                "city": result.get("locality") or "",
+                "provider": (result.get("provider") or {}).get("name", ""),
                 "measurements": measurements,
                 "aqi_category": aqi_category,
                 "distance_m": result.get("distance"),
+                # Each station's data licence and required attribution, passed through
+                "licenses": [
+                    {
+                        "name": lic.get("name", ""),
+                        "attribution": (lic.get("attribution") or {}).get("name", ""),
+                        "url": (lic.get("attribution") or {}).get("url", ""),
+                    }
+                    for lic in result.get("licenses") or []
+                ],
             })
 
         if not features:
@@ -179,12 +199,36 @@ class AirQualityChannel:
             features=features,
             metadata={
                 "source": "OpenAQ (openaq.org)",
-                "api": "free, no key required",
+                "api": "OpenAQ v3, free API key required",
                 "stations_found": len(features),
             },
             source="openaq",
             total_results=len(features),
         )
+
+    async def _latest_for(self, locations: list[dict[str, Any]]) -> dict[Any, list[dict[str, Any]]]:
+        """Latest readings for each location id (``/v3/locations/{id}/latest``).
+
+        A station whose request fails just has no readings; it doesn't fail the search.
+        """
+        ids = [loc.get("id") for loc in locations if loc.get("id") is not None]
+        if not ids:
+            return {}
+
+        async def fetch(client: httpx.AsyncClient, location_id: Any) -> tuple[Any, list[dict[str, Any]]]:
+            try:
+                resp = await client.get(
+                    f"{self.API_URL}/locations/{location_id}/latest",
+                    headers={"X-API-Key": self._api_key},
+                )
+                resp.raise_for_status()
+                return location_id, resp.json().get("results", [])
+            except Exception:
+                return location_id, []
+
+        async with httpx.AsyncClient(timeout=15) as client:
+            pairs = await asyncio.gather(*(fetch(client, i) for i in ids))
+        return dict(pairs)
 
     async def _geocode(self, location: str) -> tuple[float | None, float | None, str]:
         """Geocode via GeoSpark's Nominatim geocoder."""

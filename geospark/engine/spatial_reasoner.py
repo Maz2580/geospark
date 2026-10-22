@@ -398,7 +398,7 @@ class SpatialReasoner:
 
         geod = Geod(ellps="WGS84")
         _, _, distance_m = geod.inv(lon1, lat1, lon2, lat2)
-        return abs(distance_m)
+        return float(abs(distance_m))
 
     @staticmethod
     def check_relationship(
@@ -437,4 +437,4 @@ class SpatialReasoner:
         if check_fn is None:
             raise ValueError(f"Unknown relationship: {relationship}")
 
-        return check_fn(b)
+        return bool(check_fn(b))

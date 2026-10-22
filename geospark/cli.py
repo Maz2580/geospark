@@ -74,7 +74,8 @@ def geocode(address: str) -> None:
         console.print("[yellow]No results found[/yellow]")
 
 
-@main.command()
+# Negative coordinates (southern/western hemispheres) must parse as values, not options
+@main.command(context_settings={"ignore_unknown_options": True})
 @click.argument("lat", type=float)
 @click.argument("lon", type=float)
 def elevation(lat: float, lon: float) -> None:
@@ -96,7 +97,8 @@ def elevation(lat: float, lon: float) -> None:
         console.print(f"[red]Error:[/red] {result.errors[0]}")
 
 
-@main.command()
+# Negative coordinates (southern/western hemispheres) must parse as values, not options
+@main.command(context_settings={"ignore_unknown_options": True})
 @click.argument("coords", nargs=4, type=float)
 def distance(coords: tuple[float, ...]) -> None:
     """Calculate geodesic distance: geospark distance LAT_A LON_A LAT_B LON_B."""
@@ -154,11 +156,11 @@ def ask(question: str, provider: str, model: str | None) -> None:
         return
 
     console.print(f"\n[bold]{result.spatial_context.summary}[/bold]\n")
-    if result.metadata:
-        source = result.metadata.get("source", "unknown")
-        used = result.metadata.get("tools_used", [])
-        if used:
-            console.print(f"[dim]Tools used: {', '.join(used)} | Source: {source}[/dim]")
+    # sources = ["<provider>:<model>", "<tool>", ...] (see Engine.ask)
+    if result.sources:
+        source, used = result.sources[0], result.sources[1:]
+        tools_note = f"Tools used: {', '.join(used)} | " if used else ""
+        console.print(f"[dim]{tools_note}Model: {source}[/dim]")
 
 
 @main.command()

@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import json
 import time
-from typing import Any
+from typing import Any, ClassVar
 
 from pydantic import BaseModel, Field
 
@@ -194,32 +194,118 @@ Intent guide:
                 parsed.get("params", {}),
             )
         except Exception:
-            # Fallback: simple keyword extraction
-            locations = []
-            # Look for capitalized words as potential locations
-            for word in goal.split():
-                if word[0].isupper() and word.lower() not in {
-                    "find", "what", "where", "how", "is", "are", "the",
-                    "within", "near", "from", "to", "all", "any",
-                }:
-                    locations.append(word)
+            return self._fallback_parse(goal)
 
-            intent = "find_nearby"
-            gl = goal.lower()
-            if "distance" in gl or "far" in gl:
-                intent = "distance"
-            elif "contain" in gl or "inside" in gl:
-                intent = "check_relationship"
-            elif "weather" in gl or "temperature" in gl or "forecast" in gl or "rain" in gl:
-                intent = "weather"
-            elif "air quality" in gl or "pollution" in gl or "pm2.5" in gl or "smog" in gl:
-                intent = "air_quality"
-            elif "fire" in gl or "wildfire" in gl or "burning" in gl:
-                intent = "fire_detection"
-            elif "environment" in gl or "livability" in gl or "conditions" in gl:
-                intent = "environmental"
+    # Words that start a sentence or link phrases but are never place names on their own
+    _NOT_PLACES: ClassVar[frozenset[str]] = frozenset({
+        "find", "what", "where", "how", "is", "are", "the", "within", "near", "from", "to",
+        "all", "any", "show", "list", "which", "who", "get", "give", "me", "and", "or",
+        "between", "around", "in", "of", "a", "an", "nearest", "closest", "best",
+        "check", "does", "do", "can", "tell", "compute", "calculate",
+        # topic words that often open a question ("Weather in Paris")
+        "weather", "forecast", "temperature", "air", "pollution", "fires", "wildfires",
+        "distance", "nearby", "local", "current",
+    })
+    # Intents that concern one place: "Federation Square, Melbourne" is one address there
+    _SINGLE_PLACE_INTENTS: ClassVar[frozenset[str]] = frozenset({
+        "find_nearby", "weather", "air_quality", "fire_detection", "analyze_area", "environmental",
+    })
+    # Lower-case words allowed inside a multi-word place name ("Bay of Islands", "Rio de Janeiro")
+    _PLACE_CONNECTORS: ClassVar[frozenset[str]] = frozenset({"of", "de", "du", "la", "le", "del", "da", "di", "van", "von", "upon"})
+    _AMENITIES: ClassVar[dict[str, str]] = {
+        "hospital": "hospital", "hospitals": "hospital", "clinic": "clinic", "clinics": "clinic",
+        "school": "school", "schools": "school", "university": "university", "universities": "university",
+        "pharmacy": "pharmacy", "pharmacies": "pharmacy", "park": "park", "parks": "park",
+        "cafe": "cafe", "cafes": "cafe", "coffee": "cafe", "restaurant": "restaurant",
+        "restaurants": "restaurant", "library": "library", "libraries": "library",
+        "supermarket": "supermarket", "supermarkets": "supermarket", "bank": "bank", "banks": "bank",
+        "police": "police", "fire station": "fire_station", "fire stations": "fire_station",
+        "bus stop": "bus_stop", "bus stops": "bus_stop",
+        "station": "station", "stations": "station", "museum": "museum", "museums": "museum",
+        "hotel": "hotel", "hotels": "hotel", "playground": "playground", "playgrounds": "playground",
+    }
 
-            return locations, intent, {"radius_m": 3000}
+    @classmethod
+    def _fallback_parse(cls, goal: str) -> tuple[list[str], str, dict[str, Any]]:
+        """Rule-based goal parsing, used when the LLM is unavailable.
+
+        Groups consecutive capitalised words into one place ("Eiffel Tower", "Rio de
+        Janeiro"), and reads a radius ("2km", "500 m") and an amenity type from the text.
+        """
+        import re
+
+        tokens = re.findall(r"[\w'.-]+|[,;:?!()]", goal)
+        locations: list[str] = []
+        joined_by_comma: list[bool] = []  # was location i separated from i-1 only by a comma?
+        current: list[str] = []
+        since_last = ""  # punctuation/words seen since the previous location ended
+
+        def flush() -> None:
+            nonlocal since_last
+            while current and current[-1].lower() in cls._PLACE_CONNECTORS:
+                current.pop()  # a trailing connector isn't part of the name
+            if current:
+                joined_by_comma.append(bool(locations) and since_last == ",")
+                locations.append(" ".join(current))
+                since_last = ""
+            current.clear()
+
+        for raw in tokens:
+            word = raw.strip(".")
+            if not word or not (word[0].isalpha() or word[0].isdigit()):
+                flush()
+                since_last += raw if raw in ",;:" else " "
+                continue
+            lower = word.lower()
+            starts_place = word[0].isupper() and lower not in cls._NOT_PLACES and lower not in cls._AMENITIES
+            if starts_place or (current and word[0].isupper()) or (current and lower in cls._PLACE_CONNECTORS):
+                current.append(word)
+            else:
+                flush()
+                since_last += " "
+        flush()
+
+        params: dict[str, Any] = {"radius_m": 3000}
+        radius = re.search(
+            r"(\d+(?:\.\d+)?)\s*(km|kilometres?|kilometers?|m|metres?|meters?)\b", goal, re.I
+        )
+        if radius:
+            value, unit = float(radius.group(1)), radius.group(2).lower()
+            params["radius_m"] = int(value * 1000 if unit.startswith("k") else value)
+
+        gl = goal.lower()
+        for phrase in sorted(cls._AMENITIES, key=len, reverse=True):
+            if re.search(rf"\b{re.escape(phrase)}\b", gl):
+                params["amenity_type"] = cls._AMENITIES[phrase]
+                break
+
+        intent = "find_nearby"
+        if "distance" in gl or "how far" in gl or " far " in f" {gl} ":
+            intent = "distance"
+        elif "contain" in gl or "inside" in gl:
+            intent = "check_relationship"
+        elif "weather" in gl or "temperature" in gl or "forecast" in gl or "rain" in gl:
+            intent = "weather"
+        elif "air quality" in gl or "pollution" in gl or "pm2.5" in gl or "smog" in gl:
+            intent = "air_quality"
+        elif ("fire" in gl and "fire station" not in gl) or "wildfire" in gl or "burning" in gl:
+            intent = "fire_detection"
+        elif "environment" in gl or "livability" in gl or "conditions" in gl:
+            intent = "environmental"
+
+        # "Federation Square, Melbourne" and "Paris, France" each name one place. Merge
+        # comma-joined names, unless a two-place question would be left with one place.
+        if len(locations) > 1:
+            merged: list[str] = [locations[0]]
+            for loc, comma in zip(locations[1:], joined_by_comma[1:], strict=True):
+                if comma:
+                    merged[-1] = f"{merged[-1]}, {loc}"
+                else:
+                    merged.append(loc)
+            if intent in cls._SINGLE_PLACE_INTENTS or len(merged) >= 2:
+                locations = merged
+
+        return locations, intent, params
 
     def _geocode(self, location: str) -> dict[str, Any]:
         """Geocode a location name."""

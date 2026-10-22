@@ -110,7 +110,8 @@ class _Sandboxes:
                 return self._contexts[namespace]
             store = ContextStore(storage_dir=base / "contexts")
             pair = (store, ContextRetriever(store))
-            return self._remember(self._contexts, namespace, pair)
+            self._remember(self._contexts, namespace, pair)
+            return pair
 
     def _maybe_sweep(self) -> None:
         now = time.time()

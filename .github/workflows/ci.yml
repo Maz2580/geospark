@@ -20,6 +20,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
 
       - name: Install dependencies
         run: |
@@ -30,7 +32,11 @@ jobs:
         run: |
           ruff check geospark/ tests/
 
-      - name: Type check with mypy
+      - name: Type check (blocking for the core modules)
+        run: |
+          mypy geospark/protocol geospark/engine geospark/middleware geospark/security.py geospark/sandbox.py geospark/utils --ignore-missing-imports
+
+      - name: Type check (whole package, informational)
         run: |
           mypy geospark/ --ignore-missing-imports
         continue-on-error: true
@@ -42,7 +48,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests/ -v --cov=geospark --cov-report=xml
+          pytest tests/ -v --cov=geospark --cov-report=xml --cov-report=term --cov-fail-under=70
 
       - name: Upload coverage
         if: matrix.python-version == '3.11'

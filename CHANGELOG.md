@@ -2,7 +2,14 @@
 
 All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
-## [Unreleased] - 0.8.0: more data, more analysis
+## [0.8.0] - 2026-10-23: more data, more analysis
+
+GeoSpark now reaches beyond geocoding and geometry. It reads Overture Maps with no key, computes
+reachable areas and travel times on its own routing engine, analyses your own files without ever
+guessing their CRS, and records any analysis so it can be replayed and explained later. The website
+is redesigned around the proof behind every answer, and Ask no longer lets a model supply
+coordinates from memory.
+
 
 ### Added
 - **Website redesign ("Proof Engine")**: a dark, instrument-like look across every page.
@@ -71,6 +78,30 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
     gently (≥ 1 s apart, cached), but a production deployment refuses that fallback and says
     how to configure a server.
 
+### Fixed: Ask could answer from coordinates the model made up
+- Reported by a tester: "How far is Adelaide Oval from Glenelg beach?" gave 12.25, 14.44 and 15.76 km
+  on three runs (correct: 10.63 km), each with status `ok`. The 7B model skipped geocoding and passed
+  coordinates from memory to `calculate_distance`, which computed exactly, but between wrong points.
+- `calculate_distance` now takes place names (`place_a`, `place_b`) and geocodes them on the server.
+  The places, their provenance (Nominatim, ODbL) and any ambiguity warning come back with the
+  distance. With the same model the question now gives 10.63 km on every run.
+- Backstop: if a tool is given coordinates that no geocode call in the same answer produced and that
+  are not in the question, the answer's status is `partial`, with a caveat saying why.
+- The homepage now quotes the README's benchmark figures (1–95% for models alone, 76–96% with
+  GeoSpark's tools for models that made valid tool calls) instead of "0%" and "100%".
+- The status page, `/api/v1/tools` and `geospark tools` say what each tool does today: change
+  detection is listed as planned (not available), and NDVI and spectral indices as partial (they
+  find satellite scenes but don't compute index values yet).
+
+### Fixed: website
+- After a deploy, returning visitors could get the new pages with the old cached stylesheet and
+  scripts (Cloudflare caches `/assets` for 4 hours), so pages looked broken. Asset links now carry a
+  content hash (`/assets/styles.css?v=…`) and the pages are sent with `Cache-Control: no-cache`.
+
+### Tests
+- 1,068 tests that run offline; coverage 81%. New tests cover provenance on `/ask`, invented
+  coordinates, place-name distances, the API reference, honest tool statuses and versioned assets.
+
 ## [0.7.0] - 2026-10-22: verifiable answers
 
 Every answer now shows its work: where the data came from and under what licence, how a value was
@@ -120,26 +151,6 @@ than guesses, exports QGIS-ready GeoJSON, and its MCP server is rebuilt on SDK 2
 
 The focus of this release is that what GeoSpark says it does, it does: it installs cleanly,
 it's safe to host publicly, and its answers are geometrically correct.
-
-### Fixed: Ask could answer from coordinates the model made up
-- Reported by a tester: "How far is Adelaide Oval from Glenelg beach?" gave 12.25, 14.44 and 15.76 km
-  on three runs (correct: 10.63 km), each with status `ok`. The 7B model skipped geocoding and passed
-  coordinates from memory to `calculate_distance`, which computed exactly, but between wrong points.
-- `calculate_distance` now takes place names (`place_a`, `place_b`) and geocodes them on the server.
-  The places, their provenance (Nominatim, ODbL) and any ambiguity warning come back with the
-  distance. With the same model the question now gives 10.63 km on every run.
-- Backstop: if a tool is given coordinates that no geocode call in the same answer produced and that
-  are not in the question, the answer's status is `partial`, with a caveat saying why.
-- The homepage now quotes the README's benchmark figures (1–95% for models alone, 76–96% with
-  GeoSpark's tools for models that made valid tool calls) instead of "0%" and "100%".
-- The status page, `/api/v1/tools` and `geospark tools` say what each tool does today: change
-  detection is listed as planned (not available), and NDVI and spectral indices as partial (they
-  find satellite scenes but don't compute index values yet).
-
-### Fixed: website
-- After a deploy, returning visitors could get the new pages with the old cached stylesheet and
-  scripts (Cloudflare caches `/assets` for 4 hours), so pages looked broken. Asset links now carry a
-  content hash (`/assets/styles.css?v=…`) and the pages are sent with `Cache-Control: no-cache`.
 
 ### Fixed: install and packaging
 - `pip install geospark-ai[mcp]` then `geospark-mcp` crashed on start, because mcp 2.x removed the

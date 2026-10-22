@@ -28,7 +28,11 @@ deterministic trace you can check.
 
 ## Try it
 
-**No install: the hosted API** (open, no key needed; [interactive docs](https://geospark.terrascout.app/docs))
+**No install: the website.** [geospark.terrascout.app](https://geospark.terrascout.app) lets you ask
+questions, draw reachable areas and explore Overture Maps data around any place. Every result shows
+its sources, caveats and units, and downloads as GeoJSON.
+
+**No install: the hosted API** (open, no key needed; [API reference](https://geospark.terrascout.app/docs))
 
 ```bash
 curl -X POST https://geospark.terrascout.app/api/v1/distance \
@@ -89,7 +93,7 @@ public server, add `-e GEOSPARK_ENV=production -e GEOSPARK_ADMIN_TOKEN=<secret>`
 | **Places and terrain** | Geocoding and reverse geocoding (OpenStreetMap Nominatim, following its usage policy: ≤ 1 request/s and cached); elevation from Copernicus GLO-30 with Open Elevation fallback and vertical-datum awareness (NAVD88 / EGM96 / WGS84); routing (OSRM); **isochrones** (where can I reach in N minutes on foot, by bike or by car) and travel-time matrices (Valhalla) |
 | **Live data** | Overture Maps places, buildings, roads and admin areas (no key, via DuckDB); weather and forecasts (Open-Meteo, no key); air quality (OpenAQ v3, free key); active fires (NASA FIRMS, free key); satellite scene search (STAC) |
 | **Agents** | `GeoAgent` (multi-step analysis from a plain-English goal), `SpatialReport` (a location dossier: amenities, accessibility, elevation, weather), `SiteSelector` (multi-criteria site ranking), and a coordinator that routes a goal to the right one |
-| **Interfaces** | Python library, CLI (`geospark …`), REST API (49 documented operations), MCP server (`geospark-mcp`), web playground |
+| **Interfaces** | Python library, CLI (`geospark …`), REST API (52 documented operations, reference at `/docs`), MCP server (`geospark-mcp`), web playground |
 | **Memory and workflows** | Spatial memory with facts, episodes and contradiction detection; a tiered context store; Flows (DAG workflows, buildable from a natural-language goal) |
 | **GeoSpark Bench** | 535 reproducible questions across topology, distance, multi-step reasoning, change and multimodal tasks, with computed ground truth |
 
@@ -357,18 +361,20 @@ All state lives under `GEOSPARK_DATA_DIR`. To lift Nominatim's public limits, po
 
 ## Roadmap
 
-- **v0.7: verifiable answers.**
+- **v0.7 (released): verifiable answers.**
   - Every result carries its source, licence, timestamp, CRS and units.
   - A "cannot answer" response instead of a guess.
   - Data-quality flags, such as geocoder confidence and DEM accuracy.
   - GeoJSON FeatureCollections that load straight into QGIS.
   - The MCP server updated to the 2026 spec, with structured GeoJSON output and a hosted HTTP
     endpoint.
-- **v0.8: more data, more analysis.**
+- **v0.8 (released): more data, more analysis.**
   - Overture Maps buildings, places and roads through DuckDB, with no key.
   - Real isochrones and travel-time matrices.
   - Bring your own GeoJSON, GeoPackage or GeoParquet.
   - Reproducible run manifests.
+  - A redesigned website with a Proof panel (sources, caveats, units, GeoJSON download) on every
+    result, and Ask answers that never use coordinates the model typed from memory.
 - **Ongoing:** external benchmarks (GPSBench, GeoBenchX), a QGIS bridge, and more MCP tools.
 
 ## Data attribution

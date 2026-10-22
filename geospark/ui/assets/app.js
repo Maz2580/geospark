@@ -83,15 +83,16 @@ function resultCard(metrics) {
 function jsonToggle(data, id) {
   const jsonStr = JSON.stringify(data, null, 2);
   return `
-    <div class="json-toggle" onclick="document.getElementById('${id}').classList.toggle('hidden')">
-      &#9654; Raw JSON
-    </div>
+    <button type="button" class="json-toggle" aria-expanded="false" aria-controls="${id}"
+      onclick="const p=document.getElementById('${id}');p.classList.toggle('hidden');this.setAttribute('aria-expanded', !p.classList.contains('hidden'))">
+      { } Raw JSON
+    </button>
     <pre class="result-box hidden" id="${id}">${escapeHtml(jsonStr)}</pre>
   `;
 }
 
 function escapeHtml(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 /* --- Map Helpers (Leaflet) --- */
@@ -112,8 +113,101 @@ function createMap(containerId, lat = 0, lon = 0, zoom = 2) {
   return map;
 }
 
-function addMarker(map, lat, lon, label) {
-  return L.marker([lat, lon]).addTo(map).bindPopup(label);
+function addMarker(map, lat, lon, label, variant = '') {
+  const icon = L.divIcon({ className: '', html: `<div class="geo-pin ${variant}"></div>`, iconSize: [14, 14], iconAnchor: [7, 7] });
+  const marker = L.marker([lat, lon], { icon }).addTo(map);
+  if (label) marker.bindPopup(escapeHtml(String(label)));
+  return marker;
+}
+
+/* --- Proof panel: the checkable part of every answer ---
+ * Renders status, sources (with licence and method), caveats, units and the actions
+ * (download GeoJSON, copy a citation). `data` is any GeoSpark response that carries
+ * provenance / warnings / units / quality / status. */
+const ICON_WARN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>';
+
+function statusBadge(status) {
+  const map = { ok: ['badge-ok', 'ok'], partial: ['badge-warn', 'partial'], cannot_answer: ['badge-error', 'cannot answer'] };
+  const [cls, text] = map[status] || ['badge-info', status || 'unchecked'];
+  return `<span class="badge ${cls}">status: ${escapeHtml(text)}</span>`;
+}
+
+function collectCaveats(data) {
+  const out = [...(data.warnings || [])];
+  const q = data.quality || {};
+  if (q.vertical_accuracy_m != null) out.push(`Vertical accuracy about ±${q.vertical_accuracy_m} m (DEM).`);
+  if (q.cloud_cover_pct != null) out.push(`Cloud cover ${q.cloud_cover_pct}% in the source image.`);
+  if (data.fallback_note) out.push(data.fallback_note);
+  return [...new Set(out)];
+}
+
+function renderProof(data, opts = {}) {
+  const prov = data.provenance || data.geospark?.provenance || [];
+  const units = data.units || data.spatial_context?.units || {};
+  const caveats = collectCaveats(data);
+  const id = 'proof-' + Math.random().toString(36).slice(2, 8);
+  const sources = prov.length ? `<ul class="source-list">${prov.map(p => `
+      <li class="source-item">
+        <span class="name">${p.url ? `<a href="${escapeHtml(p.url)}" target="_blank" rel="noopener">${escapeHtml(p.name || p.source)}</a>` : escapeHtml(p.name || p.source)}</span>
+        <span class="meta">${[p.licence, p.dataset_version].filter(Boolean).map(escapeHtml).join(' · ') || escapeHtml(p.source)}</span>
+        ${p.method ? `<span class="method">${escapeHtml(p.method)}</span>` : ''}
+      </li>`).join('')}</ul>` : '<p class="text-sm text-muted">No sources were reported for this answer.</p>';
+  const unitRows = Object.entries(units);
+  const html = `
+    <section class="proof" aria-label="Proof">
+      <div class="proof-head"><h4>Proof</h4>${statusBadge(data.status || (prov.length ? 'ok' : undefined))}</div>
+      <div class="proof-section"><h5>Sources</h5>${sources}</div>
+      ${caveats.length ? `<div class="proof-section"><h5>Caveats</h5><ul class="caveats">${caveats.map(c => `<li class="caveat">${ICON_WARN}<span>${escapeHtml(c)}</span></li>`).join('')}</ul></div>` : ''}
+      ${unitRows.length ? `<div class="proof-section"><h5>Units</h5><dl class="units-grid">${unitRows.map(([k, v]) => `<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(String(v))}</dd>`).join('')}</dl></div>` : ''}
+      <div class="proof-actions">
+        ${opts.geojson ? `<button type="button" class="btn btn-light btn-sm" id="${id}-dl">Download GeoJSON</button>` : ''}
+        ${prov.length ? `<button type="button" class="btn btn-secondary btn-sm" id="${id}-cite">Copy citation</button>` : ''}
+      </div>
+    </section>`;
+  // Wire the buttons once the markup is in the page
+  setTimeout(() => {
+    const dl = document.getElementById(`${id}-dl`);
+    if (dl) dl.addEventListener('click', () => downloadGeoJSON(opts.geojson, opts.filename || 'geospark-result'));
+    const cite = document.getElementById(`${id}-cite`);
+    if (cite) cite.addEventListener('click', async () => {
+      const text = prov.map(p => [p.name || p.source, p.licence, p.attribution, p.url].filter(Boolean).join(' — ')).join('\n');
+      try { await navigator.clipboard.writeText(text); cite.textContent = 'Copied'; } catch (e) { cite.textContent = 'Copy failed'; }
+      setTimeout(() => { cite.textContent = 'Copy citation'; }, 1600);
+    });
+  }, 0);
+  return html;
+}
+
+/* An RFC 7946 FeatureCollection from a GeoSpark result (or the collection itself) */
+function toFeatureCollection(data) {
+  if (data?.type === 'FeatureCollection') return data;
+  const features = (data?.features || []).filter(f => f.geometry).map(f => ({ type: 'Feature', geometry: f.geometry, properties: f.properties || {} }));
+  return { type: 'FeatureCollection', features, geospark: { provenance: data?.provenance || [], status: data?.status } };
+}
+
+function downloadGeoJSON(data, name) {
+  const blob = new Blob([JSON.stringify(toFeatureCollection(data), null, 2)], { type: 'application/geo+json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${name}.geojson`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+
+/* A clear "cannot answer" instead of a red stack trace */
+function refusalHtml(title, detail) {
+  return `<div class="refusal" role="status">${ICON_WARN}<div><strong>${escapeHtml(title)}</strong><p>${escapeHtml(detail)}</p></div></div>`;
+}
+
+function errorDetail(message) {
+  const m = String(message).match(/^\d{3}: ([\s\S]*)$/);
+  if (!m) return String(message);
+  try { const j = JSON.parse(m[1]); return typeof j.detail === 'string' ? j.detail : JSON.stringify(j.detail); } catch (e) { return m[1]; }
+}
+
+function fmt(n, digits = 2) {
+  return n == null || Number.isNaN(Number(n)) ? '—' : Number(n).toLocaleString(undefined, { maximumFractionDigits: digits });
 }
 
 function fitBounds(map, points) {

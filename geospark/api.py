@@ -336,6 +336,13 @@ class AskResponse(BaseModel):
     model: str
     tools_used: list[str] = []
     tokens_used: int = 0
+    # The checkable part: what the tools used, on what terms, in which units, with which caveats
+    status: str = "ok"
+    provenance: list[dict[str, Any]] = []
+    units: dict[str, str] = {}
+    warnings: list[str] = []
+    quality: dict[str, Any] = {}
+    features: list[dict[str, Any]] = Field(default_factory=list, description="Places the tools found (GeoJSON)")
 
 
 # --- Endpoints ---
@@ -508,6 +515,12 @@ def ask(request: AskRequest, http: Request):
         model=model_source,
         tools_used=tools_used,
         tokens_used=0,
+        status="partial" if result.warnings and any(w.startswith("Tool ") for w in result.warnings) else result.status,
+        provenance=[p.model_dump(mode="json", exclude_none=True) for p in result.provenance],
+        units=result.spatial_context.units,
+        warnings=result.warnings,
+        quality=result.quality,
+        features=[{"type": "Feature", **f.model_dump(mode="json", include={"geometry", "properties"})} for f in result.features],
     )
 
 

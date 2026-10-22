@@ -6,6 +6,7 @@ The central orchestrator that connects spatial reasoning, tools, and LLM integra
 
 from __future__ import annotations
 
+import contextlib
 import time
 from typing import Any
 
@@ -13,6 +14,52 @@ from geospark.engine.crs_handler import CRSHandler
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.protocol.schema import SpatialContext, SpatialQuery, SpatialResult
 from geospark.tools.registry import ToolRegistry
+
+
+def answer_to_result(answer: Any, model_source: str) -> SpatialResult:
+    """Turn an LLM answer into a checkable result: the tools' provenance, units, caveats and
+    the places they found travel with the answer, so a reader can see where each number came from."""
+    from geospark.protocol.provenance import Provenance
+    from geospark.protocol.schema import SpatialFeature
+
+    provenance: list[Provenance] = []
+    seen: set[tuple[str, str | None]] = set()
+    units: dict[str, str] = {}
+    warnings: list[str] = []
+    quality: dict[str, Any] = {}
+    features: list[SpatialFeature] = []
+    for call in answer.tool_calls:
+        reply = call.get("result") if isinstance(call.get("result"), dict) else {}
+        if reply.get("status") == "error" or (reply.get("errors") and not reply.get("result")):
+            err = reply.get("error") or {}
+            message = err.get("message") if isinstance(err, dict) else None
+            warnings.append(f"Tool {call.get('tool')} failed: {message or (reply.get('errors') or ['unknown error'])[0]}")
+            continue
+        meta = reply.get("metadata") or {}
+        for item in meta.get("provenance") or []:
+            try:
+                p = Provenance(**item)
+            except Exception:
+                continue
+            if (p.source, p.method) not in seen:
+                seen.add((p.source, p.method))
+                provenance.append(p)
+        units.update(meta.get("units") or {})
+        warnings.extend(w for w in meta.get("warnings") or [] if w not in warnings)
+        quality.update(meta.get("quality") or {})
+        body = reply.get("result")
+        found = (body.get("features") or []) if isinstance(body, dict) else []
+        if call.get("tool") in ("geocode", "reverse_geocode") and found:
+            with contextlib.suppress(Exception):
+                features.append(SpatialFeature(**found[0]))  # the best match is the one the model used
+    return SpatialResult(
+        features=features,
+        spatial_context=SpatialContext(summary=answer.answer, total_features=len(answer.tool_calls), units=units),
+        sources=[model_source, *[tc["tool"] for tc in answer.tool_calls]],
+        provenance=provenance,
+        warnings=warnings,
+        quality=quality,
+    )
 
 
 class Engine:
@@ -147,14 +194,7 @@ class Engine:
                 errors=[f"Ollama call failed: {e}"],
             )
 
-        tools_used = [tc["tool"] for tc in answer.tool_calls]
-        return SpatialResult(
-            spatial_context=SpatialContext(
-                summary=answer.answer,
-                total_features=len(answer.tool_calls),
-            ),
-            sources=[f"ollama:{answer.model}", *tools_used],
-        )
+        return answer_to_result(answer, f"ollama:{answer.model}")
 
     def _ask_openrouter(
         self,
@@ -185,14 +225,7 @@ class Engine:
                 errors=[f"OpenRouter call failed: {e}"],
             )
 
-        tools_used = [tc["tool"] for tc in answer.tool_calls]
-        return SpatialResult(
-            spatial_context=SpatialContext(
-                summary=answer.answer,
-                total_features=len(answer.tool_calls),
-            ),
-            sources=[f"openrouter:{answer.model}", *tools_used],
-        )
+        return answer_to_result(answer, f"openrouter:{answer.model}")
 
     def chain(self, steps: list[dict[str, Any]]) -> QueryChain:
         """Create a chain of spatial operations."""

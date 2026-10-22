@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- GeoSpark mark: a spark inside an open globe ring, with a located point in the gap -->
+  <path d="M63.68 12.41 A40 40 0 1 0 87.59 36.32" stroke="#7CF2C8" stroke-width="11" stroke-linecap="round"/>
+  <circle cx="78.28" cy="21.72" r="6.5" fill="#7CF2C8"/>
+  <path d="M50 21 C53.5 42 58 46.5 79 50 C58 53.5 53.5 58 50 79 C46.5 58 42 53.5 21 50 C42 46.5 46.5 42 50 21 Z" fill="#7CF2C8"/>
+</svg>

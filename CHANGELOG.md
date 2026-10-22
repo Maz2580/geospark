@@ -5,6 +5,21 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 ## [Unreleased] - 0.8.0: more data, more analysis
 
 ### Added
+- **Website redesign ("Proof Engine")**: a dark, instrument-like look across every page.
+  - A new mark (a spark inside an open globe ring), animated as liquid metal with WebGL. Adapted
+    from Liquid Logo by Alan Ang (MIT); falls back to the plain SVG without WebGL, honours reduced
+    motion, and pauses when off screen.
+  - Home: a globe showing real geodesic distances with their sources, the proof chain, and a live
+    walking isochrone from Federation Square.
+  - Playground: new **Reachable area** (isochrones, walk/bike/drive, up to 4 contours) and **Open
+    map data** (Overture places, buildings, roads, boundaries) tabs, deep links (`#reach`,
+    `#overture`, `?ask=`), and one result map.
+  - A **Proof** panel on every result: status, sources with licence and method, caveats, units,
+    **Download GeoJSON** and **Copy citation**. Failures show a plain-language refusal.
+  - OSM tiles are darkened in CSS (the tile source and attribution are unchanged).
+- **`/api/v1/ask` returns the checkable part of the answer**: `status`, `provenance`, `units`,
+  `warnings`, `quality` and the places the tools found (`features`). A failed tool call makes the
+  status `partial` and is listed as a caveat.
 - **Overture Maps with no API key** (`geospark-ai[overture]`):
   - Themes: places (with categories), buildings (height, floors, geodesic footprint area),
     transportation segments (geodesic length), and the administrative divisions containing a point.

@@ -30,6 +30,7 @@
 
   <div class="container">
     <div class="page-header">
+      <span class="eyebrow">Context</span>
       <h1>Geospatial Context Database</h1>
       <p>Hierarchical storage for missions, datasets, and analysis history. Tiered L0/L1/L2 loading minimizes LLM prompt tokens &mdash; abstracts for planning, full data on demand.</p>
     </div>
@@ -48,7 +49,7 @@
         <p class="text-sm text-muted mb-2">
           Filesystem-like hierarchy. Each context has a URI like <code>geospark://missions/melbourne_flood/analysis/2026-04</code>.
         </p>
-        <div class="grid grid-2" style="gap:0.75rem">
+        <div class="grid grid-2" style="gap:0 var(--space-3)">
           <div class="form-group">
             <label>Category filter</label>
             <select id="browse-category">
@@ -59,7 +60,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label style="display:flex;align-items:center;gap:0.4rem;margin-top:1.5rem">
+            <label style="display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-5)">
               <input type="checkbox" id="browse-archived"> Include archived
             </label>
           </div>
@@ -96,7 +97,7 @@
           <label>Bounding box (min_lon, min_lat, max_lon, max_lat) &mdash; optional</label>
           <input type="text" id="query-bbox" placeholder="144.0, -38.0, 146.0, -37.0">
         </div>
-        <div class="grid grid-2" style="gap:0.75rem">
+        <div class="grid grid-2" style="gap:0 var(--space-3)">
           <div class="form-group">
             <label>Category</label>
             <select id="query-category">
@@ -123,7 +124,7 @@
         <p class="text-sm text-muted mb-2">
           Create a new context with tiered content. The URI path controls where it lives in the hierarchy.
         </p>
-        <div class="grid grid-2" style="gap:0.75rem">
+        <div class="grid grid-2" style="gap:0 var(--space-3)">
           <div class="form-group">
             <label>URI</label>
             <input type="text" id="save-uri" placeholder="geospark://missions/example" value="geospark://missions/example">

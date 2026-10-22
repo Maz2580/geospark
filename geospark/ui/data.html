@@ -32,6 +32,7 @@
 
   <div class="container">
     <div class="page-header">
+      <span class="eyebrow">Live data</span>
       <h1>Live Data Channels</h1>
       <p>Real-time geospatial data from free, authoritative sources.</p>
     </div>
@@ -126,7 +127,7 @@
       const grid = $('#status-grid');
       grid.innerHTML = data.channels.map(ch => {
         const cls = ch.status === 'ok' ? 'badge-ok' : ch.status === 'unconfigured' ? 'badge-warn' : 'badge-error';
-        return `<span class="badge ${cls}" style="margin:0.25rem">${ch.name}: ${ch.status}</span>`;
+        return `<span class="badge ${cls}" style="margin:var(--space-1)">${ch.name}: ${ch.status}</span>`;
       }).join(' ');
     }).catch(() => { $('#status-grid').textContent = 'Could not load status'; });
 

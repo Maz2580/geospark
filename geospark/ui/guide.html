@@ -7,150 +7,42 @@
   <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/styles.css">
   <style>
-    .guide-hero {
-      padding: 2rem 0 1rem;
-      text-align: center;
-    }
-    .guide-hero h1 {
-      font-size: 2.25rem;
-      margin-bottom: 0.5rem;
-    }
-    .guide-hero p {
-      font-size: 1.05rem;
-      color: var(--color-text-secondary);
-      max-width: 640px;
-      margin: 0 auto;
-    }
-    .step-list {
-      counter-reset: step;
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
+    /* Same header as every other page */
+    .guide-hero { margin: 0 0 var(--space-6); max-width: 760px; }
+    .guide-hero h1 { font-size: clamp(32px, 4.5vw, 48px); margin-bottom: var(--space-3); }
+    .guide-hero p { font-size: 17px; color: var(--text-2); }
+    .step-list { counter-reset: step; list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-3); }
     .step-list li {
-      counter-increment: step;
-      position: relative;
-      padding: 1rem 1rem 1rem 3.5rem;
-      margin-bottom: 0.75rem;
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 8px;
+      counter-increment: step; position: relative;
+      padding: var(--space-4) var(--space-4) var(--space-4) calc(var(--space-4) * 2 + 32px);
+      background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--radius);
     }
     .step-list li::before {
-      content: counter(step);
-      position: absolute;
-      left: 1rem;
-      top: 1rem;
-      width: 2rem;
-      height: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--color-primary);
-      color: white;
-      font-weight: 700;
-      border-radius: 50%;
-      font-size: 0.9rem;
+      content: counter(step); position: absolute; left: var(--space-4); top: var(--space-4);
+      width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%;
+      background: var(--accent-soft); color: var(--accent); font: 600 14px var(--font-mono);
     }
-    .step-list li strong {
-      display: block;
-      margin-bottom: 0.3rem;
-      color: var(--color-text);
-    }
-    .step-list li .step-body {
-      color: var(--color-text-secondary);
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-    .step-list li code {
-      background: rgba(0,0,0,0.3);
-      padding: 0.1rem 0.4rem;
-      border-radius: 4px;
-      font-size: 0.85rem;
-    }
-    .concept-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1rem;
-    }
-    .concept-card {
-      padding: 1.25rem;
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 10px;
-    }
-    .concept-card h4 {
-      margin: 0 0 0.5rem 0;
-      color: var(--color-text);
-      font-size: 1.05rem;
-    }
-    .concept-card p {
-      color: var(--color-text-secondary);
-      font-size: 0.9rem;
-      line-height: 1.5;
-      margin: 0 0 0.75rem 0;
-    }
+    .step-list li strong { display: block; margin-bottom: var(--space-1); color: var(--text); }
+    .step-list li .step-body { color: var(--text-2); font-size: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: var(--space-4); }
+    .concept-grid.two-col { grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); }
+    .concept-card { display: flex; flex-direction: column; gap: var(--space-2); }
+    .concept-card h4 { margin: 0; }
+    .concept-card p { margin: 0; }
     .concept-card .concept-tag {
-      display: inline-block;
-      padding: 0.15rem 0.6rem;
-      background: rgba(45,156,111,0.15);
-      color: var(--color-primary);
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-right: 0.4rem;
-    }
-    .warn-box {
-      padding: 1rem 1.25rem;
-      background: rgba(245,158,11,0.08);
-      border: 1px solid rgba(245,158,11,0.25);
-      border-radius: 8px;
-      color: #fcd34d;
-      font-size: 0.9rem;
-      margin: 1rem 0;
-    }
-    .info-box {
-      padding: 1rem 1.25rem;
-      background: rgba(45,156,111,0.06);
-      border: 1px solid rgba(45,156,111,0.2);
-      border-radius: 8px;
-      color: #6ee7b7;
-      font-size: 0.9rem;
-      margin: 1rem 0;
+      align-self: flex-start; padding: 2px var(--space-2); border-radius: 999px;
+      background: var(--accent-soft); color: var(--accent); font: 500 11px var(--font-mono);
     }
     .kbd {
-      display: inline-block;
-      padding: 0.1rem 0.45rem;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 4px;
-      font-size: 0.8rem;
-      font-family: var(--font-mono, monospace);
+      display: inline-block; padding: 1px var(--space-2); border-radius: 4px;
+      background: rgba(255,255,255,0.08); border: 1px solid var(--line-strong); font: 400 12px var(--font-mono);
     }
     .try-btn {
-      display: inline-block;
-      margin-top: 0.5rem;
-      padding: 0.4rem 0.9rem;
-      background: var(--color-primary);
-      color: white;
-      border-radius: 6px;
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 500;
-      transition: background 0.2s;
+      align-self: flex-start; margin-top: auto; display: inline-flex; align-items: center; min-height: 36px;
+      padding: 0 var(--space-4); border-radius: var(--radius-sm); background: var(--accent); color: var(--accent-ink);
+      font-size: 13px; font-weight: 600; transition: background var(--transition);
     }
-    .try-btn:hover { background: var(--color-primary-hover); }
-    .code-block {
-      padding: 1rem;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 8px;
-      font-family: var(--font-mono, 'Courier New', monospace);
-      font-size: 0.85rem;
-      color: #e2e8f0;
-      overflow-x: auto;
-      line-height: 1.6;
-    }
+    .try-btn:hover { background: var(--accent-hover); color: var(--accent-ink); }
   </style>
 </head>
 <body class="dark">
@@ -176,6 +68,7 @@
 
   <div class="container">
     <div class="guide-hero">
+      <span class="eyebrow">Guide</span>
       <h1>GeoSpark Guide</h1>
       <p>New here? This page walks you through everything you can do with GeoSpark in about 10 minutes.</p>
     </div>
@@ -203,7 +96,7 @@
       <div class="card mt-2">
         <div class="card-header"><div class="card-icon geo">&#10003;</div><h3>Answers you can check</h3></div>
         <p class="text-sm text-muted">Every result comes with a <strong>Proof</strong> panel: the status (<code>ok</code>, <code>partial</code> or <code>cannot_answer</code>), each source with its licence and method, caveats such as an ambiguous place name or a DEM's vertical accuracy, and the units of every number. You can download any result as GeoJSON (RFC 7946) and open it in QGIS.</p>
-        <div class="concept-grid mt-2">
+        <div class="concept-grid two-col mt-2">
           <div class="concept-card">
             <span class="concept-tag">New</span>
             <h4>Reachable areas</h4>
@@ -220,13 +113,13 @@
             <span class="concept-tag">New &middot; CLI</span>
             <h4>Your own data</h4>
             <p>GeoJSON, GeoPackage, Shapefile, GeoParquet or CSV. The CRS is read from the file and never guessed; a Shapefile without a <code>.prj</code> is refused until you name its CRS.</p>
-            <p><code>geospark layer count-within stops.csv suburbs.gpkg</code></p>
+            <p class="cmd"><code>geospark layer count-within stops.csv suburbs.gpkg</code></p>
           </div>
           <div class="concept-card">
             <span class="concept-tag">New &middot; CLI</span>
             <h4>Reproducible runs</h4>
             <p>Record what an analysis did, replay it later, and get a verdict: <em>reproduced</em>, <em>data changed</em> (and which source) or <em>code changed</em>.</p>
-            <p><code>geospark record isochrone --minutes 10 -- -37.818 144.969</code><br><code>geospark replay run.json</code></p>
+            <p class="cmd"><code>geospark record isochrone --minutes 10 -- -37.818 144.969</code><br><code>geospark replay run.json</code></p>
           </div>
         </div>
       </div>

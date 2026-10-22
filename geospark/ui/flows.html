@@ -30,6 +30,7 @@
 
   <div class="container">
     <div class="page-header">
+      <span class="eyebrow">Flows</span>
       <h1>Flows</h1>
       <p>Reusable spatial workflow templates, natural-language flow builder, and execution history. DAG-based automation with ground-truth spatial reasoning at every step.</p>
     </div>
@@ -66,7 +67,7 @@
           <label>Goal</label>
           <input type="text" id="build-goal" placeholder="Describe the spatial workflow you want to automate..." value="Geocode Valencia, Spain then check its elevation">
         </div>
-        <div class="grid grid-3" style="gap:0.75rem">
+        <div class="grid grid-3" style="gap:0 var(--space-3)">
           <div class="form-group">
             <label>Model</label>
             <input type="text" id="build-model" placeholder="qwen2.5:7b" value="qwen2.5:7b">
@@ -82,7 +83,7 @@
         </div>
         <button class="btn btn-primary" onclick="buildFlow()">Build Flow</button>
         <div id="build-result" class="result-box hidden"></div>
-        <div id="built-flow-actions" class="hidden mt-2" style="display:flex;gap:0.5rem">
+        <div id="built-flow-actions" class="hidden mt-2" style="display:flex;gap:var(--space-2)">
           <button class="btn btn-primary" onclick="runBuiltFlow()">Run Built Flow</button>
           <button class="btn btn-secondary" onclick="saveBuiltFlow()">Save Flow</button>
         </div>
@@ -181,8 +182,8 @@
             <table class="table-wrap"><thead><tr><th>#</th><th>ID</th><th>Name</th><th>Tool</th><th>Operation</th><th>Depends On</th></tr></thead><tbody>${steps}</tbody></table>
             <h4 class="mt-2">Routes</h4>${routeHtml}
             <h4 class="mt-2">Parameters</h4>
-            <div class="grid grid-2" style="gap:0.75rem">${paramInputs}</div>
-            <div class="mt-2" style="display:flex;gap:0.5rem">
+            <div class="grid grid-2" style="gap:0 var(--space-3)">${paramInputs}</div>
+            <div class="mt-2" style="display:flex;gap:var(--space-2)">
               <button class="btn btn-primary" onclick="runTemplate('${name}')">Run Template</button>
               <button class="btn btn-secondary" onclick="$('#template-detail').classList.add('hidden')">Close</button>
             </div>
@@ -323,11 +324,11 @@
           <div class="dark-card">
             <h3>${escapeHtml(f.name || 'Untitled')}</h3>
             <p class="text-sm text-muted">${escapeHtml(f.description || '')}</p>
-            <div class="mt-1" style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <div class="mt-1" style="display:flex;gap:var(--space-2);flex-wrap:wrap">
               <span class="badge info">${(f.steps || []).length} steps</span>
               <span class="badge info">${f.trigger?.trigger_type || 'manual'}</span>
             </div>
-            <div class="mt-2" style="display:flex;gap:0.5rem">
+            <div class="mt-2" style="display:flex;gap:var(--space-2)">
               <button class="btn btn-sm btn-primary" onclick="runSavedFlow('${f.id}')">Run</button>
               <button class="btn btn-sm btn-secondary" onclick="viewSavedFlow('${f.id}')">View</button>
               <button class="btn btn-sm btn-secondary" onclick="deleteSavedFlow('${f.id}')">Delete</button>
@@ -365,7 +366,7 @@
             <p class="text-sm text-muted">${escapeHtml(data.description || '')}</p>
             <p class="text-sm text-muted">ID: <code>${escapeHtml(data.id)}</code> &middot; Created: ${escapeHtml(data.created_at || '?')}</p>
             <table class="table-wrap"><thead><tr><th>#</th><th>ID</th><th>Name</th><th>Tool</th><th>Depends On</th></tr></thead><tbody>${steps}</tbody></table>
-            <div class="mt-2" style="display:flex;gap:0.5rem">
+            <div class="mt-2" style="display:flex;gap:var(--space-2)">
               <button class="btn btn-primary" onclick="runSavedFlow('${data.id}')">Run Flow</button>
               <button class="btn btn-secondary" onclick="$('#saved-flow-detail').classList.add('hidden')">Close</button>
             </div>
@@ -415,7 +416,7 @@
               <span class="badge ${statusColor}">${escapeHtml(r.status)}</span>
             </div>
             <p class="text-sm text-muted">Run ID: <code>${escapeHtml(r.id?.slice(0,12) || '?')}...</code></p>
-            <div class="mt-1" style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <div class="mt-1" style="display:flex;gap:var(--space-2);flex-wrap:wrap">
               <span class="badge info">${Object.keys(r.step_results || {}).length} steps</span>
               <span class="badge info">${(r.errors || []).length} errors</span>
             </div>

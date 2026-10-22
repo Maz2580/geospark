@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API reference — GeoSpark</title>
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css">
+  <link rel="stylesheet" href="/assets/api-docs.css">
+</head>
+<body class="dark">
+  <header class="nav">
+    <a class="nav-brand" href="/" aria-label="GeoSpark home">
+      <span class="brand-mark" data-liquid-logo><img src="/assets/logo.svg" alt="" width="28" height="28"></span>
+      <span>GeoSpark</span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="/playground">Playground</a>
+      <a href="/agents">Agents</a>
+      <a href="/flows">Flows</a>
+      <a href="/data">Data</a>
+      <a href="/memory">Memory</a>
+      <a href="/context">Context</a>
+      <a href="/guide">Guide</a>
+      <a href="/status">Status</a>
+      <a href="/docs">API</a>
+    </nav>
+    <span class="nav-version"></span>
+    <a class="nav-cta" href="https://github.com/Maz2580/geospark" target="_blank" rel="noopener">GitHub</a>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <span class="eyebrow">API reference</span>
+      <h1>One API for every spatial answer.</h1>
+      <p>REST endpoints for everything on this site. Responses are JSON. Spatial results carry their provenance (source, licence and method), units and caveats. Add <code>?format=geojson</code> to get RFC 7946 GeoJSON you can open in QGIS.</p>
+    </div>
+
+    <div class="grid grid-3">
+      <section class="card api-fact">
+        <h2 class="fact-label">Base URL</h2>
+        <code class="fact-value" id="base-url">https://geospark.terrascout.app</code>
+        <p class="text-sm text-muted">Every path below is relative to this address.</p>
+      </section>
+      <section class="card api-fact">
+        <h2 class="fact-label">Authentication</h2>
+        <code class="fact-value">Authorization: Bearer &lt;key&gt;</code>
+        <p class="text-sm text-muted">Only needed when the server sets an API key. The public demo is open, with rate limits per visitor.</p>
+      </section>
+      <section class="card api-fact">
+        <h2 class="fact-label">Machine-readable</h2>
+        <code class="fact-value"><a href="/openapi.json">/openapi.json</a></code>
+        <p class="text-sm text-muted">OpenAPI 3.1 for code generators and agent frameworks. Prefer a reading view? Try <a href="/redoc">ReDoc</a>.</p>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="quick-head">
+        <h2 class="quick-title">Try it from a terminal</h2>
+        <button type="button" class="btn btn-secondary btn-sm" id="copy-curl">Copy</button>
+      </div>
+<pre class="code-block" id="curl"><span class="cm"># Geodesic distance between two points, with its provenance</span>
+curl -s -X POST <span class="str" data-base>https://geospark.terrascout.app</span>/api/v1/distance \
+  -H <span class="str">'Content-Type: application/json'</span> \
+  -d <span class="str">'{"lat_a": -37.8180, "lon_a": 144.9691, "lat_b": -37.8150, "lon_b": 144.9666}'</span></pre>
+      <p class="text-sm text-muted mt-2">Using an AI agent? GeoSpark is also an MCP server: <code>pip install geospark-ai</code>, then add <code>geospark-mcp</code> to your client. See the <a href="/guide">guide</a>.</p>
+    </section>
+
+    <nav class="topic-index" aria-label="Endpoint groups" id="topics"></nav>
+
+    <section aria-label="Endpoints">
+      <div id="swagger"><div class="loading-overlay"><span class="spinner"></span>Loading the API reference…</div></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="inner">
+      <span>GeoSpark · Apache-2.0</span>
+      <a href="https://github.com/Maz2580/geospark" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://pypi.org/project/geospark-ai/" target="_blank" rel="noopener">PyPI</a>
+      <a href="/status">Status</a>
+      <span class="push">Created by <a href="https://github.com/Maz2580" target="_blank" rel="noopener">Mazdak Ghasemi Tootkaboni</a> · University of Melbourne</span>
+    </div>
+  </footer>
+
+  <script src="/assets/app.js"></script>
+  <script src="/assets/liquid-logo.js" defer></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+  <script>
+    // Show this server's own address in the examples
+    document.getElementById('base-url').textContent = location.origin;
+    document.querySelectorAll('[data-base]').forEach(el => { el.textContent = location.origin; });
+    document.getElementById('copy-curl').addEventListener('click', async (e) => {
+      try { await navigator.clipboard.writeText(document.getElementById('curl').innerText.split('\n').slice(1).join('\n')); e.target.textContent = 'Copied'; }
+      catch (err) { e.target.textContent = 'Copy failed'; }
+      setTimeout(() => { e.target.textContent = 'Copy'; }, 1600);
+    });
+
+    // Endpoint groups as chips; each opens its group in the reference below
+    fetch('/openapi.json').then(r => r.json()).then(spec => {
+      const counts = {};
+      Object.values(spec.paths).forEach(item => Object.values(item).forEach(op => (op.tags || ['Other']).forEach(t => { counts[t] = (counts[t] || 0) + 1; })));
+      document.getElementById('topics').innerHTML = (spec.tags || []).filter(t => counts[t.name]).map(t =>
+        `<a class="topic" href="#/${encodeURIComponent(t.name)}" title="${escapeHtml(t.description || '')}">${escapeHtml(t.name)}<span>${counts[t.name]}</span></a>`).join('');
+    }).catch(() => {});
+
+    if (window.SwaggerUIBundle) {
+      window.ui = SwaggerUIBundle({
+        url: '/openapi.json',
+        dom_id: '#swagger',
+        deepLinking: true,
+        docExpansion: 'none',
+        defaultModelsExpandDepth: 0,
+        displayRequestDuration: true,
+        filter: true,
+        tryItOutEnabled: false,
+        persistAuthorization: false,
+        syntaxHighlight: { activated: true, theme: 'nord' },
+      });
+    } else {
+      document.getElementById('swagger').innerHTML = refusalHtml('The interactive reference could not load',
+        'Swagger UI is loaded from unpkg.com. The raw specification is still at /openapi.json.');
+    }
+  </script>
+</body>
+</html>

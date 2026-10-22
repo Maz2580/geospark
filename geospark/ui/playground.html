@@ -9,15 +9,15 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    .workbench { display: grid; gap: 20px; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; }
+    .workbench { display: grid; gap: var(--space-5); grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; }
     @media (max-width: 960px) { .workbench { grid-template-columns: minmax(0, 1fr); } }
-    .side { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
-    .stage-map { position: sticky; top: 84px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+    .side { display: flex; flex-direction: column; gap: var(--space-5); min-width: 0; }
+    .stage-map { position: sticky; top: 84px; display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
     @media (max-width: 960px) { .stage-map { position: static; } }
     .stage-map .map-container { height: 520px; }
     @media (max-width: 720px) { .stage-map .map-container { height: 360px; } }
-    .row { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .row-3 { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .row { display: grid; gap: 0 var(--space-3); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .row-3 { display: grid; gap: 0 var(--space-3); grid-template-columns: repeat(3, minmax(0, 1fr)); }
     @media (max-width: 520px) { .row, .row-3 { grid-template-columns: minmax(0, 1fr); } }
     .toggle-group { display: flex; flex-wrap: wrap; gap: 8px; }
     .toggle-group label {
@@ -28,14 +28,14 @@
     .toggle-group label:has(input:checked) { background: var(--accent-soft); border-color: var(--accent-line); color: var(--text); }
     .toggle-group label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-    .trace { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 16px; font: 400 13px var(--font-mono); }
+    .trace { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-4); font: 400 13px var(--font-mono); }
     .trace li { display: flex; align-items: center; gap: 10px; }
     .trace li::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px rgba(124,242,200,.6); }
-    .answer-text { margin-top: 16px; padding: 16px; border-radius: var(--radius); background: var(--bg-raised); border: 1px solid var(--line); font-size: 16px; line-height: 1.6; }
+    .answer-text { margin-top: var(--space-4); padding: var(--space-4); border-radius: var(--radius); background: var(--bg-raised); border: 1px solid var(--line); font-size: 16px; line-height: 1.6; }
     .answer-meta { margin-top: 8px; font: 400 12px var(--font-mono); color: var(--text-3); }
 
-    .contours { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
-    .contours li { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+    .contours { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-4); }
+    .contours li { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
     .contours .swatch { width: 14px; height: 14px; border-radius: 4px; flex: none; }
     .contours .m { font: 500 14px var(--font-mono); }
     .contours .a { margin-left: auto; font: 600 18px var(--font-display); }

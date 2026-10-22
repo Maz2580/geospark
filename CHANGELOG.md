@@ -17,6 +17,11 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
   - A **Proof** panel on every result: status, sources with licence and method, caveats, units,
     **Download GeoJSON** and **Copy citation**. Failures show a plain-language refusal.
   - OSM tiles are darkened in CSS (the tile source and attribution are unchanged).
+  - One spacing scale and justified, hyphenated body text on every page; every page opens with the
+    same label, title and introduction.
+  - A themed **API reference** at `/docs`: base URL, authentication and a copyable request, then the
+    interactive reference with endpoints grouped by topic (Spatial, Ask, Routing, Open map data, …)
+    and real Melbourne examples instead of placeholder values. `/redoc` and `/openapi.json` are unchanged.
 - **`/api/v1/ask` returns the checkable part of the answer**: `status`, `provenance`, `units`,
   `warnings`, `quality` and the places the tools found (`features`). A failed tool call makes the
   status `partial` and is listed as a caveat.

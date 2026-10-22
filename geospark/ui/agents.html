@@ -30,6 +30,7 @@
 
   <div class="container">
     <div class="page-header">
+      <span class="eyebrow">Agents</span>
       <h1>Autonomous Agents</h1>
       <p>Give a goal, get a complete spatial analysis. The coordinator routes it to the right specialist automatically &mdash; or pick one yourself below.</p>
     </div>
@@ -57,10 +58,10 @@
           <label>Goal</label>
           <input type="text" id="coord-goal" placeholder="What do you want to know about a place?" value="Find the best location for a cafe in Melbourne CBD near schools">
         </div>
-        <div style="display:flex;gap:0.5rem;align-items:center">
+        <div style="display:flex;gap:var(--space-2);align-items:center">
           <button class="btn btn-primary" onclick="runCoordinator(false)">Run</button>
           <button class="btn btn-secondary" onclick="classifyOnly()">Classify only</button>
-          <label class="text-sm text-muted" style="margin-left:auto;display:flex;align-items:center;gap:0.4rem">
+          <label class="text-sm text-muted" style="margin-left:auto;display:flex;align-items:center;gap:var(--space-2)">
             <input type="checkbox" id="coord-stream"> Streaming progress
           </label>
         </div>
@@ -103,7 +104,7 @@
           Comprehensive location dossier: coordinates, elevation, weather, air quality,
           nearby amenities, accessibility scores, and an LLM-generated narrative.
         </p>
-        <div class="grid grid-2" style="gap:0.75rem">
+        <div class="grid grid-2" style="gap:0 var(--space-3)">
           <div class="form-group">
             <label>Location</label>
             <input type="text" id="report-location" placeholder="Federation Square, Melbourne" value="Federation Square, Melbourne">
@@ -126,7 +127,7 @@
           Find the optimal location for a facility based on proximity to amenities.
           Multi-criteria spatial scoring with distance weighting.
         </p>
-        <div class="grid grid-2" style="gap:0.75rem">
+        <div class="grid grid-2" style="gap:0 var(--space-3)">
           <div class="form-group">
             <label>Search Area</label>
             <input type="text" id="site-within" placeholder="Zurich" value="Zurich">
@@ -174,7 +175,7 @@
           el.innerHTML = '<p class="text-sm text-muted">No agents registered.</p>';
           return;
         }
-        let html = '<div class="grid grid-3" style="gap:0.75rem">';
+        let html = '<div class="grid grid-3" style="gap:0 var(--space-3)">';
         data.agents.forEach(a => {
           html += `<div class="result-card">
             <div class="metric"><span class="label">${escapeHtml(a.name)}</span></div>

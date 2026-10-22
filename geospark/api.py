@@ -61,12 +61,60 @@ def get_engine() -> Engine:
     return _engine
 
 
+# --- Hosted MCP over Streamable HTTP (opt-in: GEOSPARK_MCP_HTTP=true) ---
+# Public and read-only: the same tools as `geospark-mcp`, under the API's rate limits,
+# body cap and the shared concurrency cap for heavy tools. Stateless (no session state).
+_mcp_server: Any = None
+
+
+class _McpExactPath:
+    """Serve POST /mcp directly. The mount answers /mcp/, and a 307 redirect on POST breaks
+    some MCP clients, while /mcp is the URL people paste into their client config."""
+
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if scope["type"] == "http" and scope["path"] == "/mcp":
+            scope = {**scope, "path": "/mcp/", "raw_path": b"/mcp/"}
+        await self.app(scope, receive, send)
+
+
+def mcp_http_enabled() -> bool:
+    return os.getenv("GEOSPARK_MCP_HTTP", "").lower() in ("1", "true", "yes")
+
+
+def enable_mcp_http(target: FastAPI) -> None:
+    """Mount the MCP server at /mcp (idempotent)."""
+    global _mcp_server
+    if _mcp_server is not None:
+        return
+    from geospark.mcp_servers.server import create_server
+
+    _mcp_server = create_server()
+    target.mount(
+        "/mcp",
+        _mcp_server.streamable_http_app(
+            streamable_http_path="/",
+            stateless_http=True,
+            json_response=True,
+            # Served publicly behind the tunnel: not a localhost-only server, so no
+            # localhost DNS-rebinding guard (which would reject the public Host header)
+            host="0.0.0.0",
+        ),
+    )
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Validate security config and initialize the engine on startup."""
     security.check_startup_config()
     get_engine()
-    yield
+    if _mcp_server is not None:
+        async with _mcp_server.session_manager.run():
+            yield
+    else:
+        yield
 
 
 app = FastAPI(
@@ -116,6 +164,14 @@ app.add_middleware(
     allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["*"],
 )
+
+# Registered unconditionally (middleware can only be added before startup); a no-op
+# unless /mcp is mounted
+app.add_middleware(_McpExactPath)
+
+if mcp_http_enabled():
+    enable_mcp_http(app)
+    set_route_limit("/mcp", int(os.getenv("GEOSPARK_RATE_LIMIT_MCP_RPM", "60")))
 
 # --- Static UI ---
 _ui_dir = Path(__file__).parent / "ui"

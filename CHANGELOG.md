@@ -23,7 +23,22 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
   `--geojson FILE`. Verified by reading the files with GDAL, the reader QGIS uses.
 - Satellite scenes report a cloud-cover range and warn when every scene is mostly cloud.
 
+- **MCP server rebuilt on MCP SDK 2.x** (protocol 2026-07-28, still negotiating 2025 handshakes):
+  - **12 tools** instead of 6. New: `route`, `get_weather`, `get_air_quality`,
+    `get_active_fires`, `location_report`, `select_site`.
+  - Typed inputs with documented **output schemas** and **structured content** (GeoJSON for
+    places and shapes).
+  - Read-only / open-world tool annotations, and server instructions for the model.
+  - `isError` replies with the reason when an answer can't be given reliably.
+  - The always-ignored required `explanation` argument is gone; clients that still send it keep
+    working.
+  - Heavy tools share the API's concurrency cap.
+- **Optional hosted MCP endpoint**: Streamable HTTP at `/mcp` (stateless, JSON responses, public
+  and read-only, rate-limited), enabled with `GEOSPARK_MCP_HTTP=true`. Off by default.
+
 ### Changed
+- `mcp` extra is now `mcp>=2.3,<3`. `pip install geospark-ai[mcp]` alone runs the MCP server
+  (no web framework needed), and CI checks that.
 - **GeoSpark refuses rather than guesses.** Invalid geometry (for example a self-intersecting
   polygon, whose area used to come back as about 0), out-of-range coordinates, and likely
   [lat, lon] swaps are rejected with an explanation, everywhere: engine, REST and MCP.

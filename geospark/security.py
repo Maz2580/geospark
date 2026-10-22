@@ -26,7 +26,6 @@ import hashlib
 import hmac
 import ipaddress
 import os
-import threading
 from collections.abc import Iterator
 
 from fastapi import HTTPException, Request
@@ -183,38 +182,25 @@ def check_model(request: Request, model: str | None) -> None:
     )
 
 
-# --- LLM concurrency cap -----------------------------------------------------
+# --- LLM concurrency cap (shared with the MCP server; see geospark.utils.concurrency) ---
 
-_llm_slots: threading.BoundedSemaphore | None = None
-_llm_slots_lock = threading.Lock()
+from geospark.utils.concurrency import (  # noqa: E402
+    ServerBusyError,
+    heavy_work_slot,
+    reset_llm_slots,
+)
 
-
-def _slots() -> threading.BoundedSemaphore:
-    global _llm_slots
-    with _llm_slots_lock:
-        if _llm_slots is None:
-            size = max(1, int(os.getenv("GEOSPARK_MAX_LLM_CONCURRENCY", "2")))
-            _llm_slots = threading.BoundedSemaphore(size)
-        return _llm_slots
-
-
-def reset_llm_slots() -> None:
-    """Recreate the semaphore (used by tests after changing the env var)."""
-    global _llm_slots
-    with _llm_slots_lock:
-        _llm_slots = None
+__all__ = ["ServerBusyError", "heavy_work_slot", "reset_llm_slots"]
 
 
 def llm_slot() -> Iterator[None]:
     """FastAPI dependency: hold one LLM slot for the request, or answer 503 at once."""
-    slots = _slots()
-    if not slots.acquire(blocking=False):
+    try:
+        with heavy_work_slot():
+            yield
+    except ServerBusyError:
         raise HTTPException(
             status_code=503,
             detail="The server is busy with other model requests. Please retry shortly.",
             headers={"Retry-After": "10"},
-        )
-    try:
-        yield
-    finally:
-        slots.release()
+        ) from None

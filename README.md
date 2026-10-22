@@ -66,16 +66,16 @@ SpatialReasoner.check_relationship(park, point, "contains")  # True — ground t
   - Recursive parent-child score propagation for context retrieval
   - Spatial bbox + temporal range filters, cold-context archival
 - **Chat-to-Flow Builder** — Turn a natural-language goal into a validated Flow DAG. `ChatFlowSession` drives an LLM through incremental builder tool calls (`add_step`, `add_route`, `set_trigger`, `finish_flow`); invalid calls surface to the LLM as errors and are corrected before the Flow is emitted. Available via `geospark flow build "..."` or `POST /api/v1/flows/build`.
-- **Enterprise Middleware** — Production hardening that shipped in Phase 8A: sliding-window rate limiting (per-IP and per-API-key with `X-RateLimit-*` headers), structured JSON-Lines audit logging with daily rotation, per-endpoint usage tracking with persisted counters, and transparent LRU+TTL caching for data channels.
+- **Safe to run in public** — The hosted API is open without a key, with guard rails: an admin token for operator routes, a model allowlist so callers can't spend paid API credit, private per-visitor sandboxes for the memory/context demos, rate limits on the real client IP (`X-RateLimit-*` headers), a concurrency cap on LLM work, input bounds, hashed IPs in the JSON-Lines audit log, per-endpoint usage counters, and LRU+TTL caching for data channels. Geocoding follows the Nominatim usage policy (≤ 1 request/s, cached). See [deploy/DEPLOY.md](deploy/DEPLOY.md#security).
 - **Spatial Reasoning Engine** — Topology, geodesic distance, CRS transforms, buffering, area. All geometrically correct, not LLM-guessed.
 - **MCP Server** — 6 tools for Claude Desktop and any MCP-compatible AI assistant. `pip install geospark-ai[mcp] && geospark-mcp`
 - **GeoSpark Bench** — 535 questions, five categories. The v2 evaluation runs each of 9 models (Qwen / Llama / Gemma / Mistral / Phi at ≤9B, gpt-oss at 20B, and three frontier APIs) under three protocols: bare baseline, structured Chain-of-Thought, and tool-augmented. Outcome: a 7B model with our tools answers numeric distance questions about as well as Gemini 2.5 Pro does, at zero per-call cost. [Results →](docs/BENCHMARK_REPORT.md)
 - **GeoSpark Protocol (GSP)** — Standardized JSON protocol for spatial queries and results.
 - **Live Data Channels** — Pluggable real-time data sources:
   - Weather (Open-Meteo) — current conditions + forecast for any location
-  - Air Quality (OpenAQ) — PM2.5, NO2, O3 from government stations with WHO health categories
-  - Active Fires (NASA FIRMS) — near-real-time satellite fire detections
-- **Pluggable Tools** — Geocoding, satellite imagery (STAC), terrain/elevation with vertical datum awareness (NAVD88/EGM96/WGS84), routing, spectral indices.
+  - Air Quality (OpenAQ v3, free API key) — PM2.5, NO2, O3 from government stations with WHO health categories and each station's data licence
+  - Active Fires (NASA FIRMS, free map key) — near-real-time satellite fire detections
+- **Pluggable Tools** — Geocoding, satellite imagery search (STAC), terrain/elevation (Copernicus GLO-30, with vertical datum awareness: NAVD88/EGM96/WGS84), routing, spectral indices. *Planned, not built yet:* slope, viewshed, isochrones, raster band math and change detection. These operations return a clear "not implemented yet" error today.
 - **GeoSpark Flows** — DAG-based workflow automation with persistence (Supabase), CLI, and REST API.
 - **Spatial Knowledge Graph** — Entity-relation graph with OSM admin boundaries, BFS traversal, and natural language queries.
 - **Zero-Cost Stack** — Local Ollama (primary, no limits) + OpenRouter free tier (fallback) + Supabase free tier. All inference on your hardware.
@@ -187,7 +187,7 @@ SpatialReasoner.calculate_distance(
     {"type": "Point", "coordinates": [2.2945, 48.8584]},   # Eiffel Tower
     {"type": "Point", "coordinates": [2.3376, 48.8606]},   # Louvre
 )
-# Returns: ~3,300 meters (actual geodesic distance)
+# Returns: ~3,172 meters (geodesic distance on the WGS84 ellipsoid)
 
 # Spatial relationship check (ground-truth, not LLM-guessed)
 SpatialReasoner.check_relationship(polygon_a, polygon_b, "intersects")
@@ -282,7 +282,7 @@ geospark flow build "Monitor NDVI in Valencia; alert if it drops below 0.3" --ru
 
 ### Try the Live API (no install needed)
 
-Explore all **62+ endpoints** interactively at **[geospark.terrascout.app/docs](https://geospark.terrascout.app/docs)**.
+Explore all **49 documented API operations** interactively at **[geospark.terrascout.app/docs](https://geospark.terrascout.app/docs)**.
 
 ```bash
 # Quick distance check
@@ -316,7 +316,7 @@ python -m geospark.bench list
 │                   User / LLM                    │
 │         (Claude, ChatGPT, Ollama, ...)          │
 └──────────┬──────────────────────┬───────────────┘
-           │ MCP                  │ REST API (62+ endpoints)
+           │ MCP                  │ REST API (49 operations)
            v                      v
 ┌──────────────────────────────────────────────────┐
 │         Multi-Agent Coordinator (Phase 7C)       │
@@ -461,8 +461,9 @@ GeoSpark's value proposition depends on which LLM you're using. The table below 
 | **Phase 7B** — Context Database | **Complete** | 589 | Tiered L0/L1/L2 loading, hotness scoring, hierarchical retrieval |
 | **Phase 7C** — Multi-Agent Coordination | **Complete** | 657 | Toolkit, A2A messaging, coordinator with streaming |
 | **Phase 7 UI** — Guide & Pages | **Complete** | 679 | Onboarding guide, Memory/Context UI pages, Coordinator tab |
-| **Phase 8A** — Enterprise Hardening | **Complete** | 754 | Rate limiting, audit logging, usage tracking, channel cache |
-| **Phase 8B** — Chat-to-Flow Builder | **Complete** | **776** | Natural-language goal → validated Flow DAG via LLM tool calling |
+| **Phase 8A** — Operational middleware | **Complete** | 754 | Rate limiting, audit logging, usage tracking, channel cache |
+| **Phase 8B** — Chat-to-Flow Builder | **Complete** | 776 | Natural-language goal → validated Flow DAG via LLM tool calling |
+| **v0.6** — Trustworthy release | **Complete** | **955** | Fixed install, public-API security, correct buffers/bboxes/CRS, data no longer silently dropped, offline test suite (79% coverage), reproducible benchmark, data attribution |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
 

@@ -18,6 +18,7 @@ from geospark.protocol.schema import (
     SpatialResult,
 )
 from geospark.tools.base import BaseTool
+from geospark.tools.geocoding import client as nominatim_client
 from geospark.utils import USER_AGENT
 
 
@@ -51,18 +52,14 @@ class NominatimGeocoder(BaseTool):
             return SpatialResult(errors=["Geocode requires metadata.query"])
 
         try:
-            with httpx.Client(timeout=10) as client:
-                response = client.get(
-                    f"{self.BASE_URL}/search",
-                    params={
-                        "q": search_text,
-                        "format": "geojson",
-                        "limit": query.limit,
-                    },
-                    headers=self.HEADERS,
-                )
-                response.raise_for_status()
-                data = response.json()
+            data = nominatim_client.get_json(
+                "search",
+                {
+                    "q": search_text,
+                    "format": "geojson",
+                    "limit": query.limit,
+                },
+            )
         except (httpx.HTTPError, ValueError) as e:
             # Upstream outage or bad response: report it instead of raising (which the API
             # would turn into an opaque 500)
@@ -101,18 +98,14 @@ class NominatimGeocoder(BaseTool):
         lon, lat = coords[0], coords[1]
 
         try:
-            with httpx.Client(timeout=10) as client:
-                response = client.get(
-                    f"{self.BASE_URL}/reverse",
-                    params={
-                        "lat": lat,
-                        "lon": lon,
-                        "format": "geojson",
-                    },
-                    headers=self.HEADERS,
-                )
-                response.raise_for_status()
-                data = response.json()
+            data = nominatim_client.get_json(
+                "reverse",
+                {
+                    "lat": lat,
+                    "lon": lon,
+                    "format": "geojson",
+                },
+            )
         except (httpx.HTTPError, ValueError) as e:
             return SpatialResult(
                 errors=[f"Geocoding service unavailable ({type(e).__name__}). Try again shortly."],

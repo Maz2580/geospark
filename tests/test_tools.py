@@ -270,7 +270,7 @@ class TestReverseGeocoderURL:
         assert len(result.errors) > 0
         assert "Point geometry" in result.errors[0]
 
-    @patch("geospark.tools.geocoding.reverse.httpx.Client")
+    @patch("geospark.tools.geocoding.client.httpx.Client")
     def test_execute_mocked(self, mock_client_cls):
         """Test full execute with mocked HTTP response."""
         mock_response = MagicMock()

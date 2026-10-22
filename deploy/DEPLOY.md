@@ -162,3 +162,22 @@ capped by `GEOSPARK_MAX_LLM_CONCURRENCY`. All the settings are listed in `.env.e
 # Generate a token, then add GEOSPARK_ADMIN_TOKEN=<token> to .env
 python3 -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
+
+## Optional: self-hosted Valhalla (isochrones and travel times)
+
+`/api/v1/isochrone` and `/api/v1/travel-time` need a Valhalla routing server. Production refuses to
+fall back to the volunteer-run public instance. Run one next to GeoSpark, the same way as Ollama: add a
+`valhalla` service to `docker-compose.override.yml` (image `ghcr.io/valhalla/valhalla-scripted:<version>`):
+- `user: "1000:1000"`, with a bind mount of `/mnt/geospark/valhalla:/custom_files`
+- `tile_urls` set to a Geofabrik extract, e.g. Australia
+- `server_threads=2` (more threads crashed the build stage in testing)
+- `networks: [geospark-net]` and no published port
+- limits of `cpus: 2` and `memory: 6G`
+
+Start only that service (`docker compose ... up -d --no-deps valhalla`), then set
+`GEOSPARK_VALHALLA_URL=http://geospark-valhalla:8002` in `.env` and recreate `geospark` only.
+
+Australia, measured: about 10 min to build on the server (peak 4.2 GB), 3.8 GB on disk, about 150 MB while
+serving. Points outside the extract are refused ("outside its map coverage") rather than answered with
+Valhalla's placeholder circle. To refresh the map data, set `force_rebuild=True` once and restart the
+container.

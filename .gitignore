@@ -73,3 +73,8 @@ docs/superpowers/
 verification_roadmap.md
 docs/UI_IMPLEMENTATION_PLAN.md
 docs/FLOW_PERSISTENCE_PLAN.md
+
+# Server-only: Valhalla routing data, Docker build metadata, config backups (never committed)
+valhalla/
+.buildx/
+*.bak-*

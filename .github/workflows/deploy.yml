@@ -18,7 +18,8 @@ jobs:
       - name: Rebuild and restart containers
         run: |
           cd /mnt/geospark
-          sudo docker compose -f docker-compose.prod.yml -f docker-compose.override.yml up -d --build --remove-orphans
+          # Keep Docker's build metadata under /mnt (otherwise it goes to /root/.docker)
+          sudo env BUILDX_CONFIG=/mnt/geospark/.buildx docker compose -f docker-compose.prod.yml -f docker-compose.override.yml up -d --build --remove-orphans
 
       - name: Wait for healthy
         run: |
@@ -36,4 +37,4 @@ jobs:
 
       - name: Cleanup old Docker images
         run: |
-          sudo docker image prune -f
+          sudo env BUILDX_CONFIG=/mnt/geospark/.buildx docker image prune -f

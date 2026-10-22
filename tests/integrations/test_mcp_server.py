@@ -42,7 +42,7 @@ class TestMCPHandler:
         assert isinstance(tools, list)
         assert len(tools) >= 4
         names = {t["name"] for t in tools}
-        assert "spatial_query" in names
+        assert "spatial_operation" in names
         assert "check_spatial_relationship" in names
         assert "geocode" in names
         assert "get_elevation" in names
@@ -92,7 +92,7 @@ class TestMCPHandler:
         assert result["status"] == "success"
         assert len(result["result"]["features"]) > 0
         assert result["metadata"]["crs"] == "EPSG:4326"
-        assert result["metadata"]["operation"] == "buffer"
+        assert result["metadata"]["operation"] == "buffer"  # legacy name, served by spatial_operation
 
     def test_spatial_query_centroid(self):
         result = self.handler.handle_tool_call(
@@ -130,10 +130,15 @@ class TestMCPHandler:
     def test_geocode_empty_result_has_suggestion(self):
         """When geocoding returns no results, the suggestion field should guide recovery."""
         # We can't easily trigger this with Nominatim, but we test the handler structure
-        result = self.handler.handle_tool_call(
-            "geocode",
-            {"explanation": "test", "query": "Paris, France"},
-        )
+        from unittest.mock import patch
+
+        paris = {"features": [{"geometry": {"type": "Point", "coordinates": [2.35, 48.86]},
+                               "properties": {"display_name": "Paris, France", "importance": 0.9}}]}
+        with patch("geospark.tools.geocoding.client.get_json", return_value=paris):
+            result = self.handler.handle_tool_call(
+                "geocode",
+                {"explanation": "test", "query": "Paris, France"},
+            )
         assert result["status"] == "success"
         assert "result" in result
         assert "metadata" in result

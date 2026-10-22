@@ -45,7 +45,7 @@ class GeocodingServer(BaseMCPServer):
             "description": (
                 "Convert coordinates to an address or place name. "
                 "Use when you have coordinates and need to know what location they represent. "
-                "Returns the nearest address and place details."
+                "Returns the nearest address and place details. Do NOT use for distances or containment checks; use calculate_distance or check_spatial_relationship."
             ),
             "inputSchema": {
                 "type": "object",

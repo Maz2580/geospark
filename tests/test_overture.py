@@ -234,3 +234,29 @@ def test_duckdb_resource_caps(monkeypatch) -> None:
     monkeypatch.setattr(duckdb, "connect", lambda: Recorder())
     ov._connection()
     assert "SET threads = 2" in executed and "SET memory_limit = '256MB'" in executed
+
+
+def test_only_one_duckdb_query_at_a_time(fake_overture, monkeypatch) -> None:
+    """Two 512 MB DuckDB queries at once could exceed a 1 GB container: they queue instead."""
+    import threading
+    import time
+
+    active, peak = [0], [0]
+    real = ov._query
+
+    def tracked(*args, **kwargs):
+        active[0] += 1
+        peak[0] = max(peak[0], active[0])
+        time.sleep(0.2)
+        try:
+            return real(*args, **kwargs)
+        finally:
+            active[0] -= 1
+
+    monkeypatch.setattr(ov, "_query", tracked)
+    threads = [threading.Thread(target=ov.query, args=("places", -37.818 + i * 0.01, 144.969)) for i in range(3)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    assert peak[0] == 1

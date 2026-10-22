@@ -14,6 +14,7 @@ Themes:
 Configuration:
     GEOSPARK_DUCKDB_THREADS     CPU threads per query (default 4)
     GEOSPARK_DUCKDB_MEMORY      memory cap per query (default 512MB)
+    GEOSPARK_OVERTURE_CONCURRENCY  DuckDB queries at once (default 1; memory cap x this must fit)
     GEOSPARK_OVERTURE_RELEASE   pin a release (e.g. "2026-10-21.0"); default: the latest
     GEOSPARK_OVERTURE_STAC      STAC root (default https://stac.overturemaps.org/catalog.json)
 
@@ -54,6 +55,10 @@ _RELEASE_TTL_S = 6 * 3600
 _RESULT_TTL_S = 24 * 3600
 
 _lock = threading.Lock()
+# One DuckDB query at a time per process: each may use up to GEOSPARK_DUCKDB_MEMORY, and two at
+# once could exceed a small container's memory limit. Queries are S3-bound, so queuing costs little.
+_query_gate = threading.BoundedSemaphore(max(1, int(os.getenv("GEOSPARK_OVERTURE_CONCURRENCY", "1"))))
+_QUEUE_WAIT_S = 60
 _release_cache: tuple[float, str] | None = None
 _results: OrderedDict[tuple, tuple[float, SpatialResult]] = OrderedDict()
 
@@ -173,7 +178,12 @@ def query(
         if hit and time.time() - hit[0] < _RESULT_TTL_S:
             _results.move_to_end(key)
             return hit[1].model_copy(deep=True)
-    result = _query(theme, lat, lon, radius_m, category, limit)
+    if not _query_gate.acquire(timeout=_QUEUE_WAIT_S):
+        raise OvertureError("Overture queries are busy; please retry shortly.")
+    try:
+        result = _query(theme, lat, lon, radius_m, category, limit)
+    finally:
+        _query_gate.release()
     with _lock:
         _results[key] = (time.time(), result.model_copy(deep=True))
         while len(_results) > 256:

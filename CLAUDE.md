@@ -6,9 +6,9 @@
 - **Language**: Python 3.11+
 - **Package manager**: pip (venv at `.venv/`)
 - **License**: Apache 2.0
-- **Status**: v0.6.0 -- 955 tests passing (offline; 79% coverage), live at geospark.terrascout.app
+- **Status**: v0.7.0 -- 1003 tests passing (offline; 80% coverage), live at geospark.terrascout.app
 - **PyPI**: `pip install geospark-ai[mcp]` — https://pypi.org/project/geospark-ai/
-- **MCP**: `geospark-mcp` CLI command (6 tools, official MCP SDK)
+- **MCP**: `geospark-mcp` CLI command (12 tools, MCP SDK 2.x; optional hosted /mcp via GEOSPARK_MCP_HTTP)
 
 ## Architecture
 

@@ -2,7 +2,11 @@
 
 All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
-## [Unreleased] - 0.7.0: verifiable answers
+## [0.7.0] - 2026-10-22: verifiable answers
+
+Every answer now shows its work: where the data came from and under what licence, how a value was
+computed, its units, how good it is, and whether it's an answer at all. GeoSpark refuses rather
+than guesses, exports QGIS-ready GeoJSON, and its MCP server is rebuilt on SDK 2.x with 12 tools.
 
 ### Added
 - **Provenance on every answer.** Results carry `provenance` records (source, licence,

@@ -187,6 +187,10 @@ class SpatialReasoningServer(BaseMCPServer):
         for found in lookups:  # where the places came from, and any ambiguity, travel with the distance
             checked.provenance = [*found.provenance, *checked.provenance]
             checked.warnings.extend(w for w in found.warnings if w not in checked.warnings)
+        unique: dict[tuple[str, str | None], Any] = {}
+        for p in checked.provenance:  # one entry per source and method, however many lookups used it
+            unique.setdefault((p.source, p.method), p)
+        checked.provenance = list(unique.values())
         result: dict[str, Any] = dict(values)
         if places:
             result["places"] = places

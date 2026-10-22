@@ -66,7 +66,8 @@ def test_tools_have_output_schemas_and_read_only_annotations(mcp) -> None:
         assert tool["annotations"]["readOnlyHint"] is True
         assert "explanation" not in tool["inputSchema"].get("required", [])
     by_name = {t["name"]: t for t in tools}
-    assert by_name["calculate_distance"]["annotations"]["openWorldHint"] is False  # pure computation
+    assert by_name["calculate_distance"]["annotations"]["openWorldHint"] is True  # may geocode place names
+    assert by_name["check_spatial_relationship"]["annotations"]["openWorldHint"] is False  # pure computation
     assert by_name["geocode"]["annotations"]["openWorldHint"] is True  # calls a web service
 
 
@@ -119,6 +120,32 @@ SPRINGFIELD = {"features": [
     {"geometry": {"type": "Point", "coordinates": [-72.59, 42.10]},
      "properties": {"display_name": "Springfield, Massachusetts, United States", "importance": 0.611}},
 ]}
+
+
+ADELAIDE = {
+    "Adelaide Oval": {"features": [{"geometry": {"type": "Point", "coordinates": [138.5961558, -34.9155946]},
+                                    "properties": {"display_name": "Adelaide Oval, North Adelaide", "importance": 0.5}}]},
+    "Glenelg beach": {"features": [{"geometry": {"type": "Point", "coordinates": [138.5102143, -34.9802]},
+                                    "properties": {"display_name": "Glenelg Jetty, Glenelg", "importance": 0.4}}]},
+}
+
+
+def test_distance_between_place_names_is_geocoded_on_the_server(mcp) -> None:
+    """A small model can't invent coordinates if it never has to supply them."""
+    with patch("geospark.tools.geocoding.client.get_json",
+               side_effect=lambda path, params: ADELAIDE.get(params.get("q"), {"features": []})):
+        data = call(mcp, "calculate_distance", {"place_a": "Adelaide Oval", "place_b": "Glenelg beach"})["structuredContent"]
+    assert data["distance_m"] == pytest.approx(10630, abs=2)
+    assert [p["query"] for p in data["places"]] == ["Adelaide Oval", "Glenelg beach"]
+    assert {p["source"] for p in data["provenance"]} >= {"openstreetmap-nominatim", "geospark-engine"}
+
+
+def test_distance_with_an_unknown_place_or_nothing_given_is_a_tool_error(mcp) -> None:
+    with patch("geospark.tools.geocoding.client.get_json", return_value={"features": []}):
+        unknown = call(mcp, "calculate_distance", {"place_a": "Atlantis", "point_b": EIFFEL})
+    assert unknown["isError"] is True and "Atlantis" in unknown["content"][0]["text"]
+    missing = call(mcp, "calculate_distance", {"point_a": EIFFEL})
+    assert missing["isError"] is True and "place_b" in missing["content"][0]["text"]
 
 
 def test_geocode_surfaces_ambiguity(mcp) -> None:

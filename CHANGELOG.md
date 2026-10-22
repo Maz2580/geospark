@@ -2,6 +2,19 @@
 
 All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
+## [Unreleased]
+
+### Added
+- **The hosted MCP server is live** at `https://geospark.terrascout.app/mcp`: add it to Claude (or
+  any MCP client) as a custom connector, with no install. README and `deploy/DEPLOY.md` show how
+  to connect and how to turn it on for your own deployment.
+
+### Changed
+- The MCP server's `calculate_distance` takes place names (`place_a`, `place_b`) and geocodes them
+  on the server, as `/ask` already does, so a model never has to type coordinates for a named
+  place. The places and their Nominatim provenance come back with the distance. Because it may
+  call the geocoder, the tool is now annotated `openWorldHint: true`.
+
 ## [0.8.0] - 2026-10-23: more data, more analysis
 
 GeoSpark now reaches beyond geocoding and geometry. It reads Overture Maps with no key, computes

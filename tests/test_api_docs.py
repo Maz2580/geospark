@@ -27,3 +27,17 @@ def test_main_requests_have_real_examples() -> None:
     schemas = TestClient(app).get("/openapi.json").json()["components"]["schemas"]
     assert schemas["DistanceRequest"]["example"]["lat_a"] == -37.818
     assert schemas["IsochroneRequest"]["example"]["minutes"] == [10, 20]
+
+
+def test_pages_link_versioned_assets_so_deploys_are_not_mixed_with_cached_files() -> None:
+    import re
+
+    from geospark.api import _ASSET_VERSION
+
+    client = TestClient(app)
+    for page in ("/", "/playground", "/guide", "/docs", "/status"):
+        response = client.get(page)
+        assert response.headers["cache-control"] == "no-cache"
+        links = re.findall(r"""["'](/assets/[^"']+)["']""", response.text)
+        assert links and all(link.endswith(f"?v={_ASSET_VERSION}") for link in links), (page, links)
+    assert client.get(f"/assets/styles.css?v={_ASSET_VERSION}").status_code == 200

@@ -20,6 +20,20 @@ TOOL_CLASSES: dict[str, str] = {
     "router": "geospark.tools.routing.osrm.OSRMRouteTool",
 }
 
+# What each tool can do today: "ready", "partial" (works, but less than its name suggests) or
+# "planned" (the protocol has it, the code returns "not implemented"). Planned tools are never
+# listed as available, and the status page shows the description so nothing is overclaimed.
+TOOL_STATUS: dict[str, tuple[str, str]] = {
+    "geocoder": ("ready", "Place names to coordinates (OpenStreetMap Nominatim)"),
+    "reverse_geocoder": ("ready", "Coordinates to addresses (OpenStreetMap Nominatim)"),
+    "satellite": ("ready", "Satellite scene search (Sentinel-2 and others via STAC)"),
+    "ndvi": ("partial", "Finds Sentinel-2 scenes for NDVI; does not compute NDVI values yet"),
+    "spectral_indices": ("partial", "Finds scenes for spectral indices; does not compute index values yet"),
+    "terrain": ("ready", "Elevation (Copernicus DEM, Open Elevation as fallback), with vertical accuracy"),
+    "change_detection": ("planned", "Not built yet"),
+    "router": ("ready", "Driving routes between two points (public OSRM server)"),
+}
+
 # Optional-dependency extra that each tool needs (tools not listed need only the core install)
 TOOL_EXTRAS: dict[str, str] = {
     "satellite": "satellite",
@@ -79,8 +93,8 @@ class ToolRegistry:
         return list(self._tools.keys())
 
     def list_available_tools(self) -> list[str]:
-        """List all available (but not necessarily loaded) tools."""
-        return list(TOOL_CLASSES.keys())
+        """List the tools that can be loaded and do something (planned ones are left out)."""
+        return [name for name in TOOL_CLASSES if TOOL_STATUS.get(name, ("ready", ""))[0] != "planned"]
 
     def register_custom_tool(self, tool: BaseTool) -> None:
         """Register a custom tool instance."""

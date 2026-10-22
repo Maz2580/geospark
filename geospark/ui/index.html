@@ -110,7 +110,7 @@
     .bench { display: grid; gap: 1px; margin-top: var(--space-7); grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
       background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; }
     .bench div { padding: var(--space-5); background: var(--bg-raised); }
-    .bench .v { font: 600 56px/1 var(--font-display); letter-spacing: -0.03em; }
+    .bench .v { font: 600 clamp(36px, 4.2vw, 52px)/1 var(--font-display); letter-spacing: -0.03em; white-space: nowrap; }
     .bench .v.bad { color: var(--error); }
     .bench .v.good { color: var(--accent); }
     .bench p { margin-top: var(--space-3); font-size: 14px; color: var(--text-2); }
@@ -258,12 +258,13 @@
       <div class="wrap">
         <span class="kicker">03 — Why it matters</span>
         <h2 id="why-title">LLMs guess geography. GeoSpark computes it.</h2>
-        <p class="lead">From GeoSpark's open benchmark: 535 spatial questions across 5 categories and 5 model families.</p>
+        <p class="lead">From GeoSpark Bench: numeric distance questions put to 9 models, from 3.8B open-weight models to frontier APIs. An answer counts as correct within 10% of the geodesic distance.</p>
         <div class="bench reveal">
-          <div><span class="v bad">0%</span><p>Distance accuracy for LLMs alone, in 4 of 5 model families.</p></div>
-          <div><span class="v good">100%</span><p>Spatial reasoning accuracy with GeoSpark's tools.</p></div>
-          <div><span class="v">535</span><p>Benchmark questions — reproducible, in the repository.</p></div>
+          <div><span class="v bad">1–95%</span><p>Correct for language models on their own, depending on the model. Small open models were wrong about 95% of the time.</p></div>
+          <div><span class="v good">76–96%</span><p>Correct with GeoSpark's tools, for every model that made valid tool calls. Some small models did not use the tools properly.</p></div>
+          <div><span class="v">5% → 76%</span><p>Qwen 2.5 7B, a model that runs on your own CPU: on its own, then with GeoSpark's tools.</p></div>
         </div>
+        <p class="fine">Per-model results, intervals and caveats are in the <a href="https://github.com/Maz2580/geospark#benchmark-results" target="_blank" rel="noopener">README</a>. The full analysis is under peer review.</p>
       </div>
     </section>
 

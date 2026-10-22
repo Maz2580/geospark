@@ -580,7 +580,9 @@ def ask(request: AskRequest, http: Request):
         model=model_source,
         tools_used=tools_used,
         tokens_used=0,
-        status="partial" if result.warnings and any(w.startswith("Tool ") for w in result.warnings) else result.status,
+        # Not fully checked if a tool failed or was fed coordinates no lookup produced
+        status="partial" if result.quality.get("failed_tools") or result.quality.get("unverified_coordinates")
+        else result.status,
         provenance=[p.model_dump(mode="json", exclude_none=True) for p in result.provenance],
         units=result.spatial_context.units,
         warnings=result.warnings,
@@ -643,11 +645,14 @@ _ELEVATION_SOURCE_NAMES = {
 @app.get("/api/v1/tools")
 async def list_tools():
     """List available GeoSpark tools."""
-    from geospark.tools.registry import TOOL_CLASSES
+    from geospark.tools.registry import TOOL_CLASSES, TOOL_STATUS
 
+    status = {name: TOOL_STATUS.get(name, ("ready", "")) for name in TOOL_CLASSES}
     return {
         "loaded": get_engine().available_tools,
-        "available": list(TOOL_CLASSES.keys()),
+        "available": [name for name, (state, _) in status.items() if state != "planned"],
+        "planned": [name for name, (state, _) in status.items() if state == "planned"],
+        "details": {name: {"status": state, "description": text} for name, (state, text) in status.items()},
     }
 
 

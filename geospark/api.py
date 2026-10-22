@@ -117,11 +117,42 @@ async def lifespan(app: FastAPI):
         yield
 
 
+# Endpoint groups for the API reference (/docs), in reading order
+OPENAPI_TAGS = [
+    {"name": "Spatial", "description": "Geocoding, geodesic distance, elevation, topology and engine operations."},
+    {"name": "Ask", "description": "Natural-language questions answered with GeoSpark's tools, with provenance."},
+    {"name": "Routing", "description": "Reachable areas (isochrones) and travel times from Valhalla."},
+    {"name": "Open map data", "description": "Overture Maps places, buildings, roads and boundaries near a point."},
+    {"name": "Live data", "description": "Weather, air quality and active fires."},
+    {"name": "Agents", "description": "The coordinator and the GeoAgent, SpatialReport and SiteSelector specialists."},
+    {"name": "Flows", "description": "Reusable spatial workflows (DAGs) and their run history."},
+    {"name": "Memory", "description": "Spatial facts and episodes with recall and contradiction checks."},
+    {"name": "Context", "description": "Tiered storage for missions, datasets and analysis history."},
+    {"name": "System", "description": "Health, version, tools and models."},
+    {"name": "Admin", "description": "Audit log and usage (admin token required)."},
+]
+_TAG_BY_PREFIX = [  # longest prefix first
+    ("/api/v1/check-relationship", "Spatial"), ("/api/v1/geocode", "Spatial"), ("/api/v1/query", "Spatial"),
+    ("/api/v1/distance", "Spatial"), ("/api/v1/elevation", "Spatial"),
+    ("/api/v1/ask", "Ask"),
+    ("/api/v1/isochrone", "Routing"), ("/api/v1/travel-time", "Routing"),
+    ("/api/v1/overture", "Open map data"),
+    ("/api/v1/data", "Live data"),
+    ("/api/v1/agent", "Agents"),
+    ("/api/v1/flow-runs", "Flows"), ("/api/v1/flows", "Flows"),
+    ("/api/v1/memory", "Memory"),
+    ("/api/v1/context", "Context"),
+    ("/api/v1/admin", "Admin"),
+    ("/api/v1/", "System"), ("/health", "System"),
+]
+
 app = FastAPI(
     title="GeoSpark API",
     description="The Open-Source Geospatial Intelligence Engine. Give any AI model a spatial mind.",
     version=__version__,
     lifespan=lifespan,
+    openapi_tags=OPENAPI_TAGS,
+    docs_url=None,  # served by our own themed page below; /redoc and /openapi.json stay as they are
 )
 
 # Rate limiting — sliding window per IP/API key (Phase 8A)
@@ -276,6 +307,8 @@ class HealthResponse(BaseModel):
 
 
 class GeocodeRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"query": "Federation Square, Melbourne", "limit": 3}, "examples": [{"query": "Federation Square, Melbourne", "limit": 3}]}}
+
     query: str = Field(..., min_length=1, max_length=500, description="Address or place name to geocode")
     limit: int = Field(5, ge=1, le=40, description="Max results")
 
@@ -289,6 +322,8 @@ class SpatialQueryRequest(BaseModel):
 
 
 class RelationshipRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"geometry_a": {"type": "Polygon", "coordinates": [[[2.29, 48.85], [2.30, 48.85], [2.30, 48.86], [2.29, 48.86], [2.29, 48.85]]]}, "geometry_b": {"type": "Point", "coordinates": [2.295, 48.855]}, "relationship": "contains"}, "examples": [{"geometry_a": {"type": "Polygon", "coordinates": [[[2.29, 48.85], [2.30, 48.85], [2.30, 48.86], [2.29, 48.86], [2.29, 48.85]]]}, "geometry_b": {"type": "Point", "coordinates": [2.295, 48.855]}, "relationship": "contains"}]}}
+
     geometry_a: dict[str, Any] = Field(..., description="First geometry (GeoJSON)")
     geometry_b: dict[str, Any] = Field(..., description="Second geometry (GeoJSON)")
     relationship: str = Field(
@@ -307,6 +342,8 @@ class RelationshipResponse(BaseModel):
 
 
 class DistanceRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"lat_a": -37.8180, "lon_a": 144.9691, "lat_b": -37.8150, "lon_b": 144.9666}, "examples": [{"lat_a": -37.8180, "lon_a": 144.9691, "lat_b": -37.8150, "lon_b": 144.9666}]}}
+
     lat_a: float = Field(..., ge=-90, le=90, description="Latitude of point A")
     lon_a: float = Field(..., ge=-180, le=180, description="Longitude of point A")
     lat_b: float = Field(..., ge=-90, le=90, description="Latitude of point B")
@@ -322,11 +359,15 @@ class DistanceResponse(BaseModel):
 
 
 class ElevationRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"latitude": -36.4559, "longitude": 148.2633}, "examples": [{"latitude": -36.4559, "longitude": 148.2633}]}}
+
     latitude: float = Field(..., ge=-90, le=90, description="Latitude")
     longitude: float = Field(..., ge=-180, le=180, description="Longitude")
 
 
 class AskRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"question": "How far is Federation Square from Melbourne Town Hall?"}, "examples": [{"question": "How far is Federation Square from Melbourne Town Hall?"}]}}
+
     question: str = Field(..., min_length=1, max_length=2000, description="Natural language spatial question")
     model: str | None = Field(None, max_length=200, description="Override LLM model")
 
@@ -336,6 +377,13 @@ class AskResponse(BaseModel):
     model: str
     tools_used: list[str] = []
     tokens_used: int = 0
+    # The checkable part: what the tools used, on what terms, in which units, with which caveats
+    status: str = "ok"
+    provenance: list[dict[str, Any]] = []
+    units: dict[str, str] = {}
+    warnings: list[str] = []
+    quality: dict[str, Any] = {}
+    features: list[dict[str, Any]] = Field(default_factory=list, description="Places the tools found (GeoJSON)")
 
 
 # --- Endpoints ---
@@ -508,6 +556,12 @@ def ask(request: AskRequest, http: Request):
         model=model_source,
         tools_used=tools_used,
         tokens_used=0,
+        status="partial" if result.warnings and any(w.startswith("Tool ") for w in result.warnings) else result.status,
+        provenance=[p.model_dump(mode="json", exclude_none=True) for p in result.provenance],
+        units=result.spatial_context.units,
+        warnings=result.warnings,
+        quality=result.quality,
+        features=[{"type": "Feature", **f.model_dump(mode="json", include={"geometry", "properties"})} for f in result.features],
     )
 
 
@@ -802,6 +856,8 @@ async def flow_run_get(run_id: str):
 
 
 class DataChannelRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"location": "Melbourne, Australia"}, "examples": [{"location": "Melbourne, Australia"}]}}
+
     location: str | None = Field(None, max_length=500, description="Location name to geocode")
     lat: float | None = Field(None, ge=-90, le=90, description="Latitude")
     lon: float | None = Field(None, ge=-180, le=180, description="Longitude")
@@ -871,6 +927,8 @@ async def data_query(channel_name: str, request: DataChannelRequest):
 
 
 class OvertureRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"lat": -37.8180, "lon": 144.9691, "radius_m": 400, "category": "cafe"}, "examples": [{"lat": -37.8180, "lon": 144.9691, "radius_m": 400, "category": "cafe"}]}}
+
     lat: float = Field(..., ge=-90, le=90, description="Latitude")
     lon: float = Field(..., ge=-180, le=180, description="Longitude")
     radius_m: float = Field(500, gt=0, le=2000, description="Search radius in metres (ignored for divisions)")
@@ -899,6 +957,8 @@ def overture(theme: str, request: OvertureRequest, http: Request, format: str | 
 
 
 class IsochroneRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"lat": -37.8180, "lon": 144.9691, "minutes": [10, 20], "mode": "walk"}, "examples": [{"lat": -37.8180, "lon": 144.9691, "minutes": [10, 20], "mode": "walk"}]}}
+
     lat: float = Field(..., ge=-90, le=90)
     lon: float = Field(..., ge=-180, le=180)
     minutes: list[int] = Field([10], min_length=1, max_length=4, description="Contour times, 1-60 minutes")
@@ -906,6 +966,8 @@ class IsochroneRequest(BaseModel):
 
 
 class TravelTimeRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"origins": [[-37.8180, 144.9691]], "destinations": [[-37.8150, 144.9666], [-37.8102, 144.9628]], "mode": "walk"}, "examples": [{"origins": [[-37.8180, 144.9691]], "destinations": [[-37.8150, 144.9666], [-37.8102, 144.9628]], "mode": "walk"}]}}
+
     origins: list[tuple[float, float]] = Field(..., min_length=1, max_length=5, description="[[lat, lon], ...]")
     destinations: list[tuple[float, float]] = Field(..., min_length=1, max_length=5, description="[[lat, lon], ...]")
     mode: str = Field("walk", pattern="^(walk|bike|drive)$")
@@ -1397,3 +1459,26 @@ async def admin_usage_keys():
 
     tracker = get_usage_tracker()
     return {"keys": tracker.all_keys()}
+
+
+# --- API reference: our own themed page around Swagger UI, and endpoint groups ---
+
+
+@app.get("/docs", response_class=HTMLResponse, include_in_schema=False)
+async def ui_api_docs():
+    return _serve_page("api.html")
+
+
+def _tag_routes() -> None:
+    """Group untagged endpoints by path so the API reference reads by topic, not as one list."""
+    from fastapi.routing import APIRoute
+
+    for route in app.routes:
+        if isinstance(route, APIRoute) and route.include_in_schema and not route.tags:
+            for prefix, tag in _TAG_BY_PREFIX:
+                if route.path.startswith(prefix):
+                    route.tags = [tag]
+                    break
+
+
+_tag_routes()

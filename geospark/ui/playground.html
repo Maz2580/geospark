@@ -4,291 +4,532 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Playground — GeoSpark</title>
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    .workbench { display: grid; gap: var(--space-5); grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; }
+    @media (max-width: 960px) { .workbench { grid-template-columns: minmax(0, 1fr); } }
+    .side { display: flex; flex-direction: column; gap: var(--space-5); min-width: 0; }
+    .stage-map { position: sticky; top: 84px; display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+    @media (max-width: 960px) { .stage-map { position: static; } }
+    .stage-map .map-container { height: 520px; }
+    @media (max-width: 720px) { .stage-map .map-container { height: 360px; } }
+    .row { display: grid; gap: 0 var(--space-3); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .row-3 { display: grid; gap: 0 var(--space-3); grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    @media (max-width: 520px) { .row, .row-3 { grid-template-columns: minmax(0, 1fr); } }
+    .toggle-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .toggle-group label {
+      display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--line-strong); color: var(--text-2); font: 500 13px var(--font-sans); margin: 0; letter-spacing: 0;
+    }
+    .toggle-group input { position: absolute; opacity: 0; pointer-events: none; }
+    .toggle-group label:has(input:checked) { background: var(--accent-soft); border-color: var(--accent-line); color: var(--text); }
+    .toggle-group label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .trace { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-4); font: 400 13px var(--font-mono); }
+    .trace li { display: flex; align-items: center; gap: 10px; }
+    .trace li::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px rgba(124,242,200,.6); }
+    .answer-text { margin-top: var(--space-4); padding: var(--space-4); border-radius: var(--radius); background: var(--bg-raised); border: 1px solid var(--line); font-size: 16px; line-height: 1.6; }
+    .answer-meta { margin-top: 8px; font: 400 12px var(--font-mono); color: var(--text-3); }
+
+    .contours { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-4); }
+    .contours li { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+    .contours .swatch { width: 14px; height: 14px; border-radius: 4px; flex: none; }
+    .contours .m { font: 500 14px var(--font-mono); }
+    .contours .a { margin-left: auto; font: 600 18px var(--font-display); }
+    .feature-list { max-height: 320px; overflow: auto; }
+  </style>
 </head>
 <body class="dark">
-  <nav class="nav">
-    <span class="nav-brand">GeoSpark</span>
-    <div class="nav-links">
-      <a href="/">Home</a>
-      <a href="/guide">Guide</a>
+  <header class="nav">
+    <a class="nav-brand" href="/" aria-label="GeoSpark home">
+      <span class="brand-mark" data-liquid-logo><img src="/assets/logo.svg" alt="" width="28" height="28"></span>
+      <span>GeoSpark</span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
       <a href="/playground">Playground</a>
-      <a href="/flows">Flows</a>
       <a href="/agents">Agents</a>
+      <a href="/flows">Flows</a>
+      <a href="/data">Data</a>
       <a href="/memory">Memory</a>
       <a href="/context">Context</a>
-      <a href="/data">Data</a>
+      <a href="/guide">Guide</a>
       <a href="/status">Status</a>
-      <a href="/docs">API Docs</a>
-    </div>
+      <a href="/docs">API</a>
+    </nav>
     <span class="nav-version"></span>
-  </nav>
+    <a class="nav-cta" href="https://github.com/Maz2580/geospark" target="_blank" rel="noopener">GitHub</a>
+  </header>
 
-  <div class="container">
+  <main class="container">
     <div class="page-header">
-      <h1>Playground</h1>
-      <p>Try GeoSpark's spatial tools interactively. All results are ground-truth &mdash; not LLM-guessed.</p>
+      <span class="eyebrow">Playground</span>
+      <h1>Ask, measure, explore.</h1>
+      <p>Every result here is computed by real tools on open data, and comes with its proof: sources, licences, units and caveats. Download any result as GeoJSON for QGIS.</p>
     </div>
 
-    <div class="tabs">
-      <button class="tab active" data-tab="tab-geocode">Geocode</button>
-      <button class="tab" data-tab="tab-distance">Distance</button>
-      <button class="tab" data-tab="tab-elevation">Elevation</button>
-      <button class="tab" data-tab="tab-relationship">Relationship</button>
-      <button class="tab" data-tab="tab-ask">Ask GeoSpark</button>
+    <div class="tabs" role="tablist" aria-label="Playground tools">
+      <button class="tab active" role="tab" data-tab="tab-ask" id="t-ask">Ask</button>
+      <button class="tab" role="tab" data-tab="tab-reach" id="t-reach">Reachable area<span class="tab-new">new</span></button>
+      <button class="tab" role="tab" data-tab="tab-overture" id="t-overture">Open map data<span class="tab-new">new</span></button>
+      <button class="tab" role="tab" data-tab="tab-distance" id="t-distance">Distance</button>
+      <button class="tab" role="tab" data-tab="tab-geocode" id="t-geocode">Geocode</button>
+      <button class="tab" role="tab" data-tab="tab-elevation" id="t-elevation">Elevation</button>
+      <button class="tab" role="tab" data-tab="tab-relationship" id="t-relationship">Relationship</button>
     </div>
 
-    <!-- Geocode -->
-    <div class="tab-panel" id="tab-geocode">
-      <div class="grid grid-2">
-        <div class="card">
-          <div class="card-header"><div class="card-icon geo">&#128205;</div><h3>Geocode</h3></div>
-          <p class="text-sm text-muted mb-2">Convert a place name to coordinates.</p>
+    <div class="workbench">
+      <div class="side">
+
+        <!-- Ask -->
+        <section class="tab-panel card" id="tab-ask" aria-labelledby="t-ask">
+          <div class="card-header"><h3>Ask in plain words</h3></div>
+          <p class="text-sm text-muted mb-2">A language model picks GeoSpark's tools; the numbers come from the tools, not the model.</p>
           <div class="presets mb-2">
-            <button class="btn btn-sm btn-secondary" onclick="$('#geo-query').value='Eiffel Tower, Paris';runGeocode()">Eiffel Tower</button>
-            <button class="btn btn-sm btn-secondary" onclick="$('#geo-query').value='Tokyo Tower, Japan';runGeocode()">Tokyo Tower</button>
-            <button class="btn btn-sm btn-secondary" onclick="$('#geo-query').value='Sydney Opera House';runGeocode()">Sydney Opera House</button>
+            <button class="btn btn-sm btn-secondary" data-ask="How far is Federation Square from Melbourne Town Hall?">Fed Square → Town Hall</button>
+            <button class="btn btn-sm btn-secondary" data-ask="How far is the Eiffel Tower from Big Ben?">Eiffel Tower → Big Ben</button>
+            <button class="btn btn-sm btn-secondary" data-ask="What is the elevation of Mount Kosciuszko?">Elevation of Kosciuszko</button>
           </div>
-          <div class="form-group">
-            <label>Location</label>
-            <input type="text" id="geo-query" placeholder="Eiffel Tower, Paris" value="Eiffel Tower, Paris">
-          </div>
-          <button class="btn btn-primary" onclick="runGeocode()">Geocode</button>
-          <div id="geo-result" class="result-box hidden"></div>
-        </div>
-        <div>
-          <div id="geo-map" class="map-container"></div>
-        </div>
-      </div>
-    </div>
+          <form id="ask-form">
+            <div class="form-group">
+              <label for="ask-q">Question</label>
+              <input type="text" id="ask-q" required value="How far is Federation Square from Melbourne Town Hall?">
+            </div>
+            <button class="btn btn-primary" type="submit">Ask</button>
+          </form>
+          <div id="ask-result" aria-live="polite"></div>
+        </section>
 
-    <!-- Distance -->
-    <div class="tab-panel hidden" id="tab-distance">
-      <div class="grid grid-2">
-        <div class="card">
-          <div class="card-header"><div class="card-icon geo">&#128207;</div><h3>Geodesic Distance</h3></div>
-          <p class="text-sm text-muted mb-2">Calculate the precise distance between two points on Earth.</p>
+        <!-- Reachable area -->
+        <section class="tab-panel card hidden" id="tab-reach" aria-labelledby="t-reach">
+          <div class="card-header"><h3>Reachable area</h3></div>
+          <p class="text-sm text-muted mb-2">Where can you get to in a few minutes? Routing covers Australia; points elsewhere are refused rather than guessed.</p>
           <div class="presets mb-2">
-            <button class="btn btn-sm btn-secondary" onclick="setDist(48.8566,2.3522,51.5074,-0.1278)">Paris &rarr; London</button>
-            <button class="btn btn-sm btn-secondary" onclick="setDist(35.6762,139.6503,37.5665,126.9780)">Tokyo &rarr; Seoul</button>
-            <button class="btn btn-sm btn-secondary" onclick="setDist(-33.8688,151.2093,-37.8136,144.9631)">Sydney &rarr; Melbourne</button>
+            <button class="btn btn-sm btn-secondary" data-reach="Federation Square, Melbourne">Federation Square</button>
+            <button class="btn btn-sm btn-secondary" data-reach="Sydney Opera House">Sydney Opera House</button>
+            <button class="btn btn-sm btn-secondary" data-reach="South Bank Parklands, Brisbane">South Bank, Brisbane</button>
           </div>
-          <div class="grid grid-2" style="gap:0.75rem">
-            <div class="form-group"><label>Point A &mdash; Lat</label><input type="number" id="dist-lat-a" step="any" value="48.8566"></div>
-            <div class="form-group"><label>Point A &mdash; Lon</label><input type="number" id="dist-lon-a" step="any" value="2.3522"></div>
-            <div class="form-group"><label>Point B &mdash; Lat</label><input type="number" id="dist-lat-b" step="any" value="51.5074"></div>
-            <div class="form-group"><label>Point B &mdash; Lon</label><input type="number" id="dist-lon-b" step="any" value="-0.1278"></div>
-          </div>
-          <button class="btn btn-primary" onclick="runDistance()">Calculate</button>
-          <div id="dist-result" class="hidden"></div>
-        </div>
-        <div>
-          <div id="dist-map" class="map-container"></div>
-        </div>
-      </div>
-    </div>
+          <form id="reach-form">
+            <div class="form-group">
+              <label for="reach-place">Starting place</label>
+              <input type="text" id="reach-place" required value="Federation Square, Melbourne">
+            </div>
+            <div class="form-group">
+              <span class="field-label" id="mode-label">Mode</span>
+              <div class="toggle-group" role="radiogroup" aria-labelledby="mode-label">
+                <label><input type="radio" name="mode" value="walk" checked>Walk</label>
+                <label><input type="radio" name="mode" value="bike">Bike</label>
+                <label><input type="radio" name="mode" value="drive">Drive</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <span class="field-label" id="min-label">Minutes (up to 4)</span>
+              <div class="toggle-group" role="group" aria-labelledby="min-label">
+                <label><input type="checkbox" name="min" value="5">5</label>
+                <label><input type="checkbox" name="min" value="10" checked>10</label>
+                <label><input type="checkbox" name="min" value="15">15</label>
+                <label><input type="checkbox" name="min" value="20" checked>20</label>
+                <label><input type="checkbox" name="min" value="30">30</label>
+              </div>
+            </div>
+            <button class="btn btn-primary" type="submit">Draw reachable area</button>
+          </form>
+          <div id="reach-result" aria-live="polite"></div>
+        </section>
 
-    <!-- Elevation -->
-    <div class="tab-panel hidden" id="tab-elevation">
-      <div class="grid grid-2">
-        <div class="card">
-          <div class="card-header"><div class="card-icon geo">&#9968;</div><h3>Elevation</h3></div>
-          <p class="text-sm text-muted mb-2">Get elevation above sea level at any point.</p>
-          <div class="grid grid-2" style="gap:0.75rem">
-            <div class="form-group"><label>Latitude</label><input type="number" id="elev-lat" step="any" value="27.9881"></div>
-            <div class="form-group"><label>Longitude</label><input type="number" id="elev-lon" step="any" value="86.9250"></div>
-          </div>
-          <button class="btn btn-primary" onclick="runElevation()">Get Elevation</button>
-          <div id="elev-result" class="hidden"></div>
-        </div>
-        <div>
-          <div id="elev-map" class="map-container"></div>
-        </div>
-      </div>
-    </div>
+        <!-- Overture -->
+        <section class="tab-panel card hidden" id="tab-overture" aria-labelledby="t-overture">
+          <div class="card-header"><h3>Open map data</h3></div>
+          <p class="text-sm text-muted mb-2">Places, buildings, roads and boundaries from Overture Maps around any point on Earth. Distances and areas are geodesic.</p>
+          <form id="ov-form">
+            <div class="form-group">
+              <label for="ov-place">Around</label>
+              <input type="text" id="ov-place" required value="Federation Square, Melbourne">
+            </div>
+            <div class="row">
+              <div class="form-group">
+                <label for="ov-theme">Layer</label>
+                <select id="ov-theme">
+                  <option value="places">Places</option>
+                  <option value="buildings">Buildings</option>
+                  <option value="transportation">Roads &amp; paths</option>
+                  <option value="divisions">Boundaries containing it</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ov-radius">Radius (m, max 2000)</label>
+                <input type="number" id="ov-radius" min="50" max="2000" step="50" value="400">
+              </div>
+            </div>
+            <div class="form-group" id="ov-cat-group">
+              <label for="ov-cat">Category (places only, optional)</label>
+              <input type="text" id="ov-cat" placeholder="cafe, pharmacy, park…">
+            </div>
+            <button class="btn btn-primary" type="submit">Find</button>
+          </form>
+          <div id="ov-result" aria-live="polite"></div>
+        </section>
 
-    <!-- Relationship -->
-    <div class="tab-panel hidden" id="tab-relationship">
-      <div class="card">
-        <div class="card-header"><div class="card-icon geo">&#128296;</div><h3>Spatial Relationship Check</h3></div>
-        <p class="text-sm text-muted mb-2">Check if two geometries have a topological relationship (contains, intersects, within, etc.).</p>
-        <div class="grid grid-2" style="gap:0.75rem">
-          <div class="form-group">
-            <label>Geometry A (GeoJSON)</label>
-            <textarea id="rel-geom-a" rows="5">{"type": "Polygon", "coordinates": [[[2.29, 48.85], [2.30, 48.85], [2.30, 48.86], [2.29, 48.86], [2.29, 48.85]]]}</textarea>
+        <!-- Distance -->
+        <section class="tab-panel card hidden" id="tab-distance" aria-labelledby="t-distance">
+          <div class="card-header"><h3>Geodesic distance</h3></div>
+          <p class="text-sm text-muted mb-2">The shortest distance over the WGS84 ellipsoid between two points.</p>
+          <div class="presets mb-2">
+            <button class="btn btn-sm btn-secondary" data-dist="48.8566,2.3522,51.5074,-0.1278">Paris → London</button>
+            <button class="btn btn-sm btn-secondary" data-dist="35.6762,139.6503,37.5665,126.9780">Tokyo → Seoul</button>
+            <button class="btn btn-sm btn-secondary" data-dist="-33.8688,151.2093,-37.8136,144.9631">Sydney → Melbourne</button>
           </div>
-          <div class="form-group">
-            <label>Geometry B (GeoJSON)</label>
-            <textarea id="rel-geom-b" rows="5">{"type": "Point", "coordinates": [2.295, 48.855]}</textarea>
-          </div>
-        </div>
-        <div class="form-group" style="max-width:300px">
-          <label>Relationship</label>
-          <select id="rel-type">
-            <option value="contains">contains</option>
-            <option value="intersects">intersects</option>
-            <option value="within">within</option>
-            <option value="touches">touches</option>
-            <option value="disjoint">disjoint</option>
-            <option value="overlaps">overlaps</option>
-            <option value="crosses">crosses</option>
-          </select>
-        </div>
-        <button class="btn btn-primary" onclick="runRelationship()">Check</button>
-        <div id="rel-result" class="hidden"></div>
-      </div>
-    </div>
+          <form id="dist-form">
+            <div class="row">
+              <div class="form-group"><label for="dist-lat-a">Point A — latitude</label><input type="number" id="dist-lat-a" step="any" value="48.8566"></div>
+              <div class="form-group"><label for="dist-lon-a">Point A — longitude</label><input type="number" id="dist-lon-a" step="any" value="2.3522"></div>
+              <div class="form-group"><label for="dist-lat-b">Point B — latitude</label><input type="number" id="dist-lat-b" step="any" value="51.5074"></div>
+              <div class="form-group"><label for="dist-lon-b">Point B — longitude</label><input type="number" id="dist-lon-b" step="any" value="-0.1278"></div>
+            </div>
+            <button class="btn btn-primary" type="submit">Measure</button>
+          </form>
+          <div id="dist-result" aria-live="polite"></div>
+        </section>
 
-    <!-- Ask -->
-    <div class="tab-panel hidden" id="tab-ask">
-      <div class="card">
-        <div class="card-header"><div class="card-icon agent">&#128172;</div><h3>Ask GeoSpark</h3></div>
-        <p class="text-sm text-muted mb-2">Ask a spatial question in natural language. Uses local Ollama models &mdash; free and private.</p>
-        <div class="presets mb-2">
-          <button class="btn btn-sm btn-secondary" onclick="$('#ask-q').value='How far is the Eiffel Tower from Big Ben?';runAsk()">Eiffel Tower to Big Ben</button>
-          <button class="btn btn-sm btn-secondary" onclick="$('#ask-q').value='Is Tokyo closer to Seoul or Beijing?';runAsk()">Tokyo: Seoul or Beijing?</button>
-        </div>
-        <div class="form-group">
-          <label>Question</label>
-          <input type="text" id="ask-q" placeholder="How far is the Eiffel Tower from Big Ben?" value="How far is the Eiffel Tower from Big Ben?">
-        </div>
-        <button class="btn btn-primary" onclick="runAsk()">Ask</button>
-        <div id="ask-result" class="result-box hidden"></div>
+        <!-- Geocode -->
+        <section class="tab-panel card hidden" id="tab-geocode" aria-labelledby="t-geocode">
+          <div class="card-header"><h3>Geocode</h3></div>
+          <p class="text-sm text-muted mb-2">A place name to coordinates, with a warning when the name is ambiguous.</p>
+          <div class="presets mb-2">
+            <button class="btn btn-sm btn-secondary" data-geo="Eiffel Tower, Paris">Eiffel Tower</button>
+            <button class="btn btn-sm btn-secondary" data-geo="Springfield">Springfield (ambiguous)</button>
+            <button class="btn btn-sm btn-secondary" data-geo="Sydney Opera House">Sydney Opera House</button>
+          </div>
+          <form id="geo-form">
+            <div class="form-group"><label for="geo-query">Place</label><input type="text" id="geo-query" required value="Eiffel Tower, Paris"></div>
+            <button class="btn btn-primary" type="submit">Geocode</button>
+          </form>
+          <div id="geo-result" aria-live="polite"></div>
+        </section>
+
+        <!-- Elevation -->
+        <section class="tab-panel card hidden" id="tab-elevation" aria-labelledby="t-elevation">
+          <div class="card-header"><h3>Elevation</h3></div>
+          <p class="text-sm text-muted mb-2">Height above sea level from a digital elevation model, with its vertical accuracy.</p>
+          <div class="presets mb-2">
+            <button class="btn btn-sm btn-secondary" data-elev="27.9881,86.9250">Everest</button>
+            <button class="btn btn-sm btn-secondary" data-elev="-36.4559,148.2633">Kosciuszko</button>
+            <button class="btn btn-sm btn-secondary" data-elev="31.5590,35.4732">Dead Sea</button>
+          </div>
+          <form id="elev-form">
+            <div class="row">
+              <div class="form-group"><label for="elev-lat">Latitude</label><input type="number" id="elev-lat" step="any" value="27.9881"></div>
+              <div class="form-group"><label for="elev-lon">Longitude</label><input type="number" id="elev-lon" step="any" value="86.9250"></div>
+            </div>
+            <button class="btn btn-primary" type="submit">Get elevation</button>
+          </form>
+          <div id="elev-result" aria-live="polite"></div>
+        </section>
+
+        <!-- Relationship -->
+        <section class="tab-panel card hidden" id="tab-relationship" aria-labelledby="t-relationship">
+          <div class="card-header"><h3>Spatial relationship</h3></div>
+          <p class="text-sm text-muted mb-2">Does A contain, touch or overlap B? Invalid geometry is refused, and swapped lat/lon is flagged.</p>
+          <form id="rel-form">
+            <div class="form-group">
+              <label for="rel-geom-a">Geometry A (GeoJSON)</label>
+              <textarea id="rel-geom-a" rows="4">{"type": "Polygon", "coordinates": [[[2.29, 48.85], [2.30, 48.85], [2.30, 48.86], [2.29, 48.86], [2.29, 48.85]]]}</textarea>
+            </div>
+            <div class="form-group">
+              <label for="rel-geom-b">Geometry B (GeoJSON)</label>
+              <textarea id="rel-geom-b" rows="3">{"type": "Point", "coordinates": [2.295, 48.855]}</textarea>
+            </div>
+            <div class="form-group">
+              <label for="rel-type">Relationship</label>
+              <select id="rel-type">
+                <option>contains</option><option>intersects</option><option>within</option><option>touches</option>
+                <option>disjoint</option><option>overlaps</option><option>crosses</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" type="submit">Check</button>
+          </form>
+          <div id="rel-result" aria-live="polite"></div>
+        </section>
+      </div>
+
+      <div class="stage-map">
+        <div id="map" class="map-container" role="region" aria-label="Result map"></div>
+        <div id="proof"></div>
       </div>
     </div>
-  </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="inner">
+      <span>GeoSpark · Apache-2.0</span>
+      <a href="https://github.com/Maz2580/geospark" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://pypi.org/project/geospark-ai/" target="_blank" rel="noopener">PyPI</a>
+      <a href="/status">Status</a>
+      <span class="push">Created by <a href="https://github.com/Maz2580" target="_blank" rel="noopener">Mazdak Ghasemi Tootkaboni</a> · University of Melbourne</span>
+    </div>
+  </footer>
 
   <script src="/assets/app.js"></script>
+  <script src="/assets/liquid-logo.js" defer></script>
   <script>
-    // Init tabs
-    initTabs($('.container'));
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const MINT = '#7CF2C8', AMBER = '#FFB547';
+    const CONTOUR_COLORS = ['#7CF2C8', '#5FD4E0', '#8AB4FF', '#C9A2FF'];
 
-    /* --- Preset helpers --- */
-    function setDist(la, lo, lb, lob) {
-      $('#dist-lat-a').value = la; $('#dist-lon-a').value = lo;
-      $('#dist-lat-b').value = lb; $('#dist-lon-b').value = lob;
-      runDistance();
+    /* ---------- one shared map ---------- */
+    const map = createMap('map', 20, 10, 2);
+    let layer = L.featureGroup().addTo(map);
+    function clearMap() { layer.clearLayers(); }
+    function focus(bounds, maxZoom = 16) {
+      if (bounds && bounds.isValid()) map.flyToBounds(bounds, { padding: [32, 32], maxZoom, duration: reduceMotion ? 0 : 0.9 });
+    }
+    function drawIn(group) {
+      if (reduceMotion) return;
+      group.eachLayer(l => {
+        const path = l.getElement && l.getElement();
+        if (!path || !path.getTotalLength) return;
+        const len = path.getTotalLength();
+        path.animate([{ strokeDasharray: `${len}`, strokeDashoffset: len }, { strokeDasharray: `${len}`, strokeDashoffset: 0 }],
+                     { duration: 1000, easing: 'cubic-bezier(.2,.7,.2,1)' });
+      });
+    }
+    function setProof(data, geojson, filename) {
+      document.getElementById('proof').innerHTML = data ? renderProof(data, { geojson, filename }) : '';
+    }
+    function loading(el, msg) { el.innerHTML = `<div class="loading-overlay mt-2"><span class="spinner"></span>${escapeHtml(msg)}</div>`; }
+    function refuse(el, e, title = 'Cannot answer this one') {
+      el.innerHTML = refusalHtml(title, errorDetail(e.message || e));
+      setProof(null);
+    }
+    async function geocodeOne(place) {
+      const d = await geo.post('/api/v1/geocode', { query: place, limit: 1 });
+      const f = (d.features || [])[0];
+      if (!f) throw new Error(`No place called "${place}" was found. Try adding the city or country.`);
+      return { lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0], name: f.properties?.display_name || place, raw: d };
     }
 
-    /* --- Geocode --- */
-    async function runGeocode() {
-      const el = $('#geo-result');
-      showLoading(el, 'Geocoding...');
+    /* ---------- tabs with deep links (#reach, #overture, …) ---------- */
+    const tabs = [...document.querySelectorAll('.tab')];
+    function openTab(id, push = true) {
+      tabs.forEach(t => { const on = t.dataset.tab === id; t.classList.toggle('active', on); t.setAttribute('aria-selected', on); });
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('hidden', p.id !== id));
+      if (push) history.replaceState(null, '', '#' + id.replace('tab-', ''));
+      setTimeout(() => map.invalidateSize(), 50);
+    }
+    tabs.forEach(t => t.addEventListener('click', () => openTab(t.dataset.tab)));
+
+    /* ---------- Ask ---------- */
+    async function runAsk(q) {
+      const el = document.getElementById('ask-result');
+      loading(el, 'Thinking — the model is choosing tools (5–30 s)…');
       try {
-        const data = await geo.post('/api/v1/geocode', { query: $('#geo-query').value });
-        const features = data.features || [];
-        if (features.length === 0) { showError(el, 'No results found'); return; }
-
-        const f = features[0];
-        const coords = f.geometry?.coordinates || [];
-        const props = f.properties || {};
-        el.innerHTML = resultCard([
-          ['Address', props.display_name || '—'],
-          ['Longitude', coords[0]?.toFixed(6)],
-          ['Latitude', coords[1]?.toFixed(6)],
-        ]) + jsonToggle(data, 'geo-json');
-
-        el.classList.remove('hidden');
-        // Map
-        const map = createMap('geo-map', coords[1], coords[0], 14);
-        addMarker(map, coords[1], coords[0], props.display_name || 'Result');
-      } catch (e) { showError(el, e.message); }
+        const d = await geo.post('/api/v1/ask', { question: q });
+        clearMap();
+        const pts = (d.features || []).filter(f => f.geometry?.type === 'Point').map(f => [f.geometry.coordinates[1], f.geometry.coordinates[0], f.properties?.display_name]);
+        pts.forEach((p, i) => addMarker(layer, p[0], p[1], p[2], i ? 'b' : ''));
+        if (pts.length === 2) {
+          const line = L.polyline([[pts[0][0], pts[0][1]], [pts[1][0], pts[1][1]]], { color: MINT, weight: 3, dashArray: '2 8', lineCap: 'round' }).addTo(layer);
+          drawIn(L.featureGroup([line]));
+        }
+        if (pts.length) focus(L.latLngBounds(pts.map(p => [p[0], p[1]])), 15);
+        el.innerHTML = `
+          <div class="answer-text">${escapeHtml(d.answer || '')}</div>
+          <p class="answer-meta">model · ${escapeHtml(d.model)}</p>
+          ${d.tools_used?.length ? `<ol class="trace" aria-label="Tools used">${d.tools_used.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ol>` : '<p class="text-sm text-muted mt-2">No tools were used, so this answer is the model\'s own and is not checked.</p>'}
+          ${jsonToggle(d, 'ask-json')}`;
+        setProof({ ...d, status: d.tools_used?.length ? d.status : 'partial',
+                   warnings: [...(d.warnings || []), ...(d.tools_used?.length ? [] : ['The model answered without calling a tool; nothing here was computed.'])] },
+                 d.features?.length ? d : null, 'geospark-answer');
+      } catch (e) { refuse(el, e, 'No answer this time'); }
     }
+    document.getElementById('ask-form').addEventListener('submit', e => { e.preventDefault(); runAsk(document.getElementById('ask-q').value); });
+    document.querySelectorAll('[data-ask]').forEach(b => b.addEventListener('click', () => { document.getElementById('ask-q').value = b.dataset.ask; runAsk(b.dataset.ask); }));
 
-    /* --- Distance --- */
+    /* ---------- Reachable area ---------- */
+    async function runReach() {
+      const el = document.getElementById('reach-result');
+      const minutes = [...document.querySelectorAll('input[name=min]:checked')].map(i => Number(i.value)).slice(0, 4);
+      if (!minutes.length) { el.innerHTML = refusalHtml('Pick at least one time', 'Choose one to four contour times.'); return; }
+      const mode = document.querySelector('input[name=mode]:checked').value;
+      loading(el, 'Finding the place…');
+      try {
+        const p = await geocodeOne(document.getElementById('reach-place').value);
+        loading(el, `Routing from ${p.name.split(',')[0]}…`);
+        const d = await geo.post('/api/v1/isochrone', { lat: p.lat, lon: p.lon, minutes, mode });
+        clearMap();
+        const feats = [...(d.features || [])].sort((a, b) => b.properties.minutes - a.properties.minutes);
+        const order = [...feats].sort((a, b) => a.properties.minutes - b.properties.minutes).map(f => f.properties.minutes);
+        const colour = m => CONTOUR_COLORS[order.indexOf(m) % CONTOUR_COLORS.length];
+        const group = L.featureGroup();
+        feats.forEach(f => L.geoJSON(f.geometry, { style: { color: colour(f.properties.minutes), weight: 2, fillColor: colour(f.properties.minutes), fillOpacity: 0.12 } }).eachLayer(l => group.addLayer(l)));
+        group.addTo(layer);
+        addMarker(layer, p.lat, p.lon, p.name);
+        focus(group.getBounds());
+        drawIn(group);
+        el.innerHTML = `<ul class="contours">${[...feats].reverse().map(f => `
+            <li><span class="swatch" style="background:${colour(f.properties.minutes)}"></span>
+              <span class="m">${fmt(f.properties.minutes, 0)} min ${escapeHtml(mode)}</span>
+              <span class="a">${fmt(f.properties.area_sq_km, 2)} km²</span></li>`).join('')}</ul>
+          <p class="answer-meta">from ${escapeHtml(p.name)}</p>${jsonToggle(d, 'reach-json')}`;
+        setProof({ ...d, provenance: [...(p.raw.provenance || []), ...(d.provenance || [])], warnings: [...(p.raw.warnings || []), ...(d.warnings || [])] }, d, 'geospark-isochrone');
+      } catch (e) { refuse(el, e, 'No reachable area for this place'); }
+    }
+    document.getElementById('reach-form').addEventListener('submit', e => { e.preventDefault(); runReach(); });
+    document.querySelectorAll('[data-reach]').forEach(b => b.addEventListener('click', () => { document.getElementById('reach-place').value = b.dataset.reach; runReach(); }));
+    document.querySelectorAll('input[name=min]').forEach(i => i.addEventListener('change', () => {
+      const on = document.querySelectorAll('input[name=min]:checked');
+      if (on.length > 4) i.checked = false;
+    }));
+
+    /* ---------- Overture ---------- */
+    const theme = document.getElementById('ov-theme');
+    theme.addEventListener('change', () => {
+      document.getElementById('ov-cat-group').classList.toggle('hidden', theme.value !== 'places');
+      document.getElementById('ov-radius').disabled = theme.value === 'divisions';
+    });
+    function label(props) {
+      const n = props.names?.primary || props.name || props.class || props.subtype || props.id || 'feature';
+      return typeof n === 'string' ? n : JSON.stringify(n);
+    }
+    function detail(props) {
+      const kind = props.categories?.primary || props.category || props.class || props.subtype || '';
+      const metric = props.footprint_area_sq_m != null ? `${fmt(props.footprint_area_sq_m, 0)} m²`
+                   : props.length_m != null ? `${fmt(props.length_m, 0)} m long`
+                   : props.distance_m != null ? `${fmt(props.distance_m, 0)} m away` : (props.admin_level != null ? `level ${props.admin_level}` : '');
+      return [kind, metric].filter(Boolean).join(' · ');
+    }
+    async function runOverture() {
+      const el = document.getElementById('ov-result');
+      loading(el, 'Finding the place…');
+      try {
+        const p = await geocodeOne(document.getElementById('ov-place').value);
+        loading(el, 'Reading Overture Maps (first query can take ~20 s)…');
+        const body = { lat: p.lat, lon: p.lon, radius_m: Number(document.getElementById('ov-radius').value) || 400 };
+        const cat = document.getElementById('ov-cat').value.trim();
+        if (theme.value === 'places' && cat) body.category = cat;
+        const d = await geo.post(`/api/v1/overture/${theme.value}`, body);
+        clearMap();
+        const feats = d.features || [];
+        const group = L.geoJSON({ type: 'FeatureCollection', features: feats.map(f => ({ type: 'Feature', geometry: f.geometry, properties: f.properties })) }, {
+          style: { color: MINT, weight: theme.value === 'transportation' ? 2 : 1.2, fillColor: MINT, fillOpacity: theme.value === 'divisions' ? 0.05 : 0.18 },
+          pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 5, color: '#07090D', weight: 1, fillColor: MINT, fillOpacity: 0.95 }),
+          onEachFeature: (f, l) => l.bindPopup(`<strong>${escapeHtml(label(f.properties || {}))}</strong><br>${escapeHtml(detail(f.properties || {}))}`),
+        }).addTo(layer);
+        if (theme.value !== 'divisions') L.circle([p.lat, p.lon], { radius: body.radius_m, color: AMBER, weight: 1, dashArray: '4 6', fill: false }).addTo(layer);
+        addMarker(layer, p.lat, p.lon, p.name, 'b');
+        focus(theme.value === 'divisions' ? group.getBounds() : L.latLng(p.lat, p.lon).toBounds(body.radius_m * 2.2), 17);
+        el.innerHTML = feats.length ? `
+          <p class="text-sm text-muted mt-2">${fmt(feats.length, 0)} ${escapeHtml(theme.options[theme.selectedIndex].text.toLowerCase())} found</p>
+          <div class="table-wrap mt-1 feature-list"><table><thead><tr><th>Name</th><th>Details</th></tr></thead><tbody>
+            ${feats.slice(0, 60).map(f => `<tr><td>${escapeHtml(label(f.properties || {}))}</td><td>${escapeHtml(detail(f.properties || {}))}</td></tr>`).join('')}
+          </tbody></table></div>${jsonToggle(d, 'ov-json')}`
+          : refusalHtml('Nothing found here', 'Overture has no features of this kind within that radius. Try a bigger radius or another layer.');
+        setProof({ ...d, provenance: [...(p.raw.provenance || []), ...(d.provenance || [])] }, feats.length ? d : null, `geospark-overture-${theme.value}`);
+      } catch (e) { refuse(el, e, 'Open map data is unavailable'); }
+    }
+    document.getElementById('ov-form').addEventListener('submit', e => { e.preventDefault(); runOverture(); });
+
+    /* ---------- Distance ---------- */
     async function runDistance() {
-      const el = $('#dist-result');
-      el.innerHTML = '<div class="loading-overlay"><span class="spinner"></span>Calculating...</div>';
-      el.classList.remove('hidden');
+      const el = document.getElementById('dist-result');
+      const v = id => parseFloat(document.getElementById(id).value);
+      const body = { lat_a: v('dist-lat-a'), lon_a: v('dist-lon-a'), lat_b: v('dist-lat-b'), lon_b: v('dist-lon-b') };
+      loading(el, 'Measuring…');
       try {
-        const body = {
-          lat_a: parseFloat($('#dist-lat-a').value),
-          lon_a: parseFloat($('#dist-lon-a').value),
-          lat_b: parseFloat($('#dist-lat-b').value),
-          lon_b: parseFloat($('#dist-lon-b').value),
-        };
-        const data = await geo.post('/api/v1/distance', body);
-        el.innerHTML = resultCard([
-          ['Distance (m)', data.distance_m?.toLocaleString() + ' m'],
-          ['Distance (km)', data.distance_km?.toLocaleString() + ' km'],
-          ['Method', 'Geodesic on WGS84 ellipsoid'],
-        ]) + jsonToggle(data, 'dist-json');
-
-        // Map
-        const map = createMap('dist-map', (body.lat_a + body.lat_b) / 2, (body.lon_a + body.lon_b) / 2, 4);
-        addMarker(map, body.lat_a, body.lon_a, 'Point A');
-        addMarker(map, body.lat_b, body.lon_b, 'Point B');
-        L.polyline([[body.lat_a, body.lon_a], [body.lat_b, body.lon_b]], { color: '#2d9c6f', weight: 2, dashArray: '6 4' }).addTo(map);
-        fitBounds(map, [[body.lat_a, body.lon_a], [body.lat_b, body.lon_b]]);
-      } catch (e) { showError(el, e.message); el.classList.add('error'); }
+        const d = await geo.post('/api/v1/distance', body);
+        clearMap();
+        addMarker(layer, body.lat_a, body.lon_a, 'A');
+        addMarker(layer, body.lat_b, body.lon_b, 'B', 'b');
+        const line = L.polyline([[body.lat_a, body.lon_a], [body.lat_b, body.lon_b]], { color: MINT, weight: 2, dashArray: '2 8', lineCap: 'round' }).addTo(layer);
+        focus(line.getBounds(), 12);
+        drawIn(L.featureGroup([line]));
+        el.innerHTML = `<div class="readout"><span class="num">${fmt(d.distance_km, 3)}</span><span class="unit">km</span>
+          <span class="sub">${fmt(d.distance_m, 2)} m · geodesic on the WGS84 ellipsoid</span></div>${jsonToggle(d, 'dist-json')}`;
+        const fc = { type: 'FeatureCollection', features: [{ type: 'Feature', geometry: { type: 'LineString', coordinates: [[body.lon_a, body.lat_a], [body.lon_b, body.lat_b]] }, properties: { distance_m: d.distance_m, method: 'geodesic WGS84 (straight segment drawn for display)' } }] };
+        setProof({ ...d, status: 'ok' }, fc, 'geospark-distance');
+      } catch (e) { refuse(el, e); }
     }
+    document.getElementById('dist-form').addEventListener('submit', e => { e.preventDefault(); runDistance(); });
+    document.querySelectorAll('[data-dist]').forEach(b => b.addEventListener('click', () => {
+      const [a, b2, c, d] = b.dataset.dist.split(',');
+      Object.entries({ 'dist-lat-a': a, 'dist-lon-a': b2, 'dist-lat-b': c, 'dist-lon-b': d }).forEach(([id, val]) => { document.getElementById(id).value = val; });
+      runDistance();
+    }));
 
-    /* --- Elevation --- */
+    /* ---------- Geocode ---------- */
+    async function runGeocode() {
+      const el = document.getElementById('geo-result');
+      loading(el, 'Geocoding…');
+      try {
+        const d = await geo.post('/api/v1/geocode', { query: document.getElementById('geo-query').value });
+        const f = (d.features || [])[0];
+        if (!f) throw new Error('No place was found. Try adding the city or country.');
+        const [lon, lat] = f.geometry.coordinates;
+        clearMap();
+        addMarker(layer, lat, lon, f.properties?.display_name);
+        focus(L.latLng(lat, lon).toBounds(800), 15);
+        el.innerHTML = resultCard([['Place', escapeHtml(f.properties?.display_name || '—')], ['Latitude', fmt(lat, 6)], ['Longitude', fmt(lon, 6)]]) + jsonToggle(d, 'geo-json');
+        setProof(d, d, 'geospark-geocode');
+      } catch (e) { refuse(el, e, 'Place not found'); }
+    }
+    document.getElementById('geo-form').addEventListener('submit', e => { e.preventDefault(); runGeocode(); });
+    document.querySelectorAll('[data-geo]').forEach(b => b.addEventListener('click', () => { document.getElementById('geo-query').value = b.dataset.geo; runGeocode(); }));
+
+    /* ---------- Elevation ---------- */
     async function runElevation() {
-      const el = $('#elev-result');
-      el.innerHTML = '<div class="loading-overlay"><span class="spinner"></span>Fetching elevation...</div>';
-      el.classList.remove('hidden');
+      const el = document.getElementById('elev-result');
+      const lat = parseFloat(document.getElementById('elev-lat').value), lon = parseFloat(document.getElementById('elev-lon').value);
+      loading(el, 'Reading the elevation model…');
       try {
-        const lat = parseFloat($('#elev-lat').value);
-        const lon = parseFloat($('#elev-lon').value);
-        const data = await geo.post('/api/v1/elevation', { latitude: lat, longitude: lon });
-        el.innerHTML = resultCard([
-          ['Elevation', (data.elevation_m ?? '—') + ' m'],
-          ['Latitude', lat.toFixed(6)],
-          ['Longitude', lon.toFixed(6)],
-          ['Source', data.source || 'Open Elevation API'],
-        ]) + jsonToggle(data, 'elev-json');
-
-        const map = createMap('elev-map', lat, lon, 10);
-        addMarker(map, lat, lon, `Elevation: ${data.elevation_m}m`);
-      } catch (e) { showError(el, e.message); el.classList.add('error'); }
+        const d = await geo.post('/api/v1/elevation', { latitude: lat, longitude: lon });
+        clearMap();
+        addMarker(layer, lat, lon, `${fmt(d.elevation_m, 1)} m`);
+        focus(L.latLng(lat, lon).toBounds(20000), 11);
+        el.innerHTML = `<div class="readout"><span class="num">${fmt(d.elevation_m, 1)}</span><span class="unit">m</span>
+          <span class="sub">${escapeHtml(d.source || '')}${d.vertical_datum ? ' · ' + escapeHtml(d.vertical_datum) : ''}</span></div>${jsonToggle(d, 'elev-json')}`;
+        const fc = { type: 'FeatureCollection', features: [{ type: 'Feature', geometry: { type: 'Point', coordinates: [lon, lat] }, properties: { elevation_m: d.elevation_m, source: d.source } }] };
+        setProof({ ...d, status: 'ok' }, fc, 'geospark-elevation');
+      } catch (e) { refuse(el, e, 'No elevation for this point'); }
     }
+    document.getElementById('elev-form').addEventListener('submit', e => { e.preventDefault(); runElevation(); });
+    document.querySelectorAll('[data-elev]').forEach(b => b.addEventListener('click', () => {
+      const [a, c] = b.dataset.elev.split(','); document.getElementById('elev-lat').value = a; document.getElementById('elev-lon').value = c; runElevation();
+    }));
 
-    /* --- Relationship --- */
+    /* ---------- Relationship ---------- */
     async function runRelationship() {
-      const el = $('#rel-result');
-      el.innerHTML = '<div class="loading-overlay"><span class="spinner"></span>Checking relationship...</div>';
-      el.classList.remove('hidden');
+      const el = document.getElementById('rel-result');
+      let a, b;
+      try { a = JSON.parse(document.getElementById('rel-geom-a').value); b = JSON.parse(document.getElementById('rel-geom-b').value); }
+      catch (e) { el.innerHTML = refusalHtml('That isn\'t valid JSON', e.message); return; }
+      loading(el, 'Checking…');
       try {
-        const body = {
-          geometry_a: JSON.parse($('#rel-geom-a').value),
-          geometry_b: JSON.parse($('#rel-geom-b').value),
-          relationship: $('#rel-type').value,
-        };
-        const data = await geo.post('/api/v1/check-relationship', body);
-        const color = data.result ? 'var(--color-success)' : 'var(--color-error)';
-        el.innerHTML = `
-          <div class="result-card">
-            <div class="metric">
-              <span class="label">Relationship</span>
-              <span class="value">${data.relationship}</span>
-            </div>
-            <div class="metric">
-              <span class="label">Result</span>
-              <span class="value" style="color:${color}; font-size:1rem">${data.result ? 'TRUE' : 'FALSE'}</span>
-            </div>
-          </div>
-        ` + jsonToggle(data, 'rel-json');
-      } catch (e) { showError(el, e.message); el.classList.add('error'); }
+        const d = await geo.post('/api/v1/check-relationship', { geometry_a: a, geometry_b: b, relationship: document.getElementById('rel-type').value });
+        clearMap();
+        const ga = L.geoJSON(a, { style: { color: MINT, weight: 2, fillOpacity: 0.15 }, pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 6, color: MINT }) }).addTo(layer);
+        const gb = L.geoJSON(b, { style: { color: AMBER, weight: 2, fillOpacity: 0.15 }, pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 6, color: AMBER, fillColor: AMBER, fillOpacity: 0.9 }) }).addTo(layer);
+        focus(L.featureGroup([ga, gb]).getBounds(), 17);
+        el.innerHTML = `<div class="readout"><span class="num" style="color:${d.result ? 'var(--accent)' : 'var(--error)'}">${d.result ? 'Yes' : 'No'}</span>
+          <span class="unit">A ${escapeHtml(d.relationship)} B</span></div>${jsonToggle(d, 'rel-json')}`;
+        setProof({ ...d, status: 'ok' }, { type: 'FeatureCollection', features: [{ type: 'Feature', geometry: a, properties: { role: 'A' } }, { type: 'Feature', geometry: b, properties: { role: 'B' } }] }, 'geospark-relationship');
+      } catch (e) { refuse(el, e, 'Geometry refused'); }
     }
+    document.getElementById('rel-form').addEventListener('submit', e => { e.preventDefault(); runRelationship(); });
 
-    /* --- Ask --- */
-    async function runAsk() {
-      const el = $('#ask-result');
-      showLoading(el, 'Thinking... (may take 5-30 seconds)');
-      try {
-        const data = await geo.post('/api/v1/ask', { question: $('#ask-q').value });
-        el.innerHTML = `
-          <div class="result-card">
-            <div class="metric"><span class="label">Answer</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(data.answer)}</span></div>
-            <div class="metric"><span class="label">Model</span><span class="value">${data.model}</span></div>
-            <div class="metric"><span class="label">Tools Used</span><span class="value">${data.tools_used?.join(', ') || 'none'}</span></div>
-          </div>
-        ` + jsonToggle(data, 'ask-json');
-        el.classList.remove('hidden', 'error');
-      } catch (e) { showError(el, e.message); }
+    /* ---------- deep links: #reach, #overture, ?ask=… from the home page ---------- */
+    const params = new URLSearchParams(location.search);
+    const hash = location.hash.replace('#', '');
+    if (hash && document.getElementById('tab-' + hash)) openTab('tab-' + hash, false);
+    window.addEventListener('hashchange', () => {
+      const h = location.hash.replace('#', '');
+      if (h && document.getElementById('tab-' + h)) openTab('tab-' + h, false);
+    });
+    if (params.get('ask')) {
+      document.getElementById('ask-q').value = params.get('ask');
+      openTab('tab-ask');
+      runAsk(params.get('ask'));
     }
   </script>
 </body>

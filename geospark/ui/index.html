@@ -3,756 +3,502 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GeoSpark &mdash; Spatial Intelligence, Verified.</title>
+  <title>GeoSpark — Ask the planet. Check the answer.</title>
+  <meta name="description" content="Open-source spatial engine and MCP server: AI agents get real geography — distances, reachable areas, places, terrain — with the source, licence and caveats of every number.">
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/globe.gl@2.33.0"></script>
   <style>
-    /* ===== LANDING PAGE DESIGN SYSTEM ===== */
-    body.landing { background: #080b12; color: #e2e8f0; }
-    body.landing .container { max-width: 100%; padding: 0; }
-    body.landing .section-inner { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+    .wrap { max-width: 1240px; margin: 0 auto; padding-left: var(--gutter); padding-right: var(--gutter); }
 
-    /* Nav override for dark landing */
-    body.landing .nav {
-      background: rgba(8,11,18,0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      box-shadow: none;
+    /* ---- Hero ---- */
+    .hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
+    .hero-contours { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.5; pointer-events: none; }
+    .hero-grid {
+      position: relative; display: grid; gap: var(--space-7); align-items: center;
+      grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+      padding-top: var(--space-9); padding-bottom: var(--space-9);
     }
+    .hero h1 { font-size: clamp(44px, 6.4vw, 80px); line-height: 1.0; letter-spacing: -0.035em; margin: var(--space-4) 0 var(--space-5); }
+    .hero h1 .hl { color: var(--accent); }
+    .hero .lede { max-width: 540px; font-size: 18px; color: var(--text-2); }
+    .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 50% { opacity: 0.35; } }
 
-    /* ===== HERO ===== */
-    .hero-globe {
-      position: relative;
-      min-height: 92vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      padding: 2rem;
+    .ask { margin-top: var(--space-6); display: flex; flex-direction: column; gap: var(--space-3); }
+    .ask-bar {
+      display: flex; gap: 8px; padding: 8px; border-radius: 18px;
+      background: rgba(15, 19, 26, 0.92); border: 1px solid var(--accent-line);
+      box-shadow: 0 0 0 6px rgba(124, 242, 200, 0.05), var(--shadow);
+      transition: box-shadow 0.3s var(--ease);
     }
+    .ask-bar:focus-within { box-shadow: 0 0 0 6px rgba(124, 242, 200, 0.12), var(--shadow); }
+    .ask-bar input { border: 0; background: transparent; box-shadow: none !important; font-size: 16px; min-height: 48px; }
+    .ask-bar .btn { min-height: 48px; border-radius: 12px; padding: 0 24px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      min-height: 36px; padding: 0 14px; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--line-strong); background: transparent; color: var(--text-2); font: 400 13px var(--font-sans);
+      transition: color var(--transition), border-color var(--transition), background var(--transition);
+    }
+    .chip:hover, .chip[aria-pressed="true"] { color: var(--text); border-color: var(--accent-line); background: var(--accent-soft); }
 
-    /* Ambient glow */
-    .hero-globe::before {
-      content: '';
-      position: absolute;
-      width: 800px; height: 800px;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(45,156,111,0.12) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
+    .stage {
+      position: relative; aspect-ratio: 1 / 1; max-height: 620px; width: 100%;
+      border-radius: var(--radius-xl); overflow: hidden;
+      background: radial-gradient(circle at 50% 45%, #0E1A1C 0%, #07090D 70%);
+      border: 1px solid var(--line);
     }
+    #globe { position: absolute; inset: 0; }
+    #globe canvas { outline: none; }
+    .answer-card {
+      position: absolute; left: var(--space-4); right: var(--space-4); bottom: var(--space-4);
+      display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4) var(--space-5); border-radius: 16px;
+      background: rgba(10, 13, 19, 0.78); border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      transform: translateY(8px); opacity: 0; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+    }
+    .answer-card.on { opacity: 1; transform: none; }
+    .answer-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+    .answer-route { flex-basis: 100%; font: 400 12px var(--font-mono); color: var(--text-3); }
+    .answer-num { font: 600 34px/1.05 var(--font-display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+    .answer-top .badge { margin-left: auto; }
+    .proof-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .proof-chip { padding: 3px 8px; border-radius: 6px; border: 1px solid var(--line-strong); font: 400 11px var(--font-mono); color: var(--text-2); }
 
-    .hero-text {
-      position: relative;
-      z-index: 10;
-      text-align: center;
-      margin-bottom: 1rem;
-    }
+    /* ---- Live strip ---- */
+    .live { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); padding-top: var(--space-4); padding-bottom: var(--space-4); font: 400 12px var(--font-mono); color: var(--text-3); }
+    .live b { font-weight: 500; color: var(--text); }
+    .live .dot { display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--text-3); vertical-align: middle; }
+    .live .dot.on { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
 
-    .hero-text h1 {
-      font-size: 3.5rem;
-      font-weight: 800;
-      letter-spacing: -2px;
-      line-height: 1.05;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #ffffff 0%, #a0d8c0 50%, #2d9c6f 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+    /* ---- Sections ---- */
+    .block { padding: var(--space-9) 0; border-top: 1px solid var(--line); }
+    .block.alt { background: var(--bg-raised); }
+    .block.compact { padding: var(--space-8) 0; }
+    .kicker { font: 500 12px var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+    .block h2 { font-size: clamp(32px, 4.4vw, 48px); line-height: 1.06; letter-spacing: -0.025em; margin: var(--space-3) 0 var(--space-4); max-width: 760px; }
+    .block .lead { max-width: 640px; font-size: 17px; color: var(--text-2); }
 
-    .hero-text .subtitle {
-      font-size: 1.15rem;
-      color: #64748b;
-      max-width: 500px;
-      margin: 0 auto 1.5rem;
-      line-height: 1.6;
-    }
+    .chain { list-style: none; margin-top: var(--space-7); display: grid; gap: 1px; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+      background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; }
+    .chain li { position: relative; display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-5); background: var(--bg); }
+    .chain .n { font: 500 12px var(--font-mono); color: var(--text-3); }
+    .chain h3 { font-size: 22px; }
+    .chain p { font-size: 15px; color: var(--text-2); }
+    .chain code { margin-top: auto; padding: 0; background: none; font-size: 12px; color: var(--accent); }
+    .chain li:last-child code { color: var(--warn); }
+    .chain li::after { content: ''; position: absolute; left: 0; top: 0; height: 2px; width: 0; background: var(--accent); transition: width 0.9s var(--ease); }
+    .chain.visible li::after { width: 100%; }
+    .chain.visible li:nth-child(2)::after { transition-delay: 0.25s; }
+    .chain.visible li:nth-child(3)::after { transition-delay: 0.5s; }
+    .chain.visible li:nth-child(4)::after { transition-delay: 0.75s; }
 
-    /* Search bar */
-    .hero-search-bar {
-      position: relative;
-      z-index: 10;
-      max-width: 580px;
-      width: 100%;
-      margin: 0 auto 1rem;
-    }
+    .split { display: grid; gap: var(--space-7); align-items: center; grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr)); }
+    .seg { display: inline-flex; gap: var(--space-1); padding: var(--space-1); margin-top: var(--space-5); border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+    .seg button { min-height: 40px; padding: 0 18px; border: 0; border-radius: 9px; background: transparent; color: var(--text-2); font: 500 14px var(--font-sans); cursor: pointer; }
+    .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+    .big { display: flex; align-items: baseline; gap: var(--space-3); margin-top: var(--space-5); }
+    .big .num { font: 600 72px/1 var(--font-display); letter-spacing: -0.04em; color: var(--accent); font-variant-numeric: tabular-nums; }
+    .big .unit { font-size: 20px; color: var(--text-2); }
+    .fine { margin-top: var(--space-3); font: 400 12px var(--font-mono); color: var(--text-3); }
+    #iso-map { height: 460px; }
+    #iso-note:empty { display: none; }
 
-    .hero-search-bar .search-wrap {
-      display: flex;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 14px;
-      overflow: hidden;
-      transition: all 0.3s;
-    }
+    .bench { display: grid; gap: 1px; margin-top: var(--space-7); grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+      background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; }
+    .bench div { padding: var(--space-5); background: var(--bg-raised); }
+    .bench .v { font: 600 56px/1 var(--font-display); letter-spacing: -0.03em; }
+    .bench .v.bad { color: var(--error); }
+    .bench .v.good { color: var(--accent); }
+    .bench p { margin-top: var(--space-3); font-size: 14px; color: var(--text-2); }
 
-    .hero-search-bar .search-wrap:focus-within {
-      border-color: rgba(45,156,111,0.5);
-      box-shadow: 0 0 30px rgba(45,156,111,0.1);
-      background: rgba(255,255,255,0.06);
-    }
+    .features { display: grid; gap: var(--space-4); margin-top: var(--space-7); grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); }
+    .feature { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-5); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); transition: border-color var(--transition), transform 0.3s var(--ease); }
+    .feature:hover { border-color: var(--accent-line); transform: translateY(-2px); }
+    .feature svg { color: var(--accent); }
+    .feature h3 { font-size: 19px; }
+    .feature p { font-size: 14px; color: var(--text-2); }
+    .feature a { margin-top: auto; font-size: 14px; font-weight: 500; }
 
-    .hero-search-bar input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: #e2e8f0;
-      font-size: 0.95rem;
-      padding: 1rem 1.25rem;
-      outline: none;
-      font-family: var(--font-sans);
-    }
-    .hero-search-bar input::placeholder { color: #475569; }
+    .terminal { border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--bg-raised); overflow: hidden; }
+    .terminal .bar { display: flex; gap: 6px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); font: 400 12px var(--font-mono); color: var(--text-3); }
+    .terminal .bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--surface-3); }
+    .terminal pre { margin: 0; padding: 20px; font: 400 14px/1.85 var(--font-mono); color: var(--text-2); white-space: pre-wrap; }
+    .terminal .p { color: var(--text-3); }
+    .terminal .ok { color: var(--accent); }
+    .cta-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); }
 
-    .hero-search-bar button {
-      background: var(--color-primary);
-      border: none;
-      color: #fff;
-      padding: 1rem 1.75rem;
-      font-weight: 700;
-      font-size: 0.85rem;
-      cursor: pointer;
-      font-family: var(--font-sans);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: background 0.2s;
-    }
-    .hero-search-bar button:hover { background: #34b87f; }
-
-    .hero-chips {
-      display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap;
-      position: relative; z-index: 10;
-    }
-    .hero-chips button {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: #64748b;
-      padding: 0.4rem 0.9rem;
-      border-radius: 20px;
-      font-size: 0.78rem;
-      cursor: pointer;
-      transition: all 0.25s;
-      font-family: var(--font-sans);
-    }
-    .hero-chips button:hover {
-      background: rgba(45,156,111,0.12);
-      border-color: rgba(45,156,111,0.4);
-      color: #a0d8c0;
-    }
-
-    /* Globe container */
-    .globe-container {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      opacity: 0.55;
-    }
-
-    /* Result overlay */
-    .globe-result {
-      position: relative;
-      z-index: 10;
-      max-width: 480px;
-      width: 100%;
-      margin: 1.5rem auto 0;
-      background: rgba(8,11,18,0.8);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(45,156,111,0.2);
-      border-radius: 16px;
-      padding: 1.25rem 1.5rem;
-      opacity: 0;
-      transform: translateY(16px);
-      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .globe-result.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .globe-result .gr-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.3rem 0;
-    }
-    .globe-result .gr-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: #475569;
-    }
-    .globe-result .gr-value {
-      font-family: var(--font-mono);
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #2d9c6f;
-      text-shadow: 0 0 20px rgba(45,156,111,0.3);
-    }
-    .globe-result .gr-method {
-      font-size: 0.72rem;
-      color: #334155;
-      margin-top: 0.15rem;
-    }
-    .globe-result .gr-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      background: rgba(45,156,111,0.1);
-      border: 1px solid rgba(45,156,111,0.2);
-      color: #2d9c6f;
-      padding: 0.25rem 0.65rem;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-
-    /* ===== LIVE PULSE ===== */
-    .live-strip {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 2.5rem;
-      flex-wrap: wrap;
-      padding: 1rem 2rem;
-      background: rgba(255,255,255,0.02);
-      border-top: 1px solid rgba(255,255,255,0.04);
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-    }
-    .live-strip .ls-item {
-      display: flex; align-items: center; gap: 0.5rem;
-      font-size: 0.8rem; color: #475569;
-    }
-    .live-strip .ls-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: #2d9c6f;
-      box-shadow: 0 0 8px rgba(45,156,111,0.6);
-      animation: pulse-glow 2s ease-in-out infinite;
-    }
-    @keyframes pulse-glow {
-      0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(45,156,111,0.6); }
-      50% { opacity: 0.5; box-shadow: 0 0 4px rgba(45,156,111,0.3); }
-    }
-    .live-strip .ls-val { color: #e2e8f0; font-weight: 600; font-family: var(--font-mono); font-size: 0.8rem; }
-
-    /* ===== SECTIONS (dark theme) ===== */
-    body.landing .section { padding: 4rem 0; }
-    body.landing .section-header {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-    body.landing .section-header h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: -1px;
-      margin-bottom: 0.5rem;
-    }
-    body.landing .section-header p {
-      color: #64748b;
-      font-size: 1rem;
-      max-width: 500px;
-      margin: 0 auto;
-    }
-
-    /* Dark cards */
-    body.landing .dark-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 1.75rem;
-      transition: all 0.3s;
-    }
-    body.landing .dark-card:hover {
-      background: rgba(255,255,255,0.05);
-      border-color: rgba(45,156,111,0.2);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-      transform: translateY(-2px);
-    }
-    body.landing .dark-card h3 {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: #e2e8f0;
-    }
-    body.landing .dark-card p { color: #64748b; font-size: 0.88rem; line-height: 1.6; }
-    body.landing .dark-card .card-icon-sm {
-      font-size: 1.5rem;
-      margin-bottom: 0.75rem;
-      display: block;
-    }
-
-    /* VS Comparison */
-    .compare-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      position: relative;
-    }
-    .compare-grid::after {
-      content: 'VS';
-      position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      background: #080b12;
-      border: 2px solid rgba(255,255,255,0.1);
-      border-radius: 50%;
-      width: 44px; height: 44px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 0.7rem; color: #475569;
-      z-index: 2;
-    }
-    .compare-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 1.75rem;
-    }
-    .compare-card.fail { border-left: 3px solid var(--color-error); }
-    .compare-card.pass { border-left: 3px solid var(--color-primary); }
-    .compare-card .cc-head {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: #475569;
-      margin-bottom: 1rem;
-    }
-    .compare-card .cc-answer {
-      font-family: var(--font-mono);
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-    .compare-card.fail .cc-answer { color: var(--color-error); }
-    .compare-card.pass .cc-answer { color: var(--color-primary); }
-    .compare-card .cc-detail {
-      font-size: 0.82rem;
-      color: #475569;
-      line-height: 1.5;
-    }
-
-    /* Credibility numbers */
-    .cred-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      margin-top: 3rem;
-    }
-    .cred-item {
-      text-align: center;
-      padding: 2rem 1rem;
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.04);
-      border-radius: 16px;
-    }
-    .cred-item .cred-num {
-      font-size: 3.5rem;
-      font-weight: 800;
-      letter-spacing: -2px;
-      line-height: 1;
-      margin-bottom: 0.5rem;
-    }
-    .cred-item .cred-num.red { color: var(--color-error); text-shadow: 0 0 40px rgba(215,58,73,0.3); }
-    .cred-item .cred-num.green { color: var(--color-primary); text-shadow: 0 0 40px rgba(45,156,111,0.3); }
-    .cred-item .cred-desc { font-size: 0.82rem; color: #475569; line-height: 1.4; }
-
-    /* Code block */
-    body.landing .code-block {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 12px;
-      padding: 1.5rem;
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      color: #94a3b8;
-      line-height: 1.7;
-      overflow-x: auto;
-    }
-    body.landing .code-block .kw { color: #c084fc; }
-    body.landing .code-block .fn { color: #2d9c6f; }
-    body.landing .code-block .str { color: #fbbf24; }
-    body.landing .code-block .cm { color: #334155; }
-
-    /* Scroll reveal */
-    .reveal {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Footer */
-    body.landing footer {
-      text-align: center;
-      padding: 3rem 0 2rem;
-      color: #334155;
-      font-size: 0.82rem;
-      border-top: 1px solid rgba(255,255,255,0.04);
-      margin-top: 3rem;
-    }
-    body.landing footer a { color: #475569; }
-    body.landing footer a:hover { color: #2d9c6f; }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .hero-text h1 { font-size: 2rem; }
-      .globe-container { opacity: 0.3; }
-      .compare-grid { grid-template-columns: 1fr; }
-      .compare-grid::after { display: none; }
-      .cred-grid { grid-template-columns: 1fr; }
-      .hero-globe { min-height: 80vh; }
-    }
+    .sources-strip { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-6); margin-top: var(--space-4); font: 500 20px var(--font-display); color: var(--text-2); }
   </style>
 </head>
-<body class="landing">
-  <nav class="nav">
-    <span class="nav-brand">GeoSpark</span>
-    <div class="nav-links">
-      <a href="/" class="active">Home</a>
-      <a href="/guide">Guide</a>
+<body>
+  <header class="nav">
+    <a class="nav-brand" href="/" aria-label="GeoSpark home">
+      <span class="brand-mark" data-liquid-logo><img src="/assets/logo.svg" alt="" width="28" height="28"></span>
+      <span>GeoSpark</span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
       <a href="/playground">Playground</a>
-      <a href="/flows">Flows</a>
       <a href="/agents">Agents</a>
+      <a href="/flows">Flows</a>
+      <a href="/data">Data</a>
       <a href="/memory">Memory</a>
       <a href="/context">Context</a>
-      <a href="/data">Data</a>
+      <a href="/guide">Guide</a>
       <a href="/status">Status</a>
-      <a href="/docs">API Docs</a>
-    </div>
+      <a href="/docs">API</a>
+    </nav>
     <span class="nav-version"></span>
-  </nav>
+    <a class="nav-cta" href="https://github.com/Maz2580/geospark" target="_blank" rel="noopener">GitHub</a>
+  </header>
 
-  <div class="container">
+  <main>
+    <!-- ===== Hero ===== -->
+    <section class="hero" aria-labelledby="hero-title">
+      <svg class="hero-contours" viewBox="0 0 1440 760" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <g fill="none" stroke="#7CF2C8" stroke-width="1" opacity="0.16">
+          <path d="M-40 620 C 200 560 360 640 560 590 S 900 470 1120 520 S 1400 600 1500 560"/>
+          <path d="M-40 560 C 210 500 380 590 580 540 S 920 420 1130 470 S 1400 540 1500 500"/>
+          <path d="M-40 500 C 220 440 400 530 600 480 S 940 370 1140 420 S 1400 480 1500 440"/>
+          <path d="M-40 440 C 240 380 420 470 620 420 S 950 320 1150 370 S 1400 420 1500 380"/>
+          <path d="M-40 380 C 250 320 440 410 640 360 S 960 270 1160 320 S 1400 360 1500 320"/>
+          <path d="M-40 320 C 260 260 460 350 660 300 S 970 220 1170 270 S 1400 300 1500 260"/>
+          <path d="M-40 260 C 270 200 480 290 680 240 S 980 170 1180 220 S 1400 240 1500 200"/>
+          <path d="M-40 200 C 280 140 500 230 700 180 S 990 120 1190 170 S 1400 180 1500 140"/>
+        </g>
+        <g fill="none" stroke="#fff" stroke-width="1" opacity="0.04">
+          <path d="M0 95H1440M0 190H1440M0 285H1440M0 380H1440M0 475H1440M0 570H1440M0 665H1440"/>
+          <path d="M180 0V760M360 0V760M540 0V760M720 0V760M900 0V760M1080 0V760M1260 0V760"/>
+        </g>
+      </svg>
+      <div class="wrap hero-grid">
+        <div>
+          <span class="eyebrow"><span class="pulse-dot"></span>Open source · MCP server · Verifiable answers</span>
+          <h1 id="hero-title">Ask the planet.<br><span class="hl">Check</span> the answer.</h1>
+          <p class="lede">GeoSpark gives AI agents real geography — distances, reachable areas, places, buildings, terrain — and shows exactly where every number came from. If it can't answer, it says so.</p>
 
-    <!-- ===== HERO WITH GLOBE ===== -->
-    <div class="hero-globe">
-      <div class="globe-container" id="globe-container"></div>
-
-      <div class="hero-text">
-        <h1>Spatial Intelligence,<br>Verified.</h1>
-        <p class="subtitle">
-          The open-source engine that replaces LLM guessing with
-          ground-truth spatial computation. Topology. Distance. Containment.
-          All correct.
-        </p>
-      </div>
-
-      <div class="hero-search-bar">
-        <div class="search-wrap">
-          <input type="text" id="hero-q" placeholder="Try: Eiffel Tower to Big Ben">
-          <button onclick="heroCompute()">Compute</button>
+          <form class="ask" action="/playground" method="get" role="search">
+            <label for="ask-q" class="field-label">Ask a spatial question</label>
+            <div class="ask-bar">
+              <input id="ask-q" name="ask" type="text" autocomplete="off" required
+                     placeholder="How far is Federation Square from Melbourne Town Hall?">
+              <button class="btn btn-primary" type="submit">Ask</button>
+            </div>
+            <div class="chips" role="group" aria-label="Try a distance on the globe">
+              <button type="button" class="chip" data-route="0">Paris → London</button>
+              <button type="button" class="chip" data-route="1">Tokyo → Sydney</button>
+              <button type="button" class="chip" data-route="2">New York → Los Angeles</button>
+              <button type="button" class="chip" data-route="3">Melbourne → Auckland</button>
+            </div>
+          </form>
         </div>
-      </div>
 
-      <div class="hero-chips">
-        <button onclick="heroArc('Paris','Eiffel Tower',48.8584,2.2945,'London','Big Ben',51.5007,-0.1246)">Paris &rarr; London</button>
-        <button onclick="heroArc('Tokyo','Tokyo Tower',35.6586,139.7454,'Sydney','Opera House',-33.8568,151.2153)">Tokyo &rarr; Sydney</button>
-        <button onclick="heroArc('New York','Statue of Liberty',40.6892,-74.0445,'Los Angeles','Hollywood Sign',34.1341,-118.3215)">NYC &rarr; LA</button>
-        <button onclick="heroArc('Dubai','Burj Khalifa',25.1972,55.2744,'Mumbai','Gateway of India',18.9220,72.8347)">Dubai &rarr; Mumbai</button>
-        <button onclick="heroArc('Melbourne','Fed Square',-37.8180,144.9691,'Auckland','Sky Tower',-36.8485,174.7633)">Melbourne &rarr; Auckland</button>
-      </div>
-
-      <div class="globe-result" id="globe-result">
-        <div class="gr-row">
-          <span class="gr-label">Geodesic Distance</span>
-          <span class="gr-badge">&#9679; Verified</span>
-        </div>
-        <div class="gr-value" id="gr-value">&mdash;</div>
-        <div class="gr-method">WGS84 ellipsoid &middot; pyproj Geod.inv &middot; <span id="gr-route">...</span></div>
-      </div>
-    </div>
-
-    <!-- ===== LIVE PULSE ===== -->
-    <div class="live-strip">
-      <div class="ls-item"><span class="ls-dot"></span> System <span class="ls-val" id="lp-status">...</span></div>
-      <div class="ls-item"><span class="ls-dot"></span> Models <span class="ls-val" id="lp-models">...</span></div>
-      <div class="ls-item"><span class="ls-dot"></span> Live <span class="ls-val" id="lp-weather">...</span></div>
-      <div class="ls-item"><span class="ls-dot"></span> Version <span class="ls-val" id="lp-version">...</span></div>
-    </div>
-
-    <!-- ===== WHY GEOSPARK ===== -->
-    <div class="section reveal">
-      <div class="section-inner">
-      <div class="section-header">
-        <h2>LLMs guess. GeoSpark computes.</h2>
-        <p>Every spatial answer is computed on the WGS84 ellipsoid, not inferred from training data.</p>
-      </div>
-
-      <div class="compare-grid">
-        <div class="compare-card fail">
-          <div class="cc-head">&#10060; LLM Alone</div>
-          <div class="cc-answer">~500 km</div>
-          <div class="cc-detail">
-            <em>"How far is the Eiffel Tower from Big Ben?"</em><br>
-            Guessed from training data. 0% accuracy on distance benchmarks across 4 of 5 model families.
-          </div>
-        </div>
-        <div class="compare-card pass">
-          <div class="cc-head">&#9989; With GeoSpark</div>
-          <div class="cc-answer">343,923 m</div>
-          <div class="cc-detail">
-            <em>"How far is the Eiffel Tower from Big Ben?"</em><br>
-            Geodesic computation on WGS84 ellipsoid. Ground truth. Reproducible. Citeable.
+        <div class="stage">
+          <div id="globe" aria-hidden="true"></div>
+          <div class="answer-card" id="answer" aria-live="polite">
+            <div class="answer-top">
+              <span class="answer-route" id="ans-route">—</span>
+              <span class="answer-num" id="ans-num">—</span>
+              <span class="badge badge-ok" id="ans-status">status: ok</span>
+            </div>
+            <div class="proof-chips" id="ans-chips"></div>
           </div>
         </div>
       </div>
+    </section>
 
-      <div class="cred-grid">
-        <div class="cred-item reveal">
-          <div class="cred-num red">0%</div>
-          <div class="cred-desc">Distance accuracy<br>LLMs alone (4 of 5 families)</div>
-        </div>
-        <div class="cred-item reveal">
-          <div class="cred-num green">535</div>
-          <div class="cred-desc">Benchmark questions<br>5 categories, 5 model families</div>
-        </div>
-        <div class="cred-item reveal">
-          <div class="cred-num green">100%</div>
-          <div class="cred-desc">Spatial reasoning accuracy<br>with GeoSpark augmentation</div>
-        </div>
-      </div>
-      </div>
+    <div class="wrap live" aria-label="Live system">
+      <span><i class="dot" id="lv-dot"></i>System <b id="lv-status">checking…</b></span>
+      <span>Version <b id="lv-version">…</b></span>
+      <span>Models <b id="lv-models">…</b></span>
+      <span>Routing <b id="lv-routing">…</b></span>
     </div>
 
-    <!-- ===== PLATFORM ===== -->
-    <div class="section reveal">
-      <div class="section-inner">
-      <div class="section-header">
-        <h2>The Platform</h2>
-        <p>Spatial reasoning, live data, autonomous agents, and model-agnostic integration.</p>
+    <!-- ===== 01 Proof chain ===== -->
+    <section class="block" aria-labelledby="chain-title">
+      <div class="wrap">
+        <span class="kicker">01 — The proof chain</span>
+        <h2 id="chain-title">Every answer carries its own receipt.</h2>
+        <p class="lead">Most AI tools give you a number. GeoSpark gives you the number, the tools that produced it, the data and licence behind each step, and a run record anyone can replay.</p>
+        <ol class="chain reveal" id="chain">
+          <li><span class="n">STEP 1</span><h3>Question</h3><p>Plain words in. Places are geocoded — and when two places share a name, you're told.</p><code>"Federation Square" → −37.8180, 144.9691</code></li>
+          <li><span class="n">STEP 2</span><h3>Tools</h3><p>The agent calls real tools — routing, Overture places, terrain — never a guess from memory.</p><code>geocode → geocode → travel_time</code></li>
+          <li><span class="n">STEP 3</span><h3>Geometry</h3><p>Measured on the WGS84 ellipsoid and validated; swapped lat/lon is caught before it misleads you.</p><code>geodesic · validated · RFC 7946</code></li>
+          <li><span class="n">STEP 4</span><h3>Provenance</h3><p>Sources, licences, accuracy and caveats — plus a replay that says whether the data or the code changed.</p><code>geospark replay run.json → REPRODUCED</code></li>
+        </ol>
       </div>
+    </section>
 
-      <div class="grid grid-3">
-        <div class="dark-card reveal">
-          <span class="card-icon-sm">&#127758;</span>
-          <h3>Spatial Engine</h3>
-          <p>Topology, geodesic distance, CRS transforms, buffering, area. Geometrically correct on WGS84.</p>
+    <!-- ===== 02 Reachable area (live) ===== -->
+    <section class="block alt" aria-labelledby="iso-title">
+      <div class="wrap split">
+        <div>
+          <span class="kicker">02 — Reachable area · live</span>
+          <h2 id="iso-title">Watch a city open up, minute by minute.</h2>
+          <p class="lead">Isochrones from GeoSpark's own routing engine. Pick a time: the walkable area redraws and its area is measured, not estimated.</p>
+          <div class="seg" role="group" aria-label="Walking time">
+            <button type="button" data-min="10" aria-pressed="true">10 min</button>
+            <button type="button" data-min="20" aria-pressed="false">20 min</button>
+            <button type="button" data-min="30" aria-pressed="false">30 min</button>
+          </div>
+          <div class="big" aria-live="polite"><span class="num" id="iso-area">—</span><span class="unit">km² on foot</span></div>
+          <p class="fine" id="iso-src">From Federation Square, Melbourne · Valhalla on OpenStreetMap · coverage: Australia</p>
+          <div id="iso-note"></div>
+          <div class="cta-row"><a class="btn btn-secondary" href="/playground#reach">Try your own place</a></div>
         </div>
-        <div class="dark-card reveal">
-          <span class="card-icon-sm">&#129504;</span>
-          <h3>Multi-Agent Coordinator</h3>
-          <p>One input, intelligent routing. The coordinator classifies your goal and dispatches to GeoAgent, SpatialReport, or SiteSelector automatically.</p>
-        </div>
-        <div class="dark-card reveal">
-          <span class="card-icon-sm">&#129302;</span>
-          <h3>Autonomous Specialists</h3>
-          <p>GeoAgent, SpatialReport (with weather + air quality), SiteSelector. Give a goal, get analysis.</p>
-        </div>
-        <div class="dark-card reveal">
-          <span class="card-icon-sm">&#129504;</span>
-          <h3>Spatial Memory</h3>
-          <p>Dual memory: timeless facts + timestamped episodes. Vector-based recall, automatic contradiction detection, auto-linking of related knowledge.</p>
-        </div>
-        <div class="dark-card reveal">
-          <span class="card-icon-sm">&#128218;</span>
-          <h3>Context Database</h3>
-          <p>Tiered L0/L1/L2 storage for missions, datasets, and analysis history. Hotness scoring and hierarchical retrieval keep prompts lean.</p>
-        </div>
-        <div class="dark-card reveal">
-          <span class="card-icon-sm">&#127780;</span>
-          <h3>Live Data Channels</h3>
-          <p>Weather, air quality, fire detection. Real-time from Open-Meteo, OpenAQ, NASA FIRMS.</p>
-        </div>
-        <div class="dark-card reveal">
-          <span class="card-icon-sm">&#128268;</span>
-          <h3>MCP + Integrations</h3>
-          <p>6 MCP tools for Claude Desktop. OpenAI, Anthropic, Ollama adapters. Any LLM gains spatial reasoning.</p>
-        </div>
-        <div class="dark-card reveal">
-          <span class="card-icon-sm">&#128202;</span>
-          <h3>Benchmarked</h3>
-          <p>535 questions, 5 benchmarks, 5 model families. Reproducible and citeable results.</p>
-        </div>
-        <div class="dark-card reveal">
-          <span class="card-icon-sm">&#128176;</span>
-          <h3>Zero-Cost</h3>
-          <p>9 local Ollama models, free APIs, no rate limits. Run the entire stack on your hardware at $0.</p>
+        <div id="iso-map" class="map-container" role="img" aria-label="Map of the area reachable on foot from Federation Square"></div>
+      </div>
+    </section>
+
+    <!-- ===== 03 Why ===== -->
+    <section class="block" aria-labelledby="why-title">
+      <div class="wrap">
+        <span class="kicker">03 — Why it matters</span>
+        <h2 id="why-title">LLMs guess geography. GeoSpark computes it.</h2>
+        <p class="lead">From GeoSpark's open benchmark: 535 spatial questions across 5 categories and 5 model families.</p>
+        <div class="bench reveal">
+          <div><span class="v bad">0%</span><p>Distance accuracy for LLMs alone, in 4 of 5 model families.</p></div>
+          <div><span class="v good">100%</span><p>Spatial reasoning accuracy with GeoSpark's tools.</p></div>
+          <div><span class="v">535</span><p>Benchmark questions — reproducible, in the repository.</p></div>
         </div>
       </div>
+    </section>
+
+    <!-- ===== 04 Platform ===== -->
+    <section class="block alt" aria-labelledby="platform-title">
+      <div class="wrap">
+        <span class="kicker">04 — The platform</span>
+        <h2 id="platform-title">Everything an agent needs to reason about place.</h2>
+        <div class="features">
+          <article class="feature reveal">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>
+            <h3>Spatial engine</h3><p>Geodesic distance, topology, buffers, areas and CRS handling — correct on the ellipsoid, with invalid input refused.</p>
+            <a href="/playground">Measure something →</a>
+          </article>
+          <article class="feature reveal">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7a5 5 0 1 0 5 5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+            <h3>Reachable areas &amp; travel times</h3><p>Walk, bike or drive isochrones and travel-time matrices from a self-hosted Valhalla.</p>
+            <a href="/playground#reach">Draw an isochrone →</a>
+          </article>
+          <article class="feature reveal">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-6h6v6"/></svg>
+            <h3>Open map data</h3><p>Overture Maps places, buildings, roads and boundaries near any point — no API key.</p>
+            <a href="/playground#overture">Explore a place →</a>
+          </article>
+          <article class="feature reveal">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="16" r="3"/><path d="M11.5 10 14.5 14"/></svg>
+            <h3>Agents</h3><p>A coordinator routes your goal to GeoAgent, SpatialReport or SiteSelector, with live weather and air quality.</p>
+            <a href="/agents">Run an agent →</a>
+          </article>
+          <article class="feature reveal">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>
+            <h3>Bring your own data</h3><p>GeoJSON, GeoPackage, Shapefile, GeoParquet or CSV. The CRS is read, never guessed.</p>
+            <a href="/guide">How it works →</a>
+          </article>
+          <article class="feature reveal">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12a8 8 0 0 1 14-5.3L20 9"/><path d="M20 4v5h-5"/><path d="M20 12a8 8 0 0 1-14 5.3L4 15"/><path d="M4 20v-5h5"/></svg>
+            <h3>Reproducible runs</h3><p>Record any analysis, replay it later, and learn whether the data or the code changed the answer.</p>
+            <a href="/guide">Record a run →</a>
+          </article>
+        </div>
       </div>
+    </section>
+
+    <!-- ===== 05 Developers ===== -->
+    <section class="block" aria-labelledby="dev-title">
+      <div class="wrap split">
+        <div>
+          <span class="kicker">05 — For agents &amp; developers</span>
+          <h2 id="dev-title">One install. Your agent gets a map.</h2>
+          <p class="lead">A Python library, CLI, REST API and MCP server in one package. Works with Claude, local models through Ollama, and anything that speaks MCP.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="/guide">Read the guide</a>
+            <a class="btn btn-secondary" href="/playground">Open the playground</a>
+          </div>
+        </div>
+        <div class="terminal">
+          <div class="bar"><i></i><i></i><i></i><span style="margin-left:8px">terminal</span></div>
+<pre><span class="p">$</span> pip install geospark-ai
+<span class="p">$</span> geospark record isochrone --minutes 10 -- -37.818 144.969
+<span class="ok">✓ run saved to iso.json</span>
+<span class="p">$</span> geospark replay iso.json
+<span class="ok">REPRODUCED</span> <span class="p">· same data, same code</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="block alt compact" aria-labelledby="data-title">
+      <div class="wrap">
+        <span class="kicker" id="data-title">Built on open data</span>
+        <div class="sources-strip">
+          <span>OpenStreetMap</span><span>Overture Maps</span><span>Valhalla</span><span>Copernicus DEM</span><span>Open-Meteo</span><span>OpenAQ</span><span>NASA FIRMS</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="inner">
+      <span>GeoSpark · Apache-2.0</span>
+      <a href="https://github.com/Maz2580/geospark" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://pypi.org/project/geospark-ai/" target="_blank" rel="noopener">PyPI</a>
+      <a href="/status">Status</a>
+      <span class="push">Created by <a href="https://github.com/Maz2580" target="_blank" rel="noopener">Mazdak Ghasemi Tootkaboni</a> · University of Melbourne</span>
     </div>
-
-    <!-- ===== GET STARTED ===== -->
-    <div class="section reveal">
-      <div class="section-inner">
-      <div class="section-header">
-        <h2>Get Started</h2>
-      </div>
-
-      <div class="grid grid-2">
-        <div class="code-block">
-          <span class="cm"># Install</span><br>
-          pip install geospark-ai
-        </div>
-        <div class="code-block">
-          <span class="kw">from</span> geospark <span class="kw">import</span> <span class="fn">Engine</span><br><br>
-          engine = <span class="fn">Engine</span>(tools=[<span class="str">"geocoder"</span>, <span class="str">"terrain"</span>])<br>
-          result = engine.<span class="fn">ask</span>(<span class="str">"How far is the Eiffel Tower from Big Ben?"</span>)<br>
-          <span class="kw">print</span>(result.spatial_context.summary)
-        </div>
-      </div>
-
-      <div style="text-align:center; margin-top:2rem;">
-        <a href="/playground" class="btn btn-primary" style="padding:0.85rem 2.5rem;font-size:1rem;border-radius:10px;">Open Playground</a>
-        &nbsp;&nbsp;
-        <a href="https://github.com/Maz2580/geospark" target="_blank" style="color:#475569;font-size:0.9rem;font-weight:600;">View on GitHub &rarr;</a>
-      </div>
-      </div>
-    </div>
-
-    <footer>
-      Created by <a href="https://github.com/Maz2580" target="_blank">Mazdak Ghasemi Tootkaboni</a>
-      &middot; University of Melbourne
-      &middot; <a href="https://github.com/Maz2580/geospark" target="_blank">GitHub</a>
-      &middot; <a href="https://pypi.org/project/geospark-ai/" target="_blank">PyPI</a>
-      &middot; Apache 2.0
-    </footer>
-  </div>
+  </footer>
 
   <script src="/assets/app.js"></script>
+  <script src="/assets/liquid-logo.js" defer></script>
   <script>
-    /* ===== 3D GLOBE ===== */
-    const container = document.getElementById('globe-container');
-    const globe = Globe()(container)
-      .globeImageUrl('https://unpkg.com/three-globe@2.33.0/example/img/earth-dark.jpg')
-      .bumpImageUrl('https://unpkg.com/three-globe@2.33.0/example/img/earth-topology.png')
-      .backgroundImageUrl('')
-      .showAtmosphere(true)
-      .atmosphereColor('#2d9c6f')
-      .atmosphereAltitude(0.2)
-      .arcsData([])
-      .arcColor(() => '#2d9c6f')
-      .arcDashLength(0.6)
-      .arcDashGap(0.3)
-      .arcDashAnimateTime(2000)
-      .arcStroke(0.8)
-      .labelsData([])
-      .labelColor(() => '#ffffff')
-      .labelSize(1.2)
-      .labelDotRadius(0.4)
-      .labelAltitude(0.01)
-      .labelText('label')
-      .pointsData([])
-      .pointColor(() => '#2d9c6f')
-      .pointAltitude(0.02)
-      .pointRadius(0.35);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Set background transparent
-    globe.renderer().setClearColor(0x000000, 0);
-
-    // Auto-rotate
-    globe.controls().autoRotate = true;
-    globe.controls().autoRotateSpeed = 0.4;
-    globe.controls().enableZoom = false;
-
-    // Initial view
-    globe.pointOfView({ lat: 35, lng: 20, altitude: 2.2 });
-
-    /* ===== GLOBE ARCS ===== */
-    async function heroArc(cityA, nameA, latA, lonA, cityB, nameB, latB, lonB) {
-      document.getElementById('hero-q').value = `${nameA}, ${cityA} to ${nameB}, ${cityB}`;
-
-      // Stop rotation, fly to midpoint
-      globe.controls().autoRotate = false;
-      const midLat = (latA + latB) / 2;
-      const midLon = (lonA + lonB) / 2;
-      globe.pointOfView({ lat: midLat, lng: midLon, altitude: 1.8 }, 1500);
-
-      // Set arc
-      globe.arcsData([{ startLat: latA, startLng: lonA, endLat: latB, endLng: lonB }]);
-
-      // Set points
-      globe.pointsData([
-        { lat: latA, lng: lonA },
-        { lat: latB, lng: lonB },
-      ]);
-
-      // Set labels
-      globe.labelsData([
-        { lat: latA, lng: lonA, label: nameA },
-        { lat: latB, lng: lonB, label: nameB },
-      ]);
-
-      // Compute distance via API
-      const resultEl = document.getElementById('globe-result');
-      try {
-        const data = await geo.post('/api/v1/distance', { lat_a: latA, lon_a: lonA, lat_b: latB, lon_b: lonB });
-        document.getElementById('gr-value').textContent = `${data.distance_m.toLocaleString()} m (${data.distance_km} km)`;
-        document.getElementById('gr-route').textContent = `${nameA} \u2192 ${nameB}`;
-        resultEl.classList.add('visible');
-      } catch (e) {
-        document.getElementById('gr-value').textContent = 'Computing...';
-        resultEl.classList.add('visible');
-      }
-
-      // Resume rotation after a delay
-      setTimeout(() => { globe.controls().autoRotate = true; globe.controls().autoRotateSpeed = 0.2; }, 5000);
+    /* ===== Count-up for numbers (skipped with reduced motion) ===== */
+    function countTo(el, target, digits, suffix = '') {
+      if (reduceMotion || !isFinite(target)) { el.textContent = fmt(target, digits) + suffix; return; }
+      const start = performance.now(), dur = 900;
+      const step = (now) => {
+        const t = Math.min(1, (now - start) / dur), e = 1 - Math.pow(1 - t, 3);
+        el.textContent = fmt(target * e, digits) + suffix;
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
     }
 
-    async function heroCompute() {
-      const q = document.getElementById('hero-q').value;
-      const match = q.match(/(.+?)\s+(?:from|to|and)\s+(.+)/i);
-      if (!match) {
-        heroArc('Paris','Eiffel Tower',48.8584,2.2945,'London','Big Ben',51.5007,-0.1246);
-        return;
-      }
-      try {
-        const [dA, dB] = await Promise.all([
-          geo.post('/api/v1/geocode', { query: match[1].trim(), limit: 1 }),
-          geo.post('/api/v1/geocode', { query: match[2].trim(), limit: 1 }),
-        ]);
-        const fA = dA.features?.[0], fB = dB.features?.[0];
-        if (!fA || !fB) return;
-        const cA = fA.geometry.coordinates, cB = fB.geometry.coordinates;
-        const nA = fA.properties?.display_name?.split(',')[0] || match[1];
-        const nB = fB.properties?.display_name?.split(',')[0] || match[2];
-        heroArc('', nA, cA[1], cA[0], '', nB, cB[1], cB[0]);
-      } catch (e) {
-        heroArc('Paris','Eiffel Tower',48.8584,2.2945,'London','Big Ben',51.5007,-0.1246);
-      }
+    /* ===== Globe: real geodesic distances, with their proof ===== */
+    const ROUTES = [
+      ['Eiffel Tower', 48.8584, 2.2945, 'Big Ben', 51.5007, -0.1246],
+      ['Tokyo Tower', 35.6586, 139.7454, 'Sydney Opera House', -33.8568, 151.2153],
+      ['Statue of Liberty', 40.6892, -74.0445, 'Hollywood Sign', 34.1341, -118.3215],
+      ['Federation Square', -37.8180, 144.9691, 'Sky Tower, Auckland', -36.8485, 174.7633],
+    ];
+    let globe = null;
+    try {
+      const el = document.getElementById('globe');
+      globe = Globe({ animateIn: !reduceMotion })(el)
+        .globeImageUrl('https://unpkg.com/three-globe@2.33.0/example/img/earth-dark.jpg')
+        .bumpImageUrl('https://unpkg.com/three-globe@2.33.0/example/img/earth-topology.png')
+        .backgroundColor('rgba(0,0,0,0)')
+        .showAtmosphere(true).atmosphereColor('#7CF2C8').atmosphereAltitude(0.18)
+        .arcColor(() => ['#7CF2C8', '#FFB547']).arcStroke(0.7)
+        .arcDashLength(0.5).arcDashGap(0.2).arcDashAnimateTime(reduceMotion ? 0 : 1800)
+        .pointColor(d => d.c).pointAltitude(0.015).pointRadius(0.45)
+        .ringColor(() => t => `rgba(124,242,200,${1 - t})`).ringMaxRadius(4).ringPropagationSpeed(2).ringRepeatPeriod(1400)
+        .labelText('label').labelColor(() => '#E8ECF1').labelSize(1.1).labelDotRadius(0.3).labelAltitude(0.012);
+      const sizeGlobe = () => globe.width(el.clientWidth).height(el.clientHeight);
+      sizeGlobe();
+      new ResizeObserver(sizeGlobe).observe(el);
+      globe.controls().autoRotate = !reduceMotion;
+      globe.controls().autoRotateSpeed = 0.35;
+      globe.controls().enableZoom = false;
+      globe.pointOfView({ lat: 25, lng: 60, altitude: 2.3 });
+    } catch (e) {
+      document.getElementById('globe').innerHTML = '';
     }
 
-    // Enter key triggers compute
-    document.getElementById('hero-q').addEventListener('keydown', e => {
-      if (e.key === 'Enter') heroCompute();
-    });
-
-    /* ===== LIVE PULSE ===== */
-    Promise.all([
-      geo.get('/health').catch(() => null),
-      geo.get('/api/v1/llm/models').catch(() => null),
-      geo.post('/api/v1/data/weather', { location: 'London' }).catch(() => null),
-    ]).then(([health, models, weather]) => {
-      if (health) {
-        document.getElementById('lp-status').textContent = 'ONLINE';
-        document.getElementById('lp-version').textContent = 'v' + health.version;
+    let routeIndex = 0, routeTimer = null;
+    async function showRoute(i, userPicked = false) {
+      routeIndex = i;
+      const [na, la, oa, nb, lb, ob] = ROUTES[i];
+      document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(Number(c.dataset.route) === i)));
+      if (globe) {
+        globe.controls().autoRotate = false;
+        globe.pointOfView({ lat: (la + lb) / 2, lng: oa + (((ob - oa + 540) % 360) - 180) / 2, altitude: 1.9 }, reduceMotion ? 0 : 1400);
+        globe.arcsData([{ startLat: la, startLng: oa, endLat: lb, endLng: ob }]);
+        globe.pointsData([{ lat: la, lng: oa, c: '#7CF2C8' }, { lat: lb, lng: ob, c: '#FFB547' }]);
+        globe.ringsData([{ lat: lb, lng: ob }]);
+        globe.labelsData([{ lat: la, lng: oa, label: na }, { lat: lb, lng: ob, label: nb }]);
       }
-      if (models?.data) document.getElementById('lp-models').textContent = models.data.length + ' models';
-      if (weather?.features) {
-        const c = weather.features.find(f => f.type === 'current_weather');
-        if (c) document.getElementById('lp-weather').textContent = `London ${c.temperature_c}\u00B0C`;
+      const card = document.getElementById('answer');
+      card.classList.remove('on');
+      try {
+        const d = await geo.post('/api/v1/distance', { lat_a: la, lon_a: oa, lat_b: lb, lon_b: ob });
+        document.getElementById('ans-route').textContent = `${na} → ${nb}`;
+        countTo(document.getElementById('ans-num'), d.distance_km, 1, ' km');
+        const p = (d.provenance || [])[0] || {};
+        const chips = ['distance · geodesic · WGS84', p.licence ? `${p.name || 'GeoSpark engine'} · ${p.licence}` : null,
+                       `units · ${Object.values(d.units || {}).join(', ')}`].filter(Boolean);
+        document.getElementById('ans-chips').innerHTML = chips.map(c => `<span class="proof-chip">${escapeHtml(c)}</span>`).join('');
+        document.getElementById('ans-status').className = 'badge badge-ok';
+        document.getElementById('ans-status').textContent = 'status: ok';
+      } catch (e) {
+        document.getElementById('ans-route').textContent = `${na} → ${nb}`;
+        document.getElementById('ans-num').textContent = 'Unavailable';
+        document.getElementById('ans-status').className = 'badge badge-error';
+        document.getElementById('ans-status').textContent = 'cannot answer';
+        document.getElementById('ans-chips').innerHTML = `<span class="proof-chip">${escapeHtml(errorDetail(e.message)).slice(0, 120)}</span>`;
       }
-    });
+      card.classList.add('on');
+      clearTimeout(routeTimer);
+      if (!reduceMotion) routeTimer = setTimeout(() => showRoute((routeIndex + 1) % ROUTES.length), userPicked ? 12000 : 7000);
+    }
+    document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => showRoute(Number(c.dataset.route), true)));
+    setTimeout(() => showRoute(0), reduceMotion ? 0 : 900);
 
-    /* ===== SCROLL REVEAL ===== */
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
+    /* ===== Live strip ===== */
+    geo.get('/health').then(h => {
+      document.getElementById('lv-status').textContent = 'online';
+      document.getElementById('lv-dot').classList.add('on');
+      document.getElementById('lv-version').textContent = 'v' + h.version;
+    }).catch(() => { document.getElementById('lv-status').textContent = 'unreachable'; });
+    geo.get('/api/v1/models').then(m => {
+      const list = m.data || m.models || [];
+      const n = Array.isArray(list) ? list.length : Object.keys(list).length;
+      document.getElementById('lv-models').textContent = n ? `${n} available` : 'none';
+    }).catch(() => { document.getElementById('lv-models').textContent = '—'; });
+
+    /* ===== Reachable area (live isochrone, drawn in) ===== */
+    const FED_SQ = [-37.8180, 144.9691];
+    let isoMap = null, isoLayer = null, isoCache = {};
+    function drawIn(layer) {
+      if (reduceMotion) return;
+      layer.eachLayer(l => {
+        const path = l.getElement && l.getElement();
+        if (!path || !path.getTotalLength) return;
+        const len = path.getTotalLength();
+        path.animate([{ strokeDasharray: `${len}`, strokeDashoffset: len, fillOpacity: 0 },
+                      { strokeDasharray: `${len}`, strokeDashoffset: 0, fillOpacity: 0 }], { duration: 1100, easing: 'cubic-bezier(.2,.7,.2,1)' });
+        path.animate([{ fillOpacity: 0 }, { fillOpacity: 0 }, { fillOpacity: l.options.fillOpacity }], { duration: 1500, easing: 'ease-out' });
       });
-    }, { threshold: 0.1 });
+    }
+    async function showIso(minutes) {
+      document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.min) === minutes)));
+      const note = document.getElementById('iso-note');
+      note.innerHTML = '';
+      if (!isoMap) {
+        isoMap = createMap('iso-map', FED_SQ[0], FED_SQ[1], 14);
+        isoMap.scrollWheelZoom.disable();
+        addMarker(isoMap, FED_SQ[0], FED_SQ[1], 'Federation Square');
+      }
+      try {
+        const data = isoCache[minutes] || (isoCache[minutes] = await geo.post('/api/v1/isochrone', { lat: FED_SQ[0], lon: FED_SQ[1], minutes: [minutes], mode: 'walk' }));
+        const f = (data.features || [])[0];
+        if (!f) throw new Error('No reachable area returned');
+        if (isoLayer) isoMap.removeLayer(isoLayer);
+        isoLayer = L.geoJSON(f.geometry, { style: { color: '#7CF2C8', weight: 2, fillColor: '#7CF2C8', fillOpacity: 0.18 } }).addTo(isoMap);
+        isoMap.flyToBounds(isoLayer.getBounds(), { padding: [24, 24], duration: reduceMotion ? 0 : 0.8 });
+        drawIn(isoLayer);
+        countTo(document.getElementById('iso-area'), f.properties?.area_sq_km, 2);
+        document.getElementById('lv-routing').textContent = 'online';
+      } catch (e) {
+        document.getElementById('lv-routing').textContent = 'unavailable';
+        document.getElementById('iso-area').textContent = '—';
+        note.innerHTML = refusalHtml('Routing is unavailable right now', errorDetail(e.message));
+      }
+    }
+    document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => showIso(Number(b.dataset.min))));
+    // Only call the routing engine when the section is actually seen
+    new IntersectionObserver((entries, obs) => {
+      if (entries[0].isIntersecting) { obs.disconnect(); showIso(10); }
+    }, { rootMargin: '200px' }).observe(document.getElementById('iso-map'));
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-    /* ===== AUTO DEMO ===== */
-    setTimeout(() => heroArc('Paris','Eiffel Tower',48.8584,2.2945,'London','Big Ben',51.5007,-0.1246), 1200);
+    /* ===== Reveal on scroll ===== */
+    const reveal = new IntersectionObserver(entries => entries.forEach(en => {
+      if (en.isIntersecting) { en.target.classList.add('visible'); reveal.unobserve(en.target); }
+    }), { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => reveal.observe(el));
   </script>
 </body>
 </html>

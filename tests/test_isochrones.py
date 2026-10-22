@@ -39,13 +39,21 @@ def server(monkeypatch):
     real = httpx.Client
 
     def transport(request):
+        if request.url.path == "/locate":  # coverage check: road edges everywhere by default
+            body = json.loads(request.content)
+            covered = state.get("covered", lambda lat, lon: True)
+            return httpx.Response(200, json=[
+                {"edges": [{"way_id": 1}] if covered(loc["lat"], loc["lon"]) else None, "nodes": None}
+                for loc in body["locations"]])
         seen.append(request)
         return state["handler"](request)
 
     monkeypatch.setattr(httpx, "Client", lambda *a, **k: real(*a, transport=httpx.MockTransport(transport), **k))
 
-    def use(handler):
+    def use(handler, covered=None):
         state["handler"] = handler
+        if covered:
+            state["covered"] = covered
         return seen
 
     return use
@@ -168,3 +176,18 @@ def test_rest_isochrone(server, monkeypatch) -> None:
 def test_live_public_valhalla() -> None:
     result = valhalla.isochrone(*FED_SQ, [10], "walk")
     assert 0.5 < result.features[0].properties["area_sq_km"] < 3
+
+
+def test_points_outside_the_servers_coverage_are_refused(server) -> None:
+    """Outside its map extract, Valhalla returns a tiny placeholder circle instead of an error."""
+    seen = server(iso_response, covered=lambda lat, lon: lat < 0)  # southern hemisphere only
+    with pytest.raises(ValueError, match="outside its map coverage"):
+        valhalla.isochrone(48.8584, 2.2945, [10])  # Paris
+    assert seen == []  # the isochrone itself was never requested
+    assert valhalla.isochrone(*FED_SQ, [10]).features  # Melbourne is covered
+
+
+def test_matrix_refuses_uncovered_points(server) -> None:
+    server(lambda r: httpx.Response(200, json={"sources_to_targets": [[]]}), covered=lambda lat, lon: lat < 0)
+    with pytest.raises(ValueError, match="outside its map coverage"):
+        valhalla.travel_time_matrix([FED_SQ], [(48.8584, 2.2945)], "walk")

@@ -110,6 +110,23 @@ def _check_point(lat: float, lon: float) -> None:
         raise ValueError("Latitude must be in [-90, 90] and longitude in [-180, 180]")
 
 
+def _require_coverage(points: list[tuple[float, float]], costing: str) -> None:
+    """Refuse points the routing server has no road/path data for.
+
+    Outside its map extract Valhalla doesn't fail: it returns a tiny placeholder circle around
+    the point, which would be a confident wrong answer. ``/locate`` reveals it (no edges).
+    """
+    data = _call("locate", {"locations": [{"lat": a, "lon": b} for a, b in points], "costing": costing})
+    missing = [points[i] for i, loc in enumerate(data if isinstance(data, list) else [])
+               if not (loc or {}).get("edges")]
+    if missing:
+        where = ", ".join(f"({a:.4f}, {b:.4f})" for a, b in missing[:3])
+        raise ValueError(
+            f"No {costing} road or path data near {where} on this routing server: the point is outside "
+            "its map coverage (or far from any road). GeoSpark won't estimate a reachable area there."
+        )
+
+
 def isochrone(lat: float, lon: float, minutes: list[int], mode: str = "walk") -> SpatialResult:
     """Areas reachable from a point within each number of minutes (largest first)."""
     from pyproj import Geod
@@ -122,6 +139,7 @@ def isochrone(lat: float, lon: float, minutes: list[int], mode: str = "walk") ->
     if not contours or len(contours) > MAX_CONTOURS or contours[0] < 1 or contours[-1] > MAX_MINUTES:
         raise ValueError(f"Give 1-{MAX_CONTOURS} contour times between 1 and {MAX_MINUTES} minutes")
 
+    _require_coverage([(lat, lon)], costing)
     data = _call("isochrone", {
         "locations": [{"lat": lat, "lon": lon}],
         "costing": costing,
@@ -168,6 +186,7 @@ def travel_time_matrix(
     for lat, lon in [*origins, *destinations]:
         _check_point(lat, lon)
 
+    _require_coverage([*origins, *destinations], costing)
     data = _call("sources_to_targets", {
         "sources": [{"lat": a, "lon": b} for a, b in origins],
         "targets": [{"lat": a, "lon": b} for a, b in destinations],

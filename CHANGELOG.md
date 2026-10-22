@@ -11,10 +11,17 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
   method and the exact pyproj/PROJ/Shapely/GEOS versions. This covers REST responses, MCP tool
   replies, data channels and location reports.
 - **Units**: `spatial_context.units`, e.g. `{"distance_m": "metre"}`.
-- **Quality flags and warnings**: geocoder match importance and an ambiguity warning when two
-  places are almost equally likely; DEM vertical accuracy (GLO-30 4 m, SRTM 16 m LE90) and the
+- **Quality flags and warnings**: geocoder match importance and an ambiguity warning when
+  near-equal candidates are far apart (e.g. "Springfield" in Illinois, Massachusetts, Missouri); DEM vertical accuracy (GLO-30 4 m, SRTM 16 m LE90) and the
   vertical datum; a warning when topology is computed on very large geometries.
 - **`status`** on every result: `ok`, `partial` or `cannot_answer`.
+
+- **QGIS-ready GeoJSON**: `SpatialResult.to_geojson()` and `LocationReport.to_geojson()` give
+  RFC 7946 FeatureCollections (WGS84, bbox, flat attribute columns, per-feature `attribution`,
+  provenance/units/warnings in a `geospark` member). REST supports `?format=geojson` or
+  `Accept: application/geo+json` on geocode, query, elevation and agent/report; the CLI has
+  `--geojson FILE`. Verified by reading the files with GDAL, the reader QGIS uses.
+- Satellite scenes report a cloud-cover range and warn when every scene is mostly cloud.
 
 ### Changed
 - **GeoSpark refuses rather than guesses.** Invalid geometry (for example a self-intersecting

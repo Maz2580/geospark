@@ -237,16 +237,71 @@ class SpatialResult(BaseModel):
         return "ok"
 
     def to_geojson(self) -> dict[str, Any]:
-        """Convert result to GeoJSON FeatureCollection."""
-        return {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "geometry": f.geometry,
-                    "properties": f.properties,
-                    "id": f.id,
-                }
-                for f in self.features
-            ],
+        """This result as an RFC 7946 GeoJSON FeatureCollection, ready for QGIS or any GIS.
+
+        Coordinates are WGS84 lon/lat (RFC 7946 has no ``crs`` member). Each feature keeps
+        its properties flat, so they become ordinary attribute columns, plus ``attribution``
+        for the data it came from. The collection carries a ``geospark`` member with the
+        status, summary, units, warnings, quality flags and full provenance.
+        """
+        return feature_collection(self)
+
+
+def _plain(value: Any) -> Any:
+    """JSON-safe value for GeoJSON properties."""
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, BaseModel):
+        return value.model_dump(mode="json")
+    return value
+
+
+def feature_collection(
+    result: SpatialResult, extra: dict[str, Any] | None = None
+) -> dict[str, Any]:
+    """RFC 7946 FeatureCollection for a SpatialResult (see ``SpatialResult.to_geojson``)."""
+    data_attribution = "; ".join(
+        dict.fromkeys(p.attribution for p in result.provenance if p.attribution)
+    )
+    features = []
+    for feature in result.features:
+        properties = {key: _plain(value) for key, value in feature.properties.items()}
+        if data_attribution and "attribution" not in properties:
+            properties["attribution"] = data_attribution
+        geo_feature: dict[str, Any] = {
+            "type": "Feature", "geometry": feature.geometry, "properties": properties,
         }
+        if feature.id is not None:
+            geo_feature["id"] = feature.id
+        features.append(geo_feature)
+
+    collection: dict[str, Any] = {"type": "FeatureCollection", "features": features}
+    bbox = _bbox_of(f["geometry"] for f in features)
+    if bbox:
+        collection["bbox"] = bbox
+    collection["geospark"] = {
+        "status": result.status,
+        "summary": result.spatial_context.summary,
+        "units": result.spatial_context.units,
+        "warnings": result.warnings,
+        "quality": result.quality,
+        "errors": result.errors,
+        "provenance": [p.model_dump(mode="json", exclude_none=True) for p in result.provenance],
+        **(extra or {}),
+    }
+    return collection
+
+
+def _bbox_of(geometries: Any) -> list[float] | None:
+    try:
+        from shapely.geometry import shape
+
+        bounds = [shape(g).bounds for g in geometries if g]
+    except Exception:
+        return None
+    if not bounds:
+        return None
+    return [
+        min(b[0] for b in bounds), min(b[1] for b in bounds),
+        max(b[2] for b in bounds), max(b[3] for b in bounds),
+    ]

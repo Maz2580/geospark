@@ -16,6 +16,29 @@ from geospark import __version__
 
 console = Console()
 
+# --geojson FILE: save the answer as an RFC 7946 FeatureCollection (opens in QGIS)
+geojson_option = click.option(
+    "--geojson", "geojson_path", type=click.Path(dir_okay=False, writable=True), default=None,
+    help="Also save the result as GeoJSON (opens in QGIS), with sources and units.",
+)
+
+
+def _save_geojson(path: str | None, collection: dict) -> None:
+    if not path:
+        return
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(collection, fh, ensure_ascii=False, indent=2)
+    console.print(f"[dim]Saved {len(collection.get('features', []))} feature(s) to {path}[/dim]")
+
+
+def _print_caveats(result) -> None:  # type: ignore[no-untyped-def]
+    """Warnings and data attribution, so a CLI answer is as checkable as an API one."""
+    for warning in getattr(result, "warnings", []):
+        console.print(f"[yellow]Warning:[/yellow] {warning}")
+    attributions = dict.fromkeys(p.attribution for p in getattr(result, "provenance", []) if p.attribution)
+    for attribution in attributions:
+        console.print(f"[dim]{attribution}[/dim]")
+
 
 @click.group()
 @click.version_option(version=__version__, prog_name="geospark")
@@ -26,7 +49,8 @@ def main() -> None:
 
 @main.command()
 @click.argument("query_json")
-def query(query_json: str) -> None:
+@geojson_option
+def query(query_json: str, geojson_path: str | None) -> None:
     """Execute a GSP spatial query (JSON string)."""
     from geospark import Engine
     from geospark.protocol.schema import SpatialQuery
@@ -38,13 +62,15 @@ def query(query_json: str) -> None:
         result = engine.execute(spatial_query)
 
         console.print_json(result.model_dump_json(indent=2))
+        _save_geojson(geojson_path, result.to_geojson())
     except Exception as e:
         console.print(f"[red]Error:[/red] {e}")
 
 
 @main.command()
 @click.argument("address")
-def geocode(address: str) -> None:
+@geojson_option
+def geocode(address: str, geojson_path: str | None) -> None:
     """Geocode an address to coordinates."""
     from geospark import Engine
     from geospark.protocol.schema import SpatialOperation, SpatialQuery
@@ -70,6 +96,10 @@ def geocode(address: str) -> None:
             table.add_row(name[:80], coord_str, ftype)
 
         console.print(table)
+        _print_caveats(result)
+        _save_geojson(geojson_path, result.to_geojson())
+    elif result.errors:
+        console.print(f"[red]Error:[/red] {result.errors[0]}")
     else:
         console.print("[yellow]No results found[/yellow]")
 
@@ -78,7 +108,8 @@ def geocode(address: str) -> None:
 @main.command(context_settings={"ignore_unknown_options": True})
 @click.argument("lat", type=float)
 @click.argument("lon", type=float)
-def elevation(lat: float, lon: float) -> None:
+@geojson_option
+def elevation(lat: float, lon: float, geojson_path: str | None) -> None:
     """Get elevation at a coordinate (lat lon)."""
     from geospark import Engine
     from geospark.protocol.schema import Point, SpatialOperation, SpatialQuery
@@ -89,6 +120,7 @@ def elevation(lat: float, lon: float) -> None:
         geometry=Point.from_latlon(lat, lon),
     )
     result = engine.execute(q)
+    _save_geojson(geojson_path, result.to_geojson())
 
     if result.features:
         elev = result.features[0].properties.get("elevation_m", "N/A")
@@ -505,13 +537,15 @@ def agent(goal: str) -> None:
 @main.command()
 @click.argument("location")
 @click.option("--radius", default=2000, help="Search radius in meters")
-def report(location: str, radius: int) -> None:
+@geojson_option
+def report(location: str, radius: int, geojson_path: str | None) -> None:
     """Generate a spatial intelligence report for a location."""
     from geospark.agents import SpatialReport
 
     reporter = SpatialReport()
     console.print(f"[bold]Analyzing[/bold]: {location}\n")
     rep = reporter.analyze(location, radius_m=radius)
+    _save_geojson(geojson_path, rep.to_geojson())
 
     table = Table(title=f"Spatial Report: {location}")
     table.add_column("Property", style="cyan")

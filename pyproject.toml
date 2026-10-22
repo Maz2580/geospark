@@ -8,7 +8,7 @@ packages = ["geospark"]
 [project]
 name = "geospark-ai"
 version = "0.6.0"
-description = "Ground-truth spatial reasoning and tool augmentation for LLMs. Open-source Geospatial Intelligence Protocol & Engine."
+description = "Verifiable spatial reasoning for LLMs: geodesic distance, topology and CRS computed by a geometry engine, with sources and licences on every answer. MCP server, REST API and Python library."
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"
@@ -24,6 +24,11 @@ keywords = [
     "remote-sensing",
     "mcp",
     "protocol",
+    "gis",
+    "geoai",
+    "openstreetmap",
+    "mcp-server",
+    "geojson",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -105,6 +110,8 @@ dev = [
     "ruff>=0.4",
     "mypy>=1.10",
     "pre-commit>=3.6",
+    # Reads our GeoJSON with GDAL, the same driver QGIS uses (export tests)
+    "pyogrio>=0.7",
 ]
 
 [project.scripts]

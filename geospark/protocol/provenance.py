@@ -223,8 +223,17 @@ def _extent_deg(geometry: dict[str, Any] | None) -> float:
         return 0.0
 
 
-def _country(display_name: str) -> str:
-    return display_name.rsplit(",", 1)[-1].strip() if display_name else ""
+def _km_apart(a: Any, b: Any) -> float:
+    """Geodesic distance in km between two features' representative points."""
+    try:
+        from pyproj import Geod
+        from shapely.geometry import shape
+
+        pa = shape(a.geometry).representative_point()
+        pb = shape(b.geometry).representative_point()
+        return float(Geod(ellps="WGS84").inv(pa.x, pa.y, pb.x, pb.y)[2]) / 1000
+    except Exception:
+        return 0.0
 
 
 def enrich(
@@ -247,14 +256,19 @@ def enrich(
         importances = [float(f.properties.get("importance") or 0) for f in result.features]
         result.quality["match_importance"] = round(importances[0], 3)
         result.quality["candidates"] = len(result.features)
-        if len(result.features) >= 2 and importances[0] - importances[1] < 0.05:
-            first = result.features[0].properties.get("display_name", "")
-            second = result.features[1].properties.get("display_name", "")
-            if _country(first) != _country(second) or first.split(",")[0] != second.split(",")[0]:
-                result.warnings.append(
-                    f"Ambiguous place name: '{first}' and '{second}' are almost equally likely. "
-                    "Add a city or country to be sure."
-                )
+        rivals = [
+            f for f, importance in zip(result.features[1:], importances[1:], strict=True)
+            if importances[0] - importance < 0.05 and _km_apart(result.features[0], f) > 25
+        ]
+        if rivals:
+            names = [result.features[0].properties.get("display_name", "?")]
+            names += [f.properties.get("display_name", "?") for f in rivals[:2]]
+            result.quality["ambiguous"] = True
+            result.warnings.append(
+                "Ambiguous place name: " + "; ".join(f"'{n}'" for n in names)
+                + (" and others" if len(rivals) > 2 else "")
+                + " are almost equally likely and far apart. Add a region or country to be sure."
+            )
 
     if operation == "elevation" and result.features:
         dem = next((s for s in result.sources if s in VERTICAL_ACCURACY_LE90_M), None)
@@ -263,6 +277,19 @@ def enrich(
         datum = result.features[0].properties.get("vertical_datum")
         if datum:
             result.quality["vertical_datum"] = datum
+
+    if operation == "satellite_view" and result.features:
+        covers = [
+            float(c) for f in result.features
+            if isinstance(c := f.properties.get("cloud_cover"), (int, float))
+        ]
+        if covers:
+            result.quality["cloud_cover_pct"] = {"min": min(covers), "max": max(covers)}
+            if min(covers) > 50:
+                result.warnings.append(
+                    f"Every scene found is more than 50% cloud-covered (least cloudy: {min(covers):.0f}%). "
+                    "Widen the date range or filter on cloud cover before analysing the imagery."
+                )
 
     planar = _OPERATION_METHOD.get(operation or "") in (
         "topology",

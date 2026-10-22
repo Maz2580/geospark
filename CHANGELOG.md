@@ -5,6 +5,10 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 ## [Unreleased]
 
 ### Added
+- `server.json` for the official MCP Registry, listing the hosted endpoint as
+  `io.github.Maz2580/geospark` (validated against the registry's 2025-12-11 schema).
+- The README's `mcp-name` tag now matches that name exactly; the registry compares it
+  case-sensitively, so the earlier lowercase tag would not have verified the PyPI package.
 - **The hosted MCP server is live** at `https://geospark.terrascout.app/mcp`: add it to Claude (or
   any MCP client) as a custom connector, with no install. README and `deploy/DEPLOY.md` show how
   to connect and how to turn it on for your own deployment.

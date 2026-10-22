@@ -1,4 +1,4 @@
-<!-- mcp-name: io.github.maz2580/geospark -->
+<!-- mcp-name: io.github.Maz2580/geospark -->
 <p align="center">
   <h1 align="center">GeoSpark</h1>
   <p align="center"><strong>Verifiable spatial reasoning for any LLM.</strong></p>

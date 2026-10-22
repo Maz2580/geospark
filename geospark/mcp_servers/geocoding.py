@@ -77,6 +77,13 @@ class GeocodingServer(BaseMCPServer):
             metadata={"query": args["query"]},
         )
         result = self.engine.execute(query)
+        if result.errors and not result.features:
+            # The service failed: say so, rather than implying the place doesn't exist
+            return {
+                "result": None,
+                "errors": result.errors,
+                "suggestion": "The geocoding service is temporarily unavailable; retry shortly.",
+            }
         if not result.features:
             return {
                 "result": {"features": []},
@@ -97,6 +104,12 @@ class GeocodingServer(BaseMCPServer):
             geometry=Point.from_latlon(args["latitude"], args["longitude"]),
         )
         result = self.engine.execute(query)
+        if result.errors and not result.features:
+            return {
+                "result": None,
+                "errors": result.errors,
+                "suggestion": "The geocoding service is temporarily unavailable; retry shortly.",
+            }
         if not result.features:
             return {
                 "result": {"address": None},

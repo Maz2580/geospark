@@ -126,8 +126,8 @@ class Engine:
         """Try answering via local Ollama."""
         import os
 
-        url = ollama_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-        use_model = model or os.getenv("GEOSPARK_OLLAMA_MODEL", "qwen2.5:7b")
+        url = ollama_url or os.getenv("OLLAMA_BASE_URL") or "http://localhost:11434"
+        use_model = model or os.getenv("GEOSPARK_OLLAMA_MODEL") or "qwen2.5:7b"
 
         from geospark.integrations.ollama_tools import OllamaClient
 

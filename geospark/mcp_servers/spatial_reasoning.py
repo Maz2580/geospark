@@ -5,8 +5,15 @@ from typing import Any, ClassVar
 
 from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
-from geospark.mcp_servers.base import BaseMCPServer
-from geospark.protocol.schema import Point, SpatialOperation, SpatialQuery
+from geospark.mcp_servers.base import BaseMCPServer, verification
+from geospark.protocol.provenance import enrich
+from geospark.protocol.schema import (
+    Point,
+    SpatialFeature,
+    SpatialOperation,
+    SpatialQuery,
+    SpatialResult,
+)
 
 
 class SpatialReasoningServer(BaseMCPServer):
@@ -121,19 +128,24 @@ class SpatialReasoningServer(BaseMCPServer):
         }
 
     def _handle_relationship(self, args: dict[str, Any]) -> dict[str, Any]:
-        result = SpatialReasoner.check_relationship(
+        holds = SpatialReasoner.check_relationship(
             args["geometry_a"], args["geometry_b"], args["relationship"]
         )
+        checked = enrich(SpatialResult(), args["relationship"], [args["geometry_a"], args["geometry_b"]])
         return {
-            "result": {"relationship": args["relationship"], "holds": result},
-            "metadata": {"method": "ground_truth_topology", "crs": "EPSG:4326"},
+            "result": {"relationship": args["relationship"], "holds": holds},
+            "metadata": {"method": "ground_truth_topology", "crs": "EPSG:4326", **verification(checked)},
         }
 
     def _handle_distance(self, args: dict[str, Any]) -> dict[str, Any]:
         distance = SpatialReasoner.calculate_distance(args["point_a"], args["point_b"])
+        values = {"distance_m": distance, "distance_km": distance / 1000}
+        checked = enrich(
+            SpatialResult(features=[SpatialFeature(geometry=args["point_a"], properties=values)]), "distance"
+        )
         return {
-            "result": {"distance_m": distance, "distance_km": distance / 1000},
-            "metadata": {"method": "geodesic_wgs84", "crs": "EPSG:4326"},
+            "result": values,
+            "metadata": {"method": "geodesic_wgs84", "crs": "EPSG:4326", **verification(checked)},
         }
 
     def _handle_operation(self, args: dict[str, Any]) -> dict[str, Any]:
@@ -151,5 +163,5 @@ class SpatialReasoningServer(BaseMCPServer):
                 "features": [f.model_dump() for f in result.features],
                 "summary": result.spatial_context.summary,
             },
-            "metadata": {"crs": "EPSG:4326", "operation": args["operation"]},
+            "metadata": {"crs": "EPSG:4326", "operation": args["operation"], **verification(result)},
         }

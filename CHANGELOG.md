@@ -2,6 +2,25 @@
 
 All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
+## [Unreleased] - 0.7.0: verifiable answers
+
+### Added
+- **Provenance on every answer.** Results carry `provenance` records (source, licence,
+  attribution, retrieval time, method, dataset version) for OpenStreetMap, Copernicus GLO-30, Open
+  Elevation, Open-Meteo, OpenAQ, NASA FIRMS, OSRM, STAC, and for computed answers the engine's
+  method and the exact pyproj/PROJ/Shapely/GEOS versions. This covers REST responses, MCP tool
+  replies, data channels and location reports.
+- **Units**: `spatial_context.units`, e.g. `{"distance_m": "metre"}`.
+- **Quality flags and warnings**: geocoder match importance and an ambiguity warning when two
+  places are almost equally likely; DEM vertical accuracy (GLO-30 4 m, SRTM 16 m LE90) and the
+  vertical datum; a warning when topology is computed on very large geometries.
+- **`status`** on every result: `ok`, `partial` or `cannot_answer`.
+
+### Changed
+- **GeoSpark refuses rather than guesses.** Invalid geometry (for example a self-intersecting
+  polygon, whose area used to come back as about 0), out-of-range coordinates, and likely
+  [lat, lon] swaps are rejected with an explanation, everywhere: engine, REST and MCP.
+
 ## [0.6.0] - 2026-10-22: the trustworthy release
 
 The focus of this release is that what GeoSpark says it does, it does: it installs cleanly,

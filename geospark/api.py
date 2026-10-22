@@ -31,6 +31,7 @@ from shapely.errors import ShapelyError
 from geospark import __version__, security
 from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
+from geospark.protocol.provenance import Provenance, engine_provenance, enrich
 from geospark.protocol.schema import (
     Point,
     SpatialFilter,
@@ -242,6 +243,8 @@ class RelationshipResponse(BaseModel):
     relationship: str
     result: bool
     note: str = "Ground-truth spatial reasoning via GeoSpark"
+    provenance: list[Provenance] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
 
 
 class DistanceRequest(BaseModel):
@@ -255,6 +258,8 @@ class DistanceResponse(BaseModel):
     distance_m: float
     distance_km: float
     note: str = "Geodesic distance on WGS84 ellipsoid"
+    units: dict[str, str] = Field(default_factory=lambda: {"distance_m": "metre", "distance_km": "kilometre"})
+    provenance: list[Provenance] = Field(default_factory=list)
 
 
 class ElevationRequest(BaseModel):
@@ -385,11 +390,17 @@ async def check_relationship(request: RelationshipRequest):
             request.geometry_b,
             request.relationship,
         )
+        checked = enrich(SpatialResult(), request.relationship, [request.geometry_a, request.geometry_b])
         return RelationshipResponse(
             relationship=request.relationship,
             result=result,
+            provenance=checked.provenance,
+            warnings=checked.warnings,
         )
-    except (ValueError, KeyError, TypeError, AttributeError, ShapelyError) as e:
+    except ValueError as e:
+        # Validation already explains the problem (invalid shape, [lat, lon] order, ...)
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except (KeyError, TypeError, AttributeError, ShapelyError) as e:
         # Malformed GeoJSON is the caller's mistake (400), not a server error (500)
         raise HTTPException(
             status_code=400, detail=f"Invalid GeoJSON geometry: {type(e).__name__}: {e}"
@@ -431,7 +442,9 @@ async def distance(request: DistanceRequest):
     geom_a = {"type": "Point", "coordinates": [request.lon_a, request.lat_a]}
     geom_b = {"type": "Point", "coordinates": [request.lon_b, request.lat_b]}
     d = SpatialReasoner.calculate_distance(geom_a, geom_b)
-    return DistanceResponse(distance_m=round(d, 2), distance_km=round(d / 1000, 3))
+    return DistanceResponse(
+        distance_m=round(d, 2), distance_km=round(d / 1000, 3), provenance=[engine_provenance("distance")]
+    )
 
 
 @app.post("/api/v1/elevation", dependencies=[Depends(verify_api_key)])
@@ -458,6 +471,11 @@ async def elevation(request: ElevationRequest):
     for key in ("attribution", "fallback_note"):
         if props.get(key):
             response[key] = props[key]
+    # Verifiable answer: accuracy of the DEM, units, and where the value came from
+    response["units"] = {"elevation_m": "metre"}
+    if result.quality:
+        response["quality"] = result.quality
+    response["provenance"] = [p.model_dump(mode="json", exclude_none=True) for p in result.provenance]
     return response
 
 

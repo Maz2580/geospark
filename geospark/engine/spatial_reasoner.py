@@ -47,8 +47,69 @@ class SpatialReasoner:
     - Spatial aggregation (zonal stats, spatial joins)
     """
 
+    @staticmethod
+    def validate_geometry(geom: Any, role: str = "geometry", geographic: bool = True) -> Any:
+        """Parse a GeoJSON geometry and refuse anything that would give a wrong answer.
+
+        Raises ``ValueError`` (with an explanation a caller or an LLM can act on) for
+        malformed or empty geometries, coordinates outside lon/lat range (and says when they
+        look like [lat, lon] order), and invalid geometries such as self-intersecting polygons.
+        Returns the Shapely geometry.
+        """
+        try:
+            parsed = shape(geom)
+        except Exception as e:  # malformed GeoJSON raises KeyError/TypeError/GEOS errors
+            raise ValueError(f"The {role} is not valid GeoJSON ({type(e).__name__}: {e}).") from e
+        if parsed.is_empty:
+            raise ValueError(f"The {role} is empty.")
+        if geographic:
+            minx, miny, maxx, maxy = parsed.bounds
+            if minx < -180 or maxx > 180 or miny < -90 or maxy > 90:
+                swapped = minx >= -90 and maxx <= 90 and miny >= -180 and maxy <= 180
+                hint = (
+                    " The values look like [latitude, longitude]; GeoJSON coordinates are "
+                    "[longitude, latitude]."
+                    if swapped
+                    else ""
+                )
+                raise ValueError(
+                    f"The {role} has coordinates outside longitude [-180, 180] / latitude [-90, 90].{hint}"
+                )
+        if not parsed.is_valid:
+            from shapely.validation import explain_validity
+
+            raise ValueError(
+                f"The {role} is not a valid geometry ({explain_validity(parsed)}). Computing on it "
+                "would give a wrong answer; repair it first (for example with shapely.make_valid)."
+            )
+        return parsed
+
     def execute(self, query: SpatialQuery) -> SpatialResult:
-        """Execute a spatial reasoning operation."""
+        """Execute a spatial reasoning operation.
+
+        Inputs are validated first (an invalid input gives a ``cannot_answer`` result with the
+        reason), and every answer is enriched with provenance, units and quality flags.
+        """
+        from geospark.protocol.provenance import enrich
+
+        inputs: list[dict[str, Any]] = []
+        geographic = query.crs in ("EPSG:4326", "OGC:CRS84")
+        try:
+            if query.geometry is not None:
+                inputs.append(query.geometry.model_dump())
+                self.validate_geometry(inputs[-1], "geometry", geographic)
+            geom_b = (query.metadata or {}).get("geometry_b")
+            if geom_b is not None:
+                inputs.append(geom_b)
+                self.validate_geometry(geom_b, "second geometry (geometry_b)", geographic)
+        except ValueError as e:
+            return SpatialResult(errors=[str(e)])
+
+        result = self._dispatch(query)
+        return enrich(result, query.operation.value, inputs)
+
+    def _dispatch(self, query: SpatialQuery) -> SpatialResult:
+        """Route a validated query to its handler."""
         handlers = {
             SpatialOperation.BUFFER: self._buffer,
             SpatialOperation.DISTANCE: self._distance,
@@ -382,9 +443,12 @@ class SpatialReasoner:
 
         Returns:
             Distance in meters (geodesic, not planar)
+
+        Raises:
+            ValueError: if either geometry is malformed, out of range or invalid.
         """
-        a = shape(geom_a)
-        b = shape(geom_b)
+        a = SpatialReasoner.validate_geometry(geom_a, "first geometry")
+        b = SpatialReasoner.validate_geometry(geom_b, "second geometry")
 
         # Get representative points for distance calculation
         # For points, use directly; for polygons/lines, use nearest points
@@ -419,9 +483,13 @@ class SpatialReasoner:
 
         Returns:
             True if the relationship holds, False otherwise
+
+        Raises:
+            ValueError: if either geometry is malformed, out of range or invalid, or the
+                relationship is unknown.
         """
-        a = shape(geom_a)
-        b = shape(geom_b)
+        a = SpatialReasoner.validate_geometry(geom_a, "first geometry")
+        b = SpatialReasoner.validate_geometry(geom_b, "second geometry")
 
         checks = {
             "contains": a.contains,

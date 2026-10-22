@@ -37,7 +37,7 @@ class TestSystemPrompt:
         assert "CAPABILITIES:" in GEOSPARK_SYSTEM_PROMPT
         assert "geocode" in GEOSPARK_SYSTEM_PROMPT
         assert "get_elevation" in GEOSPARK_SYSTEM_PROMPT
-        assert "spatial_query" in GEOSPARK_SYSTEM_PROMPT
+        assert "calculate_distance" in GEOSPARK_SYSTEM_PROMPT and "spatial_query" not in GEOSPARK_SYSTEM_PROMPT
         assert "check_spatial_relationship" in GEOSPARK_SYSTEM_PROMPT
 
     def test_prompt_has_agent_loop(self):

@@ -13,6 +13,7 @@ import httpx
 from pydantic import BaseModel, Field
 
 from geospark.memory.vector_store import VectorStore
+from geospark.utils import data_dir
 
 # ---------------------------------------------------------------------------
 # Enums
@@ -175,7 +176,7 @@ class SpatialIntelligence:
         embed_model: str | None = None,
     ) -> None:
         if storage_dir is None:
-            storage_dir = Path.home() / ".geospark" / "intelligence"
+            storage_dir = data_dir() / "intelligence"
         self._storage_dir = Path(storage_dir)
         self._storage_dir.mkdir(parents=True, exist_ok=True)
 

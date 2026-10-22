@@ -9,11 +9,23 @@ from __future__ import annotations
 
 from typing import Any, ClassVar
 
+import numpy as np
+import shapely
 from pyproj import CRS, Transformer
 from shapely.geometry import mapping, shape
-from shapely.ops import transform
+from shapely.geometry.base import BaseGeometry
 
 from geospark.protocol.schema import Geometry
+
+
+def reproject(geom: BaseGeometry, transformer: Transformer) -> BaseGeometry:
+    """Apply a pyproj transformer (built with ``always_xy=True``) to a Shapely geometry."""
+
+    def _apply(coords: np.ndarray) -> np.ndarray:
+        x, y = transformer.transform(coords[:, 0], coords[:, 1])
+        return np.column_stack([x, y])
+
+    return shapely.transform(geom, _apply)
 
 
 class CRSHandler:
@@ -48,7 +60,7 @@ class CRSHandler:
         shapely_geom = shape(geom_dict)
 
         transformer = self.get_transformer(from_crs, to_crs)
-        transformed = transform(transformer.transform, shapely_geom)
+        transformed = reproject(shapely_geom, transformer)
 
         # Reconstruct the GSP geometry from the transformed shapely geometry
         result_dict = mapping(transformed)

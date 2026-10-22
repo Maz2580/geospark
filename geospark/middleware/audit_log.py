@@ -30,6 +30,7 @@ from starlette.requests import Request
 
 from geospark.security import client_ip as real_client_ip
 from geospark.security import hash_ip
+from geospark.utils import data_dir
 
 # Paths to skip in audit log (static assets, noisy health checks)
 _SKIP_PREFIXES = (
@@ -126,7 +127,7 @@ class AuditStore:
         if audit_dir is None:
             audit_dir = os.getenv(
                 "GEOSPARK_AUDIT_DIR",
-                str(Path.home() / ".geospark" / "audit"),
+                str(data_dir() / "audit"),
             )
         self._dir = Path(audit_dir)
         self._dir.mkdir(parents=True, exist_ok=True)

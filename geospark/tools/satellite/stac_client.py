@@ -19,7 +19,7 @@ from geospark.protocol.schema import (
     SpatialQuery,
     SpatialResult,
 )
-from geospark.tools.base import BaseTool
+from geospark.tools.base import BaseTool, not_implemented
 
 
 class STACTool(BaseTool):
@@ -119,9 +119,4 @@ class STACTool(BaseTool):
 
     def _band_math(self, query: SpatialQuery) -> SpatialResult:
         """Calculate spectral indices (NDVI, NDWI, etc.)."""
-        # TODO: Implement band math calculations
-        return SpatialResult(
-            spatial_context=SpatialContext(
-                summary="Band math calculation (coming in Phase 1)",
-            ),
-        )
+        return not_implemented("Band math")

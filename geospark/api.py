@@ -26,12 +26,14 @@ from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
+from shapely.errors import ShapelyError
 
 from geospark import __version__, security
 from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.protocol.schema import (
     Point,
+    SpatialFilter,
     SpatialOperation,
     SpatialQuery,
     SpatialResult,
@@ -327,8 +329,11 @@ async def info():
     }
 
 
+# Handlers that do blocking work (HTTP to Nominatim/Overpass/Ollama, LLM tool loops) are
+# plain ``def``: FastAPI runs them in its thread pool, so one slow request can't freeze the
+# event loop for everyone else (the API runs a single uvicorn worker).
 @app.post("/api/v1/geocode", response_model=SpatialResult, dependencies=[Depends(verify_api_key)])
-async def geocode(request: GeocodeRequest):
+def geocode(request: GeocodeRequest):
     """Geocode an address or place name."""
     engine = get_engine()
     query = SpatialQuery(
@@ -340,7 +345,7 @@ async def geocode(request: GeocodeRequest):
 
 
 @app.post("/api/v1/query", response_model=SpatialResult, dependencies=[Depends(verify_api_key)])
-async def spatial_query(request: SpatialQueryRequest):
+def spatial_query(request: SpatialQueryRequest):
     """Execute a spatial query."""
     engine = get_engine()
 
@@ -361,6 +366,7 @@ async def spatial_query(request: SpatialQueryRequest):
         operation=op,
         geometry=geometry,
         radius_m=request.radius_m,
+        filters=SpatialFilter(category=request.category) if request.category else None,
     )
     return engine.execute(query)
 
@@ -383,8 +389,11 @@ async def check_relationship(request: RelationshipRequest):
             relationship=request.relationship,
             result=result,
         )
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
+    except (ValueError, KeyError, TypeError, AttributeError, ShapelyError) as e:
+        # Malformed GeoJSON is the caller's mistake (400), not a server error (500)
+        raise HTTPException(
+            status_code=400, detail=f"Invalid GeoJSON geometry: {type(e).__name__}: {e}"
+        ) from e
 
 
 @app.post(
@@ -392,7 +401,7 @@ async def check_relationship(request: RelationshipRequest):
     response_model=AskResponse,
     dependencies=[Depends(verify_api_key), Depends(llm_slot)],
 )
-async def ask(request: AskRequest, http: Request):
+def ask(request: AskRequest, http: Request):
     """
     Ask a natural language spatial question.
 
@@ -505,7 +514,7 @@ async def flow_get_template(template_name: str):
 
 
 @app.post("/api/v1/flows/templates/{template_name}/run", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
-async def flow_run_template(template_name: str, request: TemplateRunRequest):
+def flow_run_template(template_name: str, request: TemplateRunRequest):
     """Run a flow template with optional parameter overrides."""
     from geospark.flows import FlowRunner, get_template
 
@@ -540,7 +549,7 @@ class FlowBuildRequest(BaseModel):
 
 
 @app.post("/api/v1/flows/build", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
-async def flow_build(request: FlowBuildRequest, http: Request):
+def flow_build(request: FlowBuildRequest, http: Request):
     """Build a Flow from a natural-language goal via incremental LLM tool calling.
 
     Uses the chat-to-flow builder (Phase 8B). Each LLM turn invokes one
@@ -655,7 +664,7 @@ async def flow_delete(flow_id: str):
 
 
 @app.post("/api/v1/flows/{flow_id}/run", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
-async def flow_run_saved(flow_id: str):
+def flow_run_saved(flow_id: str):
     """Run a saved flow."""
     from geospark.flows import FlowRunner
 
@@ -706,12 +715,24 @@ class DataChannelRequest(BaseModel):
     filters: dict[str, Any] = Field(default_factory=dict)
 
 
+_registry = None
+
+
+def _channel_registry():
+    """One shared registry, so its LRU+TTL cache actually serves repeat requests."""
+    global _registry
+    if _registry is None:
+        from geospark.data_channels import ChannelRegistry
+
+        _registry = ChannelRegistry()
+    return _registry
+
+
 @app.get("/api/v1/data/channels")
 async def data_list_channels():
     """List available data channels."""
-    from geospark.data_channels import ChannelRegistry
 
-    registry = ChannelRegistry()
+    registry = _channel_registry()
     channels = registry.load_all()
     return {
         "channels": [
@@ -722,20 +743,18 @@ async def data_list_channels():
 
 
 @app.get("/api/v1/data/status")
-async def data_channel_status():
+def data_channel_status():
     """Health check all data channels."""
-    from geospark.data_channels import ChannelRegistry
 
-    registry = ChannelRegistry()
+    registry = _channel_registry()
     return {"channels": [s.model_dump() for s in registry.check_all()]}
 
 
 @app.post("/api/v1/data/{channel_name}")
 async def data_query(channel_name: str, request: DataChannelRequest):
     """Query a data channel."""
-    from geospark.data_channels import ChannelRegistry
 
-    registry = ChannelRegistry()
+    registry = _channel_registry()
     try:
         result = await registry.search(
             channel_name,
@@ -774,7 +793,7 @@ class SiteSelectRequest(BaseModel):
 
 
 @app.post("/api/v1/agent/run", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
-async def agent_run(request: AgentRunRequest):
+def agent_run(request: AgentRunRequest):
     """Run the autonomous spatial agent with a goal."""
     from geospark.agents import GeoAgent
 
@@ -799,7 +818,7 @@ async def agent_report(request: ReportRequest):
 
 
 @app.post("/api/v1/agent/site-select", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
-async def agent_site_select(request: SiteSelectRequest):
+def agent_site_select(request: SiteSelectRequest):
     """Find optimal locations based on spatial criteria."""
     from geospark.agents import SiteSelector
 
@@ -844,7 +863,7 @@ def _memory(http: Request):
 
 
 @app.post("/api/v1/memory/recall", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
-async def memory_recall(request: MemoryRecallRequest, http: Request):
+def memory_recall(request: MemoryRecallRequest, http: Request):
     """Recall spatial memories matching a query."""
     _, intel = _memory(http)
     results = intel.recall(
@@ -854,7 +873,7 @@ async def memory_recall(request: MemoryRecallRequest, http: Request):
 
 
 @app.post("/api/v1/memory/fact", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
-async def memory_add_fact(request: MemoryFactRequest, http: Request):
+def memory_add_fact(request: MemoryFactRequest, http: Request):
     """Store a new spatial fact."""
     namespace, intel = _memory(http)
     check_memory_quota(namespace, intel)
@@ -868,7 +887,7 @@ async def memory_add_fact(request: MemoryFactRequest, http: Request):
 
 
 @app.post("/api/v1/memory/episode", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
-async def memory_add_episode(request: MemoryEpisodeRequest, http: Request):
+def memory_add_episode(request: MemoryEpisodeRequest, http: Request):
     """Store a timestamped spatial observation."""
     namespace, intel = _memory(http)
     check_memory_quota(namespace, intel)
@@ -900,7 +919,7 @@ async def memory_stats(http: Request):
 
 
 @app.post("/api/v1/memory/compact", dependencies=[Depends(verify_api_key)])
-async def memory_compact(http: Request):
+def memory_compact(http: Request):
     """Compact old low-importance episodes."""
     _, intel = _memory(http)
     return intel.compact()
@@ -1124,7 +1143,7 @@ def _get_coordinator():
 
 
 @app.post("/api/v1/agent/coordinate", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
-async def agent_coordinate(request: CoordinateRequest):
+def agent_coordinate(request: CoordinateRequest):
     """Route a goal through the multi-agent coordinator.
 
     The coordinator classifies the goal and dispatches to the right
@@ -1145,7 +1164,7 @@ async def agent_list_registered():
 
 
 @app.post("/api/v1/agent/classify", dependencies=[Depends(verify_api_key)])
-async def agent_classify(request: CoordinateRequest):
+def agent_classify(request: CoordinateRequest):
     """Classify a goal without actually running it (for debugging routing)."""
     from geospark.agents import classify_intent
 

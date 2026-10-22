@@ -9,6 +9,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from geospark.utils import data_dir
+
 
 class SpatialMemoryEntry(BaseModel):
     """A single spatial memory entry."""
@@ -58,7 +60,7 @@ class SpatialMemory:
 
     def __init__(self, storage_dir: str | Path | None = None) -> None:
         if storage_dir is None:
-            storage_dir = Path.home() / ".geospark" / "memory"
+            storage_dir = data_dir() / "memory"
         self.storage_dir = Path(storage_dir)
         self.storage_dir.mkdir(parents=True, exist_ok=True)
         self._entries: list[SpatialMemoryEntry] = []

@@ -9,6 +9,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from geospark.utils import data_dir
+
 
 class Message(BaseModel):
     """A single message in a conversation."""
@@ -83,7 +85,7 @@ class SessionStore:
 
     def __init__(self, storage_dir: str | Path | None = None) -> None:
         if storage_dir is None:
-            storage_dir = Path.home() / ".geospark" / "sessions"
+            storage_dir = data_dir() / "sessions"
         self.storage_dir = Path(storage_dir)
         self.storage_dir.mkdir(parents=True, exist_ok=True)
 

@@ -25,6 +25,7 @@ from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.knowledge.loaders import OverpassLoader
 from geospark.mcp_servers.launcher import MCPServerLauncher
+from geospark.utils.geo import overpass_bbox
 
 
 class SiteCandidate(BaseModel):
@@ -127,8 +128,7 @@ class SiteSelector:
 
         lon, lat = center_coords[0], center_coords[1]
         center = {"type": "Point", "coordinates": [lon, lat]}
-        delta = radius_m / 111320
-        bbox = (lat - delta, lon - delta, lat + delta, lon + delta)
+        bbox = overpass_bbox(lat, lon, radius_m)
 
         # Step 2: Load all "near" amenities
         near_features: dict[str, list[dict[str, Any]]] = {}

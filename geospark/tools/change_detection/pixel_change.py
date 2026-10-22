@@ -9,12 +9,11 @@ from __future__ import annotations
 from typing import ClassVar
 
 from geospark.protocol.schema import (
-    SpatialContext,
     SpatialOperation,
     SpatialQuery,
     SpatialResult,
 )
-from geospark.tools.base import BaseTool
+from geospark.tools.base import BaseTool, not_implemented
 
 
 class PixelChangeTool(BaseTool):
@@ -26,12 +25,4 @@ class PixelChangeTool(BaseTool):
 
     def execute(self, query: SpatialQuery) -> SpatialResult:
         """Execute change detection."""
-        # TODO: Implement change detection using rasterio
-        # This will compare two temporal images and produce a change map
-        return SpatialResult(
-            spatial_context=SpatialContext(
-                summary="Change detection (full implementation coming in Phase 1). "
-                "Will compare satellite imagery across time periods to identify "
-                "land use changes, new construction, deforestation, flooding, etc.",
-            ),
-        )
+        return not_implemented("Change detection")

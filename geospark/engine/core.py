@@ -50,8 +50,10 @@ class Engine:
         """
         start_time = time.time()
 
-        # Normalize CRS if needed
-        if query.crs != "EPSG:4326" and query.geometry:
+        # Normalize CRS if needed (both the main geometry and any second geometry)
+        if query.crs != "EPSG:4326" and (
+            query.geometry or (query.metadata or {}).get("geometry_b")
+        ):
             query = self._normalize_crs(query)
 
         # Route to appropriate handler
@@ -189,13 +191,28 @@ class Engine:
         return QueryChain(engine=self, steps=steps)
 
     def _normalize_crs(self, query: SpatialQuery) -> SpatialQuery:
-        """Transform query geometry to EPSG:4326."""
-        if query.geometry is None:
-            return query
-        transformed = self.crs_handler.transform_geometry(
-            query.geometry, from_crs=query.crs, to_crs="EPSG:4326"
-        )
-        return query.model_copy(update={"geometry": transformed, "crs": "EPSG:4326"})
+        """Transform the query geometry, and ``metadata["geometry_b"]``, to EPSG:4326.
+
+        Distance, topology and overlay operations compare ``geometry`` with
+        ``geometry_b``; transforming only one of them would compare coordinates in two
+        different CRSs and silently give wrong answers.
+        """
+        update: dict[str, Any] = {"crs": "EPSG:4326"}
+        if query.geometry is not None:
+            update["geometry"] = self.crs_handler.transform_geometry(
+                query.geometry, from_crs=query.crs, to_crs="EPSG:4326"
+            )
+        metadata = dict(query.metadata or {})
+        geom_b = metadata.get("geometry_b")
+        if isinstance(geom_b, dict):
+            from shapely.geometry import mapping, shape
+
+            from geospark.engine.crs_handler import reproject
+
+            transformer = self.crs_handler.get_transformer(query.crs, "EPSG:4326")
+            metadata["geometry_b"] = dict(mapping(reproject(shape(geom_b), transformer)))
+            update["metadata"] = metadata
+        return query.model_copy(update=update)
 
     def _route_query(self, query: SpatialQuery) -> SpatialResult:
         """Route a query to the appropriate handler."""

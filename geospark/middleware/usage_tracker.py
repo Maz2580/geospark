@@ -20,6 +20,8 @@ from typing import Any
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
+from geospark.utils import data_dir
+
 
 class UsageTracker:
     """In-memory usage counters with disk persistence.
@@ -36,7 +38,7 @@ class UsageTracker:
         if storage_dir is None:
             storage_dir = os.getenv(
                 "GEOSPARK_USAGE_DIR",
-                str(Path.home() / ".geospark" / "usage"),
+                str(data_dir() / "usage"),
             )
         self._dir = Path(storage_dir)
         self._dir.mkdir(parents=True, exist_ok=True)

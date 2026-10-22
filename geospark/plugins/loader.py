@@ -16,6 +16,7 @@ from typing import Any
 from geospark.plugins.hooks import PluginHooks
 from geospark.plugins.manifest import PluginManifest
 from geospark.tools.base import BaseTool
+from geospark.utils import data_dir
 
 MANIFEST_FILENAME = "geospark.plugin.json"
 
@@ -41,7 +42,7 @@ class PluginLoader:
         hooks: PluginHooks | None = None,
     ) -> None:
         self._plugin_dirs: list[Path] = plugin_dirs or [
-            Path.home() / ".geospark" / "plugins",
+            data_dir() / "plugins",
             Path("plugins"),
         ]
         self._loaded: dict[str, PluginManifest] = {}

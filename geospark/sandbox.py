@@ -29,15 +29,12 @@ from typing import Any
 from fastapi import HTTPException, Request
 
 from geospark.security import SESSION_HEADER, client_ip, hash_ip, is_admin
+from geospark.utils import data_dir
 
 GLOBAL_NAMESPACE = "global"
 _SESSION_RE = re.compile(r"^[A-Za-z0-9-]{16,64}$")
 _MAX_CACHED = 128
 _SWEEP_INTERVAL_S = 3600
-
-
-def data_dir() -> Path:
-    return Path(os.getenv("GEOSPARK_DATA_DIR") or Path.home() / ".geospark")
 
 
 def sandbox_root() -> Path:

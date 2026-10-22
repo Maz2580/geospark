@@ -13,6 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import threading
 import time
 from collections import OrderedDict
 from typing import Any
@@ -49,6 +50,8 @@ class ChannelCache:
         self._cache: OrderedDict[str, tuple[float, ChannelResult]] = OrderedDict()
         self._hits: int = 0
         self._misses: int = 0
+        # The API shares one cache across worker threads
+        self._lock = threading.Lock()
 
     def get(self, channel_name: str, kwargs: dict[str, Any]) -> ChannelResult | None:
         """Look up a cached result. Returns None on miss or expiry."""
@@ -57,22 +60,23 @@ class ChannelCache:
             return None
 
         key = _make_cache_key(channel_name, kwargs)
-        entry = self._cache.get(key)
-        if entry is None:
-            self._misses += 1
-            return None
+        with self._lock:
+            entry = self._cache.get(key)
+            if entry is None:
+                self._misses += 1
+                return None
 
-        timestamp, result = entry
-        if time.time() - timestamp > self.ttl:
-            # Expired — evict
-            del self._cache[key]
-            self._misses += 1
-            return None
+            timestamp, result = entry
+            if time.time() - timestamp > self.ttl:
+                # Expired — evict
+                del self._cache[key]
+                self._misses += 1
+                return None
 
-        # Move to end (most recently used)
-        self._cache.move_to_end(key)
-        self._hits += 1
-        return result
+            # Move to end (most recently used)
+            self._cache.move_to_end(key)
+            self._hits += 1
+            return result
 
     def put(self, channel_name: str, kwargs: dict[str, Any], result: ChannelResult) -> None:
         """Store a result in the cache."""
@@ -80,12 +84,13 @@ class ChannelCache:
             return
 
         key = _make_cache_key(channel_name, kwargs)
-        self._cache[key] = (time.time(), result)
-        self._cache.move_to_end(key)
+        with self._lock:
+            self._cache[key] = (time.time(), result)
+            self._cache.move_to_end(key)
 
-        # Evict oldest if over capacity
-        while len(self._cache) > self.max_entries:
-            self._cache.popitem(last=False)
+            # Evict oldest if over capacity
+            while len(self._cache) > self.max_entries:
+                self._cache.popitem(last=False)
 
     def invalidate(self, channel_name: str | None = None) -> int:
         """Clear cached entries. If channel_name given, only that channel's entries.

@@ -15,6 +15,20 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
     GeoJSON with `?format=geojson`) and the MCP tool `overture_features`.
   - DuckDB is capped per query (4 threads, 512 MB) so it can't starve a shared host. The Docker image
     pre-installs DuckDB's extensions.
+  - One DuckDB query at a time (`GEOSPARK_OVERTURE_CONCURRENCY`), so concurrent requests can't
+    exceed a small container's memory.
+- **Real isochrones and travel-time matrices** (Valhalla over OpenStreetMap) for walking, cycling and
+  driving:
+  - Reachable-area polygons per contour (up to 4, 1–60 min), validated and repaired, with geodesic
+    area.
+  - Origin × destination matrices (up to 5×5) with travel time and network distance, flagging
+    unreachable pairs.
+  - Available from Python, the CLI (`geospark isochrone`), REST (`/api/v1/isochrone`,
+    `/api/v1/travel-time`), the engine's `isochrone` operation (no longer "not implemented") and the
+    MCP tools `isochrone` and `travel_time_matrix`.
+  - Uses `GEOSPARK_VALHALLA_URL`. Without it, GeoSpark falls back to the public FOSSGIS instance,
+    gently (≥ 1 s apart, cached), but a production deployment refuses that fallback and says
+    how to configure a server.
 
 ## [0.7.0] - 2026-10-22: verifiable answers
 

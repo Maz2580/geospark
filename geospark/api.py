@@ -137,6 +137,8 @@ for _prefix in (
     "/api/v1/memory/",
     "/api/v1/data/status",
     "/api/v1/overture/",
+    "/api/v1/isochrone",
+    "/api/v1/travel-time",
 ):
     set_route_limit(_prefix, int(os.getenv("GEOSPARK_RATE_LIMIT_EXPENSIVE_RPM", "12")))
 # Cheap listings under those prefixes keep the normal limit (longest prefix wins)
@@ -890,6 +892,51 @@ def overture(theme: str, request: OvertureRequest, http: Request, format: str | 
         raise HTTPException(status_code=400, detail=str(e)) from None
     except OvertureError as e:
         raise HTTPException(status_code=502, detail=str(e)) from None
+    return _geojson(result.to_geojson()) if _wants_geojson(http, format) else result
+
+
+# --- Isochrones and travel times (v0.8, Valhalla) ---
+
+
+class IsochroneRequest(BaseModel):
+    lat: float = Field(..., ge=-90, le=90)
+    lon: float = Field(..., ge=-180, le=180)
+    minutes: list[int] = Field([10], min_length=1, max_length=4, description="Contour times, 1-60 minutes")
+    mode: str = Field("walk", pattern="^(walk|bike|drive)$")
+
+
+class TravelTimeRequest(BaseModel):
+    origins: list[tuple[float, float]] = Field(..., min_length=1, max_length=5, description="[[lat, lon], ...]")
+    destinations: list[tuple[float, float]] = Field(..., min_length=1, max_length=5, description="[[lat, lon], ...]")
+    mode: str = Field("walk", pattern="^(walk|bike|drive)$")
+
+
+def _routing_call(fn: Any, *args: Any) -> Any:
+    from geospark.tools.routing.valhalla import RoutingUnavailableError
+
+    try:
+        return fn(*args)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from None
+    except RoutingUnavailableError as e:
+        raise HTTPException(status_code=503, detail=str(e)) from None
+
+
+@app.post("/api/v1/isochrone", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
+def isochrone(request: IsochroneRequest, http: Request, format: str | None = FormatParam):
+    """Areas reachable on foot, by bike or by car within each number of minutes (Valhalla)."""
+    from geospark.tools.routing import valhalla
+
+    result = _routing_call(valhalla.isochrone, request.lat, request.lon, request.minutes, request.mode)
+    return _geojson(result.to_geojson()) if _wants_geojson(http, format) else result
+
+
+@app.post("/api/v1/travel-time", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
+def travel_time(request: TravelTimeRequest, http: Request, format: str | None = FormatParam):
+    """Travel time and network distance from each origin to each destination (Valhalla)."""
+    from geospark.tools.routing import valhalla
+
+    result = _routing_call(valhalla.travel_time_matrix, request.origins, request.destinations, request.mode)
     return _geojson(result.to_geojson()) if _wants_geojson(http, format) else result
 
 

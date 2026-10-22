@@ -107,6 +107,12 @@ SOURCES: dict[str, dict[str, Any]] = {
         "attribution": "NASA LANCE FIRMS (MODIS/VIIRS active fire detections)",
         "method": "FIRMS area API, near-real-time detections",
     },
+    "valhalla": {
+        "name": "Valhalla", "url": "https://valhalla1.openstreetmap.de",
+        "licence": "ODbL-1.0 (road network data)",
+        "attribution": "Routing by Valhalla; map data © OpenStreetMap contributors",
+        "method": "Valhalla routing over the OpenStreetMap network",
+    },
     "overture-maps": {
         "name": "Overture Maps", "url": "https://overturemaps.org",
         "licence": "Per theme: CDLA-Permissive-2.0 (places), ODbL-1.0 (buildings, transportation, divisions)",

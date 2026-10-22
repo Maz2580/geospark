@@ -518,6 +518,32 @@ def flow_build(
 
 # Negative coordinates (southern/western hemispheres) must parse as values, not options
 @main.command(context_settings={"ignore_unknown_options": True})
+@click.argument("lat", type=float)
+@click.argument("lon", type=float)
+@click.option("--minutes", default="10", help="Comma-separated contour times, e.g. 10,20,30")
+@click.option("--mode", type=click.Choice(["walk", "bike", "drive"]), default="walk")
+@geojson_option
+def isochrone(lat: float, lon: float, minutes: str, mode: str, geojson_path: str | None) -> None:
+    """Areas reachable from LAT LON within N minutes (Valhalla)."""
+    from geospark.tools.routing import valhalla
+
+    try:
+        result = valhalla.isochrone(lat, lon, [int(m) for m in minutes.split(",") if m.strip()], mode)
+    except (ValueError, valhalla.RoutingUnavailableError) as e:
+        console.print(f"[red]Error:[/red] {e}")
+        return
+    table = Table(title=result.spatial_context.summary)
+    table.add_column("Minutes")
+    table.add_column("Area (km²)")
+    for feature in result.features:
+        table.add_row(str(feature.properties["minutes"]), str(feature.properties["area_sq_km"]))
+    console.print(table)
+    _print_caveats(result)
+    _save_geojson(geojson_path, result.to_geojson())
+
+
+# Negative coordinates (southern/western hemispheres) must parse as values, not options
+@main.command(context_settings={"ignore_unknown_options": True})
 @click.argument("theme", type=click.Choice(["places", "buildings", "transportation", "divisions"]))
 @click.argument("lat", type=float)
 @click.argument("lon", type=float)

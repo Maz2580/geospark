@@ -285,6 +285,39 @@ def create_server() -> MCPServer:
         """Satellite active-fire detections near a point (NASA FIRMS; the server needs a FIRMS_MAP_KEY)."""
         return await _channel("fires", lat=latitude, lon=longitude, filters={"days": days})
 
+    def _routing(fn: Any, *args: Any) -> Any:
+        from geospark.tools.routing.valhalla import RoutingUnavailableError
+
+        try:
+            return fn(*args)
+        except RoutingUnavailableError as e:
+            raise ToolError(str(e)) from e
+
+    @mcp.tool(title="Isochrone (reachable area)", annotations=READ_ONLY_WEB)
+    async def isochrone(
+        latitude: Latitude,
+        longitude: Longitude,
+        minutes: Annotated[list[int], Field(min_length=1, max_length=4, description="Contour times, 1-60")] = [10],  # noqa: B006
+        mode: Literal["walk", "bike", "drive"] = "walk",
+    ) -> FeatureCollection:
+        """Where can you get to from a point within N minutes on foot, by bike or by car?
+        Returns one polygon per contour with its geodesic area (Valhalla over OpenStreetMap)."""
+        from geospark.tools.routing import valhalla
+
+        return _collection(await _heavy(_routing, valhalla.isochrone, latitude, longitude, minutes, mode))
+
+    @mcp.tool(title="Travel-time matrix", annotations=READ_ONLY_WEB)
+    async def travel_time_matrix(
+        origins: Annotated[list[tuple[float, float]], Field(min_length=1, max_length=5, description="[[lat, lon], ...]")],
+        destinations: Annotated[list[tuple[float, float]], Field(min_length=1, max_length=5, description="[[lat, lon], ...]")],
+        mode: Literal["walk", "bike", "drive"] = "walk",
+    ) -> FeatureCollection:
+        """Network travel time (minutes) and distance (metres) from each origin to each destination.
+        Note: points here are [latitude, longitude] pairs."""
+        from geospark.tools.routing import valhalla
+
+        return _collection(await _heavy(_routing, valhalla.travel_time_matrix, origins, destinations, mode))
+
     @mcp.tool(title="Overture Maps features", annotations=READ_ONLY_WEB)
     async def overture_features(
         theme: Literal["places", "buildings", "transportation", "divisions"],

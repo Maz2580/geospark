@@ -18,7 +18,7 @@ from geospark.protocol.schema import (
     SpatialQuery,
     SpatialResult,
 )
-from geospark.tools.base import BaseTool, not_implemented
+from geospark.tools.base import BaseTool
 
 
 class OSRMRouteTool(BaseTool):
@@ -178,4 +178,17 @@ class OSRMRouteTool(BaseTool):
 
     def _isochrone_stub(self, query: SpatialQuery) -> SpatialResult:
         """Isochrone analysis placeholder."""
-        return not_implemented("Isochrone analysis")
+        """Reachable areas from query.geometry (a Point) via Valhalla.
+
+        metadata: ``minutes`` (list of ints, default [10]) and ``mode`` (walk|bike|drive).
+        """
+        from geospark.tools.routing import valhalla
+
+        if query.geometry is None or query.geometry.type.value != "Point":
+            return SpatialResult(errors=["Isochrone requires a Point geometry"])
+        lon, lat = query.geometry.coordinates[0], query.geometry.coordinates[1]  # type: ignore[index]
+        meta = query.metadata or {}
+        try:
+            return valhalla.isochrone(lat, lon, meta.get("minutes", [10]), meta.get("mode", "walk"))
+        except (ValueError, valhalla.RoutingUnavailableError) as e:
+            return SpatialResult(errors=[str(e)])

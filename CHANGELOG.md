@@ -4,6 +4,10 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Fixed
+- GeoAgent uses a distance written in the question ("within 2km", "500 m") even when the model's
+  reading of the question leaves it out; live, one run searched the model's default 3 km instead of 2 km.
+
 ### Added
 - **Self-hosted Overpass support** (`GEOSPARK_OVERPASS_URL`). Queries whose area lies inside the
   server's coverage go to it first (10 s limit), with the public servers as fallback; everything

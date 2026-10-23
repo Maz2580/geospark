@@ -213,7 +213,7 @@ server has 64 cores, 251 GB RAM and ~800 GB free on `/mnt`, so the other apps ar
 `rm -rf /mnt/geospark/overpass` once the maintainer agrees. GeoSpark keeps working without it (public
 mirrors, then Overture).
 
-## How GeoSpark would use it (code change, not implemented here)
+## How GeoSpark uses it (implemented: `GEOSPARK_OVERPASS_URL`)
 In `geospark/knowledge/loaders.py`, `OverpassLoader`:
 
 - New setting **`GEOSPARK_OVERPASS_URL`** (unset by default, so nothing changes for anyone else).

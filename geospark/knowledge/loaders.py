@@ -6,12 +6,15 @@ geospatial data sources (GeoJSON files, OpenStreetMap via Overpass API).
 
 from __future__ import annotations
 
+import functools
 import hashlib
 import json
+import os
 import threading
 import time
 from collections import OrderedDict
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from pathlib import Path
 from typing import Any, ClassVar
 
 import httpx
@@ -104,6 +107,43 @@ class GeoJSONLoader:
         return entities
 
 
+_DEFAULT_COVERAGE = Path(__file__).parent / "coverage" / "australia.poly"
+
+
+@functools.lru_cache(maxsize=4)
+def _read_poly(path: str) -> Any:
+    """A Geofabrik/Osmosis ``.poly`` file as a shapely (Multi)Polygon; holes ("!" sections) subtracted."""
+    import shapely
+    from shapely.ops import unary_union
+
+    outer, holes, ring, hole = [], [], [], False
+    lines = [line.strip() for line in Path(path).read_text().splitlines()]
+    for line in lines[1:]:  # first line is the file's name
+        if not line:
+            continue
+        if line == "END":
+            if ring:
+                (holes if hole else outer).append(shapely.Polygon(ring))
+                ring = []
+            continue
+        if not ring and len(line.split()) == 1:  # a section header, e.g. "1" or "!2" (a hole)
+            hole = line.startswith("!")
+            continue
+        lon, lat = (float(v) for v in line.split()[:2])
+        ring.append((lon, lat))
+    area = unary_union(outer)
+    return area.difference(unary_union(holes)) if holes else area
+
+
+def _coverage_polygon() -> Any:
+    """The self-hosted Overpass's coverage (``GEOSPARK_OVERPASS_POLY``, default Australia), or None."""
+    path = os.getenv("GEOSPARK_OVERPASS_POLY") or str(_DEFAULT_COVERAGE)
+    try:
+        return _read_poly(path)
+    except (OSError, ValueError):
+        return None
+
+
 class OverpassLoader:
     """Load OpenStreetMap data via the Overpass API.
 
@@ -122,6 +162,8 @@ class OverpassLoader:
     )
     # The public Overpass servers answer 406/403 to the default httpx user agent.
     USER_AGENT = "GeoSpark (https://github.com/Maz2580/geospark)"
+    # A self-hosted Overpass (GEOSPARK_OVERPASS_URL) answers in under 1.5 s; give up on it quickly
+    LOCAL_TIMEOUT_S = 10.0
 
     # Answers are kept for a while: OpenStreetMap changes slowly and the same
     # town is often asked about repeatedly.
@@ -130,11 +172,56 @@ class OverpassLoader:
     _cache: ClassVar[OrderedDict[str, tuple[float, dict[str, Any]]]] = OrderedDict()
     _cache_lock: ClassVar[threading.Lock] = threading.Lock()
 
-    def _query(self, overpass_ql: str, timeout: float = 40.0) -> dict[str, Any]:
-        """Overpass query, recorded in an active run record (see geospark.runs)."""
+    @staticmethod
+    def local_url() -> str | None:
+        """A self-hosted Overpass for one region (``GEOSPARK_OVERPASS_URL``), or None."""
+        return os.getenv("GEOSPARK_OVERPASS_URL") or None
+
+    def covers(self, bbox: tuple[float, float, float, float] | None) -> bool:
+        """Whether the self-hosted Overpass holds data for this whole bbox (south, west, north, east).
+
+        Decided from its extract's boundary, before asking: a local Overpass answers a point outside
+        its data with 0 elements, exactly like an empty place inside it.
+        """
+        if bbox is None or not self.local_url():
+            return False
+        area = _coverage_polygon()
+        if area is None:
+            return False
+        import shapely
+
+        south, west, north, east = bbox
+        return bool(area.contains(shapely.box(west, south, east, north)))
+
+    def _query(
+        self,
+        overpass_ql: str,
+        timeout: float = 40.0,
+        bbox: tuple[float, float, float, float] | None = None,
+        allow_public: bool = True,
+    ) -> dict[str, Any]:
+        """Overpass query, recorded in an active run record (see geospark.runs).
+
+        A query whose bbox lies inside the self-hosted server's coverage asks that server first;
+        if it fails (or for anything outside its coverage) the public servers are raced, unless
+        ``allow_public`` is False.
+        """
         from geospark.runs import record
 
-        data = self._query_uncached_or_cached(overpass_ql, timeout)
+        data = None
+        if self.covers(bbox):
+            key = hashlib.sha256(overpass_ql.encode()).hexdigest()
+            data = self._cached(key)
+            if data is None:
+                try:
+                    data = self._post(self.local_url() or "", overpass_ql, min(self.LOCAL_TIMEOUT_S, timeout))
+                    self._remember(key, data)
+                except Exception:
+                    data = None  # fall through to the public servers
+        if data is None:
+            if not allow_public:
+                raise RuntimeError("The self-hosted Overpass did not answer and the public servers were not asked")
+            data = self._query_uncached_or_cached(overpass_ql, timeout)
         record("data", "overpass", overpass_ql, data, "openstreetmap-overpass")
         return data
 
@@ -307,6 +394,7 @@ class OverpassLoader:
         bbox: tuple[float, float, float, float],
         amenity_types: list[str],
         timeout: float = 40.0,
+        allow_public: bool = True,
     ) -> dict[str, list[SpatialEntity]]:
         """Fetch several amenity types in one Overpass request.
 
@@ -334,7 +422,7 @@ class OverpassLoader:
             f"({south},{west},{north},{east});"
             f"out center;"
         )
-        data = self._query(query, timeout=timeout)
+        data = self._query(query, timeout=timeout, bbox=bbox, allow_public=allow_public)
 
         grouped: dict[str, list[SpatialEntity]] = {t: [] for t in amenity_types}
         for element in data.get("elements", []):

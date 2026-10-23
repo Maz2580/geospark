@@ -257,3 +257,18 @@ Australia, measured: about 10 min to build on the server (peak 4.2 GB), 3.8 GB o
 serving. Points outside the extract are refused ("outside its map coverage") rather than answered with
 Valhalla's placeholder circle. To refresh the map data, set `force_rebuild=True` once and restart the
 container.
+
+## Optional: self-hosted Overpass (OpenStreetMap queries for the agents)
+
+The agents' nearby-place lookups (hospitals, schools, pharmacies...) use Overpass. The public servers
+rate-limit by IP, so a busy site soon gets refused. Run one for your region next to GeoSpark and point
+`GEOSPARK_OVERPASS_URL` at it (for example `http://geospark-overpass/api/interpreter`): queries whose
+area lies inside its coverage polygon go to it first, everything else to the public servers.
+
+The full plan, measurements and the exact service block are in
+[OVERPASS_SELFHOST_PLAN.md](OVERPASS_SELFHOST_PLAN.md). In short: image `wiktorn/overpass-api:<version>`,
+data in `/mnt/geospark/overpass:/db`, `geospark-net` only with no published port, limits `memory: 8G`,
+`cpus: 2`, `OVERPASS_ALLOW_DUPLICATE_QUERIES=yes`. Australia takes about 70 minutes to build once, uses
+8.5 GB of disk and under 100 MB of memory while serving, and answers in under a second. Coverage defaults
+to the bundled Australia boundary (`geospark/knowledge/coverage/australia.poly`, from Geofabrik); set
+`GEOSPARK_OVERPASS_POLY` for another region.

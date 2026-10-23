@@ -76,6 +76,7 @@ docs/FLOW_PERSISTENCE_PLAN.md
 
 # Server-only: Valhalla routing data, Docker build metadata, config backups (never committed)
 valhalla/
+overpass/
 .buildx/
 *.bak-*
 

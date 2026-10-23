@@ -461,3 +461,20 @@ def test_a_non_relationship_from_the_model_is_replaced_by_the_wording(model_valu
     with patch("httpx.post", return_value=reply):
         _, _, params = agent._parse_goal("Is Federation Square in Melbourne?")
     assert params["relationship"] == "within"
+
+
+def test_the_wording_beats_a_valid_but_reversed_relationship_from_the_model() -> None:
+    """Live, the model said "contains" for "Is Federation Square in Melbourne?" (answer: No)."""
+    from unittest.mock import MagicMock
+
+    from geospark.agents.geo_agent import GeoAgent
+
+    reply = MagicMock()
+    reply.json.return_value = {"message": {"content": json.dumps({
+        "locations": ["Federation Square", "Melbourne"], "intent": "check_relationship",
+        "params": {"relationship": "contains"}})}}
+    agent = GeoAgent.__new__(GeoAgent)
+    agent.__init__()
+    with patch("httpx.post", return_value=reply):
+        _, _, params = agent._parse_goal("Is Federation Square in Melbourne?")
+    assert params["relationship"] == "within"

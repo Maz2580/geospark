@@ -197,9 +197,14 @@ Intent guide:
             stated = self._stated_radius(goal)
             if stated:
                 params["radius_m"] = stated
-            # Only real predicate names count: the model has returned the string "null" here
-            if parsed.get("intent") == "check_relationship" and params.get("relationship") not in self._RELATIONSHIPS:
-                params["relationship"] = self._stated_relationship(goal) or "within"
+            # The question's wording decides the relationship, like a stated distance: live, the model
+            # returned the string "null", and "contains" for "Is Federation Square in Melbourne?".
+            if parsed.get("intent") == "check_relationship":
+                stated = self._stated_relationship(goal)
+                if stated:
+                    params["relationship"] = stated
+                elif params.get("relationship") not in self._RELATIONSHIPS:
+                    params["relationship"] = "within"
             return (
                 parsed.get("locations", []),
                 parsed.get("intent", "find_nearby"),

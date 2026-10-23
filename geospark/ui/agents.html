@@ -52,7 +52,7 @@
         <div class="presets mb-2">
           <button class="btn btn-sm btn-secondary" onclick="$('#coord-goal').value='Find the best location for a cafe in Melbourne CBD near schools'">Best cafe location</button>
           <button class="btn btn-sm btn-secondary" onclick="$('#coord-goal').value='Analyze Federation Square, Melbourne'">Analyze location</button>
-          <button class="btn btn-sm btn-secondary" onclick="$('#coord-goal').value='Find all hospitals within 2km of the Eiffel Tower'">Nearby hospitals</button>
+          <button class="btn btn-sm btn-secondary" onclick="$('#coord-goal').value='Find all pharmacies within 1km of Bondi Beach'">Nearby pharmacies</button>
         </div>
         <div class="form-group">
           <label>Goal</label>
@@ -89,7 +89,7 @@
         </p>
         <div class="form-group">
           <label>Goal</label>
-          <input type="text" id="agent-goal" placeholder="Find all hospitals within 2km of the Eiffel Tower" value="Find all hospitals within 2km of the Eiffel Tower">
+          <input type="text" id="agent-goal" placeholder="Find all hospitals within 2km of Federation Square, Melbourne" value="Find all hospitals within 2km of Federation Square, Melbourne">
         </div>
         <button class="btn btn-primary" onclick="runAgent()">Run Agent</button>
         <div id="agent-result" class="result-box hidden"></div>
@@ -130,7 +130,7 @@
         <div class="grid grid-2" style="gap:0 var(--space-3)">
           <div class="form-group">
             <label>Search Area</label>
-            <input type="text" id="site-within" placeholder="Zurich" value="Zurich">
+            <input type="text" id="site-within" placeholder="Melbourne CBD" value="Melbourne CBD">
           </div>
           <div class="form-group">
             <label>Facility Type</label>
@@ -142,7 +142,7 @@
           </div>
           <div class="form-group">
             <label>Radius (m)</label>
-            <input type="number" id="site-radius" value="5000">
+            <input type="number" id="site-radius" value="2000">
           </div>
         </div>
         <button class="btn btn-primary" onclick="runSiteSelect()">Find Best Location</button>

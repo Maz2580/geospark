@@ -25,6 +25,8 @@ from geospark.agents.messaging import AgentCard, AgentRegistry, MessageHub, Msg
 _SITE_SELECT_PATTERNS = [
     r"\bbest\s+(?:\w+\s+)*(?:location|place|spot|site)\b",  # "best cafe spot", "best location"
     r"\bwhere\s+(?:to|should)\s+(?:put|place|open|build)\b",
+    # "where should I open...", "where could we put...", "where can I build..."
+    r"\bwhere\s+(?:should|could|can|would|do)\s+(?:i|we|you)\s+(?:put|place|open|build|start|locate)\b",
     r"\bsite\s+(?:select|selection)\b",
     r"\boptimal\s+(?:\w+\s+)*(?:location|site|spot|place)\b",  # "optimal restaurant location"
     r"\bfind\s+(?:the\s+)?(?:best|ideal)\s+(?:\w+\s+)*(?:location|place|spot|site)\b",

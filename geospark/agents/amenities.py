@@ -159,3 +159,21 @@ def _from_overture(lat: float, lon: float, radius_m: float, types: list[str]) ->
                         f"were searched within {int(radius)} m instead of {int(radius_m)} m.")
     return AmenityLookup(by_type=by_type, source="overture-maps", provenance=provenance,
                          warnings=warnings, radius_m=radius, unavailable=unavailable)
+
+
+def place_boundary(name: str) -> dict | None:
+    """A place's boundary from Nominatim (simplified), or None if it has none (a point, e.g. a building)."""
+    from geospark.tools.geocoding import client as nominatim_client
+
+    try:
+        data = nominatim_client.get_json("search", {
+            "q": name, "format": "geojson", "limit": 1,
+            "polygon_geojson": 1, "polygon_threshold": 0.0005,
+        })
+    except Exception:
+        return None
+    features = (data or {}).get("features") or []
+    geometry = features[0].get("geometry") if features else None
+    if geometry and geometry.get("type") in ("Polygon", "MultiPolygon"):
+        return dict(geometry)
+    return None

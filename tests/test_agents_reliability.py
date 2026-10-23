@@ -279,3 +279,167 @@ def test_without_a_stated_distance_the_models_value_stands() -> None:
     with patch("httpx.post", return_value=reply):
         _, _, params = agent._parse_goal("Cafes near Fitzroy")
     assert params["radius_m"] == 1000
+
+
+# --- second live pass (2026-10-23) --------------------------------------------------------------
+
+@pytest.mark.parametrize("goal", ["Where should I open a pharmacy in Zurich near hospitals and schools?",
+                                  "Where could we put a gym in Fitzroy near parks?"])
+def test_where_should_i_open_goes_to_the_site_selector(goal: str) -> None:
+    assert classify_intent(goal, AgentCoordinator().registry).matched_agent == "site_selector"
+
+
+def test_place_types_are_not_geocoded_as_places() -> None:
+    """The model listed "hospitals" and "schools" as locations: they were geocoded to New York and
+    the West Bank, and "hospital,school" was searched as one (impossible) type."""
+    from geospark.agents.geo_agent import GeoAgent
+
+    places, params = GeoAgent._separate_place_types(["Zurich", "hospitals", "schools"],
+                                                     {"amenity_type": "hospital,school", "radius_m": 3000})
+    assert places == ["Zurich"] and params["amenity_type"] == ["hospital", "school"]
+    assert GeoAgent._separate_place_types(["Eiffel Tower"], {"amenity_type": "hospital"})[1]["amenity_type"] == "hospital"
+
+
+@pytest.mark.parametrize(("goal", "relationship"), [
+    ("Is the Louvre inside Paris?", "within"), ("Does Paris contain the Louvre?", "contains"),
+    ("Is Federation Square in Melbourne?", "within"),
+])
+def test_the_question_decides_the_relationship(goal: str, relationship: str) -> None:
+    from geospark.agents.geo_agent import GeoAgent
+
+    _, intent, params = GeoAgent._fallback_parse(goal)
+    assert intent == "check_relationship" and params["relationship"] == relationship
+
+
+def test_a_nearby_search_is_not_mistaken_for_a_containment_question() -> None:
+    from geospark.agents.geo_agent import GeoAgent
+
+    assert GeoAgent._fallback_parse("Are any hospitals within 2km of Bondi?")[1] == "find_nearby"
+
+
+PARIS = {"type": "Polygon", "coordinates": [[[2.22, 48.81], [2.47, 48.81], [2.47, 48.91], [2.22, 48.91], [2.22, 48.81]]]}
+
+
+def _geo_agent_with_points():
+    from geospark.agents.geo_agent import AgentResult, GeoAgent
+
+    agent = GeoAgent.__new__(GeoAgent)
+    agent.__init__()
+    geocoded = {"Louvre": {"geometry": {"type": "Point", "coordinates": [2.3376, 48.8606]}},
+                "Paris": {"geometry": {"type": "Point", "coordinates": [2.3200, 48.8589]}}}
+    return agent, AgentResult(goal="Is the Louvre inside Paris?"), geocoded
+
+
+def test_containment_uses_the_boundary_not_two_points() -> None:
+    """Live, "Is the Louvre inside Paris?" answered No: a point can't contain another point."""
+    agent, result, geocoded = _geo_agent_with_points()
+    with patch.object(type(agent), "_boundary", return_value=PARIS):
+        agent._check_relationships(result, geocoded, {"relationship": "within"})
+    assert result.findings["relationships"] == [{"a": "Louvre", "b": "Paris", "relationship": "within", "result": True}]
+    assert any("boundary from OpenStreetMap" in c for c in result.findings["caveats"])
+
+
+def test_without_a_boundary_containment_is_not_answered() -> None:
+    agent, result, geocoded = _geo_agent_with_points()
+    with patch.object(type(agent), "_boundary", return_value=None):
+        agent._check_relationships(result, geocoded, {"relationship": "within"})
+    assert "relationships" not in result.findings
+    assert any("no boundary found for Paris" in (s.error or "") for s in result.steps)
+
+
+def test_a_missing_api_key_is_not_reported_as_try_again_later() -> None:
+    from geospark.agents.geo_agent import AgentResult, AgentStep, GeoAgent
+
+    agent = GeoAgent.__new__(GeoAgent)
+    agent.__init__()
+    result = AgentResult(goal="Air quality in Delhi", findings={"geocoded": {}},
+                         steps=[AgentStep(action="air_quality", description="Air quality for Delhi",
+                                          error="OPENAQ_API_KEY not set. Register free at https://openaq.org/register")])
+    with patch("httpx.post", side_effect=AssertionError("no model call")):
+        summary = agent._generate_summary(result)
+    assert "API key" in summary and "try again" not in summary.lower()
+
+
+def test_agent_model_replies_are_length_capped() -> None:
+    """JSON mode could pad with blank space until the 60 s timeout; every call now caps its reply."""
+    import inspect
+
+    from geospark.agents import geo_agent, site_selector, spatial_report
+
+    for module in (geo_agent, site_selector, spatial_report):
+        source = inspect.getsource(module)
+        assert source.count('"stream": False') == source.count('"num_predict"'), module.__name__
+
+
+def test_site_candidates_stay_inside_the_requested_area() -> None:
+    """Live, "cafe in Melbourne CBD near schools" picked a school 5 km away in Brunswick."""
+    cbd = {"type": "Polygon", "coordinates": [[[144.94, -37.83], [144.99, -37.83], [144.99, -37.79],
+                                               [144.94, -37.79], [144.94, -37.83]]]}
+
+    class Overpass:
+        def load_amenities_by_type(self, bbox, types, timeout=None, **_):
+            return {"school": [
+                SpatialEntity(id="in", name="CBD School", entity_type="school",
+                              geometry={"type": "Point", "coordinates": [144.965, -37.81]}),
+                SpatialEntity(id="in2", name="Other CBD School", entity_type="school",
+                              geometry={"type": "Point", "coordinates": [144.975, -37.815]}),
+                SpatialEntity(id="out", name="Brunswick School", entity_type="school",
+                              geometry={"type": "Point", "coordinates": [144.96, -37.77]})]}
+
+    selector = _selector()
+    selector._overpass = Overpass()
+    with patch("geospark.agents.site_selector.place_boundary", return_value=cbd), \
+         patch("httpx.post", side_effect=ConnectionError("no LLM")):
+        result = selector.find("Melbourne CBD", near=["school"], facility_type="cafe", radius_m=5000)
+    names = [c.name for c in result.candidates]
+    assert "Brunswick School area" not in names and names
+    assert any("boundary" in c for c in result.caveats)
+
+
+def test_a_candidates_own_campus_does_not_count_as_nearby() -> None:
+    """Two parts of one campus 12 m apart scored as "next to a school"."""
+
+    class Overpass:
+        def load_amenities_by_type(self, bbox, types, timeout=None, **_):
+            return {"school": [
+                SpatialEntity(id="a", name="Campus Block A", entity_type="school",
+                              geometry={"type": "Point", "coordinates": [8.5410, 47.3744]}),
+                SpatialEntity(id="b", name="Campus Block B", entity_type="school",  # ~12 m away
+                              geometry={"type": "Point", "coordinates": [8.54084, 47.3744]}),
+                SpatialEntity(id="c", name="Other School", entity_type="school",   # ~600 m away
+                              geometry={"type": "Point", "coordinates": [8.5490, 47.3744]})]}
+
+    selector = _selector()
+    selector._overpass = Overpass()
+    with patch("geospark.agents.site_selector.place_boundary", return_value=None), \
+         patch("httpx.post", side_effect=ConnectionError("no LLM")):
+        result = selector.find("Zurich", near=["school"], facility_type="cafe", radius_m=2000)
+    block_a = next(c for c in result.candidates if c.name == "Campus Block A area")
+    assert block_a.details["nearest_school_m"] > 500  # its own campus (12 m) is not "a nearby school"
+
+
+def test_report_says_air_quality_needs_a_key(monkeypatch) -> None:
+    from geospark.agents.spatial_report import SpatialReport, WeatherSnapshot
+
+    monkeypatch.delenv("OPENAQ_API_KEY", raising=False)
+
+    class Launcher:
+        def handle_tool_call(self, name, args):
+            if name == "geocode":
+                return {"status": "success", "result": {"features": [{
+                    "geometry": {"type": "Point", "coordinates": [144.969, -37.818]},
+                    "properties": {"display_name": "Federation Square"}}]}}
+            return {"status": "success", "result": {"elevation_m": 20.0}}
+
+    class Overpass:
+        def load_amenities_by_type(self, bbox, services, timeout=None, **_):
+            return {s: [] for s in services}
+
+    report = SpatialReport.__new__(SpatialReport)
+    report.__init__()
+    report._launcher, report._overpass = Launcher(), Overpass()
+    with patch.object(SpatialReport, "_fetch_weather", return_value=WeatherSnapshot(temperature_c=20.0)), \
+         patch.object(SpatialReport, "_fetch_air_quality", return_value=None), \
+         patch("httpx.post", side_effect=ConnectionError("no LLM")):
+        result = report.analyze("Federation Square", radius_m=500)
+    assert "air quality (this server has no OpenAQ API key)" in result.data_gaps

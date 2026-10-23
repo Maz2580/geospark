@@ -13,6 +13,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import hmac
+import logging
 import os
 import re
 import time
@@ -47,6 +48,8 @@ from geospark.sandbox import (
     sandboxes,
 )
 from geospark.security import check_model, llm_slot, verify_admin
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -106,11 +109,48 @@ def enable_mcp_http(target: FastAPI) -> None:
     )
 
 
+def _warm_up_language_model() -> None:
+    """Have the local model read /ask's instructions and tool list once, in the background.
+
+    Ollama keeps a prompt's processed prefix, so later questions only pay for their own words. Without
+    this, the first questions after each deploy timed out after 120 s while the model read the tool
+    list on a CPU. Runs only when OLLAMA_BASE_URL is set (a server with its own Ollama).
+    """
+    url = os.getenv("OLLAMA_BASE_URL")
+    if not url or os.getenv("GEOSPARK_OLLAMA_WARMUP", "true").lower() in ("0", "false", "no"):
+        return
+
+    def warm() -> None:
+        import httpx
+
+        from geospark.integrations.ollama_tools import OllamaClient
+        from geospark.integrations.openrouter import GEOSPARK_SYSTEM_PROMPT
+
+        model = os.getenv("GEOSPARK_OLLAMA_MODEL") or "qwen2.5:7b"
+        try:
+            client = OllamaClient(model=model, base_url=url)
+            httpx.post(f"{url.rstrip('/')}/api/chat", timeout=300, json={
+                "model": model, "stream": False, "options": {"num_predict": 1},
+                "tools": client._build_tool_definitions(),
+                "messages": [{"role": "system", "content": GEOSPARK_SYSTEM_PROMPT},
+                             {"role": "user", "content": "Ready?"}],
+            })
+            client.close()
+            logger.info("Language model warmed up (%s)", model)
+        except Exception as e:  # the first question is just slower
+            logger.warning("Language model warm-up failed: %s", e)
+
+    import threading
+
+    threading.Thread(target=warm, name="ollama-warmup", daemon=True).start()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Validate security config and initialize the engine on startup."""
     security.check_startup_config()
     get_engine()
+    _warm_up_language_model()
     if _mcp_server is not None:
         async with _mcp_server.session_manager.run():
             yield

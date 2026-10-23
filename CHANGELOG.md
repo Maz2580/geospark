@@ -12,6 +12,11 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
   Ollama settings, which were missing.
 
 ### Fixed
+- **The first questions after a deploy timed out** (120 s) while the local model read /ask's tool list
+  on the CPU; the server now has the model read it once at startup, in the background
+  (`GEOSPARK_OLLAMA_WARMUP=false` turns this off). The OpenRouter fallback then failed with a 404:
+  OpenRouter had retired every free model GeoSpark named. The fallback now uses the auto-router
+  (`openrouter/free`), the named models are current, and when both fail the visitor reads why in words.
 - **Testing the live site as an outside user** found and fixed:
   - **Flows**: every template failed at its first step (the runner never passed `address` to the
     geocoder or the geocoded point to later steps) and the run still reported "completed". Parameters

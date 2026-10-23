@@ -28,14 +28,17 @@ import httpx
 from geospark.integrations.mcp_server import MCP_TOOLS, GeoSparkMCPHandler
 
 # Best free models ranked by quality for geospatial tasks
+# OpenRouter retires free models often: on 2026-10-24 every named model listed here before had
+# gone, and the /ask fallback failed with 404. The default is therefore the auto-router, which
+# always exists; the named entries were checked against https://openrouter.ai/api/v1/models then.
 FREE_MODELS = {
-    "best": "meta-llama/llama-3.3-70b-instruct:free",       # 128K ctx, tool calling
-    "coder": "qwen/qwen3-coder:free",                        # 262K ctx, structured output
-    "large": "openai/gpt-oss-120b:free",                     # 131K ctx, largest free
-    "fast": "mistralai/mistral-small-3.1-24b-instruct:free", # 128K ctx, fast
-    "long_context": "nvidia/nemotron-3-nano-30b-a3b:free",   # 256K ctx
-    "vision": "nvidia/nemotron-nano-12b-v2-vl:free",         # 128K ctx, vision+tools
-    "auto": "openrouter/free",                                # Auto-routes to best free
+    "auto": "openrouter/free",                               # routes to an available free model
+    "best": "nvidia/nemotron-3-super-120b-a12b:free",        # tool calling
+    "large": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "fast": "nvidia/nemotron-3.5-lightning:free",
+    "coder": "cohere/north-mini-code:free",
+    "long_context": "google/gemma-4-31b-it:free",
+    "vision": "nvidia/nemotron-3.5-super-vl:free",
 }
 
 
@@ -109,7 +112,7 @@ class OpenRouterClient:
     ):
         self.api_key = api_key or os.getenv("OPENROUTER_API_KEY", "")
         self.base_url = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-        self.model = model or os.getenv("GEOSPARK_DEFAULT_MODEL", FREE_MODELS["best"])
+        self.model = model or os.getenv("GEOSPARK_DEFAULT_MODEL", FREE_MODELS["auto"])
 
         if not self.api_key:
             raise ValueError(

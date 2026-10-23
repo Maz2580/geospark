@@ -291,7 +291,16 @@ class Engine:
             # Return the Ollama error since OpenRouter isn't configured either
             return ollama_result
 
-        return self._ask_openrouter(question, model, api_key, tools)
+        fallback = self._ask_openrouter(question, model, api_key, tools)
+        if fallback.errors:
+            # Both failed: say so in words, not as two raw HTTP errors (live: an OpenRouter 404 was
+            # all a visitor saw after the local model timed out)
+            fallback.errors = [
+                "The answer could not be computed right now: the local language model did not answer "
+                "in time and the backup model service also failed. Please try again in a minute.",
+                *ollama_result.errors, *fallback.errors,
+            ]
+        return fallback
 
     def _ask_ollama(
         self,

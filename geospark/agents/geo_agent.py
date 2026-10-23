@@ -236,21 +236,10 @@ Intent guide:
         return places, out
 
     def _boundary(self, name: str) -> dict[str, Any] | None:
-        """A place's boundary from Nominatim (simplified), or None if it has none (e.g. a building point)."""
-        from geospark.tools.geocoding import client as nominatim_client
+        """A place's boundary from OpenStreetMap (Nominatim), or None (see agents.amenities.place_boundary)."""
+        from geospark.agents.amenities import place_boundary
 
-        try:
-            data = nominatim_client.get_json("search", {
-                "q": name, "format": "geojson", "limit": 1,
-                "polygon_geojson": 1, "polygon_threshold": 0.0005,
-            })
-        except Exception:
-            return None
-        features = (data or {}).get("features") or []
-        geometry = features[0].get("geometry") if features else None
-        if geometry and geometry.get("type") in ("Polygon", "MultiPolygon"):
-            return dict(geometry)
-        return None
+        return place_boundary(name)
 
     @staticmethod
     def _stated_relationship(goal: str) -> str | None:

@@ -19,6 +19,13 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
     server needs the free key.
   - Model replies in the agents are length-capped (`num_predict`); a JSON-mode reply could pad with
     blank space until the 60 s timeout (seen live: 35 s, 43 s and 60 s calls among 2-7 s ones).
+  - The Site Selector kept candidates anywhere within the radius: "cafe in Melbourne CBD" picked a
+    school 5 km away in Brunswick. Candidates now stay inside the area's OpenStreetMap boundary
+    (with a caveat), and a candidate's own campus (anything within 50 m, e.g. one school mapped as
+    several buildings) no longer counts as "a nearby school".
+  - The Spatial Report says air quality needs an OpenAQ API key instead of "could not be retrieved".
+  - The Agents page's default examples are Australian, where the self-hosted Overpass answers in
+    under a second; places elsewhere still use the public servers.
 - GeoAgent uses a distance written in the question ("within 2km", "500 m") even when the model's
   reading of the question leaves it out; live, one run searched the model's default 3 km instead of 2 km.
 

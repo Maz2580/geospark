@@ -21,7 +21,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from geospark.agents.amenities import AmenityLookupError, find_amenities
+from geospark.agents.amenities import AmenityLookupError, find_amenities, place_boundary
 from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.knowledge.loaders import OverpassLoader
@@ -185,10 +185,26 @@ class SiteSelector:
                     "source_amenity": amenity,
                 })
 
+        # Keep candidates inside the requested area: "in Melbourne CBD" must not return a site 5 km
+        # away in another suburb. Uses the area's OpenStreetMap boundary when it has one.
+        area = place_boundary(within)
+        if area and candidate_points:
+            import shapely
+            from shapely.geometry import shape
+
+            region = shape(area)
+            inside = [cp for cp in candidate_points
+                      if len(cp["coordinates"]) >= 2 and region.covers(shapely.Point(cp["coordinates"][:2]))]
+            if len(inside) < len(candidate_points):
+                result.caveats.append(f"Candidates limited to {within}'s boundary from OpenStreetMap "
+                                      f"({len(candidate_points) - len(inside)} outside it were left out).")
+            candidate_points = inside
+
         if not candidate_points:
             # Nothing to anchor a site to: say so rather than inventing a "center" candidate
-            result.summary = (f"No {' or '.join(near_types)} found within {round(radius_m)} m of {within}, "
-                              "so no site can be ranked. Try a larger area or different criteria.")
+            result.summary = (f"No {' or '.join(near_types)} found within {round(radius_m)} m of {within}"
+                              f"{' (inside its boundary)' if area else ''}, so no site can be ranked. "
+                              "Try a larger area or different criteria.")
             result.duration_s = round(time.time() - start, 1)
             return result
 
@@ -207,8 +223,9 @@ class SiteSelector:
                 for f in feats:
                     try:
                         d = SpatialReasoner.calculate_distance(cp_geom, f["geometry"])
-                        # Skip self-matches (distance < 10m means same feature)
-                        if d > 10:
+                        # Skip the candidate's own site: within 50 m is the same place (a school
+                        # campus is often mapped as several buildings a few metres apart)
+                        if d > 50:
                             distances.append(d)
                     except Exception:
                         continue

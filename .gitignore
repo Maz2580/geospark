@@ -83,3 +83,7 @@ valhalla/
 # .env.example is the secret-free template and stays tracked.
 .env.*
 !.env.example
+
+# Server-side change checks (deploy/DEPLOY.md)
+.containers-before
+.change-start

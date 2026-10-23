@@ -158,6 +158,17 @@ docker compose up geospark     # Just GeoSpark API
 - Docs: `docs/<topic>.md`
 - Tools: `geospark/tools/<category>/<tool_name>.py` (must extend `BaseTool`)
 
+## Production server (shared: read before touching it)
+
+- The server also runs UrbanMind, TerraScout, GeoLibre and Umami. Follow
+  [deploy/DEPLOY.md → Running on a shared server](deploy/DEPLOY.md#running-on-a-shared-server-read-this-first).
+- Everything stays under `/mnt`: GeoSpark in `/mnt/geospark`, each service's data a bind mount under
+  `/mnt/geospark/<service>`, Docker data-root `/mnt/docker-data`, compose run with
+  `BUILDX_CONFIG=/mnt/geospark/.buildx`.
+- Change only GeoSpark's services (`up -d --no-deps <service>`); never prune, never restart the
+  Docker daemon. Compare container IDs before and after; only GeoSpark's may change.
+- Every server change and every merge to `main` (it auto-deploys) is approved by the maintainer first.
+
 ## Common Gotchas
 
 - **Coordinate order**: GeoJSON uses `[lon, lat]`, NOT `[lat, lon]`. Always verify.

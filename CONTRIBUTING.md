@@ -90,3 +90,10 @@ Every tool must accept an `explanation` parameter (forces the LLM to reason befo
 ## License
 
 By contributing, you agree that your contributions will be licensed under the Apache 2.0 License.
+
+## Deploying or adding a service
+
+The production server is shared with other apps. Before changing anything on it, read
+[Running on a shared server](deploy/DEPLOY.md#running-on-a-shared-server-read-this-first): every
+container's data stays under `/mnt`, only GeoSpark's services are touched, and every change is
+approved by the maintainer first.

@@ -13,6 +13,63 @@ Internet --> Cloudflare Edge (SSL, DDoS) --> Tunnel --> VM:8000 (GeoSpark API)
 
 No public IP needed. No ports to open. No SSL certs to manage.
 
+## Running on a shared server (read this first)
+
+The production server also runs other apps (UrbanMind, TerraScout, GeoLibre, Umami). Anything added
+for GeoSpark must leave them untouched and keep every byte under `/mnt`. These rules come from how the
+server is actually set up (checked 2026-10-23), and every GeoSpark service follows them.
+
+**How the server is organised**
+
+| What | Where |
+|---|---|
+| Each app | its own folder and compose project: `/mnt/geospark`, `/mnt/urbanmind/app`, `/mnt/terrascout/app`, `/mnt/geolibre/app` |
+| Container data | bind mounts from that app's folder, e.g. `/mnt/geospark/data`, `/mnt/geospark/valhalla`, `/mnt/ollama` |
+| Images, layers, named volumes, container logs | Docker `data-root` = `/mnt/docker-data` (`/etc/docker/daemon.json`) |
+| containerd | `root = /mnt/containerd-data`; only its runtime state is in `/run` (memory, not disk) |
+| Log limits | json-file: 100 MB × 5 server-wide; GeoSpark containers 10 MB × 3 |
+| Public traffic | each app's own Cloudflare tunnel container; app ports bind to `127.0.0.1` only |
+
+**Rules for any new GeoSpark service** (Ollama and Valhalla are the examples)
+
+1. **Data under `/mnt/geospark/<service>`**, as a bind mount you can see and back up. No anonymous
+   volumes or paths elsewhere on the host. Check `docker info -f '{{.DockerRootDir}}'` prints
+   `/mnt/docker-data` before starting anything new.
+2. **Defined in `/mnt/geospark/docker-compose.override.yml`**, on the `geospark-net` network, with no
+   published port (or `127.0.0.1:` only if the host truly needs it). The public reaches GeoSpark only
+   through `geospark-cloudflared`.
+3. **Run as uid 1000** (`user: "1000:1000"`) when the image allows it, so files are owned by `ubuntu`.
+4. **Limits from a measured test run**: `deploy.resources.limits` for memory and CPUs (Valhalla: 6 GB,
+   2 CPUs, measured build peak 4.2 GB), `restart: unless-stopped`, and json-file logs capped at
+   `max-size: 10m`, `max-file: 3`.
+5. **Build metadata stays under `/mnt`**: run compose as `sudo env BUILDX_CONFIG=/mnt/geospark/.buildx
+   docker compose ...` (without it, buildx wrote 477 files to `/root/.docker`).
+6. **Change only GeoSpark's services**, one at a time: `docker compose -f docker-compose.prod.yml -f
+   docker-compose.override.yml up -d --no-deps <service>` (add `--no-build` to reuse the image).
+   Never run `docker system prune`, `docker volume prune` or `docker image prune -a` (they delete other
+   apps' data and images), never stop or restart the Docker daemon, and never touch another app's
+   compose project, network or tunnel.
+7. **Back up before editing**: `cp .env .env.bak-$(date +%F)-<reason>` and the same for
+   `docker-compose.override.yml`. Every server change is approved by the maintainer first.
+
+**Check that nothing else was affected**
+
+```bash
+# Before: note every container's ID; after the change, only GeoSpark's should differ
+docker ps --format '{{.Names}} {{.ID}}' | sort > /mnt/geospark/.containers-before
+# ... make the change ...
+docker ps --format '{{.Names}} {{.ID}}' | sort | diff /mnt/geospark/.containers-before -
+
+# Nothing written outside /mnt: mark the start, then list files newer than the marker elsewhere
+sudo touch /mnt/geospark/.change-start
+# ... make the change ...
+sudo find / -xdev \( -path /proc -o -path /sys -o -path /run -o -path /tmp -o -path /var/log \) -prune \
+  -o -newer /mnt/geospark/.change-start -type f -print | head -50
+```
+
+The last command should list only the operating system's own files (logs, timers), never anything
+from Docker or the new service.
+
 ## Step 1: Get a Free VM
 
 **Option A: Oracle Cloud Always Free (best specs)**
@@ -106,7 +163,7 @@ cd ~/geospark && git pull
 docker compose -f docker-compose.prod.yml build
 docker compose -f docker-compose.prod.yml up -d
 
-# Stop everything
+# Stop everything (GeoSpark's project only; on the shared server, prefer stopping one service)
 docker compose -f docker-compose.prod.yml --profile tunnel down
 
 # Check resource usage

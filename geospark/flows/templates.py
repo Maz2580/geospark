@@ -85,7 +85,8 @@ def _vegetation_monitor(
         name="Vegetation Monitor",
         description=(
             f"Monitor vegetation health for {address}. "
-            f"Alert when NDVI drops below {ndvi_threshold}."
+            f"Alert when NDVI drops below {ndvi_threshold}. Needs NDVI values, which GeoSpark "
+            "does not compute yet (the ndvi tool finds Sentinel-2 scenes only), so this run stops there."
         ),
         steps=[
             FlowStep(
@@ -110,7 +111,7 @@ def _vegetation_monitor(
                     f"Evaluate whether the NDVI value is below {ndvi_threshold}. "
                     "If so, flag the area for review."
                 ),
-                parameters={"ndvi_ref": "{ndvi.ndvi_value}"},
+                parameters={"ndvi": "{ndvi.ndvi_value}"},
                 depends_on=["ndvi"],
                 routes=[
                     FlowRoute(
@@ -197,11 +198,11 @@ def _distance_analysis(
                     f"Check whether the calculated distance exceeds "
                     f"{max_distance_km} km and summarise the result."
                 ),
-                parameters={"distance_ref": "{calculate_distance.distance_km}"},
+                parameters={"distance": "{calculate_distance.distance_km}"},
                 depends_on=["calculate_distance"],
                 routes=[
                     FlowRoute(
-                        condition=f"if distance > {max_distance_km}",
+                        condition=f"if distance > {max_distance_km}",  # km, from the step's "distance" input
                         target_step_id="over_threshold",
                         description="Distance exceeds threshold",
                     ),

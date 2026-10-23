@@ -68,6 +68,11 @@ class NominatimGeocoder(BaseTool):
                 sources=["openstreetmap-nominatim"],
             )
 
+        found = data.get("features", [])
+        warnings: list[str] = []
+        if not found and "," in search_text:
+            found, warnings = self._search_inside(search_text, query.limit)
+
         features = [
             SpatialFeature(
                 geometry=f["geometry"],
@@ -77,7 +82,7 @@ class NominatimGeocoder(BaseTool):
                     "importance": f["properties"].get("importance", 0),
                 },
             )
-            for f in data.get("features", [])
+            for f in found
         ]
 
         return SpatialResult(
@@ -87,7 +92,36 @@ class NominatimGeocoder(BaseTool):
                 summary=f"Found {len(features)} results for '{search_text}'",
             ),
             sources=["openstreetmap-nominatim"],
+            warnings=warnings,
         )
+
+    @staticmethod
+    def _search_inside(search_text: str, limit: int) -> tuple[list[dict], list[str]]:
+        """"Mount Wellington, Hobart" finds nothing: the peak's address doesn't name Hobart. Search
+        for the part before the last comma inside the area named after it instead."""
+        name, _, area = search_text.rpartition(",")
+        name, area = name.strip(), area.strip()
+        if not name or not area:
+            return [], []
+        try:
+            areas = nominatim_client.get_json("search", {"q": area, "format": "geojson", "limit": 1})
+            box = ((areas or {}).get("features") or [{}])[0].get("bbox")
+            if not box:
+                return [], []
+            # Widen the area's box: a landmark named after a city is often just outside its boundary
+            pad_x, pad_y = max((box[2] - box[0]) * 0.25, 0.05), max((box[3] - box[1]) * 0.25, 0.05)
+            data = nominatim_client.get_json("search", {
+                "q": name, "format": "geojson", "limit": limit, "bounded": 1,
+                "viewbox": f"{box[0] - pad_x},{box[3] + pad_y},{box[2] + pad_x},{box[1] - pad_y}",
+            })
+        except (httpx.HTTPError, ValueError, TypeError, IndexError):
+            return [], []
+        found = (data or {}).get("features") or []
+        if not found:
+            return [], []
+        shown = found[0].get("properties", {}).get("display_name", name)
+        return found, [f"No exact match for '{search_text}'; used '{shown}', the best match for "
+                       f"'{name}' in the {area} area."]
 
     def _reverse_geocode(self, query: SpatialQuery) -> SpatialResult:
         """Reverse geocode: coordinates → address/place name."""

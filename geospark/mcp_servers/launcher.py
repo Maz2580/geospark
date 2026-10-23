@@ -5,6 +5,7 @@ from typing import Any
 
 from geospark.mcp_servers.base import BaseMCPServer
 from geospark.mcp_servers.geocoding import GeocodingServer
+from geospark.mcp_servers.places import PlacesServer
 from geospark.mcp_servers.spatial_reasoning import SpatialReasoningServer
 from geospark.mcp_servers.terrain import TerrainServer
 
@@ -13,6 +14,7 @@ SERVERS: dict[str, type[BaseMCPServer]] = {
     "spatial_reasoning": SpatialReasoningServer,
     "geocoding": GeocodingServer,
     "terrain": TerrainServer,
+    "places": PlacesServer,
 }
 
 

@@ -389,6 +389,17 @@ class OverpassLoader:
         """
         return self.load_amenities_by_type(bbox, [amenity_type])[amenity_type]
 
+    # The OpenStreetMap key for place types that are not amenity=* (everything else is an amenity)
+    OSM_KEYS: ClassVar[dict[str, str]] = {
+        "supermarket": "shop", "convenience": "shop", "bakery": "shop", "butcher": "shop",
+        "greengrocer": "shop", "mall": "shop", "department_store": "shop", "chemist": "shop",
+        "park": "leisure", "playground": "leisure", "sports_centre": "leisure", "fitness_centre": "leisure",
+        "swimming_pool": "leisure", "pitch": "leisure", "garden": "leisure",
+        "hotel": "tourism", "museum": "tourism", "attraction": "tourism", "gallery": "tourism",
+        "hostel": "tourism", "motel": "tourism", "viewpoint": "tourism",
+        "bus_stop": "highway", "station": "railway", "tram_stop": "railway",
+    }
+
     def load_amenities_by_type(
         self,
         bbox: tuple[float, float, float, float],
@@ -415,23 +426,27 @@ class OverpassLoader:
         """
         south, west, north, east = bbox
         wanted = [t for t in amenity_types if t.replace("_", "").isalnum()]
-        pattern = "|".join(wanted)
-        query = (
-            f"[out:json][timeout:25];"
-            f'nwr["amenity"~"^({pattern})$"]'
-            f"({south},{west},{north},{east});"
-            f"out center;"
+        # Not everything is an amenity in OpenStreetMap: a supermarket is shop=supermarket and a park
+        # leisure=park. Asking only amenity=* returned none of them, which callers reported as "0 nearby".
+        by_key: dict[str, list[str]] = {}
+        for t in wanted:
+            by_key.setdefault(self.OSM_KEYS.get(t, "amenity"), []).append(t)
+        selectors = "".join(
+            f'nwr["{key}"~"^({"|".join(values)})$"]({south},{west},{north},{east});'
+            for key, values in by_key.items()
         )
+        query = f"[out:json][timeout:25];({selectors});out center;"
         data = self._query(query, timeout=timeout, bbox=bbox, allow_public=allow_public)
 
         grouped: dict[str, list[SpatialEntity]] = {t: [] for t in amenity_types}
         for element in data.get("elements", []):
-            amenity = element.get("tags", {}).get("amenity")
-            if amenity not in grouped:
+            tags = element.get("tags", {})
+            kind = next((v for key, values in by_key.items() if (v := tags.get(key)) in values), None)
+            if kind not in grouped:
                 continue
-            ent = self._element_to_entity(element, amenity, ["cuisine"])
+            ent = self._element_to_entity(element, kind, ["cuisine"])
             if ent:
-                grouped[amenity].append(ent)
+                grouped[kind].append(ent)
         return grouped
 
     def load_admin_boundary(

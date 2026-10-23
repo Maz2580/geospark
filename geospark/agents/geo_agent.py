@@ -88,6 +88,7 @@ class GeoAgent:
         # Step 1: Extract locations and intent from the goal
         locations, intent, params = self._parse_goal(goal)
         locations, params = self._separate_place_types(locations, params)
+        locations = self._join_comma_places(goal, locations, intent)
         result.steps.append(AgentStep(
             action="parse_goal",
             description=f"Extracted locations: {locations}, intent: {intent}",
@@ -109,6 +110,10 @@ class GeoAgent:
                 step.error = f"Failed to geocode: {loc}"
             else:
                 geocoded[loc] = geo_result
+                # e.g. an ambiguous name, or a match found only near the named area
+                for caveat in geo_result.get("warnings") or []:
+                    if caveat not in result.findings.setdefault("caveats", []):
+                        result.findings["caveats"].append(caveat)
             result.steps.append(step)
 
         result.findings["geocoded"] = geocoded
@@ -124,6 +129,8 @@ class GeoAgent:
             self._check_relationships(result, geocoded, params)
         elif intent == "weather":
             self._get_weather(result, geocoded)
+        elif intent == "elevation":
+            self._get_elevations(result, geocoded)
         elif intent == "air_quality":
             self._get_air_quality(result, geocoded)
         elif intent == "fire_detection":
@@ -162,7 +169,7 @@ Task: {goal}
 Respond with ONLY valid JSON (no markdown, no explanation):
 {{
   "locations": ["list of place names mentioned"],
-  "intent": "one of: find_nearby, distance, analyze_area, check_relationship, weather, air_quality, fire_detection, environmental",
+  "intent": "one of: find_nearby, distance, analyze_area, check_relationship, elevation, weather, air_quality, fire_detection, environmental",
   "params": {{
     "amenity_type": "type of thing to find (hospital, school, park, etc.) or null",
     "radius_m": radius in meters or 3000,
@@ -171,6 +178,7 @@ Respond with ONLY valid JSON (no markdown, no explanation):
 }}
 
 Intent guide:
+- elevation: how high a place is (elevation, altitude, height above sea level)
 - weather: questions about temperature, rain, forecast, climate conditions
 - air_quality: questions about pollution, PM2.5, air quality, smog
 - fire_detection: questions about wildfires, active fires, burning
@@ -197,12 +205,15 @@ Intent guide:
             stated = self._stated_radius(goal)
             if stated:
                 params["radius_m"] = stated
+            # "How high is ...?" has no list intent the model reliably picks; it fell back to a nearby search
+            if self._asks_elevation(goal) and parsed.get("intent") != "distance":
+                parsed["intent"] = "elevation"
             # The question's wording decides the relationship, like a stated distance: live, the model
             # returned the string "null", and "contains" for "Is Federation Square in Melbourne?".
             if parsed.get("intent") == "check_relationship":
-                stated = self._stated_relationship(goal)
-                if stated:
-                    params["relationship"] = stated
+                worded = self._stated_relationship(goal)
+                if worded:
+                    params["relationship"] = worded
                 elif params.get("relationship") not in self._RELATIONSHIPS:
                     params["relationship"] = "within"
             return (
@@ -264,6 +275,30 @@ Intent guide:
         return None
 
     @staticmethod
+    def _asks_elevation(goal: str) -> bool:
+        return bool(re.search(r"\b(?:elevation|altitude|how high|height above sea|above sea level)\b", goal, re.I))
+
+    @classmethod
+    def _join_comma_places(cls, goal: str, locations: list[str], intent: str) -> list[str]:
+        """The model splits "Mount Wellington, Hobart" into two places; the question wrote one.
+
+        Consecutive names joined by a comma in the question are merged, unless a two-place question
+        (a distance) would be left with one place.
+        """
+        if len(locations) < 2:
+            return locations
+        merged = [str(locations[0])]
+        for loc in locations[1:]:
+            pattern = re.escape(merged[-1].split(", ")[-1]) + r"\s*,\s*" + re.escape(str(loc))
+            if re.search(pattern, goal, re.I):
+                merged[-1] = f"{merged[-1]}, {loc}"
+            else:
+                merged.append(str(loc))
+        if intent in cls._SINGLE_PLACE_INTENTS or len(merged) >= 2:
+            return merged
+        return locations
+
+    @staticmethod
     def _stated_radius(goal: str) -> int | None:
         """A search distance written in the question ("within 2km", "500 m", "1.5 kilometres"), in metres."""
         match = re.search(r"(\d+(?:\.\d+)?)\s*(km|kilometres?|kilometers?|m|metres?|meters?)\b", goal, re.I)
@@ -284,7 +319,7 @@ Intent guide:
     })
     # Intents that concern one place: "Federation Square, Melbourne" is one address there
     _SINGLE_PLACE_INTENTS: ClassVar[frozenset[str]] = frozenset({
-        "find_nearby", "weather", "air_quality", "fire_detection", "analyze_area", "environmental",
+        "find_nearby", "elevation", "weather", "air_quality", "fire_detection", "analyze_area", "environmental",
     })
     # Lower-case words allowed inside a multi-word place name ("Bay of Islands", "Rio de Janeiro")
     _PLACE_CONNECTORS: ClassVar[frozenset[str]] = frozenset({"of", "de", "du", "la", "le", "del", "da", "di", "van", "von", "upon"})
@@ -299,6 +334,7 @@ Intent guide:
         "bus stop": "bus_stop", "bus stops": "bus_stop",
         "station": "station", "stations": "station", "museum": "museum", "museums": "museum",
         "hotel": "hotel", "hotels": "hotel", "playground": "playground", "playgrounds": "playground",
+        "gym": "fitness_centre", "gyms": "fitness_centre", "doctor": "doctors", "doctors": "doctors",
     }
 
     @classmethod
@@ -356,6 +392,8 @@ Intent guide:
                                                         and "amenity_type" not in params and not cls._stated_radius(goal)):
             intent = "check_relationship"
             params["relationship"] = cls._stated_relationship(goal)
+        elif cls._asks_elevation(goal):
+            intent = "elevation"
         elif "weather" in gl or "temperature" in gl or "forecast" in gl or "rain" in gl:
             intent = "weather"
         elif "air quality" in gl or "pollution" in gl or "pm2.5" in gl or "smog" in gl:
@@ -394,6 +432,7 @@ Intent guide:
                     "coordinates": coords,
                     "name": name,
                     "geometry": features[0].get("geometry"),
+                    "warnings": (result.get("metadata") or {}).get("warnings") or [],
                 }
         return {"coordinates": None, "error": "Geocoding failed"}
 
@@ -473,6 +512,34 @@ Intent guide:
                     error=str(e),
                     duration_s=round(time.time() - t0, 1),
                 ))
+
+    def _get_elevations(self, result: AgentResult, geocoded: dict[str, dict]) -> None:
+        """Ground elevation at each geocoded place (Copernicus DEM, Open Elevation as fallback)."""
+        elevations = []
+        for loc_name, geo in geocoded.items():
+            coords = geo.get("coordinates")
+            if not coords:
+                continue
+            t0 = time.time()
+            reply = self._launcher.handle_tool_call("get_elevation", {
+                "explanation": f"Elevation of {loc_name}", "latitude": coords[1], "longitude": coords[0],
+            })
+            body = reply.get("result") if reply.get("status") == "success" else None
+            if not body or body.get("elevation_m") is None:
+                result.steps.append(AgentStep(action="elevation", description=f"Elevation of {loc_name}",
+                                              error="no elevation data", duration_s=round(time.time() - t0, 1)))
+                continue
+            elevations.append({"place": geo.get("name", loc_name), "elevation_m": body["elevation_m"],
+                               "coordinates": coords})
+            result.steps.append(AgentStep(
+                action="elevation", description=f"{loc_name}: {body['elevation_m']} m above sea level",
+                result=body, duration_s=round(time.time() - t0, 1),
+            ))
+        if elevations:
+            result.findings["elevations"] = elevations
+            result.findings.setdefault("caveats", []).append(
+                "Elevation is the ground height at the geocoded point of each place, from a 30 m terrain "
+                "model; for a mountain this can be below the summit if the point is not the peak.")
 
     def _compute_distances(
         self,
@@ -838,6 +905,8 @@ Write a clear, concise summary:"""
             if "distances" in result.findings:
                 for d in result.findings["distances"]:
                     parts.append(f"{d['from']} to {d['to']}: {d['distance_km']} km")
+            for e in result.findings.get("elevations", []):
+                parts.append(f"{e['place']}: {e['elevation_m']} m above sea level")
             for rel in result.findings.get("relationships", []):
                 parts.append(f"{rel['a']} {rel['relationship']} {rel['b']}: {'yes' if rel['result'] else 'no'}")
             if "nearby" in result.findings:

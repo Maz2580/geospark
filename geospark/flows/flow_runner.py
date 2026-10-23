@@ -32,6 +32,9 @@ _OPERATORS: dict[str, Any] = {
     "!=": operator.ne,
 }
 
+# A parameter that is still an unresolved "{step.key}" reference
+_REF = re.compile(r"\{[\w.]+\}")
+
 # Regex for parsing simple numeric conditions like "NDVI < 0.3"
 _CONDITION_PATTERN = re.compile(
     r"(?:if\s+)?(\w+)\s*(<=?|>=?|==|!=)\s*([\d.]+)",
@@ -86,10 +89,19 @@ class FlowRunner:
 
         for step in ordered_steps:
             flow_run.current_step_id = step.id
+            # A step whose input failed can't run; say which input, instead of running it on nothing
+            broken = [d for d in step.depends_on if context.get(d, {}).get("status") in ("error", "skipped")]
+            if broken:
+                result = {"status": "skipped", "errors": [f"Not run: it needs {', '.join(broken)}, which did not succeed."]}
+                context[step.id] = result
+                flow_run.step_results[step.id] = result
+                continue
             try:
                 result = self._execute_step(step, context)
                 context[step.id] = result
                 flow_run.step_results[step.id] = result
+                if result.get("status") == "error":
+                    flow_run.errors.extend(f"Step '{step.id}': {e}" for e in result.get("errors") or ["failed"])
                 self._persist_run(flow_run)
 
                 # Evaluate routes and add routed steps to context
@@ -105,7 +117,9 @@ class FlowRunner:
                 self._persist_run(flow_run)
                 return flow_run
 
-        flow_run.status = "completed"
+        # A run is complete only if every step did its job; a run whose steps all errored used to
+        # report "completed"
+        flow_run.status = "failed" if flow_run.errors else "completed"
         flow_run.completed_at = datetime.now(timezone.utc)
         flow_run.current_step_id = None
         self._persist_run(flow_run)
@@ -142,45 +156,106 @@ class FlowRunner:
             # Tool-based step: build a SpatialQuery and execute
             try:
                 op = SpatialOperation(step.operation)
+            except ValueError:
+                return self._step_error(step, start_time, f"Unknown operation '{step.operation}'.")
+
+            unresolved = [k for k, v in resolved_params.items() if isinstance(v, str) and _REF.fullmatch(v)]
+            if unresolved:
+                return self._step_error(step, start_time, "Missing input: " + ", ".join(
+                    f"{k}={resolved_params[k]}" for k in unresolved))
+            try:
+                query = self._build_query(op, step, resolved_params)
             except ValueError as err:
-                raise FlowRunnerError(
-                    f"Invalid operation '{step.operation}' in step '{step.id}'"
-                ) from err
+                return self._step_error(step, start_time, f"Invalid parameters: {err}")
 
-            # Build query kwargs from resolved params that match SpatialQuery fields,
-            # excluding 'operation' (already set) and 'metadata' (merged separately).
-            query_fields = {
-                k: v
-                for k, v in resolved_params.items()
-                if k in SpatialQuery.model_fields and k not in ("operation", "metadata")
-            }
-            query = SpatialQuery(
-                operation=op,
-                metadata={"flow_step": step.id, **resolved_params},
-                **query_fields,
-            )
-
+            self._ensure_tool(step.tool)
             result: SpatialResult = self.engine.execute(query)
+            errors = list(result.errors)
+            if errors:
+                from geospark.tools.registry import TOOL_STATUS
 
+                status, what = TOOL_STATUS.get(step.tool, ("ready", ""))
+                if status in ("partial", "planned"):
+                    errors.append(f"The {step.tool} tool is {status}: {what}.")
+            warnings = list(result.warnings)
+            if not errors:
+                from geospark.tools.registry import TOOL_STATUS
+
+                status, what = TOOL_STATUS.get(step.tool, ("ready", ""))
+                if status in ("partial", "planned"):
+                    warnings.append(f"The {step.tool} tool is {status}: {what}.")
+            first = result.features[0] if result.features else None
             elapsed = (time.time() - start_time) * 1000
             return {
-                "status": "error" if result.errors else "success",
+                "status": "error" if errors else "success",
                 "tool": step.tool,
                 "operation": step.operation,
+                # The first feature's geometry and values, for later steps' {step.key} references
+                "geometry": first.geometry if first else None,
+                "values": dict(first.properties) if first else {},
                 "features": [f.model_dump() for f in result.features],
                 "spatial_context": result.spatial_context.model_dump(),
-                "errors": result.errors,
+                "errors": errors,
+                "warnings": warnings,
                 "execution_time_ms": elapsed,
             }
 
-        # Pure LLM / passthrough step
+        unresolved = [k for k, v in resolved_params.items() if isinstance(v, str) and _REF.fullmatch(v)]
+        if unresolved:  # e.g. {ndvi.ndvi_value} when the NDVI step produced no value
+            return self._step_error(step, start_time, "Missing input: " + ", ".join(
+                f"{k}={resolved_params[k]} (the step produced no such value)" for k in unresolved))
+
+        # Instruction step: no tool runs. Its inputs and route conditions are resolved, and the
+        # instruction is recorded for a person or model to act on; it is not executed here.
         elapsed = (time.time() - start_time) * 1000
         return {
             "status": "success",
             "agent_instructions": step.agent_instructions,
             "parameters": resolved_params,
+            # The step's own inputs come first: "if distance > 500" reads its "distance" parameter
+            "routes_taken": [r.target_step_id for r in step.routes
+                             if self._evaluate_condition(r.condition, {step.id: resolved_params, **context})],
+            "note": "Instruction step: recorded, not executed by a model.",
             "execution_time_ms": elapsed,
         }
+
+    # Parameter names templates and the flow builder use, and the query field each one sets
+    _QUERY_TEXT = ("address", "query", "place")
+    _GEOMETRY = ("geometry", "geometry_ref", "origin", "origin_ref")
+    _GEOMETRY_B = ("geometry_b", "geometry_b_ref", "destination", "destination_ref")
+
+    def _build_query(self, op: SpatialOperation, step: FlowStep, params: dict[str, Any]) -> SpatialQuery:
+        metadata: dict[str, Any] = {"flow_step": step.id, **params}
+        fields: dict[str, Any] = {
+            k: v for k, v in params.items()
+            if k in SpatialQuery.model_fields and k not in ("operation", "metadata", "geometry")
+        }
+        text = next((params[k] for k in self._QUERY_TEXT if isinstance(params.get(k), str)), None)
+        if text:
+            metadata["query"] = text
+        geometry = next((params[k] for k in self._GEOMETRY if isinstance(params.get(k), dict)), None)
+        if geometry:
+            fields["geometry"] = geometry
+        geometry_b = next((params[k] for k in self._GEOMETRY_B if isinstance(params.get(k), dict)), None)
+        if geometry_b:
+            metadata["geometry_b"] = geometry_b
+        return SpatialQuery(operation=op, metadata=metadata, **fields)
+
+    def _ensure_tool(self, tool: str) -> None:
+        """Load the step's tool if the engine doesn't have it (a default Engine has none)."""
+        if tool == "spatial_reasoner":
+            return
+        registry = getattr(self.engine, "tool_registry", None)
+        try:
+            if registry is not None and tool not in self.engine.available_tools:
+                registry.load_tool(tool)
+        except Exception as err:  # unknown tool: the engine reports it when the step runs
+            logger.debug("Could not load tool %s: %s", tool, err)
+
+    @staticmethod
+    def _step_error(step: FlowStep, start_time: float, message: str) -> dict[str, Any]:
+        return {"status": "error", "tool": step.tool, "operation": step.operation, "errors": [message],
+                "execution_time_ms": (time.time() - start_time) * 1000}
 
     def _evaluate_condition(self, condition: str, context: dict[str, Any]) -> bool:
         """Evaluate a natural-language condition against step results.
@@ -262,7 +337,11 @@ class FlowRunner:
                     step_id, result_key = parts
                     step_result = context.get(step_id, {})
                     if isinstance(step_result, dict):
-                        resolved[param_key] = step_result.get(result_key, param_value)
+                        # A key of the step's result, or a value of its first feature ({calc.distance_km})
+                        value = step_result.get(result_key)
+                        if value is None:
+                            value = (step_result.get("values") or {}).get(result_key)
+                        resolved[param_key] = param_value if value is None else value
                     else:
                         resolved[param_key] = param_value
                 else:

@@ -83,3 +83,40 @@ def verification(result: Any) -> dict[str, Any]:
     if result.quality:
         out["quality"] = result.quality
     return out
+
+
+def geocode_place(name: str) -> tuple[dict[str, Any] | None, dict[str, Any], Any]:
+    """The best match for a place name, so a model never has to supply (and possibly invent)
+    coordinates: (point geometry or None, a description of the match, the lookup result).
+
+    On failure the description holds ``error``: the service's message or "no place called ...".
+    """
+    from geospark.engine.core import Engine
+    from geospark.protocol.schema import SpatialOperation, SpatialQuery
+
+    global _place_geocoder
+    if _place_geocoder is None:
+        _place_geocoder = Engine(tools=["geocoder"])
+    found = _place_geocoder.execute(SpatialQuery(operation=SpatialOperation.GEOCODE, metadata={"query": name}))
+    if not found.features:
+        reason = found.errors[0] if found.errors else f"No place called '{name}' was found."
+        return None, {"query": name, "error": reason}, found
+    best = found.features[0]
+    geometry = best.geometry if isinstance(best.geometry, dict) else best.geometry.model_dump()
+    return geometry, {"query": name, "display_name": best.properties.get("display_name"),
+                      "coordinates": geometry["coordinates"]}, found
+
+
+def merge_lookups(result: Any, lookups: list[Any]) -> None:
+    """Put the place lookups' provenance and caveats (e.g. an ambiguous name) on a tool's result,
+    once per source and method."""
+    for found in lookups:
+        result.provenance = [*found.provenance, *result.provenance]
+        result.warnings.extend(w for w in found.warnings if w not in result.warnings)
+    unique: dict[tuple[str, str | None], Any] = {}
+    for p in result.provenance:
+        unique.setdefault((p.source, p.method), p)
+    result.provenance = list(unique.values())
+
+
+_place_geocoder: Any = None

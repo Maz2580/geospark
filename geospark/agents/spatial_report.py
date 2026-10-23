@@ -467,6 +467,7 @@ Summary:"""
                     "model": self._model,
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,
+                    "options": {"num_predict": 400},  # bounded: a 3-5 sentence summary
                 },
                 # Past this the plain summary below is used instead of waiting
                 timeout=NARRATIVE_TIMEOUT_S,

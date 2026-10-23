@@ -312,6 +312,7 @@ Summary:"""
                     "model": self._model,
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,
+                    "options": {"num_predict": 320},  # bounded: a 2-3 sentence summary
                 },
                 timeout=60,
             )

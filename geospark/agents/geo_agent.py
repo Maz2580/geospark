@@ -87,6 +87,7 @@ class GeoAgent:
 
         # Step 1: Extract locations and intent from the goal
         locations, intent, params = self._parse_goal(goal)
+        locations, params = self._separate_place_types(locations, params)
         result.steps.append(AgentStep(
             action="parse_goal",
             description=f"Extracted locations: {locations}, intent: {intent}",
@@ -182,6 +183,7 @@ Intent guide:
                     "model": self._model,
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,
+                    "options": {"num_predict": 200},  # bounded: the parsed question is a short JSON object; JSON mode can otherwise pad with blank space until the timeout
                     "format": "json",
                 },
                 timeout=60,
@@ -195,6 +197,8 @@ Intent guide:
             stated = self._stated_radius(goal)
             if stated:
                 params["radius_m"] = stated
+            if parsed.get("intent") == "check_relationship" and not params.get("relationship"):
+                params["relationship"] = self._stated_relationship(goal)
             return (
                 parsed.get("locations", []),
                 parsed.get("intent", "find_nearby"),
@@ -202,6 +206,64 @@ Intent guide:
             )
         except Exception:
             return self._fallback_parse(goal)
+
+    @classmethod
+    def _separate_place_types(
+        cls, locations: list[str], params: dict[str, Any],
+    ) -> tuple[list[str], dict[str, Any]]:
+        """Keep place names and things-to-find apart.
+
+        The model sometimes lists "hospitals" or "schools" as locations (they were then geocoded to a
+        hospital in New York and a place in the West Bank) or joins types as "hospital,school".
+        """
+        raw = params.get("amenity_type")
+        parts = raw if isinstance(raw, list) else re.split(r"\s*(?:,|/|&|\band\b)\s*", str(raw or ""))
+        types: list[str] = []
+        for part in parts:
+            word = str(part).strip().lower()
+            if word and word not in ("null", "none"):
+                types.append(cls._AMENITIES.get(word, word.rstrip("s") if word.endswith("s") and len(word) > 3 else word))
+        places = []
+        for loc in locations:
+            key = str(loc).strip().lower()
+            if key in cls._AMENITIES:
+                types.append(cls._AMENITIES[key])
+            else:
+                places.append(loc)
+        out = dict(params)
+        unique = list(dict.fromkeys(types))
+        out["amenity_type"] = (unique[0] if len(unique) == 1 else unique) if unique else None
+        return places, out
+
+    def _boundary(self, name: str) -> dict[str, Any] | None:
+        """A place's boundary from Nominatim (simplified), or None if it has none (e.g. a building point)."""
+        from geospark.tools.geocoding import client as nominatim_client
+
+        try:
+            data = nominatim_client.get_json("search", {
+                "q": name, "format": "geojson", "limit": 1,
+                "polygon_geojson": 1, "polygon_threshold": 0.0005,
+            })
+        except Exception:
+            return None
+        features = (data or {}).get("features") or []
+        geometry = features[0].get("geometry") if features else None
+        if geometry and geometry.get("type") in ("Polygon", "MultiPolygon"):
+            return dict(geometry)
+        return None
+
+    @staticmethod
+    def _stated_relationship(goal: str) -> str | None:
+        """The relationship a question asks about, from its wording ("Is A inside B?" -> within)."""
+        g = goal.lower()
+        if re.search(r"\b(?:contains?|containing|include[sd]?)\b", g):
+            return "contains"
+        if re.search(r"\b(?:inside|within|in)\b", g):
+            return "within"
+        for word in ("intersects", "overlaps", "touches", "crosses", "disjoint"):
+            if word.rstrip("s") in g:
+                return word.rstrip("s") + ("s" if word != "disjoint" else "")
+        return None
 
     @staticmethod
     def _stated_radius(goal: str) -> int | None:
@@ -292,8 +354,10 @@ Intent guide:
         intent = "find_nearby"
         if "distance" in gl or "how far" in gl or " far " in f" {gl} ":
             intent = "distance"
-        elif "contain" in gl or "inside" in gl:
+        elif "contain" in gl or "inside" in gl or (re.match(r"\s*(?:is|are)\s+.+\b(?:in|within)\b", gl)
+                                                        and "amenity_type" not in params and not cls._stated_radius(goal)):
             intent = "check_relationship"
+            params["relationship"] = cls._stated_relationship(goal)
         elif "weather" in gl or "temperature" in gl or "forecast" in gl or "rain" in gl:
             intent = "weather"
         elif "air quality" in gl or "pollution" in gl or "pm2.5" in gl or "smog" in gl:
@@ -346,8 +410,11 @@ Intent guide:
     ) -> None:
         """Find nearby amenities for geocoded locations (OpenStreetMap, Overture Maps as fallback)."""
         amenity = params.get("amenity_type")
-        types = [amenity] if amenity else list(self.EVERYDAY_SERVICES)
-        label = amenity or ", ".join(types)
+        if isinstance(amenity, list):
+            types = [a for a in amenity if a] or list(self.EVERYDAY_SERVICES)
+        else:
+            types = [amenity] if amenity else list(self.EVERYDAY_SERVICES)
+        label = ", ".join(types)
         radius = params.get("radius_m", 3000)
 
         for loc_name, geo in geocoded.items():
@@ -487,7 +554,7 @@ Intent guide:
         params: dict[str, Any],
     ) -> None:
         """Check spatial relationships between geocoded locations."""
-        relationship = params.get("relationship", "contains")
+        relationship = params.get("relationship") or "contains"
         locations = list(geocoded.items())
 
         for i, (name_a, geo_a) in enumerate(locations):
@@ -496,6 +563,28 @@ Intent guide:
                 geom_b = geo_b.get("geometry")
                 if not geom_a or not geom_b:
                     continue
+                # Geocoding gives a point; "is A inside B" needs B's boundary. A point can't contain
+                # anything, so comparing two points would always answer "no".
+                needs_area = {"within": ["b"], "contains": ["a"]}.get(relationship, ["a", "b"])
+                missing = []
+                for side, name, geo in (("a", name_a, geo_a), ("b", name_b, geo_b)):
+                    if side in needs_area and (geo.get("geometry") or {}).get("type") == "Point":
+                        boundary = self._boundary(name)
+                        if boundary:
+                            geo["geometry"] = boundary
+                            result.findings.setdefault("caveats", []).append(
+                                f"{name}: boundary from OpenStreetMap (Nominatim), simplified.")
+                        else:
+                            missing.append(name)
+                if missing and len(missing) == len(needs_area):
+                    result.steps.append(AgentStep(
+                        action="check_relationship",
+                        description=f"Check {relationship}: {name_a} vs {name_b}",
+                        error=f"no boundary found for {', '.join(missing)}, and a single point cannot "
+                              "contain anything, so this can't be checked",
+                    ))
+                    continue
+                geom_a, geom_b = geo_a.get("geometry"), geo_b.get("geometry")
 
                 try:
                     holds = SpatialReasoner.check_relationship(
@@ -710,7 +799,10 @@ Intent guide:
             # Nothing but failures to report: a model asked to summarise this tends to say
             # "none were found", which is wrong. Say plainly what could not be done.
             reasons = "; ".join(f"{s.description} ({s.error})" for s in result.steps if s.error)
-            return f"This could not be answered: {reasons}. Please try again in a few minutes."
+            needs_setup = any(("not set" in (s.error or "")) or ("API_KEY" in (s.error or "")) for s in result.steps)
+            advice = ("This server has not been given the free API key it needs for that."
+                      if needs_setup else "Please try again in a few minutes.")
+            return f"This could not be answered: {reasons}. {advice}"
 
         prompt = f"""Summarize these spatial analysis findings in 2-4 sentences.
 Use ONLY the facts listed below and be specific with their numbers and distances.
@@ -734,6 +826,7 @@ Write a clear, concise summary:"""
                     "model": self._model,
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,
+                    "options": {"num_predict": 320},  # bounded: a 2-4 sentence summary
                 },
                 timeout=60,
             )
@@ -745,6 +838,8 @@ Write a clear, concise summary:"""
             if "distances" in result.findings:
                 for d in result.findings["distances"]:
                     parts.append(f"{d['from']} to {d['to']}: {d['distance_km']} km")
+            for rel in result.findings.get("relationships", []):
+                parts.append(f"{rel['a']} {rel['relationship']} {rel['b']}: {'yes' if rel['result'] else 'no'}")
             if "nearby" in result.findings:
                 for loc, data in result.findings["nearby"].items():
                     parts.append(

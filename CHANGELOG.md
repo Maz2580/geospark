@@ -5,6 +5,20 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 ## [Unreleased]
 
 ### Fixed
+- **Second live test of all four agents (22 questions)** found and fixed:
+  - "Is the Louvre inside Paris?" answered **No**: GeoAgent compared two geocoded points, and a point
+    can't contain anything. It now fetches the container's boundary from OpenStreetMap (Nominatim,
+    simplified) and refuses to answer when there is none. The relationship comes from the wording
+    ("inside"/"in" means within, "contains" means contains), so "Is A inside B" is no longer checked
+    backwards.
+  - "Where should **I** open a pharmacy in Zurich near hospitals and schools?" went to GeoAgent, whose
+    model listed "hospitals" and "schools" as places (geocoded to New York and the West Bank) and
+    searched the type "hospital,school"; the answer claimed no hospitals or schools near Zurich. Such
+    questions now go to the Site Selector, and GeoAgent keeps place names and place types apart.
+  - Missing API keys (air quality, fires) were answered "try again in a few minutes"; they now say the
+    server needs the free key.
+  - Model replies in the agents are length-capped (`num_predict`); a JSON-mode reply could pad with
+    blank space until the 60 s timeout (seen live: 35 s, 43 s and 60 s calls among 2-7 s ones).
 - GeoAgent uses a distance written in the question ("within 2km", "500 m") even when the model's
   reading of the question leaves it out; live, one run searched the model's default 3 km instead of 2 km.
 

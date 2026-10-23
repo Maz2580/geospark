@@ -4,6 +4,13 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Added
+- **`deploy/docker-compose.override.example.yml`**: the production stack (API, Ollama, Valhalla,
+  Overpass) as one tested file for anyone hosting GeoSpark, with the measured limits and settings.
+  `DEPLOY.md` gains "The full stack" (how to bring it up one service at a time) and a current
+  architecture diagram; `.env.example` adds `GEOSPARK_VALHALLA_URL`, `GEOSPARK_NOMINATIM_URL` and the
+  Ollama settings, which were missing.
+
 ### Fixed
 - GeoAgent uses a distance written in the question ("within 2km", "500 m") even when the model's
   reading of the question leaves it out; live, one run searched the model's default 3 km instead of 2 km.

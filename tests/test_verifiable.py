@@ -202,7 +202,7 @@ def test_location_report_lists_its_sources() -> None:
             return {"status": "success", "result": {"elevation_m": 23.1}, "metadata": {"source": "copernicus-dem"}}
 
     class Overpass:
-        def load_amenities_by_type(self, bbox, services):
+        def load_amenities_by_type(self, bbox, services, timeout=None):
             return {}
 
     report = SpatialReport.__new__(SpatialReport)

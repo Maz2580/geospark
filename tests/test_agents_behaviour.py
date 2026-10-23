@@ -58,6 +58,9 @@ class FakeOverpass:
         self.calls.append((bbox, amenity_type))
         return self.by_type.get(amenity_type, [])
 
+    def load_amenities_by_type(self, bbox, amenity_types, timeout=None):
+        return {t: self.load_amenities(bbox, t) for t in amenity_types}
+
 
 @pytest.fixture(autouse=True)
 def no_llm():

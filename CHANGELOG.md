@@ -4,6 +4,32 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Fixed: the agents (Spatial Report, Site Selector, Coordinator, GeoAgent)
+Tested live with the Agents page's own examples, most answers were empty or wrong even though every
+call returned HTTP 200:
+- **Nearby places failed under load.** All agents depended on the public Overpass servers, which
+  rate-limit by IP (connection refused or 504 after a few queries, 20-30 s each when they answer).
+  A shared lookup (`geospark/agents/amenities.py`) now asks OpenStreetMap once per request with a
+  20 s limit, skips it for 5 minutes after a failure, and falls back to Overture Maps places (read
+  by GeoSpark itself, no rate limit) with strict category mapping and a confidence filter. The
+  answer names its source, and a caveat explains the fallback.
+- **No fallback for health care.** Overture's "hospitals" near the Eiffel Tower included private
+  practices, a bar and a hospital in Cameroon, so hospitals, clinics, doctors and dentists are
+  never taken from Overture: if OpenStreetMap is down they are reported as not retrieved.
+- **The Site Selector invented a site.** With no data it ranked "Zurich center" (score 0) and the
+  model explained it was near a hospital and a school. It now says what could not be retrieved and
+  never ranks on part of the criteria; the model only summarises real candidates, from the facts.
+- **GeoAgent turned failed lookups into "none found"**, and looked up hospitals for any "analyze"
+  request. Failures are now stated in fixed wording (and with nothing found, the model isn't
+  asked), and an area analysis covers everyday services.
+- **The Coordinator misread requests.** "...for a cafe in Melbourne CBD near schools" searched for a
+  place called "Melbourne CBD near schools"; facility, area, near and avoid are now parsed from
+  the sentence. "Analyze <place>" now goes to the Spatial Report, with the place name only.
+- **Spatial Report counts** were taken from the 50 closest places (mostly restaurants); all
+  services are counted now, and the nearest ten of each type are listed.
+- **The Agents page** now shows the Site Selector's summary (it never did) and, for every agent,
+  what could not be retrieved and any caveats.
+
 ### Added
 - `server.json` for the official MCP Registry, listing the hosted endpoint as
   `io.github.Maz2580/geospark` (validated against the registry's 2025-12-11 schema).

@@ -52,3 +52,13 @@ def _fresh_geocoding_cache():
     client.reset()
     yield
     client.reset()
+
+
+@pytest.fixture(autouse=True)
+def _fresh_amenity_lookup():
+    """Forget a remembered Overpass failure, so one test can't send the next to the fallback."""
+    from geospark.agents import amenities
+
+    amenities.reset()
+    yield
+    amenities.reset()

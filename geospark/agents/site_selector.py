@@ -21,11 +21,12 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from geospark.agents.amenities import AmenityLookupError, find_amenities
 from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.knowledge.loaders import OverpassLoader
 from geospark.mcp_servers.launcher import MCPServerLauncher
-from geospark.utils.geo import overpass_bbox
+from geospark.protocol.provenance import Provenance
 
 
 class SiteCandidate(BaseModel):
@@ -48,6 +49,11 @@ class SiteResult(BaseModel):
     best: SiteCandidate | None = None
     summary: str = ""
     duration_s: float = 0.0
+    radius_m: float = 0.0  # the radius actually searched
+    # What could not be looked up, and what a reader should know about the data
+    data_gaps: list[str] = Field(default_factory=list)
+    caveats: list[str] = Field(default_factory=list)
+    provenance: list[Provenance] = Field(default_factory=list)
 
 
 class SiteSelector:
@@ -127,40 +133,44 @@ class SiteSelector:
             return result
 
         lon, lat = center_coords[0], center_coords[1]
-        center = {"type": "Point", "coordinates": [lon, lat]}
-        bbox = overpass_bbox(lat, lon, radius_m)
+        result.radius_m = radius_m
+        if not near_types:
+            result.summary = (f"Nothing to rank in {within}: give at least one kind of place the site "
+                              "should be near (for example near=['school']).")
+            result.duration_s = round(time.time() - start, 1)
+            return result
 
-        # Step 2: Load all "near" amenities
-        near_features: dict[str, list[dict[str, Any]]] = {}
-        for amenity in near_types:
-            try:
-                entities = self._overpass.load_amenities(bbox, amenity)
-                near_features[amenity] = [
-                    {
-                        "name": e.name,
-                        "coordinates": e.geometry.get("coordinates", []),
-                        "geometry": e.geometry,
-                    }
-                    for e in entities
-                ]
-            except Exception:
-                near_features[amenity] = []
+        # Steps 2-3: the "near" and "avoid" amenities, in one lookup (OpenStreetMap, then Overture Maps)
+        try:
+            lookup = find_amenities(lat, lon, radius_m, near_types + avoid_types, self._overpass)
+        except AmenityLookupError:
+            result.data_gaps = near_types + avoid_types
+            result.summary = (f"Could not rank sites in {within}: the nearby places "
+                              f"({', '.join(near_types + avoid_types)}) could not be retrieved from "
+                              "OpenStreetMap or Overture Maps. Please try again in a few minutes.")
+            result.duration_s = round(time.time() - start, 1)
+            return result
+        radius_m = lookup.radius_m
+        result.radius_m = radius_m
+        result.caveats.extend(lookup.warnings)
+        result.data_gaps = list(lookup.unavailable)
+        missing = [t for t in near_types + avoid_types if t in lookup.unavailable]
+        if missing:
+            # Ranking on the remaining criteria would answer a different question than the one asked
+            result.summary = (f"Could not rank sites in {within}: {', '.join(missing)} could not be "
+                              "retrieved (OpenStreetMap was unavailable and there is no reliable fallback "
+                              "for them), and a ranking without them would not answer this request. "
+                              "Please try again in a few minutes.")
+            result.duration_s = round(time.time() - start, 1)
+            return result
+        result.provenance = list(lookup.provenance)
 
-        # Step 3: Load "avoid" amenities
-        avoid_features: dict[str, list[dict[str, Any]]] = {}
-        for amenity in avoid_types:
-            try:
-                entities = self._overpass.load_amenities(bbox, amenity)
-                avoid_features[amenity] = [
-                    {
-                        "name": e.name,
-                        "coordinates": e.geometry.get("coordinates", []),
-                        "geometry": e.geometry,
-                    }
-                    for e in entities
-                ]
-            except Exception:
-                avoid_features[amenity] = []
+        def as_features(kind: str) -> list[dict[str, Any]]:
+            return [{"name": e.name, "coordinates": e.geometry.get("coordinates", []), "geometry": e.geometry}
+                    for e in lookup.by_type.get(kind, [])]
+
+        near_features = {kind: as_features(kind) for kind in near_types}
+        avoid_features = {kind: as_features(kind) for kind in avoid_types}
 
         # Step 4: Use "near" feature locations as candidate sites
         # Each "near" amenity location is a potential candidate
@@ -176,12 +186,11 @@ class SiteSelector:
                 })
 
         if not candidate_points:
-            # Fallback: use the center point
-            candidate_points.append({
-                "name": f"{within} center",
-                "coordinates": [lon, lat],
-                "geometry": center,
-            })
+            # Nothing to anchor a site to: say so rather than inventing a "center" candidate
+            result.summary = (f"No {' or '.join(near_types)} found within {round(radius_m)} m of {within}, "
+                              "so no site can be ranked. Try a larger area or different criteria.")
+            result.duration_s = round(time.time() - start, 1)
+            return result
 
         # Step 5: Score each candidate
         scored: list[SiteCandidate] = []
@@ -283,6 +292,9 @@ class SiteSelector:
         )
 
         prompt = f"""Summarize site selection results in 2-3 sentences.
+Use ONLY the facts below. Scores add up closeness to each "near" criterion (1 per criterion when one is
+right next to the site, 0 when the nearest is at the search radius); higher is better.
+Give the real distances from the details; do not claim anything the details do not show.
 
 Goal: {result.query}
 Search area: {result.within}

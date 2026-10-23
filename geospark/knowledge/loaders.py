@@ -306,6 +306,7 @@ class OverpassLoader:
         self,
         bbox: tuple[float, float, float, float],
         amenity_types: list[str],
+        timeout: float = 40.0,
     ) -> dict[str, list[SpatialEntity]]:
         """Fetch several amenity types in one Overpass request.
 
@@ -333,7 +334,7 @@ class OverpassLoader:
             f"({south},{west},{north},{east});"
             f"out center;"
         )
-        data = self._query(query)
+        data = self._query(query, timeout=timeout)
 
         grouped: dict[str, list[SpatialEntity]] = {t: [] for t in amenity_types}
         for element in data.get("elements", []):

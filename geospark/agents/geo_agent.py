@@ -18,13 +18,13 @@ from typing import Any, ClassVar
 
 from pydantic import BaseModel, Field
 
+from geospark.agents.amenities import find_amenities
 from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.knowledge.graph import SpatialKnowledgeGraph
 from geospark.knowledge.loaders import OverpassLoader
 from geospark.mcp_servers.launcher import MCPServerLauncher
 from geospark.utils.aio import run_sync
-from geospark.utils.geo import overpass_bbox
 
 
 class AgentStep(BaseModel):
@@ -325,18 +325,20 @@ Intent guide:
                 }
         return {"coordinates": None, "error": "Geocoding failed"}
 
+    # Looked up when an area is analysed, or nearby things are asked for without a type
+    EVERYDAY_SERVICES: ClassVar[list[str]] = ["hospital", "school", "pharmacy", "supermarket", "cafe"]
+
     def _find_nearby(
         self,
         result: AgentResult,
         geocoded: dict[str, dict],
         params: dict[str, Any],
     ) -> None:
-        """Find nearby amenities for geocoded locations."""
-        amenity = params.get("amenity_type", "hospital")
+        """Find nearby amenities for geocoded locations (OpenStreetMap, Overture Maps as fallback)."""
+        amenity = params.get("amenity_type")
+        types = [amenity] if amenity else list(self.EVERYDAY_SERVICES)
+        label = amenity or ", ".join(types)
         radius = params.get("radius_m", 3000)
-
-        if not amenity:
-            amenity = "hospital"
 
         for loc_name, geo in geocoded.items():
             coords = geo.get("coordinates")
@@ -345,39 +347,54 @@ Intent guide:
 
             t0 = time.time()
             lon, lat = coords[0], coords[1]
-            bbox = overpass_bbox(lat, lon, radius)
-
             try:
-                entities = self._overpass.load_amenities(bbox, amenity)
-                # Compute distances from the center point
+                lookup = find_amenities(lat, lon, radius, types, self._overpass)
+                searched = lookup.radius_m
                 center = {"type": "Point", "coordinates": [lon, lat]}
                 nearby = []
-                for ent in entities:
-                    dist = SpatialReasoner.calculate_distance(center, ent.geometry)
-                    if dist <= radius:
-                        nearby.append({
-                            "name": ent.name,
-                            "distance_m": round(dist),
-                            "coordinates": ent.geometry.get("coordinates"),
-                        })
+                counts: dict[str, int] = {}
+                for kind, entities in lookup.by_type.items():
+                    for ent in entities:
+                        dist = SpatialReasoner.calculate_distance(center, ent.geometry)
+                        if dist <= searched:
+                            counts[kind] = counts.get(kind, 0) + 1
+                            nearby.append({
+                                "name": ent.name,
+                                "type": kind,
+                                "distance_m": round(dist),
+                                "coordinates": ent.geometry.get("coordinates"),
+                            })
                 nearby.sort(key=lambda x: x["distance_m"])
 
                 result.findings.setdefault("nearby", {})[loc_name] = {
-                    "amenity_type": amenity,
-                    "radius_m": radius,
+                    "amenity_type": label,
+                    "radius_m": searched,
                     "count": len(nearby),
+                    "by_type": counts,
                     "items": nearby[:20],
+                    "source": lookup.source,
                 }
+                for caveat in lookup.warnings:
+                    if caveat not in result.findings.setdefault("caveats", []):
+                        result.findings["caveats"].append(caveat)
+                if lookup.unavailable:  # unknown, not "none": surfaces in the summary's fixed gap note
+                    result.steps.append(AgentStep(
+                        action="find_nearby",
+                        description=f"{', '.join(lookup.unavailable)} near {loc_name}",
+                        error="not retrieved: OpenStreetMap was unavailable and no reliable fallback exists",
+                    ))
                 result.steps.append(AgentStep(
                     action="find_nearby",
-                    description=f"Found {len(nearby)} {amenity}(s) within {radius}m of {loc_name}",
-                    result={"count": len(nearby), "nearest": nearby[0]["name"] if nearby else None},
+                    description=f"Found {len(nearby)} {label} within {round(searched)}m of {loc_name} "
+                                f"({'OpenStreetMap' if lookup.source == 'openstreetmap-overpass' else 'Overture Maps'})",
+                    result={"count": len(nearby), "by_type": counts,
+                            "nearest": nearby[0]["name"] if nearby else None},
                     duration_s=round(time.time() - t0, 1),
                 ))
             except Exception as e:
                 result.steps.append(AgentStep(
                     action="find_nearby",
-                    description=f"Search {amenity} near {loc_name}",
+                    description=f"Search {label} near {loc_name}",
                     error=str(e),
                     duration_s=round(time.time() - t0, 1),
                 ))
@@ -674,8 +691,21 @@ Intent guide:
             f"- {s.description}" for s in result.steps if not s.error
         )
 
+        failed = [s.description for s in result.steps if s.error]
+        # A failed lookup is stated in fixed wording after the model's text, so it can never be
+        # phrased as "there are none" or filled in from general knowledge.
+        gap_note = (" Not included because the data could not be retrieved: " + "; ".join(failed) + ".") if failed else ""
+        found_something = any(k not in ("geocoded", "caveats") for k in result.findings)
+        if failed and not found_something:
+            # Nothing but failures to report: a model asked to summarise this tends to say
+            # "none were found", which is wrong. Say plainly what could not be done.
+            reasons = "; ".join(f"{s.description} ({s.error})" for s in result.steps if s.error)
+            return f"This could not be answered: {reasons}. Please try again in a few minutes."
+
         prompt = f"""Summarize these spatial analysis findings in 2-4 sentences.
-Be specific with numbers and distances.
+Use ONLY the facts listed below and be specific with their numbers and distances.
+Do not add general knowledge about the place or anything that is not listed.
+Do not mention anything the steps below did not find.
 
 Goal: {result.goal}
 
@@ -698,7 +728,7 @@ Write a clear, concise summary:"""
                 timeout=60,
             )
             resp.raise_for_status()
-            return resp.json().get("message", {}).get("content", "").strip()
+            return resp.json().get("message", {}).get("content", "").strip() + gap_note
         except Exception:
             # Fallback: build summary from findings
             parts = [f"Analysis for: {result.goal}"]
@@ -711,4 +741,4 @@ Write a clear, concise summary:"""
                         f"Found {data['count']} {data['amenity_type']}(s) "
                         f"within {data['radius_m']}m of {loc}"
                     )
-            return ". ".join(parts)
+            return ". ".join(parts) + gap_note

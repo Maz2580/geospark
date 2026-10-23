@@ -162,6 +162,18 @@
   </footer>
 
   <script src="/assets/app.js"></script>
+  <script>
+    /* What the agent could not retrieve, and what the reader should know about the data */
+    function agentNotes(gaps, caveats, failedSteps) {
+      const items = [
+        ...(gaps || []).map(g => `Not retrieved: ${g}. This is unknown, not "none".`),
+        ...(failedSteps || []).map(s => `A step failed: ${s}`),
+        ...(caveats || []),
+      ];
+      if (!items.length) return '';
+      return `<ul class="caveats mt-2">${items.map(t => `<li class="caveat">${ICON_WARN}<span>${escapeHtml(t)}</span></li>`).join('')}</ul>`;
+    }
+  </script>
   <script src="/assets/liquid-logo.js" defer></script>
   <script>
     initTabs($('.container'));
@@ -279,6 +291,8 @@
           if (data.summary) {
             html += `<div class="result-card mt-1"><div class="metric"><span class="label">Summary</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(data.summary)}</span></div></div>`;
           }
+          html += agentNotes(data.response?.data_gaps, data.response?.caveats || data.response?.findings?.caveats,
+                             (data.response?.steps || []).filter(s => s.error).map(s => s.description));
           // Inline the specialist-specific response metadata if present
           if (data.response && Object.keys(data.response).length) {
             const resp = data.response;
@@ -322,6 +336,7 @@
         if (data.summary) {
           html += `<div class="result-card"><div class="metric"><span class="label">Summary</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(data.summary)}</span></div></div>`;
         }
+        html += agentNotes([], data.findings?.caveats, (data.steps || []).filter(s => s.error).map(s => s.description));
         // Steps as timeline
         if (data.steps?.length) {
           html += '<div class="mt-2"><strong class="text-sm">Execution Timeline</strong>';
@@ -362,6 +377,7 @@
         if (data.summary) {
           html += `<div class="result-card"><div class="metric"><span class="label">Summary</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(data.summary)}</span></div></div>`;
         }
+        html += agentNotes(data.data_gaps, data.caveats);
         // Core info
         html += resultCard([
           ['Address', data.address || '—'],
@@ -423,6 +439,10 @@
         });
 
         let html = '';
+        if (data.summary) {
+          html += `<div class="result-card"><div class="metric"><span class="label">Summary</span><span class="value" style="white-space:normal;font-family:var(--font-sans)">${escapeHtml(data.summary)}</span></div></div>`;
+        }
+        html += agentNotes(data.data_gaps, data.caveats);
         // Best result
         if (data.best) {
           html += '<div class="mt-1"><strong class="text-sm">Best Location</strong></div>';

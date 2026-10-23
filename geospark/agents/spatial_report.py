@@ -19,6 +19,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from geospark.agents.amenities import find_amenities
 from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
 from geospark.knowledge.loaders import OverpassLoader
@@ -26,7 +27,6 @@ from geospark.mcp_servers.launcher import MCPServerLauncher
 from geospark.protocol.provenance import Provenance, engine_provenance, source_provenance
 from geospark.runs import in_context
 from geospark.utils.aio import run_sync
-from geospark.utils.geo import overpass_bbox
 
 # The local model usually writes the summary in well under this; if it is
 # busy, the report uses its plain summary rather than keep the caller waiting.
@@ -88,6 +88,10 @@ class LocationReport(BaseModel):
     accessibility: list[AccessibilityScore] = Field(default_factory=list)
     # What could not be looked up, e.g. "nearby services", "weather"
     data_gaps: list[str] = Field(default_factory=list)
+    # Things a reader should know about the data, e.g. which source answered for nearby places
+    caveats: list[str] = Field(default_factory=list)
+    # How many of each service were found within the radius (all of them, not only those listed)
+    counts_by_type: dict[str, int] = Field(default_factory=dict)
     radius_m: float = 0.0
     admin_area: str = ""
     summary: str = ""
@@ -131,7 +135,7 @@ class LocationReport(BaseModel):
             spatial_context=SpatialContext(summary=self.summary, total_features=len(features),
                                            units={"distance_m": "metre", "elevation_m": "metre"}),
             provenance=self.provenance,
-            warnings=[f"No data: {gap}" for gap in self.data_gaps],
+            warnings=[f"No data: {gap}" for gap in self.data_gaps] + self.caveats,
         )
         return feature_collection(result, extra={"query": self.query, "radius_m": self.radius_m})
 
@@ -214,7 +218,6 @@ class SpatialReport:
         # Steps 2-3: elevation, weather, air quality and nearby amenities are
         # independent, so they are fetched at the same time. Amenities (the
         # public Overpass servers) usually take longest.
-        bbox = overpass_bbox(lat, lon, radius_m)
         with ThreadPoolExecutor(max_workers=4) as pool:
             elev_job = pool.submit(in_context(self._launcher.handle_tool_call), "get_elevation", {
                 "explanation": f"Elevation at {location}",
@@ -223,7 +226,7 @@ class SpatialReport:
             })
             weather_job = pool.submit(in_context(self._fetch_weather), lat, lon)
             air_job = pool.submit(in_context(self._fetch_air_quality), lat, lon)
-            amenities_job = pool.submit(in_context(self._overpass.load_amenities_by_type), bbox, check_services)
+            amenities_job = pool.submit(in_context(find_amenities), lat, lon, radius_m, check_services, self._overpass)
 
             elev = elev_job.result()
             if elev.get("status") == "success" and elev.get("result"):
@@ -237,8 +240,16 @@ class SpatialReport:
 
             # A failed lookup must not be reported as "no services nearby"
             amenities_checked = True
+            amenity_provenance: list[Provenance] = []
+            not_retrieved: set[str] = set()
             try:
-                by_type = amenities_job.result()
+                lookup = amenities_job.result()
+                by_type = lookup.by_type
+                amenity_provenance = lookup.provenance
+                report.caveats.extend(lookup.warnings)
+                not_retrieved = set(lookup.unavailable)
+                report.data_gaps.extend(f"nearby {svc} (OpenStreetMap unavailable, no reliable fallback)"
+                                        for svc in lookup.unavailable)
             except Exception:
                 by_type = {}
                 amenities_checked = False
@@ -263,12 +274,21 @@ class SpatialReport:
             report.data_gaps.append("air quality")
 
         all_nearby.sort(key=lambda x: x.distance_m)
-        report.nearby = all_nearby[:50]  # Cap at 50
+        for item in all_nearby:
+            report.counts_by_type[item.amenity_type] = report.counts_by_type.get(item.amenity_type, 0) + 1
+        # The nearest few of each type, so one common type (restaurants) can't crowd out the rest
+        per_type: dict[str, int] = {}
+        listed: list[NearbyItem] = []
+        for item in all_nearby:
+            if per_type.get(item.amenity_type, 0) < 10:
+                per_type[item.amenity_type] = per_type.get(item.amenity_type, 0) + 1
+                listed.append(item)
+        report.nearby = listed
 
         # Step 4: Accessibility scoring (nearest of each type)
         for svc in check_services:
             svc_items = [n for n in all_nearby if n.amenity_type == svc]
-            if not amenities_checked:
+            if not amenities_checked or svc in not_retrieved:
                 report.accessibility.append(AccessibilityScore(
                     service=svc,
                     available=False,
@@ -293,13 +313,12 @@ class SpatialReport:
             used_sources.append("open-meteo")
         if report.air_quality is not None:
             used_sources.append("openaq")
-        if amenities_checked:
-            used_sources.append("openstreetmap-overpass")
         seen: set[str] = set()
         for source in used_sources:
             if source not in seen:
                 seen.add(source)
                 report.provenance.append(source_provenance(source))
+        report.provenance.extend(p for p in amenity_provenance if p.source not in seen)
         report.provenance.append(engine_provenance("distance"))
 
         # Step 5: Generate narrative summary
@@ -372,9 +391,7 @@ class SpatialReport:
 
         import httpx
 
-        amenity_counts = {}
-        for n in report.nearby:
-            amenity_counts[n.amenity_type] = amenity_counts.get(n.amenity_type, 0) + 1
+        amenity_counts = dict(report.counts_by_type)
 
         access_lines = []
         for a in report.accessibility:
@@ -417,7 +434,7 @@ class SpatialReport:
             f"{air_line}"
             f"Search radius: {round(report.radius_m)}m\n"
             + (
-                f"Total nearby amenities found: {len(report.nearby)}\n"
+                f"Total nearby amenities found: {sum(amenity_counts.values())}\n"
                 f"By type: {json.dumps(amenity_counts)}\n"
                 f"Accessibility (nearest of each service type):\n" + "\n".join(access_lines)
                 if amenities_known

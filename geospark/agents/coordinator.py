@@ -31,10 +31,81 @@ _SITE_SELECT_PATTERNS = [
 ]
 _REPORT_PATTERNS = [
     r"\banalyze\s+(?:this\s+)?(?:location|place|area)\b",
+    # "Analyze Federation Square", "Profile Fitzroy, Melbourne", "Report on Bondi Beach"
+    r"^\s*(?:please\s+)?(?:analy[sz]e|profile|assess|describe|report\s+on|give\s+me\s+a\s+report\s+on)\s+\S",
+    r"\bwhat\s+is\s+(?:it\s+)?like\s+(?:around|near|in|at)\b",
     r"\b(?:location|area)\s+(?:report|intelligence|profile|dossier)\b",
     r"\btell\s+me\s+about\s+(?:this|the)\b",
     r"\bwhat.s\s+(?:near|around|in)\b.*\?",
 ]
+
+
+# --- turning a sentence into an agent's parameters ---------------------------------------------
+
+_REPORT_VERB = re.compile(
+    r"^\s*(?:please\s+)?(?:analy[sz]e|profile|assess|describe|report\s+on|give\s+me\s+a\s+report\s+on|"
+    r"tell\s+me\s+about|what\s+is\s+(?:it\s+)?like\s+(?:around|near|in|at))\s+(?:the\s+area\s+(?:around|of)\s+)?",
+    re.IGNORECASE,
+)
+
+
+def report_location(goal: str) -> str:
+    """The place in a report request: "Analyze Federation Square, Melbourne" -> "Federation Square, Melbourne"."""
+    return _REPORT_VERB.sub("", goal).strip().rstrip("?.!").strip() or goal.strip()
+
+
+_CLAUSE = r"\s+(?:near|close\s+to|next\s+to|around|away\s+from|far\s+from|avoid(?:ing)?|but|with|that|which|within)\b"
+_STOP = r"(?=" + _CLAUSE + r"|[,.?!]|$)"
+_STOP_KEEP_COMMAS = r"(?=" + _CLAUSE + r"|[.?!]|$)"  # "in Fitzroy, Melbourne" keeps its comma
+
+
+def _singular(word: str) -> str:
+    w = word.strip().lower()
+    if w.endswith("ies") and len(w) > 4:  # pharmacies, libraries, universities
+        return w[:-3] + "y"
+    if w.endswith("ches") or w.endswith("shes") or w.endswith("sses"):
+        return w[:-2]
+    if w.endswith("s") and not w.endswith("ss"):
+        return w[:-1]
+    return w
+
+
+def _things(text: str) -> list[str]:
+    """ "schools and hospitals" / "a school, a park" -> ["school", "hospital"] (OSM amenity values)."""
+    parts = re.split(r"\s*(?:,|\band\b|\bor\b|&)\s*", text)
+    out = []
+    for part in parts:
+        part = re.sub(r"^(?:a|an|the|some|any)\s+", "", part.strip(), flags=re.IGNORECASE)
+        if part:
+            out.append(_singular(part).replace(" ", "_"))
+    return list(dict.fromkeys(out))
+
+
+def parse_site_goal(goal: str) -> dict[str, Any]:
+    """Site-selection parameters from a sentence.
+
+    "Find the best location for a cafe in Melbourne CBD near schools" ->
+    {"facility_type": "cafe", "within": "Melbourne CBD", "near": ["school"], "avoid": []}
+    """
+    out: dict[str, Any] = {}
+    facility = re.search(
+        r"\b(?:for|(?:to|should\s+(?:i|we)|could\s+(?:i|we)|can\s+(?:i|we))\s+(?:open|put|place|build|start|locate))"
+        r"\s+(?:a|an|the|my|our)?\s*([a-z][a-z\s]*?)(?=\s+in\b|" + _CLAUSE + r"|[,.?!]|$)",
+        goal, re.IGNORECASE)
+    if facility:
+        out["facility_type"] = _singular(facility.group(1)).replace(" ", "_")
+    within = re.search(r"\bin\s+(.+?)" + _STOP_KEEP_COMMAS, goal, re.IGNORECASE)
+    if within:
+        out["within"] = within.group(1).strip()
+    near = re.search(r"\b(?:near|close\s+to|next\s+to|around)\s+(.+?)(?=\s+(?:but|away\s+from|far\s+from|avoid(?:ing)?|in)\b|[.?!]|$)",
+                     goal, re.IGNORECASE)
+    if near:
+        out["near"] = _things(near.group(1))
+    avoid = re.search(r"\b(?:away\s+from|far\s+from|avoid(?:ing)?)\s+(.+?)(?=\s+(?:but|near|close\s+to|in)\b|[.?!]|$)",
+                      goal, re.IGNORECASE)
+    if avoid:
+        out["avoid"] = _things(avoid.group(1))
+    return out
 
 
 class IntentClassification(BaseModel):
@@ -214,16 +285,17 @@ class AgentCoordinator:
 
             def _site_fn(msg: Msg) -> Msg:
                 selector = SiteSelector()
-                params = msg.metadata.get("parameters", {})
+                # Explicit parameters win; anything missing is read from the sentence itself
+                params = {**parse_site_goal(msg.content), **msg.metadata.get("parameters", {})}
                 within = params.get("within", "")
                 if not within:
-                    # Try to extract "in <place>" from goal
-                    match = re.search(r"\bin\s+([A-Z][A-Za-z\s]+)", msg.content)
-                    if match:
-                        within = match.group(1).strip()
+                    return Msg(role="assistant", sender="site_selector", receiver=msg.sender,
+                               content="Which area should I search? Add it to the request, for example "
+                                       "'... in Melbourne CBD'.",
+                               metadata={"candidates": [], "duration_s": 0.0})
 
                 result = selector.find(
-                    within=within or "Melbourne",
+                    within=within,
                     near=params.get("near", []),
                     avoid=params.get("avoid", []),
                     facility_type=params.get("facility_type", "restaurant"),
@@ -236,6 +308,11 @@ class AgentCoordinator:
                     content=result.summary,
                     metadata={
                         "candidates": [c.model_dump(mode="json") for c in result.candidates[:10]],
+                        "parameters": {"within": within, "near": params.get("near", []),
+                                       "avoid": params.get("avoid", []),
+                                       "facility_type": params.get("facility_type", "restaurant")},
+                        "data_gaps": result.data_gaps,
+                        "caveats": result.caveats,
                         "duration_s": result.duration_s,
                     },
                 )
@@ -261,7 +338,7 @@ class AgentCoordinator:
             def _report_fn(msg: Msg) -> Msg:
                 reporter = SpatialReport()
                 params = msg.metadata.get("parameters", {})
-                location = params.get("location") or msg.content
+                location = params.get("location") or report_location(msg.content)
                 result = reporter.analyze(
                     location=location,
                     radius_m=params.get("radius_m", 2000),
@@ -276,6 +353,8 @@ class AgentCoordinator:
                         "coordinates": result.coordinates,
                         "nearby": [n.model_dump(mode="json") for n in result.nearby[:20]],
                         "accessibility": [a.model_dump(mode="json") for a in result.accessibility],
+                        "data_gaps": result.data_gaps,
+                        "caveats": result.caveats,
                         "duration_s": result.duration_s,
                     },
                 )

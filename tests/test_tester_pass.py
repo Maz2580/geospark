@@ -291,3 +291,40 @@ def test_overture_supermarkets_are_grocery_stores() -> None:
     with patch("geospark.tools.overture.client.query", side_effect=overture):
         lookup = _from_overture(-37.8177, 144.9691, 1000, ["supermarket"])
     assert [e.name for e in lookup.by_type["supermarket"]] == ["Coles"]
+
+
+# --- Geocoding for Melbourne users --------------------------------------------------------------------
+
+def _candidate(name: str, importance: float, cc: str, category: str = "boundary", kind: str = "administrative") -> dict:
+    return {"type": "Feature", "geometry": {"type": "Point", "coordinates": [0, 0]},
+            "properties": {"display_name": name, "importance": importance, "category": category, "type": kind,
+                           "address": {"country_code": cc}}}
+
+
+def test_a_campus_under_construction_is_not_the_university(monkeypatch) -> None:
+    monkeypatch.delenv("GEOSPARK_GEOCODE_PREFER_COUNTRY", raising=False)
+    found = [_candidate("University of Melbourne (Future Fishermans Bend Campus)", 0.08, "au", "landuse", "construction"),
+             _candidate("University of Melbourne, Carlton", 0.08, "au", "landuse", "commercial")]
+    ranked, warnings = NominatimGeocoder._rank(found)
+    assert ranked[0]["properties"]["display_name"] == "University of Melbourne, Carlton" and not warnings
+
+
+def test_the_operators_country_wins_a_close_call_and_says_so(monkeypatch) -> None:
+    monkeypatch.setenv("GEOSPARK_GEOCODE_PREFER_COUNTRY", "au")
+    found = [_candidate("Braunschweig, Deutschland", 0.672, "de"), _candidate("Brunswick, Melbourne", 0.434, "au")]
+    ranked, warnings = NominatimGeocoder._rank(found)
+    assert ranked[0]["properties"]["display_name"] == "Brunswick, Melbourne"
+    assert "Braunschweig" in warnings[0] and "AU" in warnings[0]
+
+
+def test_a_preference_never_overrides_a_clear_answer(monkeypatch) -> None:
+    monkeypatch.setenv("GEOSPARK_GEOCODE_PREFER_COUNTRY", "au")
+    found = [_candidate("Paris, France", 0.95, "fr"), _candidate("Paris Creek, South Australia", 0.3, "au")]
+    ranked, warnings = NominatimGeocoder._rank(found)
+    assert ranked[0]["properties"]["display_name"] == "Paris, France" and not warnings
+
+
+def test_without_a_preference_nominatims_order_stands(monkeypatch) -> None:
+    monkeypatch.delenv("GEOSPARK_GEOCODE_PREFER_COUNTRY", raising=False)
+    found = [_candidate("Parkville, Maryland", 0.421, "us"), _candidate("Parkville, Melbourne", 0.402, "au")]
+    assert NominatimGeocoder._rank(found)[0][0]["properties"]["display_name"] == "Parkville, Maryland"

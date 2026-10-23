@@ -179,15 +179,17 @@ def _from_overture(lat: float, lon: float, radius_m: float, types: list[str]) ->
 def place_boundary(name: str) -> dict | None:
     """A place's boundary from Nominatim (simplified), or None if it has none (a point, e.g. a building)."""
     from geospark.tools.geocoding import client as nominatim_client
+    from geospark.tools.geocoding.nominatim import NominatimGeocoder
 
     try:
         data = nominatim_client.get_json("search", {
-            "q": name, "format": "geojson", "limit": 1,
+            "q": name, "format": "geojson", "limit": 10, "addressdetails": 1,
             "polygon_geojson": 1, "polygon_threshold": 0.0005,
         })
     except Exception:
         return None
-    features = (data or {}).get("features") or []
+    # The same ranking as geocoding, so "Parkville" is the same Parkville in both (not Maryland here)
+    features, _ = NominatimGeocoder._rank((data or {}).get("features") or [])
     geometry = features[0].get("geometry") if features else None
     if geometry and geometry.get("type") in ("Polygon", "MultiPolygon"):
         return dict(geometry)

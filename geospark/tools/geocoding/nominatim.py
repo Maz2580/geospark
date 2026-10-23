@@ -6,6 +6,7 @@ Uses OpenStreetMap's Nominatim service for geocoding and reverse geocoding.
 
 from __future__ import annotations
 
+import os
 from typing import ClassVar
 
 import httpx
@@ -57,7 +58,9 @@ class NominatimGeocoder(BaseTool):
                 {
                     "q": search_text,
                     "format": "geojson",
-                    "limit": query.limit,
+                    # Ask for enough candidates to re-rank, and their country (see _rank)
+                    "limit": max(query.limit, 10),
+                    "addressdetails": 1,
                 },
             )
         except (httpx.HTTPError, ValueError) as e:
@@ -72,6 +75,9 @@ class NominatimGeocoder(BaseTool):
         warnings: list[str] = []
         if not found and "," in search_text:
             found, warnings = self._search_inside(search_text, query.limit)
+        found, why = self._rank(found)
+        found = found[: query.limit]
+        warnings.extend(why)
 
         features = [
             SpatialFeature(
@@ -80,6 +86,7 @@ class NominatimGeocoder(BaseTool):
                     "display_name": f["properties"].get("display_name", ""),
                     "type": f["properties"].get("type", ""),
                     "importance": f["properties"].get("importance", 0),
+                    **({"country_code": cc} if (cc := _country(f)) else {}),
                 },
             )
             for f in found
@@ -94,6 +101,47 @@ class NominatimGeocoder(BaseTool):
             sources=["openstreetmap-nominatim"],
             warnings=warnings,
         )
+
+    # Kinds of match that are rarely what a name means, and how much importance they lose when ranking.
+    # Live: "University of Melbourne" came back first as a future campus still under construction,
+    # 4.6 km from the Parkville campus, so every distance from the university was wrong.
+    DEMOTE: ClassVar[dict[tuple[str, str], float]] = {
+        ("landuse", "construction"): 0.2, ("landuse", "brownfield"): 0.2, ("landuse", "greenfield"): 0.2,
+        ("highway", "bus_stop"): 0.05, ("highway", "platform"): 0.05, ("public_transport", "platform"): 0.05,
+        ("public_transport", "stop_position"): 0.05, ("railway", "platform"): 0.05,
+    }
+    PREFER_WINDOW: ClassVar[float] = 0.3  # how much importance a match in the preferred country may lack
+
+    @classmethod
+    def _rank(cls, found: list[dict]) -> tuple[list[dict], list[str]]:
+        """Re-rank Nominatim's candidates: unlikely kinds of match down, and, if the operator set
+        GEOSPARK_GEOCODE_PREFER_COUNTRY (e.g. "au"), a close match in that country first.
+
+        Live: "Parkville" was Parkville, Maryland and "Brunswick" Braunschweig, for a server whose
+        users are in Melbourne. A preference is only a tie-break among likely matches, and the result
+        says when it changed the answer, so a reader can add the country if they meant elsewhere.
+        """
+        if len(found) < 2:
+            return found, []
+
+        def score(f: dict) -> float:
+            props = f.get("properties") or {}
+            kind = (str(props.get("category") or ""), str(props.get("type") or ""))
+            return float(props.get("importance") or 0) - cls.DEMOTE.get(kind, 0.0)
+
+        ranked = sorted(found, key=score, reverse=True)  # stable: Nominatim's order breaks ties
+        warnings: list[str] = []
+        preferred = [c.strip().lower() for c in os.getenv("GEOSPARK_GEOCODE_PREFER_COUNTRY", "").split(",") if c.strip()]
+        if preferred and _country(ranked[0]) not in preferred:
+            best = score(ranked[0])
+            local = next((f for f in ranked if _country(f) in preferred and best - score(f) <= cls.PREFER_WINDOW), None)
+            if local is not None:
+                ranked.remove(local)
+                ranked.insert(0, local)
+                warnings.append(
+                    f"'{_name(local)}' was chosen over '{_name(ranked[1])}' because this server prefers places in "
+                    f"{', '.join(c.upper() for c in preferred)}. Add the country to the name if you meant another place.")
+        return ranked, warnings
 
     @staticmethod
     def _search_inside(search_text: str, limit: int) -> tuple[list[dict], list[str]]:
@@ -164,3 +212,11 @@ class NominatimGeocoder(BaseTool):
             ),
             sources=["openstreetmap-nominatim"],
         )
+
+
+def _country(feature: dict) -> str:
+    return str(((feature.get("properties") or {}).get("address") or {}).get("country_code") or "").lower()
+
+
+def _name(feature: dict) -> str:
+    return str((feature.get("properties") or {}).get("display_name") or "?")

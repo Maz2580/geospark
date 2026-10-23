@@ -33,6 +33,12 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
     then used a Mount Wellington in New York and searched for hospitals nobody asked about. The geocoder
     now searches for the name inside the named area (with a caveat), GeoAgent keeps comma-joined places
     together, answers elevation questions, and shows geocoding caveats such as an ambiguous name.
+  - **Melbourne questions** (most visitors are from the University of Melbourne): "University of
+    Melbourne" geocoded to a future campus under construction at Fishermans Bend, 4.6 km from Parkville,
+    so every distance from the university was wrong; "Parkville" was Maryland and "Brunswick"
+    Braunschweig. The geocoder now ranks construction sites and bus stops below real places, and an
+    operator can set `GEOSPARK_GEOCODE_PREFER_COUNTRY` (e.g. `au`) so a close call resolves to their
+    users' country, always with a caveat naming the other match. Boundaries use the same ranking.
 - **Second live test of all four agents (22 questions)** found and fixed:
   - "Is the Louvre inside Paris?" answered **No**: GeoAgent compared two geocoded points, and a point
     can't contain anything. It now fetches the container's boundary from OpenStreetMap (Nominatim,

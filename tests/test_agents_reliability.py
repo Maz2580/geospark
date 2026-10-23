@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import json
 from unittest.mock import patch
 
 import pytest
@@ -241,3 +242,40 @@ def test_geoagent_never_turns_a_failed_lookup_into_none_found() -> None:
     with patch("httpx.post", side_effect=AssertionError("the model must not be asked")):
         summary = agent._generate_summary(result)
     assert summary.startswith("This could not be answered") and "none" not in summary.lower()
+
+
+@pytest.mark.parametrize(("goal", "radius"), [
+    ("Find all hospitals within 2km of Federation Square, Melbourne", 2000),
+    ("Schools near Southbank within 500 m", 500),
+    ("Pharmacies within 1.5 kilometres of Bondi Beach", 1500),
+])
+def test_a_stated_distance_beats_the_models_guess(goal: str, radius: int) -> None:
+    """Live, the model sometimes dropped "within 2km" and searched its default 3 km."""
+    from unittest.mock import MagicMock
+
+    from geospark.agents.geo_agent import GeoAgent
+
+    reply = MagicMock()
+    reply.json.return_value = {"message": {"content": json.dumps({
+        "locations": ["Federation Square"], "intent": "find_nearby",
+        "params": {"amenity_type": "hospital", "radius_m": 3000}})}}
+    agent = GeoAgent.__new__(GeoAgent)
+    agent.__init__()
+    with patch("httpx.post", return_value=reply):
+        _, _, params = agent._parse_goal(goal)
+    assert params["radius_m"] == radius
+
+
+def test_without_a_stated_distance_the_models_value_stands() -> None:
+    from unittest.mock import MagicMock
+
+    from geospark.agents.geo_agent import GeoAgent
+
+    reply = MagicMock()
+    reply.json.return_value = {"message": {"content": json.dumps({
+        "locations": ["Fitzroy"], "intent": "find_nearby", "params": {"amenity_type": "cafe", "radius_m": 1000}})}}
+    agent = GeoAgent.__new__(GeoAgent)
+    agent.__init__()
+    with patch("httpx.post", return_value=reply):
+        _, _, params = agent._parse_goal("Cafes near Fitzroy")
+    assert params["radius_m"] == 1000

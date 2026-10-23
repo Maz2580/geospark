@@ -13,6 +13,7 @@ Usage:
 from __future__ import annotations
 
 import json
+import re
 import time
 from typing import Any, ClassVar
 
@@ -188,13 +189,28 @@ Intent guide:
             resp.raise_for_status()
             content = resp.json().get("message", {}).get("content", "{}")
             parsed = json.loads(content)
+            params = parsed.get("params") or {}
+            # A distance written in the question is a fact, not something for the model to guess:
+            # it sometimes drops "within 2km" and falls back to its default 3000.
+            stated = self._stated_radius(goal)
+            if stated:
+                params["radius_m"] = stated
             return (
                 parsed.get("locations", []),
                 parsed.get("intent", "find_nearby"),
-                parsed.get("params", {}),
+                params,
             )
         except Exception:
             return self._fallback_parse(goal)
+
+    @staticmethod
+    def _stated_radius(goal: str) -> int | None:
+        """A search distance written in the question ("within 2km", "500 m", "1.5 kilometres"), in metres."""
+        match = re.search(r"(\d+(?:\.\d+)?)\s*(km|kilometres?|kilometers?|m|metres?|meters?)\b", goal, re.I)
+        if not match:
+            return None
+        value, unit = float(match.group(1)), match.group(2).lower()
+        return int(value * 1000 if unit.startswith("k") else value)
 
     # Words that start a sentence or link phrases but are never place names on their own
     _NOT_PLACES: ClassVar[frozenset[str]] = frozenset({
@@ -265,13 +281,7 @@ Intent guide:
                 since_last += " "
         flush()
 
-        params: dict[str, Any] = {"radius_m": 3000}
-        radius = re.search(
-            r"(\d+(?:\.\d+)?)\s*(km|kilometres?|kilometers?|m|metres?|meters?)\b", goal, re.I
-        )
-        if radius:
-            value, unit = float(radius.group(1)), radius.group(2).lower()
-            params["radius_m"] = int(value * 1000 if unit.startswith("k") else value)
+        params: dict[str, Any] = {"radius_m": cls._stated_radius(goal) or 3000}
 
         gl = goal.lower()
         for phrase in sorted(cls._AMENITIES, key=len, reverse=True):

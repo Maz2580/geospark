@@ -4,6 +4,13 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Added
+- **`deploy/docker-compose.override.example.yml`**: the production stack (API, Ollama, Valhalla,
+  Overpass) as one tested file for anyone hosting GeoSpark, with the measured limits and settings.
+  `DEPLOY.md` gains "The full stack" (how to bring it up one service at a time) and a current
+  architecture diagram; `.env.example` adds `GEOSPARK_VALHALLA_URL`, `GEOSPARK_NOMINATIM_URL` and the
+  Ollama settings, which were missing.
+
 ### Fixed
 - **Second live test of all four agents (22 questions)** found and fixed:
   - "Is the Louvre inside Paris?" answered **No**: GeoAgent compared two geocoded points, and a point

@@ -5,13 +5,19 @@ Get GeoSpark live on a free VM with Cloudflare Tunnel. Total cost: $0/month.
 ## Architecture
 
 ```
-Internet --> Cloudflare Edge (SSL, DDoS) --> Tunnel --> VM:8000 (GeoSpark API)
-                                                        |
-                                                        +--> Supabase (remote DB)
-                                                        +--> OpenRouter (free LLMs)
+Internet --> Cloudflare Edge (SSL, DDoS) --> Tunnel --> geospark-api (127.0.0.1:8080)
+                                                          |   private network "geospark-net"
+                                                          +--> geospark-ollama    (local LLM: /ask, agents)
+                                                          +--> geospark-valhalla  (isochrones, travel times)
+                                                          +--> geospark-overpass  (OpenStreetMap queries)
+                                                          |
+                                                          +--> public data: Nominatim, Overture Maps (S3),
+                                                               Copernicus DEM, Open-Meteo; OpenRouter (optional)
 ```
 
-No public IP needed. No ports to open. No SSL certs to manage.
+No public IP needed. No ports to open. No SSL certs to manage. Only the API is required; the three
+services on the right are optional and each one is a block in
+[`docker-compose.override.example.yml`](docker-compose.override.example.yml) (see "The full stack" below).
 
 ## Running on a shared server (read this first)
 
@@ -69,6 +75,30 @@ sudo find / -xdev \( -path /proc -o -path /sys -o -path /run -o -path /tmp -o -p
 
 The last command should list only the operating system's own files (logs, timers), never anything
 from Docker or the new service.
+
+## The full stack (as run at geospark.terrascout.app)
+
+[`deploy/docker-compose.override.example.yml`](docker-compose.override.example.yml) is the production
+configuration: the API plus Ollama, Valhalla and Overpass, with the settings and limits that were measured
+and tested. Use it like this:
+
+1. `cp deploy/docker-compose.override.example.yml docker-compose.override.yml` (gitignored), and change the
+   `/mnt/geospark/...` paths and the Geofabrik region if yours differ. Delete the services you don't want.
+2. Start **one service at a time** with
+   `docker compose -f docker-compose.prod.yml -f docker-compose.override.yml up -d --no-deps <service>`,
+   and wait until it is healthy:
+   - `ollama`, then `docker exec geospark-ollama ollama pull qwen2.5:7b` (about 5 GB of memory while loaded);
+   - `valhalla`: builds its routing tiles (Australia: ~10 min, peak 4.2 GB, 3.8 GB on disk);
+   - `overpass`: builds its database (Australia: ~55 min, peak 5.3 GB, 8.5 GB on disk).
+3. Add the matching lines to `.env` (see [`.env.example`](../.env.example)) and recreate only the API:
+   `GEOSPARK_VALHALLA_URL=http://geospark-valhalla:8002` and
+   `GEOSPARK_OVERPASS_URL=http://geospark-overpass/api/interpreter`.
+4. Check: `/api/v1/isochrone` answers for a point in your region, the agents find nearby places in under a
+   second, and `docker ps` shows nothing else changed.
+
+Without Valhalla, reachable-area requests are refused in production. Without Overpass, the agents use the
+public Overpass servers (rate-limited) and fall back to Overture Maps. Without Ollama, `/ask` and the agents
+need an OpenRouter key.
 
 ## Step 1: Get a Free VM
 

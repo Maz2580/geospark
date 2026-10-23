@@ -1,0 +1,130 @@
+# The full GeoSpark stack as it runs at geospark.terrascout.app: the API plus a local language
+# model (Ollama), routing (Valhalla) and OpenStreetMap queries (Overpass), all on one private network.
+#
+#   cp deploy/docker-compose.override.example.yml docker-compose.override.yml
+#   # edit the /mnt/geospark/... paths if your data lives elsewhere, then start ONE service at a time:
+#   docker compose -f docker-compose.prod.yml -f docker-compose.override.yml up -d --no-deps ollama
+#
+# docker-compose.override.yml is gitignored, so `git pull` never overwrites your copy.
+# Every service is optional except `geospark`; delete the blocks you don't want, and the matching
+# lines in .env (see .env.example) and in the `geospark` service below.
+#
+# Conventions (deploy/DEPLOY.md, "Running on a shared server"):
+# - each service's data is a bind mount under /mnt/geospark/<service> (nothing in anonymous volumes);
+# - only the private `geospark-net` network; no published ports except Ollama on 127.0.0.1;
+# - limits from measured runs; json-file logs capped; run as uid 1000 where the image allows.
+#
+# Measured for Australia (2026-10): Valhalla builds in ~10 min (peak 4.2 GB, 3.8 GB disk, ~150 MB
+# serving); Overpass builds in ~55 min (peak 5.3 GB, 8.5 GB disk, ~100 MB serving); Ollama with
+# qwen2.5:7b uses ~5 GB while the model is loaded.
+
+services:
+  # The API (defined in docker-compose.prod.yml): connect it to the other services
+  geospark:
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - GEOSPARK_OLLAMA_MODEL=qwen2.5:7b
+    depends_on:
+      - ollama
+    networks:
+      - geospark-net
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # Local language model for /ask and the agents. Pull the model once after starting:
+  #   docker exec geospark-ollama ollama pull qwen2.5:7b
+  ollama:
+    image: ollama/ollama:latest          # pin a version tag for reproducible deploys
+    container_name: geospark-ollama
+    ports:
+      - "127.0.0.1:11434:11434"          # local only, for maintenance; GeoSpark uses the network
+    volumes:
+      - /mnt/geospark/ollama:/root/.ollama
+    environment:
+      - OLLAMA_MAX_LOADED_MODELS=1
+      # Keep the model loaded: after an unload the first request waits ~1 min and agents time out
+      - OLLAMA_KEEP_ALIVE=24h
+    restart: unless-stopped
+    networks:
+      - geospark-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+  # Routing: isochrones and travel times. .env: GEOSPARK_VALHALLA_URL=http://geospark-valhalla:8002
+  # Use your region's Geofabrik extract. Points outside it are refused, not approximated.
+  valhalla:
+    image: ghcr.io/valhalla/valhalla-scripted:3.9.1
+    container_name: geospark-valhalla
+    user: "1000:1000"
+    volumes:
+      - /mnt/geospark/valhalla:/custom_files
+    environment:
+      - tile_urls=https://download.geofabrik.de/australia-oceania/australia-latest.osm.pbf
+      - server_threads=2                # 8 threads crashed the build in testing
+      - build_elevation=False
+      - build_transit=False
+      - use_tiles_ignore_pbf=True       # restarts reuse the built tiles
+    restart: unless-stopped
+    networks:
+      - geospark-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+          cpus: "2"
+
+  # OpenStreetMap queries for the agents' nearby-place lookups, so they don't depend on the
+  # rate-limited public servers. .env: GEOSPARK_OVERPASS_URL=http://geospark-overpass/api/interpreter
+  # For a region other than Australia, also set GEOSPARK_OVERPASS_POLY to its Geofabrik .poly file.
+  # Full plan and measurements: deploy/OVERPASS_SELFHOST_PLAN.md
+  overpass:
+    image: wiktorn/overpass-api:v0.7.62.11
+    container_name: geospark-overpass
+    # No `user:`: supervisord must start as root; the database runs as the image's `overpass`
+    # user, which is uid/gid 1000, and owns everything in /db.
+    volumes:
+      - /mnt/geospark/overpass:/db
+    environment:
+      - OVERPASS_MODE=init
+      - OVERPASS_META=no
+      - OVERPASS_PLANET_URL=https://download.geofabrik.de/australia-oceania/australia-latest.osm.pbf
+      - OVERPASS_DIFF_URL=https://download.geofabrik.de/australia-oceania/australia-updates/
+      - OVERPASS_PLANET_PREPROCESS=mv /db/planet.osm.bz2 /db/planet.osm.pbf && osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf && rm /db/planet.osm.pbf
+      - OVERPASS_USE_AREAS=false
+      - OVERPASS_STOP_AFTER_INIT=false
+      - OVERPASS_UPDATE_SLEEP=3600
+      - OVERPASS_ALLOW_DUPLICATE_QUERIES=yes   # the default "no" refused parallel queries
+      - OVERPASS_MAX_TIMEOUT=60s
+      - OVERPASS_FASTCGI_PROCESSES=4
+    restart: unless-stopped
+    networks:
+      - geospark-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+          cpus: "2"
+
+networks:
+  geospark-net:
+    name: geospark-net
+    driver: bridge

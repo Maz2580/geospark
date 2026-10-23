@@ -39,8 +39,11 @@ def _coordinates_supplied_by_model(tool: str, args: dict[str, Any]) -> list[tupl
                 if pt:
                     out.append(pt)
     elif tool == "check_spatial_relationship":
-        out.extend(pt for pt in (_point_coords(args.get("geometry_a")), _point_coords(args.get("geometry_b"))) if pt)
-    elif tool in ("get_elevation", "spatial_operation", "reverse_geocode"):
+        out.extend(pt for side in ("a", "b") if not args.get(f"place_{side}")
+                   and (pt := _point_coords(args.get(f"geometry_{side}"))))
+    elif tool in ("get_elevation", "spatial_operation", "reverse_geocode", "find_nearby_places", "get_weather"):
+        if args.get("place"):
+            return out  # looked up by the server
         lat, lon = args.get("latitude"), args.get("longitude")
         if isinstance(lat, (int, float)) and isinstance(lon, (int, float)):
             out.append((float(lon), float(lat)))
@@ -57,11 +60,20 @@ def _from_tool_reply(tool: str, body: Any) -> list[tuple[float, float]]:
             pt = _point_coords((f or {}).get("geometry"))
             if pt:
                 out.append(pt)
-    for place in body.get("places") or []:
+    places = list(body.get("places") or [])
+    if isinstance(body.get("place"), dict):
+        places.append(body["place"])
+    for place in places:
         c = (place or {}).get("coordinates")
         if isinstance(c, (list, tuple)) and len(c) >= 2:
             out.append((float(c[0]), float(c[1])))
     return out
+
+
+def _failed(reply: Any) -> bool:
+    if not isinstance(reply, dict):
+        return True
+    return reply.get("status") == "error" or bool(reply.get("errors") and not reply.get("result"))
 
 
 def _matches(pt: tuple[float, float], trusted: list[tuple[float, float]]) -> bool:
@@ -96,7 +108,8 @@ def answer_to_result(answer: Any, model_source: str, question: str = "") -> Spat
     trusted: list[tuple[float, float]] = []
     numbers = [float(n) for n in _NUMBER.findall(question or "")]
     failed_tools = unverified = 0
-    for call in answer.tool_calls:
+    calls = list(answer.tool_calls)
+    for index, call in enumerate(calls):
         tool = str(call.get("tool"))
         args = call.get("args") if isinstance(call.get("args"), dict) else {}
         reply = call.get("result") if isinstance(call.get("result"), dict) else {}
@@ -110,11 +123,16 @@ def answer_to_result(answer: Any, model_source: str, question: str = "") -> Spat
                 "are not in the question, so the model may have supplied them from memory. The result is "
                 "computed exactly, but possibly for the wrong places."
             )
-        if reply.get("status") == "error" or (reply.get("errors") and not reply.get("result")):
+        if _failed(reply):
             err = reply.get("error") or {}
-            message = err.get("message") if isinstance(err, dict) else None
-            failed_tools += 1
-            warnings.append(f"Tool {tool} failed: {message or (reply.get('errors') or ['unknown error'])[0]}")
+            message = err.get("message") or "" if isinstance(err, dict) else ""
+            message = message or (reply.get("errors") or ["unknown error"])[0]
+            if any(str(later.get("tool")) == tool and not _failed(later.get("result")) for later in calls[index + 1:]):
+                # The model read the error and called the tool again correctly: not a gap in the answer
+                warnings.append(f"A first {tool} call failed ({message}); it was retried successfully.")
+            else:
+                failed_tools += 1
+                warnings.append(f"Tool {tool} failed: {message}")
             continue
         meta = reply.get("metadata") or {}
         for item in meta.get("provenance") or []:
@@ -134,12 +152,24 @@ def answer_to_result(answer: Any, model_source: str, question: str = "") -> Spat
         if tool in ("geocode", "reverse_geocode") and found:
             with contextlib.suppress(Exception):
                 features.append(SpatialFeature(**found[0]))  # the best match is the one the model used
+        if isinstance(body, dict) and isinstance(body.get("place"), dict):
+            body = {**body, "places": [*(body.get("places") or []), body["place"]]}
         for place in (body.get("places") or []) if isinstance(body, dict) else []:
+            if not place.get("coordinates"):
+                continue
             with contextlib.suppress(Exception):
                 features.append(SpatialFeature(
                     geometry={"type": "Point", "coordinates": place["coordinates"]},
                     properties={"display_name": place.get("display_name") or place.get("query")},
                 ))
+        if tool == "find_nearby_places" and isinstance(body, dict):
+            for kind, items in (body.get("nearest") or {}).items():
+                for item in items:
+                    with contextlib.suppress(Exception):
+                        features.append(SpatialFeature(
+                            geometry={"type": "Point", "coordinates": item["coordinates"][:2]},
+                            properties={"name": item.get("name"), "type": kind, "distance_m": item.get("distance_m")},
+                        ))
     if failed_tools:
         quality["failed_tools"] = failed_tools
     if unverified:

@@ -389,9 +389,6 @@
       if (!confirm('Delete this saved flow? This will also delete its run history.')) return;
       const el = $('#saved-flows-list');
       try {
-        await geo.post(`/api/v1/flows/${encodeURIComponent(id)}/run`); // no DELETE via geo.post helper... use fetch directly
-      } catch (e) {}
-      try {
         const resp = await fetch(`/api/v1/flows/${encodeURIComponent(id)}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
         if (!resp.ok) throw new Error(`${resp.status}: ${await resp.text()}`);
         loadSavedFlows();
@@ -462,14 +459,32 @@
     }
 
     /* ========== SHARED RENDERERS ========== */
+    // Each step's outcome in words: its key value, or why it failed or was not run
+    function stepTable(results) {
+      const keys = Object.keys(results || {});
+      if (!keys.length) return '';
+      const shown = ['display_name', 'distance_km', 'distance_m', 'elevation_m', 'area_m2', 'area_km2'];
+      const rows = keys.map(k => {
+        const r = results[k] || {};
+        const color = r.status === 'success' ? 'ok' : r.status === 'error' ? 'error' : 'warn';
+        const vals = r.values || {};
+        const value = shown.filter(f => vals[f] != null).map(f => `${f.replace(/_/g, ' ')}: ${typeof vals[f] === 'number' ? fmt(vals[f]) : vals[f]}`);
+        const detail = [...value, ...(r.errors || []), ...(r.warnings || []), ...(r.note ? [r.note] : [])];
+        return `<tr><td><code>${escapeHtml(k)}</code></td><td><span class="badge ${color}">${escapeHtml(r.status || '?')}</span></td>
+          <td class="text-sm">${detail.map(d => escapeHtml(String(d))).join('<br>') || '<span class="text-muted">&mdash;</span>'}</td></tr>`;
+      }).join('');
+      return `<table class="table-wrap mt-2"><thead><tr><th>Step</th><th>Status</th><th>Result</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+
     function renderRunResult(el, data) {
       const statusColor = data.status === 'completed' ? 'ok' : data.status === 'failed' ? 'error' : 'warn';
       el.innerHTML = `
         <div class="result-card">
           <div class="metric"><span class="label">Status</span><span class="value"><span class="badge ${statusColor}">${escapeHtml(data.status)}</span></span></div>
           <div class="metric"><span class="label">Flow</span><span class="value">${escapeHtml(data.flow_name || data.flow_id || '')}</span></div>
-          <div class="metric"><span class="label">Steps Completed</span><span class="value">${data.steps_completed ?? '?'}</span></div>
+          <div class="metric"><span class="label">Steps succeeded</span><span class="value">${data.steps_completed ?? '?'}${data.steps_total ? ' of ' + data.steps_total : ''}</span></div>
           <div class="metric"><span class="label">Run ID</span><span class="value"><code>${escapeHtml(data.run_id || data.id || '')}</code></span></div>
+          ${stepTable(data.step_results)}
         </div>
         ${jsonToggle(data, 'run-result-json')}
       `;

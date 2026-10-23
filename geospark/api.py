@@ -687,8 +687,8 @@ async def flow_get_template(template_name: str):
     try:
         f = get_template(template_name)
         return f.model_dump()
-    except KeyError:
-        raise HTTPException(status_code=404, detail=f"Template not found: {template_name}") from None
+    except (KeyError, ValueError) as e:  # get_template raises ValueError for an unknown name
+        raise HTTPException(status_code=404, detail=str(e)) from None
 
 
 @app.post("/api/v1/flows/templates/{template_name}/run", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
@@ -698,8 +698,10 @@ def flow_run_template(template_name: str, request: TemplateRunRequest):
 
     try:
         f = get_template(template_name, **request.parameters)
-    except KeyError:
-        raise HTTPException(status_code=404, detail=f"Template not found: {template_name}") from None
+    except (KeyError, ValueError) as e:  # get_template raises ValueError for an unknown name
+        raise HTTPException(status_code=404, detail=str(e)) from None
+    except TypeError as e:  # a parameter of the wrong kind
+        raise HTTPException(status_code=422, detail=str(e)) from None
 
     engine = get_engine()
     runner = FlowRunner(engine=engine)
@@ -709,7 +711,8 @@ def flow_run_template(template_name: str, request: TemplateRunRequest):
         "run_id": str(run.id),
         "flow_name": f.name,
         "status": run.status,
-        "steps_completed": len(run.step_results),
+        "steps_completed": sum(1 for r in run.step_results.values() if r.get("status") == "success"),
+        "steps_total": len(f.steps),
         "step_results": run.step_results,
         "errors": run.errors,
     }

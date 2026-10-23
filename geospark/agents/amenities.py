@@ -34,20 +34,35 @@ OVERTURE_MIN_CONFIDENCE = 0.6
 # hospitals near the Eiffel Tower). If OpenStreetMap is down these are reported as not retrieved.
 NO_FALLBACK = frozenset({"hospital", "clinic", "doctors", "dentist"})
 
-# OSM amenity value -> (Overture search term, Overture categories accepted)
+# OSM amenity value -> (Overture search term, Overture categories accepted). A place matches on its
+# taxonomy (e.g. "grocery_store") when it has one, otherwise on its basic category; the terms were
+# checked against Overture near the University of Melbourne (2026-10): "supermarket", "university"
+# and "police" match nothing in Overture, so supermarkets were reported as none near the CBD.
 OVERTURE_CATEGORIES: dict[str, tuple[str, frozenset[str]]] = {
-    "school": ("school", frozenset({"school", "elementary_school", "middle_school", "high_school"})),
+    "school": ("school", frozenset({"school", "elementary_school", "middle_school", "high_school",
+                                    "private_school", "public_school"})),
     "kindergarten": ("preschool", frozenset({"preschool", "kindergarten"})),
-    "university": ("university", frozenset({"college_university", "university"})),
+    "university": ("college_university", frozenset({"college_university", "university"})),
     "pharmacy": ("pharmacy", frozenset({"pharmacy", "pharmacy_and_drug_store", "drugstore"})),
     "restaurant": ("restaurant", frozenset({"restaurant"})),
     "cafe": ("cafe", frozenset({"cafe", "coffee_shop"})),
     "bank": ("bank", frozenset({"bank", "bank_or_credit_union"})),
-    "supermarket": ("supermarket", frozenset({"supermarket", "grocery_store"})),
+    "supermarket": ("grocery_store", frozenset({"grocery_store", "supermarket"})),
     "library": ("library", frozenset({"library", "public_library"})),
-    "police": ("police", frozenset({"police_department", "police_station"})),
+    "police": ("police_station", frozenset({"police_department", "police_station"})),
     "fire_station": ("fire_station", frozenset({"fire_department", "fire_station"})),
 }
+
+
+def _accepted(properties: dict, amenity: str, accepted: frozenset[str]) -> bool:
+    """Does an Overture place count as this amenity? Its taxonomy decides ("grocery_store"), or its
+    basic category when the taxonomy is a kind of it ("italian_restaurant") or missing."""
+    taxonomy = str(properties.get("taxonomy") or "").lower()
+    category = str(properties.get("category") or "").lower()
+    if taxonomy in accepted:
+        return True
+    return category in accepted and (not taxonomy or taxonomy.endswith(f"_{amenity}"))
+
 
 _lock = threading.Lock()
 _overpass_down_until = 0.0
@@ -139,7 +154,7 @@ def _from_overture(lat: float, lon: float, radius_m: float, types: list[str]) ->
         entities = []
         for f in result.features:
             p = f.properties
-            if str(p.get("category") or "").lower() not in accepted:
+            if not _accepted(p, amenity, accepted):
                 continue
             if (p.get("confidence") or 0) < OVERTURE_MIN_CONFIDENCE:
                 continue
@@ -164,15 +179,17 @@ def _from_overture(lat: float, lon: float, radius_m: float, types: list[str]) ->
 def place_boundary(name: str) -> dict | None:
     """A place's boundary from Nominatim (simplified), or None if it has none (a point, e.g. a building)."""
     from geospark.tools.geocoding import client as nominatim_client
+    from geospark.tools.geocoding.nominatim import NominatimGeocoder
 
     try:
         data = nominatim_client.get_json("search", {
-            "q": name, "format": "geojson", "limit": 1,
+            "q": name, "format": "geojson", "limit": 10, "addressdetails": 1,
             "polygon_geojson": 1, "polygon_threshold": 0.0005,
         })
     except Exception:
         return None
-    features = (data or {}).get("features") or []
+    # The same ranking as geocoding, so "Parkville" is the same Parkville in both (not Maryland here)
+    features, _ = NominatimGeocoder._rank((data or {}).get("features") or [])
     geometry = features[0].get("geometry") if features else None
     if geometry and geometry.get("type") in ("Polygon", "MultiPolygon"):
         return dict(geometry)

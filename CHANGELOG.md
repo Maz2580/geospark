@@ -12,6 +12,33 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
   Ollama settings, which were missing.
 
 ### Fixed
+- **Testing the live site as an outside user** found and fixed:
+  - **Flows**: every template failed at its first step (the runner never passed `address` to the
+    geocoder or the geocoded point to later steps) and the run still reported "completed". Parameters
+    and `{step.key}` references now reach the tools, a step whose input failed is skipped with the
+    reason, and a run with a failed step is "failed". The NDVI template now stops honestly: NDVI values
+    are not computed yet. The Flows page shows each step's result, and its Delete button no longer runs
+    the flow first. An unknown template is a 404, not a 500.
+  - **Ask** gave Mount Kosciuszko's height as 1,249 m (the model typed coordinates from memory) and
+    said the Eiffel Tower is not in Paris (it compared two points). `get_elevation` now takes a place
+    name, and `check_spatial_relationship` takes place names and uses the outer place's boundary; a
+    point given as the container is refused. Ask gains `find_nearby_places` ("how many hospitals within
+    1 km of ...", which it had answered with a buffer's area) and `get_weather` (it said it couldn't).
+    A tool call that failed and was then retried correctly no longer marks the answer partial.
+  - **Supermarkets, parks, hotels, playgrounds and bus stops always counted as zero**: only `amenity=*`
+    was queried in OpenStreetMap, and they are `shop=`, `leisure=`, `tourism=` and `highway=`. The
+    Overture fallback had the same problem with its own names (supermarkets are `grocery_store`, police
+    `police_station`, universities `college_university`).
+  - "Mount Wellington, Hobart" found nothing (the peak's address doesn't name Hobart), and GeoAgent
+    then used a Mount Wellington in New York and searched for hospitals nobody asked about. The geocoder
+    now searches for the name inside the named area (with a caveat), GeoAgent keeps comma-joined places
+    together, answers elevation questions, and shows geocoding caveats such as an ambiguous name.
+  - **Melbourne questions** (most visitors are from the University of Melbourne): "University of
+    Melbourne" geocoded to a future campus under construction at Fishermans Bend, 4.6 km from Parkville,
+    so every distance from the university was wrong; "Parkville" was Maryland and "Brunswick"
+    Braunschweig. The geocoder now ranks construction sites and bus stops below real places, and an
+    operator can set `GEOSPARK_GEOCODE_PREFER_COUNTRY` (e.g. `au`) so a close call resolves to their
+    users' country, always with a caveat naming the other match. Boundaries use the same ranking.
 - **Second live test of all four agents (22 questions)** found and fixed:
   - "Is the Louvre inside Paris?" answered **No**: GeoAgent compared two geocoded points, and a point
     can't contain anything. It now fetches the container's boundary from OpenStreetMap (Nominatim,
@@ -32,7 +59,8 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
     several buildings) no longer counts as "a nearby school".
   - The Spatial Report says air quality needs an OpenAQ API key instead of "could not be retrieved".
   - "Is Federation Square in Melbourne?" failed with "Unknown relationship: null": the model returned the
-    string "null". Only real predicate names are accepted; anything else comes from the wording.
+    string "null", and then "contains" (the reverse). The question's wording ("in", "inside", "within",
+    "contains") now always decides the relationship, like a stated distance.
   - The Agents page's default examples are Australian, where the self-hosted Overpass answers in
     under a second; places elsewhere still use the public servers.
 - GeoAgent uses a distance written in the question ("within 2km", "500 m") even when the model's

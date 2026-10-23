@@ -5,8 +5,8 @@ from typing import Any, ClassVar
 
 from geospark.engine.core import Engine
 from geospark.engine.spatial_reasoner import SpatialReasoner
-from geospark.mcp_servers.base import BaseMCPServer, verification
-from geospark.protocol.provenance import enrich
+from geospark.mcp_servers.base import BaseMCPServer, geocode_place, merge_lookups, verification
+from geospark.protocol.provenance import enrich, source_provenance
 from geospark.protocol.schema import (
     Point,
     SpatialFeature,
@@ -29,9 +29,11 @@ class SpatialReasoningServer(BaseMCPServer):
         {
             "name": "check_spatial_relationship",
             "description": (
-                "Check the topological relationship between two geometries with "
-                "ground-truth accuracy (100%). Use when the user asks whether "
-                "geometries contain, intersect, overlap, or touch each other. "
+                "Check the topological relationship between two places or geometries exactly. "
+                "Use when the user asks whether something is in, inside, contains, intersects, "
+                "overlaps or touches something else. For NAMED places pass place_a and place_b as "
+                "names: the server uses the outer place's boundary. 'Is A in B?' is place_a=A, "
+                "place_b=B, relationship='within'. "
                 "Do NOT use for distance calculations or address lookups."
             ),
             "inputSchema": {
@@ -41,13 +43,21 @@ class SpatialReasoningServer(BaseMCPServer):
                         "type": "string",
                         "description": "One sentence explaining WHY you are checking this relationship.",
                     },
+                    "place_a": {
+                        "type": "string",
+                        "description": "First place by NAME, resolved on the server. Preferred.",
+                    },
+                    "place_b": {
+                        "type": "string",
+                        "description": "Second place by NAME, resolved on the server. Preferred.",
+                    },
                     "geometry_a": {
                         "type": "object",
-                        "description": "First geometry in GeoJSON format.",
+                        "description": "First geometry in GeoJSON format, if you have one (not for named places).",
                     },
                     "geometry_b": {
                         "type": "object",
-                        "description": "Second geometry in GeoJSON format.",
+                        "description": "Second geometry in GeoJSON format, if you have one (not for named places).",
                     },
                     "relationship": {
                         "type": "string",
@@ -55,10 +65,10 @@ class SpatialReasoningServer(BaseMCPServer):
                             "contains", "intersects", "within", "touches",
                             "crosses", "overlaps", "disjoint",
                         ],
-                        "description": "The topological relationship to check.",
+                        "description": "The relationship of the first to the second (A within B, A contains B).",
                     },
                 },
-                "required": ["explanation", "geometry_a", "geometry_b", "relationship"],
+                "required": ["explanation", "relationship"],
             },
         },
         {
@@ -131,7 +141,6 @@ class SpatialReasoningServer(BaseMCPServer):
 
     def __init__(self) -> None:
         self.engine = Engine()
-        self._geocoder: Engine | None = None  # created on first use of a place name
 
     def _get_handlers(self) -> dict[str, Any]:
         return {
@@ -140,20 +149,60 @@ class SpatialReasoningServer(BaseMCPServer):
             "spatial_operation": self._handle_operation,
         }
 
+    # A relationship that asks whether one thing lies inside the other: the outer one needs an area
+    _CONTAINMENT: ClassVar[dict[str, str]] = {"within": "b", "contains": "a"}
+
     def _handle_relationship(self, args: dict[str, Any]) -> dict[str, Any]:
-        holds = SpatialReasoner.check_relationship(
-            args["geometry_a"], args["geometry_b"], args["relationship"]
-        )
-        checked = enrich(SpatialResult(), args["relationship"], [args["geometry_a"], args["geometry_b"]])
+        """Named places are resolved here: the container to its boundary, the other to a point."""
+        from geospark.agents import amenities
+
+        relationship = str(args.get("relationship"))
+        outer = self._CONTAINMENT.get(relationship)
+        geometries: dict[str, dict[str, Any]] = {}
+        lookups: list[SpatialResult] = []
+        resolved: dict[str, dict[str, Any]] = {}
+        for side in ([outer, "b" if outer == "a" else "a"] if outer else ["a", "b"]):  # the outer place first
+            name, geometry = args.get(f"place_{side}"), args.get(f"geometry_{side}")
+            if isinstance(name, str) and name.strip():
+                name = name.strip()
+                if outer is None or side == outer:
+                    boundary = amenities.place_boundary(name)
+                    if boundary is not None:
+                        geometries[side] = boundary
+                        resolved[side] = {"query": name, "used": "boundary (OpenStreetMap, simplified)"}
+                        continue
+                    if side == outer:
+                        return {"result": None, "errors": [
+                            f"'{name}' has no boundary in OpenStreetMap (it is a point there), so whether "
+                            "something lies inside it can't be checked."]}
+                point, place, found = geocode_place(name)
+                if point is None:
+                    return {"result": None, "errors": [place["error"]],
+                            "suggestion": "Add the city or country to the place name."}
+                geometries[side] = point
+                resolved[side] = {**place, "used": "point"}
+                lookups.append(found)
+            elif isinstance(geometry, dict):
+                geometries[side] = geometry
+            else:
+                return {"result": None, "errors": [f"Give place_{side} (a name) or geometry_{side} (GeoJSON)."]}
+        places = [resolved[side] for side in ("a", "b") if side in resolved]
+        if outer and geometries[outer].get("type") in ("Point", "MultiPoint"):
+            return {"result": None, "errors": [
+                "The outer geometry is a point, which has no area, so nothing can be inside it. Pass the "
+                "places by name (place_a, place_b) and the server uses the outer place's boundary."]}
+        holds = SpatialReasoner.check_relationship(geometries["a"], geometries["b"], relationship)
+        checked = enrich(SpatialResult(), relationship, [geometries["a"], geometries["b"]])
+        merge_lookups(checked, lookups)
+        if any(p["used"].startswith("boundary") for p in places):
+            checked.provenance.insert(0, source_provenance("openstreetmap-nominatim"))
+        result: dict[str, Any] = {"relationship": relationship, "holds": holds}
+        if places:
+            result["places"] = places
         return {
-            "result": {"relationship": args["relationship"], "holds": holds},
+            "result": result,
             "metadata": {"method": "ground_truth_topology", "crs": "EPSG:4326", **verification(checked)},
         }
-
-    def _geocode(self, name: str) -> SpatialResult:
-        if self._geocoder is None:
-            self._geocoder = Engine(tools=["geocoder"])
-        return self._geocoder.execute(SpatialQuery(operation=SpatialOperation.GEOCODE, metadata={"query": name}))
 
     def _handle_distance(self, args: dict[str, Any]) -> dict[str, Any]:
         """Distance between two places. Named places are geocoded here, so the model never has to
@@ -164,15 +213,12 @@ class SpatialReasoningServer(BaseMCPServer):
         for side in ("a", "b"):
             name, point = args.get(f"place_{side}"), args.get(f"point_{side}")
             if isinstance(name, str) and name.strip():
-                found = self._geocode(name.strip())
-                if not found.features:
-                    reason = found.errors[0] if found.errors else f"No place called '{name}' was found."
-                    return {"result": None, "errors": [reason],
+                geometry, place, found = geocode_place(name.strip())
+                if geometry is None:
+                    return {"result": None, "errors": [place["error"]],
                             "suggestion": "Add the city or country to the place name, or call geocode first."}
-                best = found.features[0]
-                points[side] = best.geometry if isinstance(best.geometry, dict) else best.geometry.model_dump()
-                places.append({"query": name, "display_name": best.properties.get("display_name"),
-                               "coordinates": points[side]["coordinates"]})
+                points[side] = geometry
+                places.append({**place, "query": name})
                 lookups.append(found)
             elif isinstance(point, dict):
                 points[side] = point
@@ -184,13 +230,7 @@ class SpatialReasoningServer(BaseMCPServer):
         checked = enrich(
             SpatialResult(features=[SpatialFeature(geometry=points["a"], properties=values)]), "distance"
         )
-        for found in lookups:  # where the places came from, and any ambiguity, travel with the distance
-            checked.provenance = [*found.provenance, *checked.provenance]
-            checked.warnings.extend(w for w in found.warnings if w not in checked.warnings)
-        unique: dict[tuple[str, str | None], Any] = {}
-        for p in checked.provenance:  # one entry per source and method, however many lookups used it
-            unique.setdefault((p.source, p.method), p)
-        checked.provenance = list(unique.values())
+        merge_lookups(checked, lookups)  # where the places came from, and any ambiguity
         result: dict[str, Any] = dict(values)
         if places:
             result["places"] = places

@@ -328,3 +328,51 @@ def test_without_a_preference_nominatims_order_stands(monkeypatch) -> None:
     monkeypatch.delenv("GEOSPARK_GEOCODE_PREFER_COUNTRY", raising=False)
     found = [_candidate("Parkville, Maryland", 0.421, "us"), _candidate("Parkville, Melbourne", 0.402, "au")]
     assert NominatimGeocoder._rank(found)[0][0]["properties"]["display_name"] == "Parkville, Maryland"
+
+
+# --- After a deploy -------------------------------------------------------------------------------
+
+def test_when_both_models_fail_the_visitor_reads_why_in_words(monkeypatch) -> None:
+    from geospark.engine.core import Engine
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    with patch.object(Engine, "_ask_ollama", return_value=SpatialResult(errors=["Ollama call failed: timed out"])), \
+         patch.object(Engine, "_ask_openrouter", return_value=SpatialResult(errors=["OpenRouter call failed: 404"])):
+        result = Engine().ask("How far is the University of Melbourne from Federation Square?")
+    assert result.errors[0].startswith("The answer could not be computed right now")
+
+
+def test_the_default_backup_model_is_the_auto_router() -> None:
+    from geospark.integrations.openrouter import OpenRouterClient
+
+    assert OpenRouterClient(api_key="k").model == "openrouter/free"
+
+
+def test_the_model_is_warmed_up_with_asks_prompt_and_tools(monkeypatch) -> None:
+    from geospark import api
+
+    monkeypatch.setenv("OLLAMA_BASE_URL", "http://ollama:11434")
+    sent = {}
+
+    def post(url, json, timeout):
+        sent.update(url=url, **json)
+
+    class Now:  # run the warm-up thread inline
+        def __init__(self, target, **kw):
+            self.target = target
+
+        def start(self):
+            self.target()
+
+    with patch("httpx.post", side_effect=post), patch("threading.Thread", Now):
+        api._warm_up_language_model()
+    assert sent["url"] == "http://ollama:11434/api/chat" and sent["options"] == {"num_predict": 1}
+    assert {t["function"]["name"] for t in sent["tools"]} >= {"find_nearby_places", "get_weather"}
+
+
+def test_no_warm_up_without_a_local_model(monkeypatch) -> None:
+    from geospark import api
+
+    monkeypatch.delenv("OLLAMA_BASE_URL", raising=False)
+    with patch("threading.Thread", side_effect=AssertionError("started")):
+        api._warm_up_language_model()

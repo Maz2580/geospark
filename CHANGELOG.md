@@ -4,14 +4,51 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-24: tested from the outside
+
+Every agent, every Ask tool and every flow template was tested on the live site the way a visitor
+would use them, with Melbourne questions first (most visitors are from the University of Melbourne),
+and what failed is fixed. Ask's tools now take place names, so the model never supplies
+coordinates; nearby places come from a self-hosted OpenStreetMap server with the right tags; and the
+hosted MCP server is live and listed in the official MCP Registry.
+
 ### Added
+- **Self-hosted Overpass support** (`GEOSPARK_OVERPASS_URL`). Queries whose area lies inside the
+  server's coverage go to it first (10 s limit), with the public servers as fallback; everything
+  else goes to the public servers. Coverage is the extract's real boundary, not its rectangle
+  (`geospark/knowledge/coverage/australia.poly` from Geofabrik by default, or
+  `GEOSPARK_OVERPASS_POLY`), because a local Overpass answers a point outside its data with
+  0 elements, just like an empty place. The agents' 5-minute skip after a public failure no longer
+  blocks the local server. Plan and measurements: `deploy/OVERPASS_SELFHOST_PLAN.md`.
+- **Ask: `find_nearby_places` and `get_weather`**, and place names for `get_elevation` and
+  `check_spatial_relationship` (details under Fixed).
+- `server.json` for the official MCP Registry, listing the hosted endpoint as
+  `io.github.Maz2580/geospark` (validated against the registry's 2025-12-11 schema).
+- The README's `mcp-name` tag now matches that name exactly; the registry compares it
+  case-sensitively, so the earlier lowercase tag would not have verified the PyPI package.
+- **The hosted MCP server is live** at `https://geospark.terrascout.app/mcp`: add it to Claude (or
+  any MCP client) as a custom connector, with no install. README and `deploy/DEPLOY.md` show how
+  to connect and how to turn it on for your own deployment.
 - **`deploy/docker-compose.override.example.yml`**: the production stack (API, Ollama, Valhalla,
   Overpass) as one tested file for anyone hosting GeoSpark, with the measured limits and settings.
   `DEPLOY.md` gains "The full stack" (how to bring it up one service at a time) and a current
   architecture diagram; `.env.example` adds `GEOSPARK_VALHALLA_URL`, `GEOSPARK_NOMINATIM_URL` and the
   Ollama settings, which were missing.
+- `GEOSPARK_GEOCODE_PREFER_COUNTRY`: an operator's users' country wins a close geocoding call, with a
+  caveat naming the other match. `GEOSPARK_OLLAMA_WARMUP` (on by default when `OLLAMA_BASE_URL` is set).
 
-### Fixed
+### Changed
+- The MCP server's `calculate_distance` takes place names (`place_a`, `place_b`) and geocodes them
+  on the server, as `/ask` already does, so a model never has to type coordinates for a named
+  place. The places and their Nominatim provenance come back with the distance. Because it may
+  call the geocoder, the tool is now annotated `openWorldHint: true`.
+
+### Fixed: found by testing the live site
+- **The first questions after a deploy timed out** (120 s) while the local model read /ask's tool list
+  on the CPU; the server now has the model read it once at startup, in the background
+  (`GEOSPARK_OLLAMA_WARMUP=false` turns this off). The OpenRouter fallback then failed with a 404:
+  OpenRouter had retired every free model GeoSpark named. The fallback now uses the auto-router
+  (`openrouter/free`), the named models are current, and when both fail the visitor reads why in words.
 - **Testing the live site as an outside user** found and fixed:
   - **Flows**: every template failed at its first step (the runner never passed `address` to the
     geocoder or the geocoded point to later steps) and the run still reported "completed". Parameters
@@ -66,15 +103,6 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 - GeoAgent uses a distance written in the question ("within 2km", "500 m") even when the model's
   reading of the question leaves it out; live, one run searched the model's default 3 km instead of 2 km.
 
-### Added
-- **Self-hosted Overpass support** (`GEOSPARK_OVERPASS_URL`). Queries whose area lies inside the
-  server's coverage go to it first (10 s limit), with the public servers as fallback; everything
-  else goes to the public servers. Coverage is the extract's real boundary, not its rectangle
-  (`geospark/knowledge/coverage/australia.poly` from Geofabrik by default, or
-  `GEOSPARK_OVERPASS_POLY`), because a local Overpass answers a point outside its data with
-  0 elements, just like an empty place. The agents' 5-minute skip after a public failure no longer
-  blocks the local server. Plan and measurements: `deploy/OVERPASS_SELFHOST_PLAN.md`.
-
 ### Fixed: the agents (Spatial Report, Site Selector, Coordinator, GeoAgent)
 Tested live with the Agents page's own examples, most answers were empty or wrong even though every
 call returned HTTP 200:
@@ -100,21 +128,6 @@ call returned HTTP 200:
   services are counted now, and the nearest ten of each type are listed.
 - **The Agents page** now shows the Site Selector's summary (it never did) and, for every agent,
   what could not be retrieved and any caveats.
-
-### Added
-- `server.json` for the official MCP Registry, listing the hosted endpoint as
-  `io.github.Maz2580/geospark` (validated against the registry's 2025-12-11 schema).
-- The README's `mcp-name` tag now matches that name exactly; the registry compares it
-  case-sensitively, so the earlier lowercase tag would not have verified the PyPI package.
-- **The hosted MCP server is live** at `https://geospark.terrascout.app/mcp`: add it to Claude (or
-  any MCP client) as a custom connector, with no install. README and `deploy/DEPLOY.md` show how
-  to connect and how to turn it on for your own deployment.
-
-### Changed
-- The MCP server's `calculate_distance` takes place names (`place_a`, `place_b`) and geocodes them
-  on the server, as `/ask` already does, so a model never has to type coordinates for a named
-  place. The places and their Nominatim provenance come back with the distance. Because it may
-  call the geocoder, the tool is now annotated `openWorldHint: true`.
 
 ## [0.8.0] - 2026-10-23: more data, more analysis
 

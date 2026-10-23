@@ -13,6 +13,7 @@ Usage:
 
 from __future__ import annotations
 
+import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
@@ -271,7 +272,8 @@ class SpatialReport:
         if report.weather is None:
             report.data_gaps.append("weather")
         if report.air_quality is None:
-            report.data_gaps.append("air quality")
+            report.data_gaps.append("air quality" if os.getenv("OPENAQ_API_KEY")
+                                    else "air quality (this server has no OpenAQ API key)")
 
         all_nearby.sort(key=lambda x: x.distance_m)
         for item in all_nearby:
@@ -467,6 +469,7 @@ Summary:"""
                     "model": self._model,
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,
+                    "options": {"num_predict": 400},  # bounded: a 3-5 sentence summary
                 },
                 # Past this the plain summary below is used instead of waiting
                 timeout=NARRATIVE_TIMEOUT_S,

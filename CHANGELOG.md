@@ -4,6 +4,15 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Added
+- **Self-hosted Overpass support** (`GEOSPARK_OVERPASS_URL`). Queries whose area lies inside the
+  server's coverage go to it first (10 s limit), with the public servers as fallback; everything
+  else goes to the public servers. Coverage is the extract's real boundary, not its rectangle
+  (`geospark/knowledge/coverage/australia.poly` from Geofabrik by default, or
+  `GEOSPARK_OVERPASS_POLY`), because a local Overpass answers a point outside its data with
+  0 elements, just like an empty place. The agents' 5-minute skip after a public failure no longer
+  blocks the local server. Plan and measurements: `deploy/OVERPASS_SELFHOST_PLAN.md`.
+
 ### Fixed: the agents (Spatial Report, Site Selector, Coordinator, GeoAgent)
 Tested live with the Agents page's own examples, most answers were empty or wrong even though every
 call returned HTTP 200:

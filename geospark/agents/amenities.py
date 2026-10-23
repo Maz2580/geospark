@@ -94,15 +94,22 @@ def find_amenities(
     if not types:
         return AmenityLookup(by_type={}, source="none", radius_m=radius_m)
     overpass_error: Exception | None = None
-    if _overpass_available():
+    loader = overpass or OverpassLoader()
+    bbox = overpass_bbox(lat, lon, radius_m)
+    # A self-hosted Overpass covering this area is always asked; the cooldown is for the public servers
+    covers = getattr(loader, "covers", None)
+    local = bool(covers and covers(bbox))
+    public_ok = _overpass_available()
+    if local or public_ok:
         try:
-            by_type = (overpass or OverpassLoader()).load_amenities_by_type(
-                overpass_bbox(lat, lon, radius_m), types, timeout=OVERPASS_TIMEOUT_S)
+            kwargs = {} if public_ok else {"allow_public": False}
+            by_type = loader.load_amenities_by_type(bbox, types, timeout=OVERPASS_TIMEOUT_S, **kwargs)
             return AmenityLookup(by_type=by_type, source="openstreetmap-overpass",
                                  provenance=[source_provenance("openstreetmap-overpass")], radius_m=radius_m)
         except Exception as e:  # rate limit, 504, connection refused, timeout
             overpass_error = e
-            _mark_overpass_down()
+            if public_ok:
+                _mark_overpass_down()
     try:
         return _from_overture(lat, lon, radius_m, types)
     except Exception as e:

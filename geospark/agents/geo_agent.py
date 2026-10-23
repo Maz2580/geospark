@@ -197,8 +197,9 @@ Intent guide:
             stated = self._stated_radius(goal)
             if stated:
                 params["radius_m"] = stated
-            if parsed.get("intent") == "check_relationship" and not params.get("relationship"):
-                params["relationship"] = self._stated_relationship(goal)
+            # Only real predicate names count: the model has returned the string "null" here
+            if parsed.get("intent") == "check_relationship" and params.get("relationship") not in self._RELATIONSHIPS:
+                params["relationship"] = self._stated_relationship(goal) or "within"
             return (
                 parsed.get("locations", []),
                 parsed.get("intent", "find_nearby"),
@@ -240,6 +241,9 @@ Intent guide:
         from geospark.agents.amenities import place_boundary
 
         return place_boundary(name)
+
+    _RELATIONSHIPS: ClassVar[frozenset[str]] = frozenset(
+        {"contains", "within", "intersects", "touches", "crosses", "overlaps", "disjoint"})
 
     @staticmethod
     def _stated_relationship(goal: str) -> str | None:
@@ -543,7 +547,9 @@ Intent guide:
         params: dict[str, Any],
     ) -> None:
         """Check spatial relationships between geocoded locations."""
-        relationship = params.get("relationship") or "contains"
+        relationship = params.get("relationship")
+        if relationship not in self._RELATIONSHIPS:
+            relationship = "within"
         locations = list(geocoded.items())
 
         for i, (name_a, geo_a) in enumerate(locations):

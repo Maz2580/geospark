@@ -443,3 +443,21 @@ def test_report_says_air_quality_needs_a_key(monkeypatch) -> None:
          patch("httpx.post", side_effect=ConnectionError("no LLM")):
         result = report.analyze("Federation Square", radius_m=500)
     assert "air quality (this server has no OpenAQ API key)" in result.data_gaps
+
+
+@pytest.mark.parametrize("model_value", ["null", None, "", "inside"])
+def test_a_non_relationship_from_the_model_is_replaced_by_the_wording(model_value) -> None:
+    """Live, the model returned the string "null" for "Is Federation Square in Melbourne?"."""
+    from unittest.mock import MagicMock
+
+    from geospark.agents.geo_agent import GeoAgent
+
+    reply = MagicMock()
+    reply.json.return_value = {"message": {"content": json.dumps({
+        "locations": ["Federation Square", "Melbourne"], "intent": "check_relationship",
+        "params": {"relationship": model_value}})}}
+    agent = GeoAgent.__new__(GeoAgent)
+    agent.__init__()
+    with patch("httpx.post", return_value=reply):
+        _, _, params = agent._parse_goal("Is Federation Square in Melbourne?")
+    assert params["relationship"] == "within"

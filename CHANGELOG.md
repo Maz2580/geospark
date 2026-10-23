@@ -31,6 +31,8 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
     (with a caveat), and a candidate's own campus (anything within 50 m, e.g. one school mapped as
     several buildings) no longer counts as "a nearby school".
   - The Spatial Report says air quality needs an OpenAQ API key instead of "could not be retrieved".
+  - "Is Federation Square in Melbourne?" failed with "Unknown relationship: null": the model returned the
+    string "null". Only real predicate names are accepted; anything else comes from the wording.
   - The Agents page's default examples are Australian, where the self-hosted Overpass answers in
     under a second; places elsewhere still use the public servers.
 - GeoAgent uses a distance written in the question ("within 2km", "500 m") even when the model's

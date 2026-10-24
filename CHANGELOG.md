@@ -4,6 +4,18 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Fixed
+- `layer check` named only one direction of a GDA94/GDA2020 mix-up. GDA2020 numbers labelled GDA94
+  are now named the right way round too; the finding code is `gda94_gda2020_mixed`, with the
+  mislabelled layer and what it holds.
+
+### Added
+- Real-data validation (`docs/benchmarks/2026-10/agency_checks.md`): on 2,000 of Victoria's published
+  survey marks, `layer check` named GDA94 numbers labelled GDA2020, a wrong zone and ellipsoidal against
+  AHD heights, and passed correctly labelled data (6 mm). GeoSpark's GDA94 to GDA2020 matches
+  Victoria's surveyed marks within 7 mm (416 marks); AUSGeoid2020 matches spirit-levelled AHD to 6 mm
+  median (99 marks).
+
 ### Added
 - **`geospark layer check`** (Python `geospark.io.check`, local MCP tool `check_dataset`): checks a
   file's coordinates before analysis (CRS declared and consistent with the numbers, swapped axes, points

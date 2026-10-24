@@ -16,6 +16,29 @@ data. Run on 2026-10-24 with GeoSpark at `main` after #42, PROJ 9.8.1, EPSG v12.
 | NOAA NGS, [GEOID18 service](https://geodesy.noaa.gov/api/geoid/ght) | Ellipsoidal height to NAVD88 | 2 (San Francisco, Denver) | 1 mm |
 | NOAA NGS, [NCAT](https://geodesy.noaa.gov/api/ncat/llh) (NADCON 5) | NAD27 to NAD83 | 1 (San Francisco) | **0.27 m**: PROJ uses the original NADCON; NGS states ±0.27 m there |
 
+### At scale: Victoria's 2,000 survey marks around Melbourne
+
+Land Use Victoria publishes, for every survey mark, the official GDA94 and GDA2020 coordinates, both
+ellipsoidal heights and the AHD height ([Vicmap Position, SMES](https://discover.data.vic.gov.au/dataset/vicmap-position-survey-control-mark-point),
+CC BY 4.0; 2,000 marks between 144.94-145.00 E and 37.78-37.83 S, fetched 2026-10-25). How each value
+was produced is recorded, so like can be compared with like:
+
+| Comparison | Marks | Median | 95th percentile | Largest |
+|---|---|---|---|---|
+| GDA94 to GDA2020, marks surveyed (adjusted) in both datums | 416 | 5 mm | 6 mm | 7 mm |
+| GDA94 to GDA2020, GDA2020 adjusted, GDA94 transformed | 88 | 1 mm | 2 mm | 3 mm |
+| GDA94 to GDA2020, both values transformed by Victoria | 1,066 | 30 mm | 681 mm | 681 mm |
+| AUSGeoid2020 AHD vs spirit-levelled AHD | 99 | 6 mm | 53 mm | 384 mm |
+| AUSGeoid2020 AHD vs GPS-derived AHD | 223 | 10 mm | 48 mm | 103 mm |
+| AUSGeoid2020 AHD vs AHD Victoria derived from AUSGeoid | 148 | 0 mm | 243 mm | 30 m |
+
+For surveyed marks GeoSpark matches Victoria's published GDA2020 within 7 mm. Many marks whose
+published values were themselves transformed differ by exactly 0.681 m from the official 7-parameter
+result: a property of how those records were produced, which we can't explain from the data, so it is
+reported, not counted as agreement. Against levelled AHD, AUSGeoid2020 heights agree to 6 mm (median),
+within GA's stated model uncertainty; the 20-30 m "differences" are marks whose AHD is a whole-number
+placeholder.
+
 What this changed in GeoSpark:
 
 - **AHD** is refused outside mainland Australia and Tasmania. The AUSGeoid2020 grid extends over the

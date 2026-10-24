@@ -382,14 +382,32 @@ def _diagnose(centre: tuple[float, float], de: float, dn: float, ra: _Raw, rb: _
         return None
     shifted = geodesy.transform("EPSG:4283", "EPSG:7844", [[lon, lat]]).coordinates[0]
     se, sn = _local_offset((lon, lat), (shifted[0], shifted[1]))  # where a GDA94 position moves in GDA2020
-    for sign, who in ((-1, ra.name), (1, rb.name)):
-        if math.hypot(de - sign * -se, dn - sign * -sn) < 0.25:
-            other = rb.name if who == ra.name else ra.name
-            return Finding("gda94_labelled_as_gda2020", "problem",
-                           f"{rb.name} sits {math.hypot(de, dn):.2f} m from {ra.name}, matching the official GDA94 to GDA2020 "
-                           f"shift here ({math.hypot(se, sn):.2f} m). {who} holds GDA94 coordinates but is treated as the "
-                           f"same datum as {other}: relabel it as GDA94 (e.g. EPSG:4283 or 28355) so it is converted.",
-                           {"expected_shift_m": round(math.hypot(se, sn), 3), "gda94_layer": who})
+    # B - A = +shift: B's numbers are "a datum ahead" of A's (GDA2020 values where A has GDA94 values);
+    # B - A = -shift: B is behind. Which layer carries the wrong label depends on what both are labelled.
+    for sign in (1, -1):
+        if math.hypot(de - sign * se, dn - sign * sn) < 0.25:
+            ahead, behind = (rb, ra) if sign > 0 else (ra, rb)
+            label_a, label_b = _datum_name(ra.crs), _datum_name(rb.crs)
+            if "1994" in label_a and "1994" in label_b:
+                wrong, holds, labelled = ahead, "GDA2020", "GDA94"
+            elif "2020" in label_a and "2020" in label_b:
+                wrong, holds, labelled = behind, "GDA94", "GDA2020"
+            else:
+                wrong, holds, labelled = None, None, None
+            size = math.hypot(de, dn)
+            if wrong is None:
+                return Finding("gda94_gda2020_mixed", "problem",
+                               f"{rb.name} sits {size:.2f} m from {ra.name}, matching the official GDA94 to GDA2020 shift "
+                               f"here ({math.hypot(se, sn):.2f} m) although their labels already differ in datum: one of them "
+                               "carries the wrong datum label.", {"expected_shift_m": round(math.hypot(se, sn), 3)})
+            other = rb.name if wrong is ra else ra.name
+            return Finding("gda94_gda2020_mixed", "problem",
+                           f"{rb.name} sits {size:.2f} m from {ra.name}, matching the official GDA94 to GDA2020 shift here "
+                           f"({math.hypot(se, sn):.2f} m). Both are labelled {labelled}, but {wrong.name} holds {holds} "
+                           f"coordinates: relabel it as {holds} so it is converted (or {other} is the one mislabelled, "
+                           "if you know it to be wrong).",
+                           {"expected_shift_m": round(math.hypot(se, sn), 3), "mislabelled_layer": wrong.name,
+                            "holds": holds, "labelled": labelled})
     years = []
     for epoch in (2026.0,):
         moved = geodesy.transform("EPSG:7912", "EPSG:7843", [[lon, lat, 0.0]], epoch=epoch).coordinates[0]

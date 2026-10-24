@@ -245,7 +245,9 @@ Melbourne; British National Grid moves about 124 m); GeoSpark refuses instead.
 Geoscience Australia's calculators (GDA94 to GDA2020 and ATRF2014 to GDA2020 within 0.1 mm at eight
 points; AUSGeoid2020 heights within 2 mm in three cities), Ordnance Survey's 40 OSTN15/OSGM15 test
 points (grid coordinates within 8 mm, heights within 2 mm), LINZ's NZVD2016 example points (within
-their 1 cm rounding) and NGS's GEOID18 service (1 mm). Limits to know: AHD is refused outside mainland
+their 1 cm rounding) and NGS's GEOID18 service (1 mm); at scale, GDA94 to GDA2020 agrees with
+Victoria's surveyed marks within 7 mm (416 marks) and AUSGeoid2020 with spirit-levelled AHD to 6 mm
+median (99 marks). Limits to know: AHD is refused outside mainland
 Australia and Tasmania; OSGM15 heights on Scilly, the Isle of Man, the Outer Hebrides, Orkney and
 Shetland are labelled with their local datum, not ODN; and NAD27 to NAD83 uses the original NADCON,
 about 0.27 m from NGS's current NADCON 5 in San Francisco (within NADCON 5's own stated uncertainty).
@@ -289,7 +291,9 @@ and heights that don't say whether they are ellipsoidal or AHD. With `--against`
 offset to a reference layer and names the cause only when the numbers match one: GDA94 data labelled
 GDA2020 (checked against the official shift at that place), the wrong MGA zone, feet instead of
 metres, swapped axes, a plate-motion epoch, or ellipsoidal against AHD heights. Anything else is
-reported as an unexplained offset. The exit code is 2 when it finds a problem, so it fits in a
+reported as an unexplained offset. Tried on 2,000 of Victoria's published survey marks, it named
+real GDA94 numbers labelled GDA2020 (1.55 m, scatter 3 cm), a wrong zone and ellipsoidal against AHD
+heights, and found nothing wrong when they were labelled correctly (6 mm). The exit code is 2 when it finds a problem, so it fits in a
 pipeline; in Python, `geospark.io.check.check_layer` and `compare_layers`; for Claude, the local MCP
 tool `check_dataset`.
 

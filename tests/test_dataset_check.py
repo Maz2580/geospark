@@ -51,8 +51,8 @@ def test_a_gda94_layer_labelled_gda2020_is_named(tmp_path) -> None:
     a = _csv(tmp_path / "parcels.csv", MARKS_GDA2020_MGA55)
     b = _csv(tmp_path / "pipes.csv", [tuple(p) for p in gda94_values])  # GDA94 numbers...
     report = check.compare_layers(a, b, crs_a="EPSG:7855", crs_b="EPSG:7855")  # ...labelled GDA2020
-    finding = next(f for f in report["findings"] if f["code"] == "gda94_labelled_as_gda2020")
-    assert finding["evidence"]["gda94_layer"] == "pipes.csv"
+    finding = next(f for f in report["findings"] if f["code"] == "gda94_gda2020_mixed")
+    assert finding["evidence"]["mislabelled_layer"] == "pipes.csv" and finding["evidence"]["holds"] == "GDA94"
     assert 1.4 < report["offset"]["size_m"] < 1.7
     assert report["verdict"] == "problem"
 
@@ -107,7 +107,7 @@ def test_an_offset_with_no_known_cause_is_reported_unexplained(tmp_path) -> None
     b = _csv(tmp_path / "b.csv", [(x + 3.0, y - 0.5) for x, y in MARKS_GDA2020_MGA55])
     report = check.compare_layers(a, b, crs_a="EPSG:7855", crs_b="EPSG:7855")
     assert "unexplained_offset" in _codes(report)
-    assert "gda94_labelled_as_gda2020" not in _codes(report)
+    assert "gda94_gda2020_mixed" not in _codes(report)
 
 
 # --- one file -----------------------------------------------------------------------------------------
@@ -182,3 +182,13 @@ def test_cli_exit_code_signals_a_problem(tmp_path) -> None:
     assert bad.exit_code == 2 and "GDA94" in bad.output
     good = CliRunner().invoke(main, ["layer", "check", str(a), "--crs", "EPSG:7855"])
     assert good.exit_code == 0 and "no issues found" in good.output
+
+
+def test_gda2020_numbers_labelled_gda94_are_named_the_other_way_round(tmp_path) -> None:
+    """The reverse mix-up: GDA2020 coordinates exported or served under a GDA94 label."""
+    gda94_values = geodesy.transform("EPSG:7855", "EPSG:28355", [list(p) for p in MARKS_GDA2020_MGA55]).coordinates
+    a = _csv(tmp_path / "true_gda94.csv", [tuple(p) for p in gda94_values])
+    b = _csv(tmp_path / "service_gda94.csv", MARKS_GDA2020_MGA55)  # GDA2020 numbers...
+    report = check.compare_layers(a, b, crs_a="EPSG:28355", crs_b="EPSG:28355")  # ...labelled GDA94
+    finding = next(f for f in report["findings"] if f["code"] == "gda94_gda2020_mixed")
+    assert finding["evidence"]["mislabelled_layer"] == "service_gda94.csv" and finding["evidence"]["holds"] == "GDA2020"

@@ -10,7 +10,7 @@ README under "Re-check with current models (October 2026)".
 | `make_grid_set.py`, `grid_questions.json` | 11 questions that need national grids: OSTN15, OSGM15, NZGeoid2016, GEOID18, NADCON |
 | `datum_run.py` | Runs a question set on a model (bare, or `--tools` with `transform_coordinates` and `convert_height`) and scores the error in metres |
 | `results_summary.json` | Per-model scores, errors, tool use and cost (no model text) |
-| `agency_checks.md` | GeoSpark's answers compared with Geoscience Australia, Ordnance Survey, LINZ and NGS |
+| `agency_checks.md` | GeoSpark's answers compared with Geoscience Australia, Ordnance Survey, LINZ, NGS and 2,000 Victorian survey marks; and `layer check` on real data |
 | `fairness.md` | Whether the gap survives code execution, high effort and repeated runs; and AI-written GIS code |
 | `results_datum_all_runs.json` | Every datum run's grades and errors (bare, tools, code execution, repeats) |
 | `codegen/` | The eight scripting tasks, their answers (`make_tasks.py`), the runner and `scores.json` |

@@ -218,6 +218,25 @@ def _is_ballpark(op: Any) -> bool:
     return "ballpark" in (op.description or "").lower()
 
 
+def _points(coordinates: Any) -> list[list[float]]:
+    """A list of [x, y] or [x, y, z] points; one point given as [x, y] is accepted too.
+
+    Live: a 4B model always sent one point as [x, y]; the tool failed with "'float' object is not
+    subscriptable" and the model started inventing EPSG codes to get past it.
+    """
+    if isinstance(coordinates, (list, tuple)) and coordinates and all(isinstance(v, (int, float)) for v in coordinates):
+        coordinates = [coordinates]
+    if not isinstance(coordinates, (list, tuple)) or not coordinates:
+        raise GeodesyError("Give coordinates as a list of points, e.g. [[321242.045, 5812466.767]].")
+    out = []
+    for pt in coordinates:
+        if (not isinstance(pt, (list, tuple)) or len(pt) not in (2, 3)
+                or not all(isinstance(v, (int, float)) and math.isfinite(v) for v in pt)):
+            raise GeodesyError(f"Each point must be [x, y] or [x, y, z] numbers, e.g. [[321242.045, 5812466.767]]; got {pt!r}.")
+        out.append([float(v) for v in pt])
+    return out
+
+
 def transform(source_crs: str, target_crs: str, coordinates: list[list[float]],
               epoch: float | None = None) -> Transformation:
     """Transform points with the most accurate operation that covers all of them.
@@ -228,8 +247,7 @@ def transform(source_crs: str, target_crs: str, coordinates: list[list[float]],
     from pyproj.transformer import TransformerGroup
 
     _configure_proj()
-    if not coordinates:
-        raise GeodesyError("Give at least one coordinate.")
+    coordinates = _points(coordinates)
     src, dst = _crs(source_crs), _crs(target_crs)
     def build() -> Any:
         with warnings.catch_warnings():  # a missing grid is reported below, in words, not as a library warning

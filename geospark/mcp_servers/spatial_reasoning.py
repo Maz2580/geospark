@@ -204,6 +204,51 @@ class SpatialReasoningServer(BaseMCPServer):
             "metadata": {"method": "ground_truth_topology", "crs": "EPSG:4326", **verification(checked)},
         }
 
+    # How much less likely (Nominatim importance) a candidate in the other place's country may be
+    SAME_COUNTRY_WINDOW: ClassVar[float] = 0.3
+
+    @classmethod
+    def _same_country(cls, points: dict[str, Any], places: list[dict[str, Any]], lookups: list[SpatialResult]) -> str | None:
+        """Read two named places together, as a person would: "Brisbane to Gold Coast" means the Gold
+        Coast in Queensland, not Ghana. When the best matches are in different countries and a close
+        candidate for one of them is in the other's country, use it, and say so.
+
+        Live (without a preferred country): "Gold Coast" was Ghana, 16,549 km from Brisbane, with no
+        ambiguity warning, and the model concluded the Sunshine Coast was closer.
+        """
+        if len(places) != 2 or len(lookups) != 2:
+            return None
+        feats = [lk.features for lk in lookups]
+        cc = [str(f[0].properties.get("country_code") or "") if f else "" for f in feats]
+        if not all(cc) or cc[0] == cc[1]:
+            return None
+        import os
+
+        preferred = {c.strip().lower() for c in os.getenv("GEOSPARK_GEOCODE_PREFER_COUNTRY", "").split(",") if c.strip()}
+        best: tuple[float, int, Any] | None = None
+        for side, other in ((0, 1), (1, 0)):
+            if cc[side] in preferred:
+                continue  # the operator's country wins ("London to Perth" stays Western Australia on an Australian server)
+            top = float(feats[side][0].properties.get("importance") or 0)
+            for cand in feats[side][1:]:
+                if cand.properties.get("country_code") == cc[other]:
+                    gap = top - float(cand.properties.get("importance") or 0)
+                    if gap <= cls.SAME_COUNTRY_WINDOW and (best is None or gap < best[0]):
+                        best = (gap, side, cand)
+                    break
+        if best is None:
+            return None
+        _gap, side, cand = best
+        key = "ab"[side]
+        was = places[side].get("display_name")
+        geometry = cand.geometry if isinstance(cand.geometry, dict) else cand.geometry.model_dump()
+        points[key] = geometry
+        places[side] = {**places[side], "display_name": cand.properties.get("display_name"),
+                        "coordinates": geometry["coordinates"]}
+        other_name = places[1 - side].get("display_name")
+        return (f"'{places[side]['query']}' was read as '{cand.properties.get('display_name')}', in the same country as "
+                f"'{other_name}', rather than its best match '{was}'. Add the country to the name if you meant the other.")
+
     def _handle_distance(self, args: dict[str, Any]) -> dict[str, Any]:
         """Distance between two places. Named places are geocoded here, so the model never has to
         supply (and possibly invent) coordinates for them."""
@@ -225,12 +270,15 @@ class SpatialReasoningServer(BaseMCPServer):
             else:
                 return {"result": None, "errors": [f"Give place_{side} (a name) or point_{side} (GeoJSON)."],
                         "suggestion": "For named places pass place_a and place_b; the server geocodes them."}
+        context_note = self._same_country(points, places, lookups)
         distance = SpatialReasoner.calculate_distance(points["a"], points["b"])
         values = {"distance_m": distance, "distance_km": distance / 1000}
         checked = enrich(
             SpatialResult(features=[SpatialFeature(geometry=points["a"], properties=values)]), "distance"
         )
         merge_lookups(checked, lookups)  # where the places came from, and any ambiguity
+        if context_note:
+            checked.warnings.insert(0, context_note)
         result: dict[str, Any] = dict(values)
         if places:
             result["places"] = places

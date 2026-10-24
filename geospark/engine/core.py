@@ -7,6 +7,7 @@ The central orchestrator that connects spatial reasoning, tools, and LLM integra
 from __future__ import annotations
 
 import contextlib
+import math
 import re
 import time
 from typing import Any
@@ -97,6 +98,136 @@ def _crs_mismatches(question: str, calls: list[dict[str, Any]]) -> list[str]:
         if (wrong_zone or wrong_datum) and target not in out:
             out.append(target)
     return out
+
+
+# A quantity in an answer: a number and the unit after it ("3,137 square kilometres", "6.47 km")
+_QUANTITY = re.compile(
+    r"(?<![\w.,\u00a0\u2009\u202f])(\d{1,3}(?:[,\u00a0\u2009\u202f ]\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)\s*"
+    r"(km²|km2|m²|m2|square kilomet(?:re|er)s?|square met(?:re|er)s?|sq\.? ?km|sq\.? ?m|hectares?|ha|"
+    r"kilomet(?:re|er)s?|km|met(?:re|er)s?|m)(?![\w²])", re.I)
+# Factor from the unit to metres (lengths) or square metres (areas)
+_UNIT_TO_SI = {"km": 1e3, "kilometre": 1e3, "kilometer": 1e3, "m": 1.0, "metre": 1.0, "meter": 1.0,
+               "km²": 1e6, "km2": 1e6, "sq km": 1e6, "square kilometre": 1e6, "square kilometer": 1e6,
+               "m²": 1.0, "m2": 1.0, "sq m": 1.0, "square metre": 1.0, "square meter": 1.0,
+               "hectare": 1e4, "ha": 1e4}
+
+
+def _unit_factor(unit: str) -> float | None:
+    u = re.sub(r"\s+", " ", unit.lower().replace("sq.", "sq").strip())
+    u = u[:-1] if u.endswith("s") and u not in ("ha",) else u
+    return _UNIT_TO_SI.get(u)
+
+
+def _numbers_in(value: Any, out: list[float]) -> None:
+    """Every number in a tool reply, however deeply nested."""
+    if isinstance(value, bool):
+        return
+    if isinstance(value, (int, float)):
+        if math.isfinite(value):
+            out.append(float(value))
+    elif isinstance(value, dict):
+        for v in value.values():
+            _numbers_in(v, out)
+    elif isinstance(value, (list, tuple)):
+        for v in value:
+            _numbers_in(v, out)
+    elif isinstance(value, str):
+        out.extend(float(n) for n in _NUMBER.findall(value) if len(n) < 20)
+
+
+def _unsupported_quantities(answer: str, calls: list[dict[str, Any]], question: str) -> list[str]:
+    """Quantities the answer states that no tool returned (allowing unit changes and rounding).
+
+    Live: a buffer of 3,136,548 m² was reported as "3,137 square kilometres". Small models do the
+    arithmetic around tool results themselves; a number that can't be traced back is flagged.
+    """
+    known: list[float] = []
+    for c in calls:
+        if not _failed(c.get("result")):
+            reply = c.get("result") or {}
+            _numbers_in(reply.get("result"), known)
+            meta = reply.get("metadata") or {}
+            _numbers_in([meta.get("warnings"), meta.get("quality")], known)  # e.g. a stated model uncertainty
+    _numbers_in(question, known)
+    known = [abs(k) for k in known if k != 0]
+    if not known:
+        return []
+    # Sums and differences of two returned values ("20 km closer") are arithmetic on checked numbers
+    few = sorted(set(known))[:60]
+    known += [a + b for i, a in enumerate(few) for b in few[i:]] + [abs(a - b) for i, a in enumerate(few) for b in few[i + 1:]]
+    bad: list[str] = []
+    for m in _QUANTITY.finditer(answer or ""):
+        text, unit = m.group(1), m.group(2)
+        before = (answer or "")[max(0, m.start() - 25):m.start()].lower()
+        if re.search(r"(rounded to|to the nearest|precision of|accurate to|accuracy of|±|\+/-)\s*(about |approximately )?$", before):
+            continue  # a stated precision, not a measured quantity
+        factor = _unit_factor(unit)
+        if factor is None:
+            continue
+        text = re.sub(r"[\u00a0\u2009\u202f ]", ",", text)  # "2 726 638.60" -> "2,726,638.60"
+        value = float(text.replace(",", ""))
+        digits = text.replace(",", "")
+        if "." in digits:
+            step = 10 ** -len(digits.split(".")[1])  # "6.47" is stated to 0.01
+        else:
+            step = 10 ** (len(digits) - len(digits.rstrip("0"))) if digits.rstrip("0") else 1  # "6000" to 1000
+        si = value * factor
+        # the stated number's own rounding, or 1% ("about 6.5 km" for 6,473 m)
+        tolerance = max(0.5 * step * factor, 0.01 * si)
+        if not any(abs(si - k) <= tolerance for k in known):
+            bad.append(f"{text} {unit}")
+    return list(dict.fromkeys(bad))
+
+
+_COMPARATIVE = re.compile(
+    r"\b((?:the\s+)?[A-Z][\w'\u2019-]*(?:\s+[A-Z][\w'\u2019-]*){0,4})\s+(?:is|are|lies|sits)\s+(?:the\s+)?"
+    r"(closer|nearer|farther|further|larger|bigger|smaller|higher|lower|taller|longer|shorter)\b")
+
+
+def _self_contradiction(answer: str) -> list[str]:
+    """Two different places named with the same comparative ("Sunshine Coast is closer" … "Gold Coast
+    is closer"). Live: Qwen 3.5 4B's first line contradicted its own table and its last line."""
+    seen: dict[str, str] = {}
+    for m in _COMPARATIVE.finditer(answer.replace("*", "")):
+        subject = re.sub(r"^the\s+", "", m.group(1).strip(), flags=re.I)
+        word = {"nearer": "closer", "further": "farther", "bigger": "larger", "taller": "higher"}.get(m.group(2).lower(), m.group(2).lower())
+        if word in seen and seen[word].lower() != subject.lower():
+            return [f"{seen[word]} is {word}", f"{subject} is {word}"]
+        seen.setdefault(word, subject)
+    return []
+
+
+def _comparison_conflicts(answer: str, calls: list[dict[str, Any]]) -> list[str]:
+    """'X is closer/farther' claims that contradict the distances the tools measured.
+
+    Live: Qwen 3.5 4B wrote "Sunshine Coast is closer to Brisbane" after measuring 90.52 km to the
+    Sunshine Coast and 70.58 km to the Gold Coast.
+    """
+    measured: list[tuple[str, float]] = []  # (the places' names, distance)
+    for c in calls:
+        if c.get("tool") != "calculate_distance" or _failed(c.get("result")):
+            continue
+        body = (c.get("result") or {}).get("result") or {}
+        names = " ".join(str(p.get("query", "")) + " " + str(p.get("display_name", "")) for p in body.get("places") or [])
+        names += " " + " ".join(str(v) for k, v in (c.get("args") or {}).items() if k.startswith("place"))
+        if isinstance(body.get("distance_m"), (int, float)) and names.strip():
+            measured.append((names.lower(), float(body["distance_m"])))
+    if len(measured) < 2:
+        return []
+    out = []
+    for m in _COMPARATIVE.finditer(answer.replace("*", "")):
+        word = m.group(2).lower()
+        if word not in ("closer", "nearer", "farther", "further"):
+            continue
+        subject = re.sub(r"^the\s+", "", m.group(1).strip(), flags=re.I).lower()
+        mine = [d for names, d in measured if subject in names]
+        others = [d for names, d in measured if subject not in names]
+        if not mine or not others:
+            continue
+        nearer = word in ("closer", "nearer")
+        if (nearer and min(mine) > min(others)) or (not nearer and max(mine) < max(others)):
+            out.append(f"{m.group(1).strip()} is {word}")
+    return list(dict.fromkeys(out))
 
 
 def _failed(reply: Any) -> bool:
@@ -199,6 +330,24 @@ def answer_to_result(answer: Any, model_source: str, question: str = "") -> Spat
                             geometry={"type": "Point", "coordinates": item["coordinates"][:2]},
                             properties={"name": item.get("name"), "type": kind, "distance_m": item.get("distance_m")},
                         ))
+    if not (getattr(answer, "answer", "") or "").strip():
+        # Live: a small model called the tools, then spent its reply on hidden reasoning and returned no text
+        quality["no_answer"] = True
+        warnings.append("The model returned no answer text after its tool calls, so there is no answer to check.")
+    unsupported = _unsupported_quantities(getattr(answer, "answer", "") or "", calls, question or "") if calls else []
+    if unsupported:
+        quality["unsupported_numbers"] = unsupported
+        warnings.append(f"The answer states {', '.join(unsupported)}, which no tool returned (even allowing for unit "
+                        "changes and rounding); treat that number as the model's own arithmetic, not a checked value.")
+    conflicts = _comparison_conflicts(getattr(answer, "answer", "") or "", calls)
+    if conflicts:
+        quality["contradicts_tools"] = conflicts
+        warnings.append(f"The answer says {', '.join(repr(c) for c in conflicts)}, which contradicts the distances the "
+                        "tools measured.")
+    contradiction = _self_contradiction(getattr(answer, "answer", "") or "")
+    if contradiction:
+        quality["self_contradiction"] = contradiction
+        warnings.append(f"The answer contradicts itself: it says {contradiction[0]!r} and {contradiction[1]!r}.")
     mismatched = _crs_mismatches(question or "", calls)
     if mismatched:
         quality["crs_mismatch"] = mismatched

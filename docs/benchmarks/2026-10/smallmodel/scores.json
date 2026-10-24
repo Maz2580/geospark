@@ -1,0 +1,1889 @@
+{
+ "results_run0_before_fixes": [
+  {
+   "model": "qwen3.5:4b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": false,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": false,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "transform_coordinates",
+    "transform_coordinates",
+    "transform_coordinates",
+    "transform_coordinates"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": false,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "transform_coordinates"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": null
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": null
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "partial",
+   "quality": {
+    "unsupported_numbers": [
+     "473 m"
+    ]
+   },
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": null
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": false,
+   "status": "partial",
+   "quality": {
+    "unsupported_numbers": [
+     "205.4 m"
+    ]
+   },
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": null
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": null
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": null
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": false,
+   "status": "partial",
+   "quality": {
+    "unsupported_numbers": [
+     "242.54 m",
+     "468.24 m"
+    ]
+   },
+   "tools": [
+    "transform_coordinates",
+    "transform_coordinates"
+   ],
+   "finish": null
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": null
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": false,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "geocode",
+    "calculate_distance",
+    "calculate_distance",
+    "geocode",
+    "calculate_distance"
+   ],
+   "finish": null
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": false,
+   "status": "partial",
+   "quality": {
+    "unsupported_numbers": [
+     "638.60 m",
+     "726.64 km"
+    ]
+   },
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": null
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": null
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": null
+  }
+ ],
+ "results_final_a": [
+  {
+   "model": "qwen3.5:4b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "transform_coordinates"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": false,
+   "status": "cannot_answer",
+   "quality": {
+    "no_answer": true
+   },
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "transform_coordinates"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "transform_coordinates"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "transform_coordinates"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  }
+ ],
+ "results_final_b": [
+  {
+   "model": "qwen3.5:4b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "transform_coordinates"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "partial",
+   "quality": {
+    "unsupported_numbers": [
+     "0.001 m"
+    ]
+   },
+   "tools": [
+    "transform_coordinates"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "transform_coordinates"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": false,
+   "status": "cannot_answer",
+   "quality": {
+    "no_answer": true
+   },
+   "tools": [
+    "calculate_distance",
+    "geocode",
+    "geocode",
+    "geocode",
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": "round limit"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "transform_coordinates"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": false,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  }
+ ],
+ "results_final_c": [
+  {
+   "model": "qwen3.5:4b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "transform_coordinates"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": false,
+   "status": "cannot_answer",
+   "quality": {
+    "no_answer": true
+   },
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:4b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "transform_coordinates"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "qwen3.5:9b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "transform_coordinates"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "partial",
+   "quality": {
+    "unsupported_numbers": [
+     "785,398 m\u00b2"
+    ]
+   },
+   "tools": [
+    "geocode"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gpt-oss:20b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 0,
+   "question": "How far is the Sydney Opera House from Bondi Beach?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 1,
+   "question": "What is the elevation of Mount Kosciuszko?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "get_elevation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 2,
+   "question": "Is the Eiffel Tower in Paris?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 3,
+   "question": "A drone at latitude -37.8177, longitude 144.9691 reports an ellipsoidal height of 40 m. What is its AHD height?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "convert_height"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 4,
+   "question": "Convert GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55.",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "transform_coordinates"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 5,
+   "question": "What is the area of a 500 m buffer around Federation Square, in square metres?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "geocode",
+    "spatial_operation"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 6,
+   "question": "Which is closer to Brisbane: the Gold Coast or the Sunshine Coast?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance",
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 7,
+   "question": "How far is Melbourne from Perth?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 8,
+   "question": "How far is the University of Melbourne from Federation Square?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "calculate_distance"
+   ],
+   "finish": "stop"
+  },
+  {
+   "model": "gemma4:12b",
+   "q": 9,
+   "question": "Is Federation Square in Melbourne?",
+   "correct": true,
+   "status": "ok",
+   "quality": {},
+   "tools": [
+    "check_spatial_relationship"
+   ],
+   "finish": "stop"
+  }
+ ]
+}

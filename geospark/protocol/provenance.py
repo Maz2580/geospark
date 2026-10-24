@@ -36,6 +36,15 @@ class Provenance(BaseModel):
 _OSM = "© OpenStreetMap contributors"
 
 SOURCES: dict[str, dict[str, Any]] = {
+    "proj-epsg": {
+        "name": "PROJ with the EPSG Geodetic Parameter Dataset and official national grids",
+        "url": "https://proj.org",
+        "licence": "PROJ: MIT; EPSG Dataset: IOGP terms of use; each grid under its publisher's licence "
+        "(see https://cdn.proj.org)",
+        "attribution": "EPSG Geodetic Parameter Dataset (IOGP); grids from their national agencies "
+        "(e.g. Geoscience Australia, Ordnance Survey, LINZ, NOAA NGS)",
+        "method": "PROJ's most accurate published operation covering the point; ballpark operations refused",
+    },
     "openstreetmap-nominatim": {
         "name": "OpenStreetMap Nominatim",
         "url": "https://nominatim.openstreetmap.org",

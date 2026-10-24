@@ -103,9 +103,10 @@ public server, add `-e GEOSPARK_ENV=production -e GEOSPARK_ADMIN_TOKEN=<secret>`
 |---|---|
 | **Spatial engine** | Geodesic distance, area and length (pyproj on WGS84); topology checks (contains, within, intersects, touches, crosses, overlaps, disjoint) via Shapely; shape-preserving buffers; union, intersection, difference, centroid, convex hull; CRS transformation of every input geometry |
 | **Places and terrain** | Geocoding and reverse geocoding (OpenStreetMap Nominatim, following its usage policy: ≤ 1 request/s and cached); elevation from Copernicus GLO-30 with Open Elevation fallback and vertical-datum awareness (NAVD88 / EGM96 / WGS84); routing (OSRM); **isochrones** (where can I reach in N minutes on foot, by bike or by car) and travel-time matrices (Valhalla) |
+| **Official datums and heights** | Coordinate conversions exactly as the national agencies define them (GDA94 → GDA2020, MGA zones, British National Grid via OSTN15, NAD27 → NAD83 via NADCON, ITRF at an epoch) and heights between the ellipsoid and AHD, ODN, NZVD2016 or NAVD88 with the official geoid models. Grids are downloaded once; PROJ's silent ballpark fallbacks are refused; every result states the operation and its accuracy |
 | **Live data** | Overture Maps places, buildings, roads and admin areas (no key, via DuckDB); weather and forecasts (Open-Meteo, no key); air quality (OpenAQ v3, free key); active fires (NASA FIRMS, free key); satellite scene search (STAC) |
 | **Agents** | `GeoAgent` (multi-step analysis from a plain-English goal), `SpatialReport` (a location dossier: amenities, accessibility, elevation, weather), `SiteSelector` (multi-criteria site ranking), and a coordinator that routes a goal to the right one |
-| **Interfaces** | Python library, CLI (`geospark …`), REST API (52 documented operations, reference at `/docs`), MCP server (`geospark-mcp`), web playground |
+| **Interfaces** | Python library, CLI (`geospark …`), REST API (54 documented operations, reference at `/docs`), MCP server (`geospark-mcp`), web playground |
 | **Memory and workflows** | Spatial memory with facts, episodes and contradiction detection; a tiered context store; Flows (DAG workflows, buildable from a natural-language goal) |
 | **GeoSpark Bench** | 535 reproducible questions across topology, distance, multi-step reasoning, change and multimodal tasks, with computed ground truth |
 
@@ -185,6 +186,29 @@ uses the release's STAC index to read only the files covering your area, so ther
 no key. Results report the Overture release and the licence of the records returned. The same data is
 available from the CLI (`geospark overture places -37.818 144.969 --category cafe`), the REST API
 (`POST /api/v1/overture/{theme}`) and the MCP tool `overture_features`.
+
+### Official datum and height conversions
+
+```python
+from geospark import geodesy
+
+# A drone's GNSS height at Federation Square, in the Australian Height Datum (AUSGeoid2020)
+geodesy.convert_height(-37.8177, 144.9691, 40.0, "ellipsoidal", "AHD")
+# {'height_m': 35.2574, 'separation_m': 4.7426, 'geoid_model': 'AUSGeoid2020', 'accuracy_m': 0.15, ...}
+
+# GDA94 / MGA zone 55 -> GDA2020 / MGA zone 55 (a 1.55 m shift), with the EPSG operation used
+geodesy.transform("EPSG:28355", "EPSG:7855", [[321242.045, 5812466.767]]).as_dict()
+```
+
+Frontier models know the method but not the national grids: tested in October 2026, GPT-6.1 declined
+every ellipsoid-to-AHD height ("I cannot access the AUSGeoid2020 grid") and Claude Opus 5.5 estimated
+them 0.2-5.3 m off. With these tools attached, 63 of their 64 answers to the same 32 questions
+(Australia, UK, NZ, US) were survey-grade (within 5 cm horizontally, or within the geoid model's
+accuracy for heights), and the last was within 6 cm. PROJ itself falls back silently when
+a grid is missing (AHD becomes the ellipsoidal height, 4.7 m off in Melbourne; British National Grid
+moves about 124 m); GeoSpark refuses instead. Also as `POST /api/v1/transform`, `POST /api/v1/height`
+and the MCP tools `transform_coordinates` and `convert_height`. Grids are cached in
+`$GEOSPARK_DATA_DIR/proj`; set `GEOSPARK_PROJ_NETWORK=false` to never download.
 
 ### Your own data
 

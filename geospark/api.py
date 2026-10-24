@@ -162,6 +162,7 @@ async def lifespan(app: FastAPI):
 OPENAPI_TAGS = [
     {"name": "Spatial", "description": "Geocoding, geodesic distance, elevation, topology and engine operations."},
     {"name": "Ask", "description": "Natural-language questions answered with GeoSpark's tools, with provenance."},
+    {"name": "Geodesy", "description": "Official datum, projection and height conversions with national grids."},
     {"name": "Routing", "description": "Reachable areas (isochrones) and travel times from Valhalla."},
     {"name": "Open map data", "description": "Overture Maps places, buildings, roads and boundaries near a point."},
     {"name": "Live data", "description": "Weather, air quality and active fires."},
@@ -175,6 +176,7 @@ OPENAPI_TAGS = [
 _TAG_BY_PREFIX = [  # longest prefix first
     ("/api/v1/check-relationship", "Spatial"), ("/api/v1/geocode", "Spatial"), ("/api/v1/query", "Spatial"),
     ("/api/v1/distance", "Spatial"), ("/api/v1/elevation", "Spatial"),
+    ("/api/v1/transform", "Geodesy"), ("/api/v1/height", "Geodesy"),
     ("/api/v1/ask", "Ask"),
     ("/api/v1/isochrone", "Routing"), ("/api/v1/travel-time", "Routing"),
     ("/api/v1/overture", "Open map data"),
@@ -1072,6 +1074,53 @@ def travel_time(request: TravelTimeRequest, http: Request, format: str | None = 
 
     result = _routing_call(valhalla.travel_time_matrix, request.origins, request.destinations, request.mode)
     return _geojson(result.to_geojson()) if _wants_geojson(http, format) else result
+
+
+# --- Official datum and height conversions (geospark.geodesy) ---
+
+
+class TransformRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"source_crs": "EPSG:28355", "target_crs": "EPSG:7855", "coordinates": [[321242.045, 5812466.767]]}, "examples": [{"source_crs": "EPSG:28355", "target_crs": "EPSG:7855", "coordinates": [[321242.045, 5812466.767]]}]}}
+
+    source_crs: str = Field(..., max_length=100, description="e.g. EPSG:28355 (GDA94 / MGA zone 55)")
+    target_crs: str = Field(..., max_length=100, description="e.g. EPSG:7855 (GDA2020 / MGA zone 55)")
+    coordinates: list[list[float]] = Field(..., min_length=1, max_length=1000,
+                                           description="[x, y] or [x, y, z]: [lon, lat] or [easting, northing]")
+    epoch: float | None = Field(None, ge=1900, le=2100, description="Decimal year, for ITRF/ATRF frames")
+
+
+class HeightRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"latitude": -37.8177, "longitude": 144.9691, "height_m": 40.0, "from_reference": "ellipsoidal", "to_reference": "AHD"}, "examples": [{"latitude": -37.8177, "longitude": 144.9691, "height_m": 40.0, "from_reference": "ellipsoidal", "to_reference": "AHD"}]}}
+
+    latitude: float = Field(..., ge=-90, le=90)
+    longitude: float = Field(..., ge=-180, le=180)
+    height_m: float = Field(..., ge=-1000, le=10_000)
+    from_reference: str = Field(..., max_length=40, description="'ellipsoidal', AHD, ODN, NZVD2016, NAVD88, EGM2008")
+    to_reference: str = Field(..., max_length=40, description="'ellipsoidal', AHD, ODN, NZVD2016, NAVD88, EGM2008")
+
+
+@app.post("/api/v1/transform", dependencies=[Depends(verify_api_key)])
+def transform_coordinates(request: TransformRequest):
+    """Convert coordinates as the official transformation does (national grids, never PROJ's ballpark
+    approximation), with the operation used and its stated accuracy."""
+    from geospark import geodesy
+
+    try:
+        return geodesy.transform(request.source_crs, request.target_crs, request.coordinates, request.epoch).as_dict()
+    except geodesy.GeodesyError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from None
+
+
+@app.post("/api/v1/height", dependencies=[Depends(verify_api_key)])
+def convert_height(request: HeightRequest):
+    """Convert a height between the ellipsoid (GNSS) and a national height datum with its official geoid model."""
+    from geospark import geodesy
+
+    try:
+        return geodesy.convert_height(request.latitude, request.longitude, request.height_m,
+                                      request.from_reference, request.to_reference)
+    except geodesy.GeodesyError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from None
 
 
 # --- Agent Endpoints ---

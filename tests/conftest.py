@@ -18,6 +18,8 @@ _DATA_DIR = tempfile.mkdtemp(prefix="geospark-tests-")
 os.environ["GEOSPARK_DATA_DIR"] = _DATA_DIR
 os.environ["GEOSPARK_AUDIT_DIR"] = os.path.join(_DATA_DIR, "audit")
 os.environ["GEOSPARK_USAGE_DIR"] = os.path.join(_DATA_DIR, "usage")
+# Official transformation grids are never downloaded in tests (see geospark.geodesy)
+os.environ["GEOSPARK_PROJ_NETWORK"] = "false"
 # No 1 req/s Nominatim spacing in tests (nothing reaches the real server anyway)
 os.environ["GEOSPARK_NOMINATIM_MIN_INTERVAL"] = "0"
 

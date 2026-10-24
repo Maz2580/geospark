@@ -35,7 +35,9 @@ from geospark.utils import concurrency
 INSTRUCTIONS = """\
 GeoSpark computes spatial answers instead of guessing them. Use it for distances, containment and
 other topology, buffers and areas, geocoding, elevation, routing, weather, air quality, active
-fires, location reports and site selection.
+fires, location reports, site selection, and official datum and height conversions.
+- For datum shifts (GDA94/GDA2020, OSGB36, NAD27/NAD83) and heights (AHD, ODN, NZVD2016, NAVD88),
+  call transform_coordinates / convert_height: they use the national grids. Don't estimate them.
 - Coordinates are GeoJSON order: [longitude, latitude], WGS84.
 - For distances between named places, give calculate_distance the names (place_a, place_b): the
   server geocodes them. Never type coordinates for a place from memory.
@@ -107,6 +109,27 @@ class ElevationResult(Checkable):
     vertical_datum: str | None = None
     quality: dict[str, Any] = Field(default_factory=dict, description="e.g. vertical_accuracy_le90_m")
     attribution: str | None = None
+
+
+class TransformResult(Checkable):
+    coordinates: list[list[float]] = Field(description="Transformed points, in the target CRS's x/y(/z) order")
+    source_crs: str
+    target_crs: str
+    method: str = Field(description="The EPSG operation used")
+    accuracy_m: float | None = Field(description="The operation's stated accuracy; null for an exact conversion")
+    grids: list[str] = Field(default_factory=list, description="Official grid files the operation used")
+    area_of_use: str | None = None
+
+
+class HeightResult(Checkable):
+    height_m: float
+    from_reference: str
+    to_reference: str
+    geoid_model: str
+    separation_m: float = Field(description="Ellipsoidal height minus the datum height at this point")
+    method: str
+    accuracy_m: float | None
+    grids: list[str] = Field(default_factory=list)
 
 
 class FeatureCollection(BaseModel):
@@ -398,6 +421,57 @@ def create_server(local_files: bool = False) -> MCPServer:
         except OvertureError as e:
             raise ToolError(str(e)) from e
         return _collection(result)
+
+    @mcp.tool(title="Transform coordinates (official datums)", annotations=READ_ONLY_WEB)
+    async def transform_coordinates(
+        source_crs: Annotated[str, Field(max_length=100, description="e.g. EPSG:28355 (GDA94 / MGA zone 55)")],
+        target_crs: Annotated[str, Field(max_length=100, description="e.g. EPSG:7855 (GDA2020 / MGA zone 55)")],
+        coordinates: Annotated[list[list[float]], Field(min_length=1, max_length=1000,
+                                                        description="[x, y] or [x, y, z]: [lon, lat] or [easting, northing]")],
+        epoch: Annotated[float | None, Field(ge=1900, le=2100, description="Decimal year, for ITRF/ATRF frames")] = None,
+    ) -> TransformResult:
+        """Convert coordinates between CRSs as the official transformation does: GDA94 to GDA2020,
+        MGA zones, British National Grid (OSTN15), NAD27 to NAD83 (NADCON), ITRF at an epoch, and
+        any other EPSG pair. Uses national grids (downloaded once), refuses PROJ's ballpark
+        approximations, and returns the operation and its stated accuracy. Use this instead of
+        applying datum parameters yourself."""
+        from geospark import geodesy
+
+        try:
+            done = await _blocking(geodesy.transform, source_crs, target_crs, coordinates, epoch)
+        except geodesy.GeodesyError as e:
+            raise ToolError(str(e)) from e
+        out = done.as_dict()
+        return TransformResult(
+            coordinates=out["coordinates"], source_crs=out["source_crs"], target_crs=out["target_crs"],
+            method=out["method"], accuracy_m=out["accuracy_m"], grids=out["grids"], area_of_use=out["area_of_use"],
+            warnings=out["warnings"], provenance=out["provenance"],
+            units={"coordinates": "degrees or metres, as the target CRS defines"},
+        )
+
+    @mcp.tool(title="Convert height (geoid models)", annotations=READ_ONLY_WEB)
+    async def convert_height(
+        latitude: Latitude,
+        longitude: Longitude,
+        height_m: Annotated[float, Field(ge=-1000, le=10_000, description="The height to convert, in metres")],
+        from_reference: Annotated[str, Field(description="'ellipsoidal', AHD, ODN, NZVD2016, NAVD88 or EGM2008")],
+        to_reference: Annotated[str, Field(description="'ellipsoidal', AHD, ODN, NZVD2016, NAVD88 or EGM2008")],
+    ) -> HeightResult:
+        """Convert a height between the ellipsoid (GNSS, drones) and a national height datum with the
+        official geoid model: AHD (AUSGeoid2020), ODN (OSGM15), NZVD2016 (NZGeoid2016), NAVD88
+        (GEOID18), or global EGM2008. Never estimate a geoid separation from memory: it is often
+        tens of metres and varies by metres across a region."""
+        from geospark import geodesy
+
+        try:
+            out = await _blocking(geodesy.convert_height, latitude, longitude, height_m, from_reference, to_reference)
+        except geodesy.GeodesyError as e:
+            raise ToolError(str(e)) from e
+        return HeightResult(
+            height_m=out["height_m"], from_reference=out["from"], to_reference=out["to"], geoid_model=out["geoid_model"],
+            separation_m=out["separation_m"], method=out["method"], accuracy_m=out["accuracy_m"], grids=out["grids"],
+            warnings=out["warnings"], provenance=out["provenance"], units={"height_m": "metre", "separation_m": "metre"},
+        )
 
     @mcp.tool(title="Location report", annotations=READ_ONLY_WEB)
     async def location_report(

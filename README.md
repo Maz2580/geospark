@@ -103,7 +103,7 @@ public server, add `-e GEOSPARK_ENV=production -e GEOSPARK_ADMIN_TOKEN=<secret>`
 |---|---|
 | **Spatial engine** | Geodesic distance, area and length (pyproj on WGS84); topology checks (contains, within, intersects, touches, crosses, overlaps, disjoint) via Shapely; shape-preserving buffers; union, intersection, difference, centroid, convex hull; CRS transformation of every input geometry |
 | **Places and terrain** | Geocoding and reverse geocoding (OpenStreetMap Nominatim, following its usage policy: ≤ 1 request/s and cached); elevation from Copernicus GLO-30 with Open Elevation fallback and vertical-datum awareness (NAVD88 / EGM96 / WGS84); routing (OSRM); **isochrones** (where can I reach in N minutes on foot, by bike or by car) and travel-time matrices (Valhalla) |
-| **Official datums and heights** | Coordinate conversions exactly as the national agencies define them (GDA94 → GDA2020, MGA zones, British National Grid via OSTN15, NAD27 → NAD83 via NADCON, ITRF at an epoch) and heights between the ellipsoid and AHD, ODN, NZVD2016 or NAVD88 with the official geoid models. Grids are downloaded once; PROJ's silent ballpark fallbacks are refused; every result states the operation and its accuracy |
+| **Official datums and heights** | Coordinate conversions with the national agencies' published transformations and grids, as PROJ implements them (GDA94 → GDA2020, MGA zones, British National Grid via OSTN15, NAD27 → NAD83 via NADCON, ITRF at an epoch) and heights between the ellipsoid and AHD, ODN, NZVD2016 or NAVD88 with the official geoid models. Grids are downloaded once; PROJ's silent ballpark fallbacks are refused; every result states the operation and its accuracy |
 | **Live data** | Overture Maps places, buildings, roads and admin areas (no key, via DuckDB); weather and forecasts (Open-Meteo, no key); air quality (OpenAQ v3, free key); active fires (NASA FIRMS, free key); satellite scene search (STAC) |
 | **Agents** | `GeoAgent` (multi-step analysis from a plain-English goal), `SpatialReport` (a location dossier: amenities, accessibility, elevation, weather), `SiteSelector` (multi-criteria site ranking), and a coordinator that routes a goal to the right one |
 | **Interfaces** | Python library, CLI (`geospark …`), REST API (54 documented operations, reference at `/docs`), MCP server (`geospark-mcp`), web playground |
@@ -200,13 +200,22 @@ geodesy.convert_height(-37.8177, 144.9691, 40.0, "ellipsoidal", "AHD")
 geodesy.transform("EPSG:28355", "EPSG:7855", [[321242.045, 5812466.767]]).as_dict()
 ```
 
-Frontier models know the method but not the national grids: tested in October 2026, GPT-6.1 declined
-every ellipsoid-to-AHD height ("I cannot access the AUSGeoid2020 grid") and Claude Opus 5.5 estimated
-them 0.2-5.3 m off. With these tools attached, 63 of their 64 answers to the same 32 questions
-(Australia, UK, NZ, US) were survey-grade (within 5 cm horizontally, or within the geoid model's
-accuracy for heights), and the last was within 6 cm. PROJ itself falls back silently when
-a grid is missing (AHD becomes the ellipsoidal height, 4.7 m off in Melbourne; British National Grid
-moves about 124 m); GeoSpark refuses instead. Also as `POST /api/v1/transform`, `POST /api/v1/height`
+In our October 2026 test of two frontier models, both applied datum parameters and plate motion
+correctly but could not use the national grids: GPT-6.1 declined every ellipsoid-to-AHD height ("I
+cannot access the AUSGeoid2020 grid") and Claude Opus 5.5 estimated them 0.2-5.3 m off. PROJ itself
+falls back silently when a grid is missing (AHD becomes the ellipsoidal height, 4.7 m off in
+Melbourne; British National Grid moves about 124 m); GeoSpark refuses instead.
+
+**Checked against the agencies themselves**, not only against PROJ: GDA94 to GDA2020 and ATRF2014 to
+GDA2020 agree with Geoscience Australia's geodetic calculators API to within 0.1 mm at eight points
+across Australia, and NAVD88 heights agree with the US National Geodetic Survey's GEOID18 service to
+1 mm. Two limits to know: AHD is refused outside mainland Australia and Tasmania (the AUSGeoid2020
+grid extends over the sea and to external territories, where AHD doesn't apply), and NAD27 to NAD83
+uses the original NADCON grid, which differs from NGS's current NADCON 5 by about 0.27 m in San
+Francisco (within NADCON 5's own stated uncertainty there). The accuracy given with each result is
+the one EPSG states for the operation, not a measurement.
+
+Also as `POST /api/v1/transform`, `POST /api/v1/height`
 and the MCP tools `transform_coordinates` and `convert_height`. Grids are cached in
 `$GEOSPARK_DATA_DIR/proj`; set `GEOSPARK_PROJ_NETWORK=false` to never download.
 
@@ -221,9 +230,11 @@ geospark layer intersect parcels.gpkg flood_zones.geojson
 ```
 
 Formats: GeoJSON, GeoPackage, Shapefile (or a .zip), GeoParquet, CSV with longitude/latitude
-columns, FlatGeobuf, KML, GML, File Geodatabase. **The CRS is never guessed**:
+columns, FlatGeobuf, KML, GML, File Geodatabase. **The CRS comes from the file, not a guess**:
 - a projected file (e.g. MGA zone 55) is reprojected, and its original CRS is reported;
 - a Shapefile without `.prj` is refused until you pass `--crs EPSG:28355`;
+- a CSV has no CRS: longitude/latitude columns are read as WGS 84 and the result says so (pass
+  `--crs` for GDA94 or another datum); x/y columns are refused until you name the CRS;
 - invalid shapes are refused until you pass `--repair`.
 
 Results carry each file's SHA-256, so an analysis can be reproduced against exactly that data. In
@@ -400,7 +411,8 @@ The finding has moved on since the first run: the newest frontier models now han
 on their own, and with tools a 4B model on a workstation answers them as well as they do.
 
 **Datum and height conversions** (new; 32 questions in Australia, the UK, New Zealand and the US,
-with official answers from PROJ's most accurate EPSG operations and the national grids: GDA94 to
+with answers computed by PROJ's most accurate EPSG operations and the national grids (checked
+against Geoscience Australia's and NGS's own services where they offer one; see above): GDA94 to
 GDA2020, MGA zones, ITRF2014 to GDA2020 at an epoch, ellipsoidal heights to AHD, ODN, NZVD2016 and
 NAVD88, OSTN15, NAD27 to NAD83). Survey-grade means within 5 cm, or within the geoid model's stated
 accuracy for heights:
@@ -411,6 +423,11 @@ accuracy for heights:
 | GPT-6.1 | 13 | 2 | 1 (1.65 m off) | 16 | **32 survey-grade** |
 
 ⁴ Two British National Grid answers ran past an 8,000-token reply limit while working by hand.
+
+Because GeoSpark's tools also use PROJ, the with-tools column shows that the models used the tools
+correctly; whether PROJ's answers are right is the separate agency check above. For the two NAD27
+questions the reference itself is only good to about 0.27 m (NGS's stated uncertainty), so "survey-grade"
+there means agreement with PROJ's NADCON, not centimetre truth.
 
 Both models apply datum parameters, plate motion and map projections to the millimetre. What they
 can't do is read the national grids that heights and some datum conversions depend on: GPT-6.1

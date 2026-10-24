@@ -4,6 +4,30 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Fixed: found by auditing our own claims
+- **Datum and height conversions, edge cases tested on the live site:**
+  - AHD was given for Christmas Island, the Cocos Islands and at sea, because the AUSGeoid2020 grid has
+    values there; AHD is the datum of mainland Australia and Tasmania, so those are now refused, and every
+    AHD result says the model is valid onshore.
+  - Asked for GDA2020 / MGA zone 55, Ask's model converted to a Lambert projection (an EPSG code it
+    picked) and called the result MGA zone 55, with status "ok". Tools now take CRS names ("GDA2020 /
+    MGA zone 55") as well as codes, and an answer whose conversion targets a different zone or datum
+    than the question names is marked partial, with the system actually used in the warning.
+  - Coordinates given as [latitude, longitude] are named as such; an epoch that has no effect (a static
+    datum) is reported; a point outside the target CRS's area of use is flagged; a refusal no longer
+    lists grids that don't cover the point (NAD27 in Hawaii listed nine).
+- **Claims on the website and in the README:**
+  - "Topology … correct on the ellipsoid" was wrong: topology is exact on the coordinates (straight
+    edges in longitude/latitude); distances, areas and buffers are geodesic.
+  - "The CRS is never guessed": a CSV's latitude/longitude columns are read as WGS 84 (with a caveat),
+    which is now said plainly.
+  - The 1-95% / 76-96% benchmark figures are dated (GeoSpark Bench v2) and followed by the October 2026
+    re-check; "never a guess from memory" now says what is true (coordinates a model types are flagged).
+  - The geodesy section says how the answers were checked: against Geoscience Australia's calculators
+    API (within 0.1 mm) and NGS's GEOID18 service (1 mm); NAD27 to NAD83 uses the original NADCON, about
+    0.27 m from NGS's NADCON 5 in San Francisco. Results matching PROJ when the tools use PROJ is stated
+    as what it is: the model used the tool correctly.
+
 ### Added
 - **README: "Re-check with current models (October 2026)"**, next to the original GeoSpark Bench v2
   results: a GeoSpark Bench sample on Claude Opus 5.5, GPT-6.1 and open models on a local workstation,

@@ -16,6 +16,9 @@ _os.environ.setdefault(
     "PROJ_USER_WRITABLE_DIRECTORY",
     str(_Path(_os.getenv("GEOSPARK_DATA_DIR") or _Path.home() / ".geospark") / "proj"),
 )
+# PROJ never downloads by itself: its on-demand download works only on the thread that enabled it,
+# and the API answers on worker threads. geospark.geodesy fetches whole official grid files instead.
+_os.environ.setdefault("PROJ_NETWORK", "OFF")
 
 from geospark.engine.core import Engine
 

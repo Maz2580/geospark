@@ -109,8 +109,12 @@ io = [
 overture = [
     "duckdb>=1.1",
 ]
+# Point clouds (LAS, LAZ, COPC) and rasters (GeoTIFF, COG) for `layer check`, read in pure Rust
+pointcloud = [
+    "terrio>=0.5,<0.6",
+]
 all = [
-    "geospark-ai[geo,api,llm,supabase,viz,satellite,postgis,mcp,terrain,intelligence,overture,io]",
+    "geospark-ai[geo,api,llm,supabase,viz,satellite,postgis,mcp,terrain,intelligence,overture,io,pointcloud]",
 ]
 dev = [
     "pytest>=8.0",
@@ -122,6 +126,7 @@ dev = [
     # Reads our GeoJSON with GDAL, the same driver QGIS uses (export tests)
     "pyogrio>=0.7",
     "pyarrow>=14",  # GeoParquet tests
+    "terrio>=0.5,<0.6",  # point cloud and raster checks
 ]
 
 [project.scripts]

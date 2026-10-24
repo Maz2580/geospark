@@ -4,6 +4,28 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Added
+- **Point clouds and rasters in `layer check`** (`pip install "geospark-ai[pointcloud]"`; Python
+  `geospark.io.surface`; the local MCP tool `check_dataset`). LAS, LAZ, COPC, GeoTIFF and COG files,
+  local or by URL, read with [terrio](https://github.com/opengeos/terrio) (pure Rust; a remote COPC or
+  COG is read in place). One file: horizontal and vertical CRS, height units (feet, US survey feet),
+  no vertical CRS, no ground class, a label outside its area. Against survey marks with heights: the
+  surface height at each mark (ground points within 1 m, or the DEM cell; marks converted with the
+  official transformation), naming ellipsoidal heights labelled AHD, ODN, NZVD2016 or NAVD88, heights
+  in feet, and undeclared heights that match. Tested on synthetic tiles and DEMs and on a public
+  COPC file's header; not yet on a real delivery with known errors.
+  - Why terrio only reads: tested before use, its transformations match GeoSpark's within 1 mm when
+    the official grids are present, but without them it returns AHD equal to the ellipsoidal height
+    (4.7 m off in Melbourne) and British National Grid 1.7 m off, with no warning, as PROJ does.
+    GeoSpark's own conversions refuse that.
+
+### Fixed
+- A file labelled with a compound CRS (horizontal + vertical, e.g. `EPSG:7855+5711`) was never checked
+  for points outside the CRS's area: pyproj gives a compound CRS no area of use. The horizontal part's
+  area is used now.
+- A height difference between two layers is checked against the national geoid where the layers are
+  (AUSGeoid2020, OSGM15, NZGeoid2016 or GEOID18), not only AUSGeoid2020.
+
 ## [0.10.0] - 2026-10-24: official datums, checked data, safer small models
 
 GeoSpark now does datum and height conversions that need a national grid (AUSGeoid2020,

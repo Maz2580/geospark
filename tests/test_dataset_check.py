@@ -192,3 +192,9 @@ def test_gda2020_numbers_labelled_gda94_are_named_the_other_way_round(tmp_path) 
     report = check.compare_layers(a, b, crs_a="EPSG:28355", crs_b="EPSG:28355")  # ...labelled GDA94
     finding = next(f for f in report["findings"] if f["code"] == "gda94_gda2020_mixed")
     assert finding["evidence"]["mislabelled_layer"] == "service_gda94.csv" and finding["evidence"]["holds"] == "GDA2020"
+
+
+def test_a_compound_crs_label_is_checked_against_its_horizontal_area(tmp_path) -> None:
+    """pyproj gives a compound CRS no area of use, so a wrong compound label went unflagged."""
+    report = check.check_layer(_csv(tmp_path / "a.csv", MARKS_GDA2020_MGA55), crs="EPSG:2992+6360")
+    assert "outside_area_of_use" in _codes(report)

@@ -297,6 +297,26 @@ heights, and found nothing wrong when they were labelled correctly (6 mm). The e
 pipeline; in Python, `geospark.io.check.check_layer` and `compare_layers`; for Claude, the local MCP
 tool `check_dataset`.
 
+**LiDAR and DEMs** (LAS, LAZ, COPC, GeoTIFF, COG; local or by URL) are checked the same way with the
+`pointcloud` extra, which reads them with [terrio](https://github.com/opengeos/terrio) (pure Rust, no
+GDAL or PDAL):
+
+```bash
+pip install "geospark-ai[pointcloud]"
+geospark layer check tile.laz                                   # CRS, vertical CRS, height units, ground class
+geospark layer check tile.laz --against marks.csv --against-crs EPSG:7855
+# problem: Heights differ by +4.74 m, the AUSGeoid2020 separation here (4.74 m): tile.laz has
+#          ellipsoidal (GNSS) heights and the other AHD heights.
+```
+
+Against survey marks with heights, the surface height at each mark (the median of ground points
+within 1 m, or the DEM cell) is compared with the mark's: ellipsoidal heights labelled AHD (or ODN,
+NZVD2016, NAVD88), heights in feet, and an undeclared vertical CRS are named. Tested on synthetic
+tiles and DEMs with each mistake, and on reading a public 10.6-million-point COPC file's header by
+URL (horizontal and vertical CRS in 2 s); not yet against a real LiDAR delivery with known errors.
+Datum and height conversions stay in GeoSpark's own tools: terrio, like PROJ, keeps a height
+unchanged when a geoid grid is missing.
+
 Results carry each file's SHA-256, so an analysis can be reproduced against exactly that data. In
 Python, use `geospark.io.layers` (`load_layer`, `count_within`, `nearest`, `intersect`). The local
 MCP server (`geospark-mcp`) offers the same as `layer_*` tools; the hosted `/mcp` endpoint never reads

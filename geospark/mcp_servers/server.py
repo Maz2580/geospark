@@ -553,7 +553,9 @@ def _add_local_file_tools(mcp: MCPServer) -> None:
         (projected numbers labelled as degrees, swapped lat/lon, points outside the zone), datum and
         height-reference caveats. With against_path, measure the offset to a reference layer and name
         the cause when the numbers match one: GDA94 data labelled GDA2020, the wrong MGA zone, feet,
-        a plate-motion epoch, or ellipsoidal vs AHD heights. Says 'unexplained' rather than guessing."""
+        a plate-motion epoch, or ellipsoidal vs AHD heights. Says 'unexplained' rather than guessing.
+        Also reads point clouds (LAS/LAZ/COPC) and rasters (GeoTIFF/COG), local or by URL: their
+        vertical CRS, and with against_path (survey marks with heights) their height at each mark."""
         from geospark.io.check import check_layer, compare_layers
 
         if against_path:

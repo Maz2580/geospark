@@ -8,6 +8,10 @@ evidence in the coordinates themselves and says what it found, how sure it is, a
     check_layer(path)                 one file: CRS declared? numbers consistent with it? height reference?
     compare_layers(path_a, path_b)    two files: the systematic offset between them, and its likely cause
 
+Point clouds (LAS, LAZ, COPC) and rasters (GeoTIFF, COG), local or by URL, are read with terrio
+(``geospark.io.surface``, optional). Compared with survey marks, a surface's heights are looked up at
+each mark, so LiDAR delivered in ellipsoidal heights, or in feet, is named.
+
 Every finding has a ``code``, a ``severity`` ("problem", "caveat" or "info"), a plain message and the
 numbers behind it. A cause is only named when the measured offset matches it (for example the official
 GDA94 to GDA2020 shift at that place, within 0.25 m); otherwise the offset is reported unexplained.
@@ -23,7 +27,7 @@ from typing import Any
 
 from pyproj import CRS, Geod, Transformer
 
-from geospark.io import layers
+from geospark.io import layers, surface
 
 _GEOD = Geod(ellps="GRS80")
 _AUSTRALIA = (112.0, -44.5, 154.5, -9.0)  # lon/lat box of mainland Australia and Tasmania
@@ -50,6 +54,7 @@ class _Raw:
     crs: CRS  # the declared CRS, or the one assumed (a CSV's WGS 84) or given
     crs_declared: bool
     warnings: list[str]
+    surface: surface.Surface | None = None  # a point cloud or raster
 
 
 # --- reading -----------------------------------------------------------------------------------
@@ -64,7 +69,22 @@ def _representative(geom: Any) -> tuple[tuple[float, float], float | None] | Non
     return (p.x, p.y), None
 
 
+def _read_surface(path: str | Path, crs: str | None) -> tuple[_Raw | None, list[Finding]]:
+    try:
+        s = surface.open_surface(path, crs)
+    except surface.SurfaceError as e:
+        return None, [Finding("unreadable", "problem", str(e))]
+    if s.crs is None:
+        what = "point cloud" if s.kind == "pointcloud" else "raster"
+        return None, [Finding("crs_missing", "problem",
+                              f"The {what} {s.name} doesn't say which coordinate reference system it is in; pass crs= "
+                              "(e.g. EPSG:7855, or EPSG:7855+5711 with AHD heights).")]
+    return _Raw(s.name, s.xy, list(s.z_m), [{} for _ in s.xy], s.crs, s.crs_declared, list(s.warnings), s), []
+
+
 def _read_raw(path: str | Path, layer: str | None, crs: str | None) -> tuple[_Raw | None, list[Finding]]:
+    if surface.kind(path):
+        return _read_surface(path, crs)
     p = Path(path).expanduser()
     findings: list[Finding] = []
     suffix = p.suffix.lower()
@@ -130,10 +150,14 @@ def _in_box(lonlats: list[tuple[float, float]], box: tuple[float, float, float, 
 def check_layer(path: str | Path, layer: str | None = None, crs: str | None = None) -> dict[str, Any]:
     """What a file says about its coordinates, and whether its numbers agree with that."""
     raw, findings = _read_raw(path, layer, crs)
-    report: dict[str, Any] = {"file": Path(path).name, "findings": findings}
+    report: dict[str, Any] = {"file": raw.name if raw else Path(str(path)).name, "findings": findings}
     if raw is None:
         return _finish(report)
     report.update(features=len(raw.xy), crs=raw.crs.name, crs_declared=raw.crs_declared, datum=_datum_name(raw.crs))
+    if raw.surface:
+        s = raw.surface
+        report.update(kind=s.kind, features=s.count, sampled=len(s.xy),
+                      vertical_crs=s.vertical.name if s.vertical is not None else None)
     if not raw.xy:
         findings.append(Finding("empty", "problem", "The file has no geometries."))
         return _finish(report)
@@ -167,7 +191,9 @@ def check_layer(path: str | Path, layer: str | None = None, crs: str | None = No
     lonlats = _to_lonlat(raw.crs, raw.xy)
     report["extent_lonlat"] = [min(p[0] for p in lonlats), min(p[1] for p in lonlats),
                                max(p[0] for p in lonlats), max(p[1] for p in lonlats)] if lonlats else None
-    area = raw.crs.area_of_use
+    # A compound CRS (horizontal + vertical) has no area of use of its own: use the horizontal part's
+    horizontal = next((c for c in raw.crs.sub_crs_list if not c.is_vertical), raw.crs) if raw.crs.is_compound else raw.crs
+    area = horizontal.area_of_use
     if area and lonlats:
         margin = 0.5
         outside = [1 for lon, lat in lonlats
@@ -190,7 +216,10 @@ def check_layer(path: str | Path, layer: str | None = None, crs: str | None = No
                                 "The data is in GDA94, which GDA2020 superseded. GeoSpark converts it with the official "
                                 "transformation; tools that treat the two as the same put it about 1.5-1.8 m off."))
 
-    _height_findings(raw, findings)
+    if raw.surface:
+        _surface_height_findings(raw.surface, findings)
+    else:
+        _height_findings(raw, findings)
     report["warnings"] = raw.warnings
     return _finish(report)
 
@@ -223,6 +252,30 @@ def _height_findings(raw: _Raw, findings: list[Finding]) -> None:
         findings.append(Finding("height_reference_from_name", "info",
                                 f"Height reference taken from the field name: {', '.join(stated)}. A name is a hint, not a "
                                 "guarantee.", {"fields": stated}))
+
+
+def _surface_height_findings(s: surface.Surface, findings: list[Finding]) -> None:
+    what = "point heights" if s.kind == "pointcloud" else "raster values"
+    if s.vertical is None:
+        findings.append(Finding("height_reference_unstated", "caveat",
+                                f"The {what} of {s.name} have no vertical CRS: nothing says whether they are ellipsoidal "
+                                "(GNSS) or above a height datum such as AHD. In Melbourne the two differ by about 4.7 m; in "
+                                "Perth by 32 m. Compare with survey marks (--against) to find out.",
+                                {"fields": [f"the {what}"]}))
+    else:
+        findings.append(Finding("vertical_crs", "info", f"Heights are declared as {s.vertical.name}.",
+                                {"vertical_crs": s.vertical.name}))
+    factor = s.z_factor
+    if abs(factor - 1.0) > 1e-9:
+        unit = (s.vertical or s.horizontal).axis_info[0].unit_name  # type: ignore[union-attr]  # factor != 1 needs one
+        findings.append(Finding("height_units", "info",
+                                f"Heights are in {unit} ({factor:.10g} m each); GeoSpark converts them to metres when "
+                                "comparing." + ("" if s.vertical is not None else " With no vertical CRS, the height unit "
+                                "is taken to be the horizontal one."), {"metres_per_unit": factor}))
+    if s.kind == "pointcloud" and not s.ground:
+        findings.append(Finding("no_ground_class", "info",
+                                "No points are classified as ground (class 2) in the sample read, so a comparison with "
+                                "survey marks uses all points near each mark (trees and roofs included)."))
 
 
 def _finish(report: dict[str, Any]) -> dict[str, Any]:
@@ -300,11 +353,15 @@ def compare_layers(path_a: str | Path, path_b: str | Path, crs_a: str | None = N
     ra, fa = _read_raw(path_a, None, crs_a)
     rb, fb = _read_raw(path_b, None, crs_b)
     findings: list[Finding] = fa + fb
-    report: dict[str, Any] = {"reference": Path(path_a).name, "compared": Path(path_b).name, "findings": findings}
+    report: dict[str, Any] = {"reference": ra.name if ra else Path(str(path_a)).name,
+                              "compared": rb.name if rb else Path(str(path_b)).name, "findings": findings}
     if ra is None or rb is None or not ra.xy or not rb.xy:
         findings.append(Finding("not_compared", "problem", "Both files need readable geometries and a CRS to be compared."))
         return _finish(report)
     report.update(crs_reference=ra.crs.name, crs_compared=rb.crs.name)
+    if ra.surface or rb.surface:
+        _surface_compare(ra, rb, report, findings)
+        return _finish(report)
     a_ll, b_ll = _wgs84(ra), _wgs84(rb)
     ca, cb = _centre(a_ll), _centre(b_ll)
     apart = _GEOD.inv(ca[0], ca[1], cb[0], cb[1])[2]
@@ -426,41 +483,127 @@ def _diagnose(centre: tuple[float, float], de: float, dn: float, ra: _Raw, rb: _
 
 def _height_compare(ra: _Raw, rb: _Raw, pairs: list[tuple[int, int]], centre: tuple[float, float],
                     findings: list[Finding]) -> None:
-    def heights(raw: _Raw) -> list[float | None]:
-        fields = _height_fields(raw)
-        if any(z is not None for z in raw.z):
-            return raw.z
-        out: list[float | None] = []
-        for p in raw.props if fields else []:
-            try:
-                out.append(float(p[fields[0]]))
-            except (KeyError, TypeError, ValueError):
-                out.append(None)
-        return out
-
-    ha, hb = heights(ra), heights(rb)
+    ha, hb = _mark_heights(ra), _mark_heights(rb)
     if not ha or not hb:
         return
     diffs = [b - a for i, j in pairs if (a := ha[i]) is not None and (b := hb[j]) is not None]
     if len(diffs) < 3:
         return
-    dz = statistics.median(diffs)
-    if abs(dz) < 0.05:
-        return
+    _height_verdict(diffs, centre, ra, rb, findings)
+
+
+def _geoid_separation(centre: tuple[float, float]) -> tuple[float, str, str] | None:
+    """(separation in metres, height datum, geoid model) of the national datum at a place."""
     from geospark import geodesy
 
-    try:
-        n = geodesy.convert_height(centre[1], centre[0], 100.0, "ellipsoidal", "AHD")["separation_m"]
-    except geodesy.GeodesyError:
-        n = None
-    if n is not None and abs(abs(dz) - abs(n)) < 0.3:
+    for datum in ("AHD", "ODN", "NZVD2016", "NAVD88"):
+        try:
+            r = geodesy.convert_height(centre[1], centre[0], 100.0, "ellipsoidal", datum)
+        except geodesy.GeodesyError:
+            continue
+        return r["separation_m"], datum, r.get("geoid_model", "geoid")
+    return None
+
+
+def _height_verdict(diffs: list[float], centre: tuple[float, float], ra: _Raw, rb: _Raw, findings: list[Finding],
+                    say_consistent: bool = False) -> None:
+    """Name the cause of a height difference B - A when it matches one."""
+    dz = statistics.median(diffs)
+    spread = statistics.median(abs(d - dz) for d in diffs)
+    if abs(dz) < max(0.05, 2 * spread):
+        if say_consistent:
+            findings.append(Finding("heights_consistent", "info",
+                                    f"Heights agree: median difference {dz:+.3f} m (scatter {spread:.3f} m) over "
+                                    f"{len(diffs)} marks.", {"median_dz_m": round(dz, 3), "spread_m": round(spread, 3)}))
+        return
+    sep = _geoid_separation(centre)
+    if sep is not None and abs(abs(dz) - abs(sep[0])) < 0.3:
+        n, datum, model = sep
         higher = rb.name if dz > 0 else ra.name
         findings.append(Finding("ellipsoidal_vs_ahd", "problem",
-                                f"Heights differ by {dz:+.2f} m, the AUSGeoid2020 separation here ({n:.2f} m): {higher} has "
-                                "ellipsoidal (GNSS) heights and the other AHD heights, or the reverse where the geoid is "
-                                "below the ellipsoid.", {"median_dz_m": round(dz, 3), "geoid_separation_m": round(n, 3)}))
+                                f"Heights differ by {dz:+.2f} m, the {model} separation here ({n:.2f} m): {higher} has "
+                                f"ellipsoidal (GNSS) heights and the other {datum} heights, or the reverse where the geoid is "
+                                "below the ellipsoid.", {"median_dz_m": round(dz, 3), "geoid_separation_m": round(n, 3),
+                                                          "height_datum": datum}))
     else:
         findings.append(Finding("height_offset", "caveat",
-                                f"Heights differ by a median {dz:+.2f} m between the layers"
-                                + (f"; that is not the local geoid separation ({n:.2f} m)." if n is not None else "."),
-                                {"median_dz_m": round(dz, 3)}))
+                                f"Heights differ by a median {dz:+.2f} m (scatter {spread:.2f} m) between the layers"
+                                + (f"; that is not the local geoid separation ({sep[0]:.2f} m)." if sep is not None else "."),
+                                {"median_dz_m": round(dz, 3), "spread_m": round(spread, 3)}))
+
+
+def _mark_heights(raw: _Raw) -> list[float | None]:
+    fields = _height_fields(raw)
+    if any(z is not None for z in raw.z):
+        return raw.z
+    out: list[float | None] = []
+    for p in raw.props if fields else []:
+        try:
+            out.append(float(p[fields[0]]))
+        except (KeyError, TypeError, ValueError):
+            out.append(None)
+    return out
+
+
+def _surface_compare(ra: _Raw, rb: _Raw, report: dict[str, Any], findings: list[Finding]) -> None:
+    """Survey marks against a point cloud or raster: the surface's height at each mark."""
+    from geospark import geodesy
+
+    if ra.surface and rb.surface:
+        findings.append(Finding("not_compared", "problem",
+                                "Compare a point cloud or raster with survey marks (points with heights), not with another "
+                                "point cloud or raster."))
+        return
+    surf, marks = (ra, rb) if ra.surface else (rb, ra)
+    s = surf.surface
+    assert s is not None
+    heights = _mark_heights(marks)
+    keep = [i for i, h in enumerate(heights) if h is not None][: surface.MAX_MARKS]
+    if len(keep) < 3:
+        findings.append(Finding("not_compared", "problem",
+                                f"{marks.name} needs at least 3 points with heights (a Z value or a height field) to check "
+                                f"{s.name}'s heights."))
+        return
+    to_crs = s.horizontal
+    assert to_crs is not None  # _read_surface refuses a surface without a CRS
+    from_crs = marks.crs.sub_crs_list[0] if marks.crs.is_compound else marks.crs
+    pts = [list(marks.xy[i]) for i in keep]
+    try:
+        xy = pts if from_crs.equals(to_crs) else geodesy.transform(from_crs.to_wkt(), to_crs.to_wkt(), pts).coordinates
+    except geodesy.GeodesyError as e:
+        findings.append(Finding("not_compared", "problem", f"The marks couldn't be put in {s.name}'s CRS: {e}"))
+        return
+    try:
+        found = s.heights_at([(p[0], p[1]) for p in xy])
+    except surface.SurfaceError as e:
+        findings.append(Finding("not_compared", "problem", str(e)))
+        return
+    pairs = [(m, h) for i, h in zip(keep, found, strict=True) if h is not None and (m := heights[i]) is not None]
+    report["paired_by"] = ("ground points within 1 m of each mark" if s.kind == "pointcloud" and s.ground
+                           else "points within 1 m of each mark" if s.kind == "pointcloud" else "the raster cell at each mark")
+    report["pairs"] = len(pairs)
+    if len(pairs) < 3:
+        findings.append(Finding("no_overlap", "problem",
+                                f"Only {len(pairs)} of {len(keep)} marks have a surface height in {s.name}: the files may not "
+                                "cover the same area, or one CRS label is wrong (check each file on its own first).",
+                                {"marks": len(keep), "with_surface_height": len(pairs)}))
+        return
+    # B - A, whichever of the two is the surface
+    diffs = [(h - m) if surf is rb else (m - h) for m, h in pairs]
+    ratios = [h / m for m, h in pairs if abs(m) > 1.0]
+    if len(ratios) >= 3:
+        ratio = statistics.median(ratios)
+        for unit, factor in (("feet", 1 / 0.3048), ("feet", 0.3048)):
+            if abs(ratio - factor) < 0.01 * factor:
+                findings.append(Finding("height_units_wrong", "problem",
+                                        f"{s.name}'s heights are {ratio:.4f} times the marks' heights: one of them is in "
+                                        f"{unit} where metres were expected (or the reverse).", {"ratio": round(ratio, 5)}))
+                return
+    lonlats = _wgs84(marks)
+    before = len(findings)
+    _height_verdict(diffs, _centre(lonlats), ra, rb, findings, say_consistent=True)
+    if s.vertical is None and findings[before:] and findings[-1].code == "heights_consistent":
+        findings.append(Finding("height_reference_inferred", "caveat",
+                                f"{s.name} declares no vertical CRS, but its heights agree with {marks.name}'s, so they are "
+                                "probably in the same height reference. Add the vertical CRS to the file so others needn't "
+                                "check."))

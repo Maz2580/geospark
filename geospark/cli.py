@@ -7,6 +7,7 @@ Command-line interface for GeoSpark operations.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import click
 from rich.console import Console
@@ -612,10 +613,19 @@ def layer_info(path: str, crs: str | None, repair: bool) -> None:
     _print_caveats(result)
 
 
+def _local_or_surface_url(ctx: click.Context, param: click.Parameter, value: str | None) -> str | None:
+    from geospark.io.surface import is_remote, kind
+
+    if value is None or (is_remote(value) and kind(value)) or Path(value).expanduser().exists():
+        return value
+    raise click.BadParameter(f"'{value}' does not exist (URLs are accepted for LAS/LAZ/COPC and GeoTIFF files).")
+
+
 @layer.command("check")
-@click.argument("path", type=click.Path(exists=True))
-@click.option("--against", "against", type=click.Path(exists=True), default=None,
-              help="A reference layer of the same features: measure and diagnose the offset between them")
+@click.argument("path", callback=_local_or_surface_url)
+@click.option("--against", "against", default=None, callback=_local_or_surface_url,
+              help="A reference layer of the same features (or survey marks, for a point cloud or raster): "
+                   "measure and diagnose the offset between them")
 @_crs_option
 @click.option("--against-crs", default=None, help="The reference layer's CRS if it doesn't declare one")
 @click.option("--id-field", default=None, help="Field identifying the same feature in both files")
@@ -623,7 +633,10 @@ def layer_info(path: str, crs: str | None, repair: bool) -> None:
 def layer_check(path: str, against: str | None, crs: str | None, against_crs: str | None, id_field: str | None,
                 as_json: bool) -> None:
     """Check a file's coordinates: CRS declared and consistent, datum and height caveats; with
-    --against, diagnose why two layers disagree (GDA94 labelled GDA2020, wrong zone, feet, epoch, AHD)."""
+    --against, diagnose why two layers disagree (GDA94 labelled GDA2020, wrong zone, feet, epoch, AHD).
+
+    Point clouds (LAS/LAZ/COPC) and rasters (GeoTIFF/COG), local or by URL, need the pointcloud extra;
+    checked against survey marks, their heights are looked up at each mark."""
     import json as _json
 
     from geospark.io.check import check_layer, compare_layers

@@ -4,7 +4,57 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
-### Added: small-model safety (`docs/benchmarks/2026-10/small_models.md`)
+## [0.10.0] - 2026-10-24: official datums, checked data, safer small models
+
+GeoSpark now does what frontier models could not do without the official grid files: datum and height conversions that
+need a national grid (AUSGeoid2020, OSTN15/OSGM15, NZGeoid2016, GEOID18, NADCON), checked against the
+national agencies' own calculators and test points. `geospark layer check` finds why two datasets
+disagree (a GDA94/GDA2020 mix-up, a wrong zone, ellipsoidal against AHD heights), validated on 2,000
+published survey marks. And Ask now catches what small local models get wrong without saying so:
+numbers no tool returned, empty answers and contradictory comparisons.
+
+### Added
+- **Official datum and height conversions** (`geospark.geodesy`; `POST /api/v1/transform`,
+  `POST /api/v1/height`; MCP and Ask tools `transform_coordinates` and `convert_height`). Coordinates
+  convert with PROJ's most accurate operation that covers the point (GDA94 to GDA2020, MGA zones,
+  British National Grid via OSTN15, NAD27 to NAD83 via NADCON, ITRF at an epoch, any EPSG pair), and
+  heights between the ellipsoid and AHD, ODN, NZVD2016, NAVD88 or EGM2008 with the official geoid
+  model. Grids download once into `$GEOSPARK_DATA_DIR/proj` (`/mnt/geospark/data/proj` in
+  production); PROJ's ballpark fallbacks are refused; every result gives the operation, grid, stated
+  accuracy and provenance (PROJ and EPSG dataset versions).
+  - Why: on 32 datum and height questions (Australia, UK, NZ, US), GPT-6.1 and Claude Opus 5.5 applied
+    datum parameters, plate motion and map projections to the millimetre, but anything needing a
+    national grid failed: GPT-6.1 declined ("I cannot access the AUSGeoid2020 grid") and Opus 5.5
+    estimated, 0.2-5.3 m off. PROJ falls back silently when a grid is missing (AHD becomes the
+    ellipsoidal height, 4.7 m off in Melbourne; British National Grid moves about 124 m).
+    With the tools attached, 63 of the two models' 64 answers were survey-grade and the last within 6 cm.
+- GeoSpark sets `PROJ_USER_WRITABLE_DIRECTORY` to `$GEOSPARK_DATA_DIR/proj` when it is imported, so
+  grid files never land in the user's system folders.
+- **`geospark layer check`** (Python `geospark.io.check`, local MCP tool `check_dataset`): checks a
+  file's coordinates before analysis (CRS declared and consistent with the numbers, swapped axes, points
+  outside the CRS's zone, Australian data labelled WGS 84, height reference unstated) and, with
+  `--against`, diagnoses why two layers disagree: GDA94 data labelled GDA2020 (matched to the official
+  shift at that place), the wrong MGA zone, feet, swapped axes, a plate-motion epoch (with the number of
+  years), or ellipsoidal against AHD heights. Unknown offsets are reported as unexplained; nearest-
+  neighbour pairing warns when features are closer together than the offset. Exit code 2 on a problem.
+- **Fairness checks for the October 2026 re-check** (`docs/benchmarks/2026-10/fairness.md`): the
+  datum and height gap holds with the providers' own code execution at high effort (sandboxes have PROJ
+  but no internet) and across three repeated runs; it does not hold for frontier models writing a
+  script run with internet access (Opus 5.5 8/8, GPT-6.1 7/8 with a safe failure), while smaller local
+  models wrote silently wrong scripts (gpt-oss 20B returned the ellipsoidal height as AHD; Qwen 3.5 4B
+  1/8). The eight scripting tasks, their independently computed answers and the runner are in
+  `docs/benchmarks/2026-10/codegen/`. README claims are scoped to what was tested.
+- Real-data validation (`docs/benchmarks/2026-10/agency_checks.md`): on 2,000 of Victoria's published
+  survey marks, `layer check` named GDA94 numbers labelled GDA2020, a wrong zone and ellipsoidal against
+  AHD heights, and passed correctly labelled data (6 mm). GeoSpark's GDA94 to GDA2020 matches
+  Victoria's surveyed marks within 7 mm (416 marks); AUSGeoid2020 matches spirit-levelled AHD to 6 mm
+  median (99 marks).
+- **README: "Re-check with current models (October 2026)"**, next to the original GeoSpark Bench v2
+  results: a GeoSpark Bench sample on Claude Opus 5.5, GPT-6.1 and open models on a local workstation,
+  and the new datum and height test. Questions, answer generators, harness (keys from the environment
+  only) and a scored summary are in `docs/benchmarks/2026-10`.
+
+#### Small-model safety (`docs/benchmarks/2026-10/small_models.md`)
 Tested with four open models on a local workstation through Ask's own tool loop; each change below
 fixes a failure seen there:
 - Every quantity an answer states must trace back to a tool result (allowing unit changes, rounding, and
@@ -23,31 +73,6 @@ After the changes, 120 answers over three runs had one silent error (the Ghana g
 - `layer check` named only one direction of a GDA94/GDA2020 mix-up. GDA2020 numbers labelled GDA94
   are now named the right way round too; the finding code is `gda94_gda2020_mixed`, with the
   mislabelled layer and what it holds.
-
-### Added
-- Real-data validation (`docs/benchmarks/2026-10/agency_checks.md`): on 2,000 of Victoria's published
-  survey marks, `layer check` named GDA94 numbers labelled GDA2020, a wrong zone and ellipsoidal against
-  AHD heights, and passed correctly labelled data (6 mm). GeoSpark's GDA94 to GDA2020 matches
-  Victoria's surveyed marks within 7 mm (416 marks); AUSGeoid2020 matches spirit-levelled AHD to 6 mm
-  median (99 marks).
-
-### Added
-- **`geospark layer check`** (Python `geospark.io.check`, local MCP tool `check_dataset`): checks a
-  file's coordinates before analysis (CRS declared and consistent with the numbers, swapped axes, points
-  outside the CRS's zone, Australian data labelled WGS 84, height reference unstated) and, with
-  `--against`, diagnoses why two layers disagree: GDA94 data labelled GDA2020 (matched to the official
-  shift at that place), the wrong MGA zone, feet, swapped axes, a plate-motion epoch (with the number of
-  years), or ellipsoidal against AHD heights. Unknown offsets are reported as unexplained; nearest-
-  neighbour pairing warns when features are closer together than the offset. Exit code 2 on a problem.
-- **Fairness checks for the October 2026 re-check** (`docs/benchmarks/2026-10/fairness.md`): the
-  datum and height gap holds with the providers' own code execution at high effort (sandboxes have PROJ
-  but no internet) and across three repeated runs; it does not hold for frontier models writing a
-  script run with internet access (Opus 5.5 8/8, GPT-6.1 7/8 with a safe failure), while smaller local
-  models wrote silently wrong scripts (gpt-oss 20B returned the ellipsoidal height as AHD; Qwen 3.5 4B
-  1/8). The eight scripting tasks, their independently computed answers and the runner are in
-  `docs/benchmarks/2026-10/codegen/`. README claims are scoped to what was tested.
-
-### Fixed
 - **GeoSpark's own layer analyses put GDA94 files 1.55 m off** (found while building the checker).
   PROJ's default step from GDA94, and from GDA2020, to WGS 84 is a null transformation, so a correctly
   labelled GDA94 file and a GDA2020 file of the same survey marks loaded 1.55 m apart in Melbourne, and
@@ -55,8 +80,17 @@ After the changes, 120 answers over three runs had one silent error (the Ghana g
   official transformation first; the same marks load to within 0.005 m.
 - The benchmark notes said Opus 5.5 ran without extended thinking; Opus 5.5 always thinks (adaptive,
   default effort "medium"), and that is how it ran.
+- **NZVD2016 heights were refused** ("could not be downloaded"): NZGeoid2016's area of use crosses
+  the antimeridian (160.6 E to 171.2 W), and the coverage check that picks which grid to download
+  assumed west < east.
+- **Height conversions failed on the live API** ("outside its AUSGeoid2020 model") while working in
+  a script: PROJ's on-demand grid download only works on the thread that enabled it, and the API
+  answers on worker threads. GeoSpark now downloads the whole official grid file itself (only the one
+  the most accurate covering operation needs), tells PROJ to rescan, and keeps PROJ's own networking
+  off. A grid that can't be read or downloaded is now named in the error instead of being reported as
+  "outside the model".
 
-### Fixed: checked against the national agencies
+#### Checked against the national agencies
 - GeoSpark's datum and height answers were compared with Geoscience Australia's calculators, Ordnance
   Survey's OSTN15/OSGM15 test points, LINZ's NZVD2016 examples and NGS's GEOID18 and NADCON 5
   services (`docs/benchmarks/2026-10/agency_checks.md`): agreement within 0.1 mm to 8 mm, except
@@ -65,8 +99,7 @@ After the changes, 120 answers over three runs had one silent error (the Ghana g
   "ODN"; Ordnance Survey's datum flags show they are local datums (St Marys, Douglas02, Stornoway15,
   Newlyn (Orkney), Lerwick). They are now labelled so (checked against all 40 OS test points), and ODN
   results note that heights more than 2 km offshore are in "Newlyn Offshore".
-
-### Fixed: found by auditing our own claims
+#### Found by auditing our own claims
 - **Datum and height conversions, edge cases tested on the live site:**
   - AHD was given for Christmas Island, the Cocos Islands and at sea, because the AUSGeoid2020 grid has
     values there; AHD is the datum of mainland Australia and Tasmania, so those are now refused, and every
@@ -89,43 +122,6 @@ After the changes, 120 answers over three runs had one silent error (the Ghana g
     API (within 0.1 mm) and NGS's GEOID18 service (1 mm); NAD27 to NAD83 uses the original NADCON, about
     0.27 m from NGS's NADCON 5 in San Francisco. Results matching PROJ when the tools use PROJ is stated
     as what it is: the model used the tool correctly.
-
-### Added
-- **README: "Re-check with current models (October 2026)"**, next to the original GeoSpark Bench v2
-  results: a GeoSpark Bench sample on Claude Opus 5.5, GPT-6.1 and open models on a local workstation,
-  and the new datum and height test. Questions, answer generators, harness (keys from the environment
-  only) and a scored summary are in `docs/benchmarks/2026-10`.
-
-### Fixed
-- **NZVD2016 heights were refused** ("could not be downloaded"): NZGeoid2016's area of use crosses
-  the antimeridian (160.6 E to 171.2 W), and the coverage check that picks which grid to download
-  assumed west < east.
-
-### Fixed
-- **Height conversions failed on the live API** ("outside its AUSGeoid2020 model") while working in
-  a script: PROJ's on-demand grid download only works on the thread that enabled it, and the API
-  answers on worker threads. GeoSpark now downloads the whole official grid file itself (only the one
-  the most accurate covering operation needs), tells PROJ to rescan, and keeps PROJ's own networking
-  off. A grid that can't be read or downloaded is now named in the error instead of being reported as
-  "outside the model".
-
-### Added
-- **Official datum and height conversions** (`geospark.geodesy`; `POST /api/v1/transform`,
-  `POST /api/v1/height`; MCP and Ask tools `transform_coordinates` and `convert_height`). Coordinates
-  convert with PROJ's most accurate operation that covers the point (GDA94 to GDA2020, MGA zones,
-  British National Grid via OSTN15, NAD27 to NAD83 via NADCON, ITRF at an epoch, any EPSG pair), and
-  heights between the ellipsoid and AHD, ODN, NZVD2016, NAVD88 or EGM2008 with the official geoid
-  model. Grids download once into `$GEOSPARK_DATA_DIR/proj` (`/mnt/geospark/data/proj` in
-  production); PROJ's ballpark fallbacks are refused; every result gives the operation, grid, stated
-  accuracy and provenance (PROJ and EPSG dataset versions).
-  - Why: on 32 datum and height questions (Australia, UK, NZ, US), GPT-6.1 and Claude Opus 5.5 applied
-    datum parameters, plate motion and map projections to the millimetre, but anything needing a
-    national grid failed: GPT-6.1 declined ("I cannot access the AUSGeoid2020 grid") and Opus 5.5
-    estimated, 0.2-5.3 m off. PROJ falls back silently when a grid is missing (AHD becomes the
-    ellipsoidal height, 4.7 m off in Melbourne; British National Grid moves about 124 m).
-    With the tools attached, 63 of the two models' 64 answers were survey-grade and the last within 6 cm.
-- GeoSpark sets `PROJ_USER_WRITABLE_DIRECTORY` to `$GEOSPARK_DATA_DIR/proj` when it is imported, so
-  grid files never land in the user's system folders.
 
 ## [0.9.0] - 2026-10-24: tested from the outside
 

@@ -4,6 +4,24 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Added
+- **Official datum and height conversions** (`geospark.geodesy`; `POST /api/v1/transform`,
+  `POST /api/v1/height`; MCP and Ask tools `transform_coordinates` and `convert_height`). Coordinates
+  convert with PROJ's most accurate operation that covers the point (GDA94 to GDA2020, MGA zones,
+  British National Grid via OSTN15, NAD27 to NAD83 via NADCON, ITRF at an epoch, any EPSG pair), and
+  heights between the ellipsoid and AHD, ODN, NZVD2016, NAVD88 or EGM2008 with the official geoid
+  model. Grids download once into `$GEOSPARK_DATA_DIR/proj` (`/mnt/geospark/data/proj` in
+  production); PROJ's ballpark fallbacks are refused; every result gives the operation, grid, stated
+  accuracy and provenance (PROJ and EPSG dataset versions).
+  - Why: on 32 datum and height questions (Australia, UK, NZ, US), GPT-6.1 and Claude Opus 5.5 applied
+    datum parameters, plate motion and map projections to the millimetre, but anything needing a
+    national grid failed: GPT-6.1 declined ("I cannot access the AUSGeoid2020 grid") and Opus 5.5
+    estimated, 0.2-5.3 m off. PROJ falls back silently when a grid is missing (AHD becomes the
+    ellipsoidal height, 4.7 m off in Melbourne; British National Grid moves about 124 m).
+    With the tools attached, 63 of the two models' 64 answers were survey-grade and the last within 6 cm.
+- GeoSpark sets `PROJ_USER_WRITABLE_DIRECTORY` to `$GEOSPARK_DATA_DIR/proj` when it is imported, so
+  PROJ's cache never lands in the user's system folders.
+
 ## [0.9.0] - 2026-10-24: tested from the outside
 
 Every agent, every Ask tool and every flow template was tested on the live site the way a visitor

@@ -288,6 +288,20 @@ serving. Points outside the extract are refused ("outside its map coverage") rat
 Valhalla's placeholder circle. To refresh the map data, set `force_rebuild=True` once and restart the
 container.
 
+## Official transformation grids (no setup needed)
+
+`transform_coordinates` and `convert_height` download each official grid (AUSGeoid2020, OSTN15,
+GEOID18...) from the PROJ CDN the first time it is needed and keep it in `$GEOSPARK_DATA_DIR/proj`.
+In the container that is `/app/data/proj`, which is the existing `./data` bind mount, so on the server
+the grids live in **`/mnt/geospark/data/proj`**: nothing is written outside `/mnt`, and no compose
+change is needed. Grids are fetched in pieces as points need them: 32 test points across Australia,
+the UK, NZ and the US used 384 KB; a whole national geoid is tens of MB.
+
+- `GEOSPARK_PROJ_NETWORK=false` never downloads: only grids already in that folder are used, and a
+  conversion that needs a missing grid is refused (never approximated).
+- To pre-load grids on a machine without internet access, copy the `.tif` files from
+  <https://cdn.proj.org> into that folder.
+
 ## Optional: self-hosted Overpass (OpenStreetMap queries for the agents)
 
 The agents' nearby-place lookups (hospitals, schools, pharmacies...) use Overpass. The public servers

@@ -270,3 +270,19 @@ def test_ask_flags_a_conversion_to_a_different_system_than_the_question_names() 
 def test_crs_can_be_given_by_name() -> None:
     done = geodesy.transform("GDA94 / MGA zone 55", "GDA2020 / MGA zone 55", [FED_SQ_GDA94_MGA55])
     assert done.target_crs == "GDA2020 / MGA zone 55"
+
+
+# Ordnance Survey's OSTN15/OSGM15 test points (developer pack, 2016) and the datum OSGM15 gives there
+# (OS user guide Table 1): flag 1 Newlyn, 3 Douglas02, 4 Stornoway15, 6 Lerwick, 7 Newlyn (Orkney), 15 offshore.
+@pytest.mark.parametrize(("pid", "lat", "lon", "datum"), [
+    ("TP09", 51.48936564950, -0.11992557180, None),  # London: ODN
+    ("TP21", 54.08666318080, -4.63452168212, "Douglas02"),
+    ("TP33", 58.51560361300, -6.26091455533, "Stornoway15"),
+    ("TP35", 59.03743871190, -3.21454001115, "Newlyn (Orkney)"),
+    ("TP39", 59.85409913890, -1.27486910356, "Lerwick"),
+    ("TP32", 58.21262247180, -7.59255560556, None),  # offshore west of Lewis
+    ("TP40", 60.13308091660, -2.07382822798, None),  # Foula: offshore for OSGM15
+])
+def test_osgm15_heights_on_islands_are_labelled_with_their_local_datum(pid, lat, lon, datum) -> None:
+    got = geodesy._uk_local_datum(lat, lon)
+    assert (got[0] if got else None) == datum, pid

@@ -1,0 +1,69 @@
+[
+ {
+  "id": "t1_area",
+  "prompt": "precinct.geojson contains one polygon (a precinct in Melbourne). Write a Python script that prints its area in square metres.",
+  "answer": 2086626.5950994492,
+  "key": "area_m2",
+  "tol": 0.01,
+  "unit": "m\u00b2"
+ },
+ {
+  "id": "t2_buffer",
+  "prompt": "site.geojson contains one point in Melbourne. Write a Python script that creates a 500 metre buffer around it and prints the buffer's area in square metres.",
+  "answer": 785398.1633974483,
+  "key": "area_m2",
+  "tol": 0.01,
+  "unit": "m\u00b2"
+ },
+ {
+  "id": "t3_distance",
+  "prompt": "places.geojson contains two points, Melbourne and Geelong. Write a Python script that prints the distance between them in metres.",
+  "answer": 64813.151474332066,
+  "key": "distance_m",
+  "tol": 0.005,
+  "unit": "m"
+ },
+ {
+  "id": "t4_length",
+  "prompt": "road.geojson contains one road as a LineString. Write a Python script that prints its length in metres.",
+  "answer": 4785.809003593272,
+  "key": "length_m",
+  "tol": 0.005,
+  "unit": "m"
+ },
+ {
+  "id": "t5_mercator_area",
+  "prompt": "parcel.geojson contains one land parcel near Melbourne; its coordinates are in EPSG:3857 (Web Mercator). Write a Python script that prints the parcel's true area on the ground in square metres.",
+  "answer": 781972.5972900391,
+  "key": "area_m2",
+  "tol": 0.01,
+  "unit": "m\u00b2"
+ },
+ {
+  "id": "t6_within",
+  "prompt": "centre.geojson has one point and shops.geojson has shop locations, all in Melbourne. Write a Python script that prints how many shops are within 1 km of the centre.",
+  "answer": 6,
+  "key": "count",
+  "tol": 0,
+  "unit": "shops"
+ },
+ {
+  "id": "t7_gda2020",
+  "prompt": "survey.csv has survey points with easting and northing in GDA94 / MGA zone 55 (Victoria, Australia). Write a Python script that prints, for the first point, its GDA2020 latitude and longitude in decimal degrees.",
+  "answer": {
+   "lat": -37.817700003,
+   "lon": 144.969099997
+  },
+  "key": "latlon",
+  "tol": 0.05,
+  "unit": "m"
+ },
+ {
+  "id": "t8_ahd",
+  "prompt": "drone.csv has a drone survey point in Melbourne: GDA2020 latitude, longitude and ellipsoidal height (metres) from GNSS. Write a Python script that prints its height in the Australian Height Datum (AHD).",
+  "answer": 35.2574,
+  "key": "height_m",
+  "tol": 0.15,
+  "unit": "m"
+ }
+]

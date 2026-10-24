@@ -35,8 +35,10 @@ GeoSpark is tested against the models people actually use, and it changes as the
 3. **We looked for the next gap, with practitioners' problems in mind.** Both frontier models apply
    datum shifts, plate motion and map projections to the millimetre, but anything that needs a
    national grid file defeated them: converting a GNSS or drone height to AHD, ODN, NZVD2016 or
-   NAVD88, or using Britain's OSTN15. GPT-6.1 declined; Opus 5.5 estimated, up to 5.3 m off. GeoSpark
-   now does these conversions with the official grids.
+   NAVD88, or using Britain's OSTN15. Answering directly (even with their own code sandboxes, which
+   have no internet), GPT-6.1 declined and Opus 5.5 estimated, up to 9.9 m off. GeoSpark now does these
+   conversions with the official grids. (Writing a script for you to run online, both frontier
+   models got them right; smaller local models did not.)
 4. **We checked our own answers, not just the models'.** Matching PROJ only proves a model used the
    tool, so GeoSpark's answers were compared with Geoscience Australia, Ordnance Survey, LINZ and the
    US National Geodetic Survey: agreement within millimetres, with one disclosed exception. The same
@@ -465,10 +467,19 @@ questions the reference itself is only good to about 0.27 m (NGS's stated uncert
 there means agreement with PROJ's NADCON, not centimetre truth.
 
 Both models apply datum parameters, plate motion and map projections to the millimetre. What they
-can't do is read the national grids that heights and some datum conversions depend on: GPT-6.1
-declines ("I cannot access the AUSGeoid2020 grid"), and Opus 5.5 estimates from memory. That is the
-gap GeoSpark's [`transform_coordinates` and `convert_height`](#official-datum-and-height-conversions)
-close. The whole re-check cost about US$5 in API calls.
+can't do, answering directly, is read the national grids that heights and some datum conversions
+depend on: GPT-6.1 declines ("I cannot access the AUSGeoid2020 grid"), and Opus 5.5 estimates from
+memory. That is the gap GeoSpark's [`transform_coordinates` and `convert_height`](#official-datum-and-height-conversions)
+close.
+
+**Fairness checks** ([details](https://github.com/Maz2580/geospark/blob/main/docs/benchmarks/2026-10/fairness.md)):
+the gap holds with the providers' own code execution at high effort (their sandboxes have PROJ but no
+internet; GPT-6.1 declined all 17 grid questions, Opus 5.5 estimated with errors up to 9.9 m) and across
+three repeated runs. It does **not** hold when these frontier models write a script that you run with
+internet access: Opus 5.5 got all 8 everyday GIS scripting tasks right, AHD included, and GPT-6.1 got 7
+and failed safely on the eighth. The silently wrong scripts came from the smaller local models (gpt-oss
+20B printed the ellipsoidal height unchanged as "AHD"; Qwen 3.5 4B got 1 of 8). Not tested: web
+browsing. The whole October 2026 re-check cost US$8.46 in API calls.
 
 ## Self-hosting
 

@@ -1,0 +1,1 @@
+{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"name": "Melbourne"}, "geometry": {"type": "Point", "coordinates": [144.9631, -37.8136]}}, {"type": "Feature", "properties": {"name": "Geelong"}, "geometry": {"type": "Point", "coordinates": [144.36, -38.1499]}}]}

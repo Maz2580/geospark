@@ -88,3 +88,8 @@ overpass/
 # Server-side change checks (deploy/DEPLOY.md)
 .containers-before
 .change-start
+
+# Re-check harness output (scores are summarised in docs/benchmarks/2026-10/results_summary.json)
+docs/benchmarks/*/results/
+docs/benchmarks/*/proj/
+docs/benchmarks/*/.data/

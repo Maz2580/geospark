@@ -1,0 +1,246 @@
+[
+ {
+  "id": "datum_A1",
+  "group": "A: GDA94 to GDA2020 (MGA)",
+  "prompt": "A survey point near Federation Square, Melbourne has GDA94 / MGA zone 55 coordinates E = 321242.045 m, N = 5812466.767 m. What are its GDA2020 / MGA zone 55 coordinates?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"E\": <metres>, \"N\": <metres>}",
+  "answer": {
+   "E": 321242.536,
+   "N": 5812468.239
+  },
+  "kind": "en",
+  "method": "Inverse of Map Grid of Australia zone 55 + GDA94 to GDA2020 (1) + Map Grid of Australia zone 55",
+  "official_accuracy_m": 0.01
+ },
+ {
+  "id": "datum_A2",
+  "group": "A: GDA94 to GDA2020 (MGA)",
+  "prompt": "A survey point near the University of Melbourne (Parkville) has GDA94 / MGA zone 55 coordinates E = 320497.707 m, N = 5814693.132 m. What are its GDA2020 / MGA zone 55 coordinates?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"E\": <metres>, \"N\": <metres>}",
+  "answer": {
+   "E": 320498.198,
+   "N": 5814694.604
+  },
+  "kind": "en",
+  "method": "Inverse of Map Grid of Australia zone 55 + GDA94 to GDA2020 (1) + Map Grid of Australia zone 55",
+  "official_accuracy_m": 0.01
+ },
+ {
+  "id": "datum_A3",
+  "group": "A: GDA94 to GDA2020 (MGA)",
+  "prompt": "A survey point near Geelong has GDA94 / MGA zone 55 coordinates E = 268667.591 m, N = 5774258.110 m. What are its GDA2020 / MGA zone 55 coordinates?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"E\": <metres>, \"N\": <metres>}",
+  "answer": {
+   "E": 268668.075,
+   "N": 5774259.59
+  },
+  "kind": "en",
+  "method": "Inverse of Map Grid of Australia zone 55 + GDA94 to GDA2020 (1) + Map Grid of Australia zone 55",
+  "official_accuracy_m": 0.01
+ },
+ {
+  "id": "datum_A4",
+  "group": "A: GDA94 to GDA2020 (MGA)",
+  "prompt": "A survey point near Ballarat has GDA94 / MGA zone 55 coordinates E = 221792.089 m, N = 5838092.110 m. What are its GDA2020 / MGA zone 55 coordinates?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"E\": <metres>, \"N\": <metres>}",
+  "answer": {
+   "E": 221792.584,
+   "N": 5838093.597
+  },
+  "kind": "en",
+  "method": "Inverse of Map Grid of Australia zone 55 + GDA94 to GDA2020 (1) + Map Grid of Australia zone 55",
+  "official_accuracy_m": 0.01
+ },
+ {
+  "id": "datum_A5",
+  "group": "A: GDA94 to GDA2020 (MGA)",
+  "prompt": "A survey point near Hobart has GDA94 / MGA zone 55 coordinates E = 526720.077 m, N = 5252224.306 m. What are its GDA2020 / MGA zone 55 coordinates?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"E\": <metres>, \"N\": <metres>}",
+  "answer": {
+   "E": 526720.478,
+   "N": 5252225.744
+  },
+  "kind": "en",
+  "method": "Inverse of Map Grid of Australia zone 55 + GDA94 to GDA2020 (1) + Map Grid of Australia zone 55",
+  "official_accuracy_m": 0.01
+ },
+ {
+  "id": "datum_A6",
+  "group": "A: GDA94 to GDA2020 (MGA)",
+  "prompt": "A survey point near the Sydney Opera House has GDA94 / MGA zone 56 coordinates E = 334900.092 m, N = 6252287.338 m. What are its GDA2020 / MGA zone 56 coordinates?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"E\": <metres>, \"N\": <metres>}",
+  "answer": {
+   "E": 334900.57,
+   "N": 6252288.753
+  },
+  "kind": "en",
+  "method": "Inverse of Map Grid of Australia zone 56 + GDA94 to GDA2020 (1) + Map Grid of Australia zone 56",
+  "official_accuracy_m": 0.01
+ },
+ {
+  "id": "datum_A7",
+  "group": "A: GDA94 to GDA2020 (MGA)",
+  "prompt": "A survey point near Perth has GDA94 / MGA zone 50 coordinates E = 392306.207 m, N = 6464482.741 m. What are its GDA2020 / MGA zone 50 coordinates?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"E\": <metres>, \"N\": <metres>}",
+  "answer": {
+   "E": 392307.203,
+   "N": 6464484.236
+  },
+  "kind": "en",
+  "method": "Inverse of Map Grid of Australia zone 50 + GDA94 to GDA2020 (1) + Map Grid of Australia zone 50",
+  "official_accuracy_m": 0.01
+ },
+ {
+  "id": "datum_B1",
+  "group": "B: ellipsoidal height to AHD",
+  "prompt": "A drone's GNSS gives a GDA2020 ellipsoidal height of 40.00 m at latitude -37.8177, longitude 144.9691 (Federation Square, Melbourne). What is the height of that point in the Australian Height Datum (AHD)?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"AHD\": <metres>}",
+  "answer": {
+   "AHD": 35.257
+  },
+  "kind": "height",
+  "method": "GDA2020 to AHD height (1) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.15
+ },
+ {
+  "id": "datum_B2",
+  "group": "B: ellipsoidal height to AHD",
+  "prompt": "A drone's GNSS gives a GDA2020 ellipsoidal height of 640.00 m at latitude -37.8333, longitude 145.3667 (Mount Dandenong (summit area)). What is the height of that point in the Australian Height Datum (AHD)?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"AHD\": <metres>}",
+  "answer": {
+   "AHD": 634.335
+  },
+  "kind": "height",
+  "method": "GDA2020 to AHD height (1) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.15
+ },
+ {
+  "id": "datum_B3",
+  "group": "B: ellipsoidal height to AHD",
+  "prompt": "A drone's GNSS gives a GDA2020 ellipsoidal height of 30.00 m at latitude -38.1499, longitude 144.36 (Geelong). What is the height of that point in the Australian Height Datum (AHD)?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"AHD\": <metres>}",
+  "answer": {
+   "AHD": 27.55
+  },
+  "kind": "height",
+  "method": "GDA2020 to AHD height (1) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.15
+ },
+ {
+  "id": "datum_B4",
+  "group": "B: ellipsoidal height to AHD",
+  "prompt": "A drone's GNSS gives a GDA2020 ellipsoidal height of 60.00 m at latitude -33.8568, longitude 151.2153 (the Sydney Opera House). What is the height of that point in the Australian Height Datum (AHD)?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"AHD\": <metres>}",
+  "answer": {
+   "AHD": 37.338
+  },
+  "kind": "height",
+  "method": "GDA2020 to AHD height (1) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.15
+ },
+ {
+  "id": "datum_B5",
+  "group": "B: ellipsoidal height to AHD",
+  "prompt": "A drone's GNSS gives a GDA2020 ellipsoidal height of 40.00 m at latitude -31.9505, longitude 115.8605 (Perth). What is the height of that point in the Australian Height Datum (AHD)?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"AHD\": <metres>}",
+  "answer": {
+   "AHD": 72.539
+  },
+  "kind": "height",
+  "method": "GDA2020 to AHD height (1) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.15
+ },
+ {
+  "id": "datum_B6",
+  "group": "B: ellipsoidal height to AHD",
+  "prompt": "A design level in Hobart (latitude -42.8821, longitude 147.3272) is 25.00 m AHD. A GNSS rover set to GDA2020 ellipsoidal heights will be used to stake it out. What ellipsoidal height should the rover read?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"ellipsoidal\": <metres>}",
+  "answer": {
+   "ellipsoidal": 21.186
+  },
+  "kind": "height_ell",
+  "method": "Inverse of GDA2020 to AHD height (1) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.15
+ },
+ {
+  "id": "datum_C1",
+  "group": "C: diagnose a mismatch",
+  "prompt": "Layer 1 (labelled GDA2020 / MGA zone 55) has a survey mark at Federation Square at E = 321242.536, N = 5812468.239. Layer 2, also labelled GDA2020 / MGA zone 55, has the same mark at E = 321242.045, N = 5812466.767. What is the most likely cause of the difference? Choose one: (a) same datum, the difference is ordinary survey noise; (b) one layer is GDA94 and the other GDA2020; (c) the coordinates were projected in the wrong MGA zone; (d) one layer has ellipsoidal heights and the other AHD heights.\n\nEnd your reply with one line of JSON only, exactly in this form: {\"cause\": \"<a|b|c|d>\"}",
+  "answer": {
+   "cause": "b"
+  },
+  "kind": "choice",
+  "method": "constructed from the official operations above",
+  "official_accuracy_m": null
+ },
+ {
+  "id": "datum_C2",
+  "group": "C: diagnose a mismatch",
+  "prompt": "Layer 1 (labelled GDA2020 / MGA zone 55) has a survey mark at Federation Square at E = 321242.536, N = 5812468.239. Layer 2, also labelled GDA2020 / MGA zone 55, has the same mark at E = 321242.557, N = 5812468.222. What is the most likely cause of the difference? Choose one: (a) same datum, the difference is ordinary survey noise; (b) one layer is GDA94 and the other GDA2020; (c) the coordinates were projected in the wrong MGA zone; (d) one layer has ellipsoidal heights and the other AHD heights.\n\nEnd your reply with one line of JSON only, exactly in this form: {\"cause\": \"<a|b|c|d>\"}",
+  "answer": {
+   "cause": "a"
+  },
+  "kind": "choice",
+  "method": "constructed from the official operations above",
+  "official_accuracy_m": null
+ },
+ {
+  "id": "datum_C3",
+  "group": "C: diagnose a mismatch",
+  "prompt": "Layer 1 (labelled GDA2020 / MGA zone 55) has a survey mark at Federation Square at E = 321242.536, N = 5812468.239. Layer 2, also labelled GDA2020 / MGA zone 55, has the same mark at E = 849407.156, N = 5806983.902. What is the most likely cause of the difference? Choose one: (a) same datum, the difference is ordinary survey noise; (b) one layer is GDA94 and the other GDA2020; (c) the coordinates were projected in the wrong MGA zone; (d) one layer has ellipsoidal heights and the other AHD heights.\n\nEnd your reply with one line of JSON only, exactly in this form: {\"cause\": \"<a|b|c|d>\"}",
+  "answer": {
+   "cause": "c"
+  },
+  "kind": "choice",
+  "method": "constructed from the official operations above",
+  "official_accuracy_m": null
+ },
+ {
+  "id": "datum_C4",
+  "group": "C: diagnose a mismatch",
+  "prompt": "Two surveys of the same mark at Federation Square agree horizontally, but survey 1 reports a height of 40.000 m and survey 2 reports 35.257 m. Both say 'GDA2020'. What is the most likely cause? Choose one: (a) same datum, the difference is ordinary survey noise; (b) one layer is GDA94 and the other GDA2020; (c) the coordinates were projected in the wrong MGA zone; (d) one layer has ellipsoidal heights and the other AHD heights.\n\nEnd your reply with one line of JSON only, exactly in this form: {\"cause\": \"<a|b|c|d>\"}",
+  "answer": {
+   "cause": "d"
+  },
+  "kind": "choice",
+  "method": "constructed from AUSGeoid2020",
+  "official_accuracy_m": null
+ },
+ {
+  "id": "datum_D1",
+  "group": "D: plate motion (ITRF2014 to GDA2020)",
+  "prompt": "A GNSS receiver at Federation Square, Melbourne reports ITRF2014 coordinates at epoch 2026.8: latitude -37.8177000, longitude 144.9691000, ellipsoidal height 50.000 m. What are the point's GDA2020 latitude and longitude?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"lat\": <degrees>, \"lon\": <degrees>}",
+  "answer": {
+   "lat": -37.817703467,
+   "lon": 144.969098524
+  },
+  "kind": "latlon",
+  "method": "Conversion from ITRF2014 (geog3D) to ITRF2014 (geocentric) + ITRF2014 to GDA2020 (1) + Conversion from GDA2020 (geocentric) to GDA2020 (geog3D) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.03
+ },
+ {
+  "id": "datum_D2",
+  "group": "D: plate motion (ITRF2014 to GDA2020)",
+  "prompt": "A GNSS receiver at Perth reports ITRF2014 coordinates at epoch 2026.8: latitude -31.9505000, longitude 115.8605000, ellipsoidal height 50.000 m. What are the point's GDA2020 latitude and longitude?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"lat\": <degrees>, \"lon\": <degrees>}",
+  "answer": {
+   "lat": -31.950503542,
+   "lon": 115.860497241
+  },
+  "kind": "latlon",
+  "method": "Conversion from ITRF2014 (geog3D) to ITRF2014 (geocentric) + ITRF2014 to GDA2020 (1) + Conversion from GDA2020 (geocentric) to GDA2020 (geog3D) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.03
+ },
+ {
+  "id": "datum_E1",
+  "group": "E: choose the MGA zone",
+  "prompt": "Give the GDA2020 / MGA coordinates of Mildura (GDA2020 latitude -34.1855, longitude 142.1611), in the MGA zone that contains it.\n\nEnd your reply with one line of JSON only, exactly in this form: {\"zone\": <number>, \"E\": <metres>, \"N\": <metres>}",
+  "answer": {
+   "zone": 54,
+   "E": 606994.151,
+   "N": 6216666.651
+  },
+  "kind": "zone_en",
+  "method": "GDA2020 / MGA zone 54 (EPSG:7854)",
+  "official_accuracy_m": 0.0
+ },
+ {
+  "id": "datum_E2",
+  "group": "E: choose the MGA zone",
+  "prompt": "Give the GDA2020 / MGA coordinates of Albury (GDA2020 latitude -36.0737, longitude 146.9135), in the MGA zone that contains it.\n\nEnd your reply with one line of JSON only, exactly in this form: {\"zone\": <number>, \"E\": <metres>, \"N\": <metres>}",
+  "answer": {
+   "zone": 55,
+   "E": 492211.22,
+   "N": 6007873.627
+  },
+  "kind": "zone_en",
+  "method": "GDA2020 / MGA zone 55 (EPSG:7855)",
+  "official_accuracy_m": 0.0
+ }
+]

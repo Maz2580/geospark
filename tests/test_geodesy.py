@@ -204,3 +204,13 @@ def test_only_a_grid_that_covers_the_point_is_fetched(monkeypatch, tmp_path) -> 
     monkeypatch.setattr("httpx.stream", Stream)
     geodesy._fetch_grids(Ns(unavailable_operations=[alaska, conus]), None, [(-122.42, 37.77)])
     assert got == ["https://cdn.proj.org/conus.tif"]  # San Francisco: not the Alaska geoid
+
+
+def test_an_area_across_the_antimeridian_covers_new_zealand() -> None:
+    """Live: NZVD2016 was refused because NZGeoid2016's area (160.6 E to 171.2 W) crosses 180 degrees."""
+    from types import SimpleNamespace as Ns
+
+    nz = Ns(area_of_use=Ns(west=160.6, east=-171.2, south=-55.95, north=-25.88))
+    assert geodesy._covers(nz, [(174.7633, -36.8485)])  # Auckland
+    assert geodesy._covers(nz, [(-176.5, -44.0)])  # Chatham Islands, east of 180
+    assert not geodesy._covers(nz, [(144.97, -37.82)])  # Melbourne

@@ -120,7 +120,12 @@ def _covers(op: Any, lonlats: list[tuple[float, float]] | None) -> bool:
     area = getattr(op, "area_of_use", None)
     if not lonlats or area is None:
         return True
-    return all(area.west <= lon <= area.east and area.south <= lat <= area.north for lon, lat in lonlats)
+    def inside(lon: float, lat: float) -> bool:
+        # New Zealand's area runs from 160.6 E to 171.2 W, across the antimeridian (west > east)
+        in_lon = area.west <= lon <= area.east if area.west <= area.east else (lon >= area.west or lon <= area.east)
+        return in_lon and area.south <= lat <= area.north
+
+    return all(inside(lon, lat) for lon, lat in lonlats)
 
 
 def _fetch_grids(group: Any, best_available: float | None,

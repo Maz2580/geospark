@@ -52,7 +52,7 @@ class Transformation:
     source_crs: str
     target_crs: str
     method: str
-    accuracy_m: float | None  # None: an exact conversion (a map projection on one datum)
+    accuracy_m: float | None  # None: an exact conversion (a map projection on one datum; PROJ says 0 or unknown)
     grids: list[str] = field(default_factory=list)
     area_of_use: str | None = None
     warnings: list[str] = field(default_factory=list)
@@ -165,7 +165,7 @@ def transform(source_crs: str, target_crs: str, coordinates: list[list[float]],
             notes.append(f"A more accurate operation needs grid(s) {', '.join(names)}, which are not available here.")
         return Transformation(
             coordinates=[[round(v, 9) for v in p] for p in out], source_crs=src.name, target_crs=dst.name,
-            method=op.description, accuracy_m=None if key(op) < 0 else key(op), grids=_grids(op),
+            method=op.description, accuracy_m=None if key(op) <= 0 else key(op), grids=_grids(op),
             area_of_use=op.area_of_use.name if op.area_of_use else None, warnings=notes,
         )
     raise GeodesyError(f"The points are outside the area where {src.name} to {dst.name} can be transformed "

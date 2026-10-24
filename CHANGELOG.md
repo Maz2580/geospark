@@ -4,6 +4,16 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Fixed: checked against the national agencies
+- GeoSpark's datum and height answers were compared with Geoscience Australia's calculators, Ordnance
+  Survey's OSTN15/OSGM15 test points, LINZ's NZVD2016 examples and NGS's GEOID18 and NADCON 5
+  services (`docs/benchmarks/2026-10/agency_checks.md`): agreement within 0.1 mm to 8 mm, except
+  NAD27 to NAD83 (0.27 m from NADCON 5, disclosed).
+- OSGM15 heights on Scilly, the Isle of Man, the Outer Hebrides, Orkney and Shetland were labelled
+  "ODN"; Ordnance Survey's datum flags show they are local datums (St Marys, Douglas02, Stornoway15,
+  Newlyn (Orkney), Lerwick). They are now labelled so (checked against all 40 OS test points), and ODN
+  results note that heights more than 2 km offshore are in "Newlyn Offshore".
+
 ### Fixed: found by auditing our own claims
 - **Datum and height conversions, edge cases tested on the live site:**
   - AHD was given for Christmas Island, the Cocos Islands and at sea, because the AUSGeoid2020 grid has

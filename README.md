@@ -15,16 +15,48 @@
 
 ---
 
-Ask an LLM *"How far is the Eiffel Tower from the Louvre?"* or *"Is this point inside that polygon?"*
-and the answer depends on which model you picked. Across 9 models we benchmarked, small open-weight
-models (3.8B–9B) got numeric distance questions wrong about 95% of the time. Frontier APIs ranged
-from 25% (Gemini 2.5 Pro) to 95% (GPT-5.4) correct.
+GeoSpark gives AI models tools that **compute** spatial answers instead of estimating them: geodesic
+distances, exact topology, official datum and height conversions, geocoding, elevation, routing,
+open map data and live environmental data. Every answer carries its sources, units and caveats, and
+says when it can't be answered rather than guessing.
 
-GeoSpark gives the model tools that **compute** the answer: geodesic distances on the WGS84
-ellipsoid, exact topology, CRS transformations, geocoding, elevation and live environmental data.
-With them, every model that made valid tool calls answered 76–96% of the same questions correctly.
-A 7B model on your own CPU then performs like a paid frontier API, and every answer comes with a
-deterministic trace you can check.
+### How it has changed, and why
+
+GeoSpark is tested against the models people actually use, and it changes as they do.
+
+1. **The first benchmark (GeoSpark Bench v2).** Across 9 models of the time, small open-weight models
+   (3.8B–9B) got numeric distance questions wrong about 95% of the time, and frontier APIs ranged from
+   25% to 95% correct. With GeoSpark's tools, every model that made valid tool calls answered 76–96%
+   correctly; a 7B model on a CPU went from 5% to 76%.
+2. **The models improved.** Re-checked in October 2026, Claude Opus 5.5 and GPT-6.1 answer those
+   distance and topology questions well on their own, and with GeoSpark's tools a 4B open model on a
+   workstation answers them as well as they do. Distances between two given points are no longer the
+   gap.
+3. **We looked for the next gap, with practitioners' problems in mind.** Both frontier models apply
+   datum shifts, plate motion and map projections to the millimetre, but anything that needs a
+   national grid file defeated them: converting a GNSS or drone height to AHD, ODN, NZVD2016 or
+   NAVD88, or using Britain's OSTN15. GPT-6.1 declined; Opus 5.5 estimated, up to 5.3 m off. GeoSpark
+   now does these conversions with the official grids.
+4. **We checked our own answers, not just the models'.** Matching PROJ only proves a model used the
+   tool, so GeoSpark's answers were compared with Geoscience Australia, Ordnance Survey, LINZ and the
+   US National Geodetic Survey: agreement within millimetres, with one disclosed exception. The same
+   audit corrected overclaims on our website and fixed what the edge cases broke.
+
+Every step's questions, scripts and results are in the repository, so anyone can re-run them
+([benchmark results](#benchmark-results), [October 2026 re-check](#re-check-with-current-models-october-2026),
+[agency checks](https://github.com/Maz2580/geospark/blob/main/docs/benchmarks/2026-10/agency_checks.md)).
+
+### What GeoSpark is now
+
+- **A live site, API and hosted MCP server** at [geospark.terrascout.app](https://geospark.terrascout.app):
+  ask questions, draw reachable areas, explore open map data, convert datums and heights.
+- **Verifiable answers:** sources and licences, units, caveats (an ambiguous place name, a DEM's
+  accuracy, a local height datum), and status `ok`, `partial` or `cannot_answer`. Coordinates a model
+  types from memory, or a conversion to a different system than the question asks for, mark the
+  answer partial.
+- **Self-hostable on one server** with a local model at no API cost: routing (Valhalla), an
+  OpenStreetMap copy (Overpass) and the official grids, all under one data folder.
+- **Open:** Apache-2.0, 1,190+ offline tests, and benchmarks you can re-run.
 
 ## Try it
 
@@ -49,7 +81,7 @@ Add a custom connector with this URL (in Claude: Settings → Connectors → Add
 https://geospark.terrascout.app/mcp
 ```
 
-It is open, with no key, and has the same fifteen tools as the local server below, with the same
+It is open, with no key, and has the same seventeen tools as the local server below (which adds three for your own files), with the same
 rate limits as the hosted API. It never reads files; for your own files, run the server locally.
 
 **In Claude Desktop or any MCP client, running on your computer**
@@ -206,13 +238,16 @@ cannot access the AUSGeoid2020 grid") and Claude Opus 5.5 estimated them 0.2-5.3
 falls back silently when a grid is missing (AHD becomes the ellipsoidal height, 4.7 m off in
 Melbourne; British National Grid moves about 124 m); GeoSpark refuses instead.
 
-**Checked against the agencies themselves**, not only against PROJ: GDA94 to GDA2020 and ATRF2014 to
-GDA2020 agree with Geoscience Australia's geodetic calculators API to within 0.1 mm at eight points
-across Australia, and NAVD88 heights agree with the US National Geodetic Survey's GEOID18 service to
-1 mm. Two limits to know: AHD is refused outside mainland Australia and Tasmania (the AUSGeoid2020
-grid extends over the sea and to external territories, where AHD doesn't apply), and NAD27 to NAD83
-uses the original NADCON grid, which differs from NGS's current NADCON 5 by about 0.27 m in San
-Francisco (within NADCON 5's own stated uncertainty there). The accuracy given with each result is
+**Checked against the agencies themselves**, not only against PROJ
+([details](https://github.com/Maz2580/geospark/blob/main/docs/benchmarks/2026-10/agency_checks.md)):
+Geoscience Australia's calculators (GDA94 to GDA2020 and ATRF2014 to GDA2020 within 0.1 mm at eight
+points; AUSGeoid2020 heights within 2 mm in three cities), Ordnance Survey's 40 OSTN15/OSGM15 test
+points (grid coordinates within 8 mm, heights within 2 mm), LINZ's NZVD2016 example points (within
+their 1 cm rounding) and NGS's GEOID18 service (1 mm). Limits to know: AHD is refused outside mainland
+Australia and Tasmania; OSGM15 heights on Scilly, the Isle of Man, the Outer Hebrides, Orkney and
+Shetland are labelled with their local datum, not ODN; and NAD27 to NAD83 uses the original NADCON,
+about 0.27 m from NGS's current NADCON 5 in San Francisco (within NADCON 5's own stated uncertainty).
+The accuracy given with each result is
 the one EPSG states for the operation, not a measurement.
 
 Also as `POST /api/v1/transform`, `POST /api/v1/height`

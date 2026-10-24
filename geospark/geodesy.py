@@ -361,19 +361,45 @@ def convert_height(latitude: float, longitude: float, height: float, from_datum:
         raise
     converted = result.coordinates[0][2]
     separation = (height - converted) if a == "ELLIPSOIDAL" else (converted - height)
+    local = _uk_local_datum(latitude, longitude) if national == "ODN" else None
+    label = {"ODN": f"{local[0]} (OSGM15)"} if local else {}
+    local_note = ([f"This point is in {local[1]}, where OSGM15 heights are in the {local[0]} datum, not ODN."]
+                  if local else [])
     return {
-        "height_m": round(converted, 4), "from": a.lower() if a == "ELLIPSOIDAL" else a,
-        "to": b.lower() if b == "ELLIPSOIDAL" else b, "geoid_model": model, "region": region,
+        "height_m": round(converted, 4), "from": a.lower() if a == "ELLIPSOIDAL" else label.get(a, a),
+        "to": b.lower() if b == "ELLIPSOIDAL" else label.get(b, b), "geoid_model": model, "region": region,
         "separation_m": round(separation, 4),
         "method": result.method, "accuracy_m": result.accuracy_m, "grids": result.grids,
         "provenance": [provenance(result.method, result.grids)],
-        "warnings": result.warnings + _height_caveats(national),
+        "warnings": result.warnings + local_note + _height_caveats(national),
     }
+
+
+# OSGM15 gives heights in a local datum on these islands, not ODN (Ordnance Survey, Transformations and
+# OSGM15 user guide v1.3, Table 1). Boxes checked against OS's own test points and their datum flags.
+_UK_LOCAL_DATUMS = (  # (name, region, south, north, west, east)
+    ("St Marys", "the Isles of Scilly", 49.85, 50.00, -6.50, -6.15),
+    ("Douglas02", "the Isle of Man", 54.03, 54.42, -4.85, -4.30),
+    ("Stornoway15", "the Outer Hebrides", 57.65, 58.55, -7.15, -6.10),  # Lewis and Harris
+    ("Stornoway15", "the Outer Hebrides", 56.75, 57.95, -7.70, -7.00),  # the Uists and Barra
+    ("Newlyn (Orkney)", "Orkney", 58.68, 59.40, -3.45, -2.35),
+    ("Lerwick", "Shetland", 59.80, 60.90, -1.80, -0.70),  # Foula, further west, is offshore for OSGM15
+)
+
+
+def _uk_local_datum(latitude: float, longitude: float) -> tuple[str, str] | None:
+    for name, region, south, north, west, east in _UK_LOCAL_DATUMS:
+        if south <= latitude <= north and west <= longitude <= east:
+            return name, region
+    return None
 
 
 def _height_caveats(national: str) -> list[str]:
     if national == "EGM2008":
         return ["EGM2008 is a global model, not a national height datum; it can differ from the local datum by decimetres."]
     if national == "AHD":
-        return ["AUSGeoid2020 gives AHD heights onshore; at sea the grid has values but they are not AHD heights."]
+        return ["AUSGeoid2020 gives AHD heights onshore; at sea the grid has values but they are not AHD heights. "
+                "Geoscience Australia's calculator gives a local uncertainty (about 0.08 m in capital cities)."]
+    if national == "ODN":
+        return ["More than 2 km offshore, OSGM15 heights are in Ordnance Survey's 'Newlyn Offshore' datum, not ODN."]
     return []

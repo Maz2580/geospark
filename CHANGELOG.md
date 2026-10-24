@@ -6,9 +6,9 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [0.10.0] - 2026-10-24: official datums, checked data, safer small models
 
-GeoSpark now does what frontier models could not do without the official grid files: datum and height conversions that
-need a national grid (AUSGeoid2020, OSTN15/OSGM15, NZGeoid2016, GEOID18, NADCON), checked against the
-national agencies' own calculators and test points. `geospark layer check` finds why two datasets
+GeoSpark now does datum and height conversions that need a national grid (AUSGeoid2020,
+OSTN15/OSGM15, NZGeoid2016, GEOID18, NADCON), which frontier models could not do without the grid
+files, and they agree with the national agencies' own calculators and test points. `geospark layer check` finds why two datasets
 disagree (a GDA94/GDA2020 mix-up, a wrong zone, ellipsoidal against AHD heights), validated on 2,000
 published survey marks. And Ask now catches what small local models get wrong without saying so:
 numbers no tool returned, empty answers and contradictory comparisons.

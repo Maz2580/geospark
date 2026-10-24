@@ -13,6 +13,7 @@ README under "Re-check with current models (October 2026)".
 | `agency_checks.md` | GeoSpark's answers compared with Geoscience Australia, Ordnance Survey, LINZ, NGS and 2,000 Victorian survey marks; and `layer check` on real data |
 | `fairness.md` | Whether the gap survives code execution, high effort and repeated runs; and AI-written GIS code |
 | `results_datum_all_runs.json` | Every datum run's grades and errors (bare, tools, code execution, repeats) |
+| `small_models.md`, `smallmodel/` | Small local models through Ask's tool loop: silent errors found, what now catches them, final scores |
 | `codegen/` | The eight scripting tasks, their answers (`make_tasks.py`), the runner and `scores.json` |
 
 ## Re-run

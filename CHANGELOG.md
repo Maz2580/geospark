@@ -4,6 +4,21 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Added: small-model safety (`docs/benchmarks/2026-10/small_models.md`)
+Tested with four open models on a local workstation through Ask's own tool loop; each change below
+fixes a failure seen there:
+- Every quantity an answer states must trace back to a tool result (allowing unit changes, rounding, and
+  sums or differences of results); otherwise the answer is `partial` and the number is named.
+- An answer that returns no text after its tool calls is `cannot_answer`, not `ok`.
+- "X is closer/farther" claims are checked against the measured distances, and an answer that names two
+  different places as closer is flagged.
+- `transform_coordinates` accepts a single `[x, y]` point and explains the expected shape, instead of a
+  Python error that led a 4B model to invent EPSG codes.
+- `calculate_distance` reads two places together: "Gold Coast" with Brisbane is Queensland, not Ghana
+  (which it was, 16,549 km away, with no warning, on a server without a preferred country). An
+  operator's `GEOSPARK_GEOCODE_PREFER_COUNTRY` is never overridden.
+After the changes, 120 answers over three runs had one silent error (the Ghana geocode, then fixed).
+
 ### Fixed
 - `layer check` named only one direction of a GDA94/GDA2020 mix-up. GDA2020 numbers labelled GDA94
   are now named the right way round too; the finding code is `gda94_gda2020_mixed`, with the

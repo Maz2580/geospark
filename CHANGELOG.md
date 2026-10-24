@@ -8,7 +8,8 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 GeoSpark now does datum and height conversions that need a national grid (AUSGeoid2020,
 OSTN15/OSGM15, NZGeoid2016, GEOID18, NADCON), which frontier models could not do without the grid
-files, and they agree with the national agencies' own calculators and test points. `geospark layer check` finds why two datasets
+files. They agree with the national agencies' own calculators and test points to within 8 mm (NAD27
+to NAD83 excepted: 0.27 m from NADCON 5). `geospark layer check` finds why two datasets
 disagree (a GDA94/GDA2020 mix-up, a wrong zone, ellipsoidal against AHD heights), validated on 2,000
 published survey marks. And Ask now catches what small local models get wrong without saying so:
 numbers no tool returned, empty answers and contradictory comparisons.

@@ -542,6 +542,24 @@ def _add_local_file_tools(mcp: MCPServer) -> None:
         polys = await _blocking(load, polygons_path, crs, repair)
         return FeatureCollection(**(await _blocking(layers.count_within, pts, polys)).to_geojson())
 
+    @mcp.tool(title="Check a data file's coordinates (local files)", annotations=READ_ONLY_LOCAL)
+    async def check_dataset(path: FilePath, crs: CrsArg = None,
+                            against_path: Annotated[str | None, Field(description="A reference file of the same "
+                                                                      "features to compare against")] = None,
+                            against_crs: CrsArg = None,
+                            id_field: Annotated[str | None, Field(description="Field identifying the same feature "
+                                                                  "in both files")] = None) -> dict[str, Any]:
+        """Check one of the user's files before analysis: is a CRS declared, do the coordinates fit it
+        (projected numbers labelled as degrees, swapped lat/lon, points outside the zone), datum and
+        height-reference caveats. With against_path, measure the offset to a reference layer and name
+        the cause when the numbers match one: GDA94 data labelled GDA2020, the wrong MGA zone, feet,
+        a plate-motion epoch, or ellipsoidal vs AHD heights. Says 'unexplained' rather than guessing."""
+        from geospark.io.check import check_layer, compare_layers
+
+        if against_path:
+            return await _blocking(compare_layers, against_path, path, against_crs, crs, id_field)
+        return await _blocking(check_layer, path, None, crs)
+
     @mcp.tool(title="Nearest feature (local files)", annotations=READ_ONLY_LOCAL)
     async def layer_nearest(sources_path: FilePath, targets_path: FilePath, crs: CrsArg = None,
                             repair: bool = False) -> FeatureCollection:

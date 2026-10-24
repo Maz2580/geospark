@@ -120,12 +120,26 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _common_frame(source: CRS) -> CRS:
+    """The geographic CRS a file is converted to before analysis.
+
+    PROJ's default step from GDA94 (and from GDA2020) to WGS 84 is a null transformation, so a GDA94
+    file and a GDA2020 file of the same survey marks ended up 1.55 m apart in Melbourne. Australian
+    data goes to GDA2020 with the official transformation instead; GDA2020 is then treated as WGS 84
+    (they differ by decimetres), as PROJ does for every other datum.
+    """
+    datum = source.geodetic_crs.datum.name if source.geodetic_crs is not None and source.geodetic_crs.datum else ""
+    if "Geocentric Datum of Australia 1994" in datum:
+        return CRS.from_epsg(7844)
+    return CRS.from_epsg(4326)
+
+
 def _to_wgs84(geoms: list[BaseGeometry], source: CRS) -> list[BaseGeometry]:
     if source.equals(CRS.from_epsg(4326), ignore_axis_order=True) or source.equals(CRS("OGC:CRS84")):
         return geoms
     from geospark.engine.crs_handler import reproject
 
-    transformer = Transformer.from_crs(source, "EPSG:4326", always_xy=True)
+    transformer = Transformer.from_crs(source, _common_frame(source), always_xy=True)
     return [reproject(g, transformer) for g in geoms]
 
 

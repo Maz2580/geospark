@@ -4,6 +4,17 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Added
+- **README: "Re-check with current models (October 2026)"**, next to the original GeoSpark Bench v2
+  results: a GeoSpark Bench sample on Claude Opus 5.5, GPT-6.1 and open models on a local workstation,
+  and the new datum and height test. Questions, answer generators, harness (keys from the environment
+  only) and a scored summary are in `docs/benchmarks/2026-10`.
+
+### Fixed
+- **NZVD2016 heights were refused** ("could not be downloaded"): NZGeoid2016's area of use crosses
+  the antimeridian (160.6 E to 171.2 W), and the coverage check that picks which grid to download
+  assumed west < east.
+
 ### Fixed
 - **Height conversions failed on the live API** ("outside its AUSGeoid2020 model") while working in
   a script: PROJ's on-demand grid download only works on the thread that enabled it, and the API

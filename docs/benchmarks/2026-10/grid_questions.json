@@ -1,0 +1,128 @@
+[
+ {
+  "id": "grid_UK1",
+  "group": "UK: ETRS89 to British National Grid (OSTN15)",
+  "prompt": "A GNSS survey in London (Trafalgar Square) gives ETRS89 latitude 51.508, longitude -0.1281. What are the point's OSGB36 / British National Grid coordinates (easting and northing), as Ordnance Survey's official transformation gives them?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"E\": <metres>, \"N\": <metres>}",
+  "answer": {
+   "E": 530004.48,
+   "N": 180446.082
+  },
+  "kind": "en",
+  "method": "Inverse of OSGB36 to ETRS89 (2) + British National Grid (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.03
+ },
+ {
+  "id": "grid_UK2",
+  "group": "UK: ETRS89 to British National Grid (OSTN15)",
+  "prompt": "A GNSS survey in Edinburgh gives ETRS89 latitude 55.9533, longitude -3.1883. What are the point's OSGB36 / British National Grid coordinates (easting and northing), as Ordnance Survey's official transformation gives them?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"E\": <metres>, \"N\": <metres>}",
+  "answer": {
+   "E": 325897.321,
+   "N": 674001.742
+  },
+  "kind": "en",
+  "method": "Inverse of OSGB36 to ETRS89 (2) + British National Grid (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.03
+ },
+ {
+  "id": "grid_UK3",
+  "group": "UK: ETRS89 to British National Grid (OSTN15)",
+  "prompt": "A GNSS survey in Penzance gives ETRS89 latitude 50.1188, longitude -5.5371. What are the point's OSGB36 / British National Grid coordinates (easting and northing), as Ordnance Survey's official transformation gives them?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"E\": <metres>, \"N\": <metres>}",
+  "answer": {
+   "E": 147252.713,
+   "N": 30296.029
+  },
+  "kind": "en",
+  "method": "Inverse of OSGB36 to ETRS89 (2) + British National Grid (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.03
+ },
+ {
+  "id": "grid_UKH1",
+  "group": "UK: ellipsoidal height to ODN (OSGM15)",
+  "prompt": "A GNSS receiver in London (Trafalgar Square) (ETRS89 latitude 51.508, longitude -0.1281) reports an ellipsoidal height of 70.00 m. What is the height in Ordnance Datum Newlyn (ODN)?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"H\": <metres>}",
+  "answer": {
+   "H": 24.45
+  },
+  "kind": "height",
+  "method": "ETRS89 to ODN height (2) + Inverse of OSGB36 to ETRS89 (2) + British National Grid (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.038
+ },
+ {
+  "id": "grid_UKH2",
+  "group": "UK: ellipsoidal height to ODN (OSGM15)",
+  "prompt": "A GNSS receiver in Edinburgh (ETRS89 latitude 55.9533, longitude -3.1883) reports an ellipsoidal height of 120.00 m. What is the height in Ordnance Datum Newlyn (ODN)?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"H\": <metres>}",
+  "answer": {
+   "H": 67.681
+  },
+  "kind": "height",
+  "method": "ETRS89 to ODN height (2) + Inverse of OSGB36 to ETRS89 (2) + British National Grid (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.038
+ },
+ {
+  "id": "grid_NZ1",
+  "group": "NZ: ellipsoidal height to NZVD2016",
+  "prompt": "A GNSS receiver in Auckland (NZGD2000 latitude -36.8485, longitude 174.7633) reports an ellipsoidal height of 100.00 m. What is the height in the New Zealand Vertical Datum 2016 (NZVD2016)?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"H\": <metres>}",
+  "answer": {
+   "H": 65.509
+  },
+  "kind": "height",
+  "method": "NZGD2000 to NZVD2016 height (2) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.1
+ },
+ {
+  "id": "grid_NZ2",
+  "group": "NZ: ellipsoidal height to NZVD2016",
+  "prompt": "A GNSS receiver in Wellington (NZGD2000 latitude -41.2865, longitude 174.7762) reports an ellipsoidal height of 60.00 m. What is the height in the New Zealand Vertical Datum 2016 (NZVD2016)?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"H\": <metres>}",
+  "answer": {
+   "H": 46.975
+  },
+  "kind": "height",
+  "method": "NZGD2000 to NZVD2016 height (2) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.1
+ },
+ {
+  "id": "grid_US1",
+  "group": "US: ellipsoidal height to NAVD88 (GEOID18)",
+  "prompt": "A GNSS receiver in San Francisco (NAD83(2011) latitude 37.7749, longitude -122.4194) reports an ellipsoidal height of 100.00 m. What is the NAVD88 orthometric height in metres?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"H\": <metres>}",
+  "answer": {
+   "H": 132.534
+  },
+  "kind": "height",
+  "method": "NAD83(2011) to NAVD88 height (3) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.015
+ },
+ {
+  "id": "grid_US2",
+  "group": "US: ellipsoidal height to NAVD88 (GEOID18)",
+  "prompt": "A GNSS receiver in Denver (NAD83(2011) latitude 39.7392, longitude -104.9903) reports an ellipsoidal height of 1580.00 m. What is the NAVD88 orthometric height in metres?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"H\": <metres>}",
+  "answer": {
+   "H": 1597.111
+  },
+  "kind": "height",
+  "method": "NAD83(2011) to NAVD88 height (3) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.015
+ },
+ {
+  "id": "grid_NAD1",
+  "group": "US: NAD27 to NAD83 (NADCON)",
+  "prompt": "An old map of San Francisco gives NAD27 latitude 37.7749, longitude -122.4194. What are the NAD83 latitude and longitude of that point, as the official NADCON transformation gives them?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"lat\": <degrees>, \"lon\": <degrees>}",
+  "answer": {
+   "lat": 37.77482951,
+   "lon": -122.42048217
+  },
+  "kind": "latlon",
+  "method": "NAD27 to NAD83 (1) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.15
+ },
+ {
+  "id": "grid_NAD2",
+  "group": "US: NAD27 to NAD83 (NADCON)",
+  "prompt": "An old map of New York (Manhattan) gives NAD27 latitude 40.7128, longitude -74.006. What are the NAD83 latitude and longitude of that point, as the official NADCON transformation gives them?\n\nEnd your reply with one line of JSON only, exactly in this form: {\"lat\": <degrees>, \"lon\": <degrees>}",
+  "answer": {
+   "lat": 40.71290242,
+   "lon": -74.00558401
+  },
+  "kind": "latlon",
+  "method": "NAD27 to NAD83 (1) (with axis order normalized for visualization)",
+  "official_accuracy_m": 0.15
+ }
+]

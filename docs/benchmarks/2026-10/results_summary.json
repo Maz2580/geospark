@@ -1,0 +1,711 @@
+{
+ "date": "2026-10-24",
+ "geospark_bench_sample": {
+  "claude-opus-5-5": {
+   "bare": {
+    "distance_pct": 100.0,
+    "distance_n": 20,
+    "topology_pct": 100.0,
+    "topology_n": 18,
+    "api_errors": 0,
+    "used_tools_on": null,
+    "cost_usd": 0.659
+   },
+   "tools": {
+    "distance_pct": 100.0,
+    "distance_n": 20,
+    "topology_pct": 100.0,
+    "topology_n": 18,
+    "api_errors": 0,
+    "used_tools_on": 33,
+    "cost_usd": 0.701
+   }
+  },
+  "gemma4-12b": {
+   "bare": {
+    "distance_pct": 5.0,
+    "distance_n": 20,
+    "topology_pct": 0.0,
+    "topology_n": 18,
+    "api_errors": 37,
+    "used_tools_on": null,
+    "cost_usd": 0.0
+   },
+   "tools": {
+    "distance_pct": 0.0,
+    "distance_n": 8,
+    "topology_pct": null,
+    "topology_n": 0,
+    "api_errors": 8,
+    "used_tools_on": 0,
+    "cost_usd": 0.0
+   }
+  },
+  "gpt-6.1-sol": {
+   "bare": {
+    "distance_pct": 95.0,
+    "distance_n": 20,
+    "topology_pct": 100.0,
+    "topology_n": 18,
+    "api_errors": 0,
+    "used_tools_on": null,
+    "cost_usd": 0.178
+   },
+   "tools": {
+    "distance_pct": 100.0,
+    "distance_n": 20,
+    "topology_pct": 100.0,
+    "topology_n": 18,
+    "api_errors": 0,
+    "used_tools_on": 38,
+    "cost_usd": 0.156
+   }
+  },
+  "gpt-oss-20b": {
+   "bare": {
+    "distance_pct": 95.0,
+    "distance_n": 20,
+    "topology_pct": 100.0,
+    "topology_n": 18,
+    "api_errors": 1,
+    "used_tools_on": null,
+    "cost_usd": 0.0
+   },
+   "tools": {
+    "distance_pct": 100.0,
+    "distance_n": 20,
+    "topology_pct": 100.0,
+    "topology_n": 18,
+    "api_errors": 0,
+    "used_tools_on": 38,
+    "cost_usd": 0.0
+   }
+  },
+  "phi4-mini-3.8b": {
+   "bare": {
+    "distance_pct": 15.0,
+    "distance_n": 20,
+    "topology_pct": 50.0,
+    "topology_n": 18,
+    "api_errors": 0,
+    "used_tools_on": null,
+    "cost_usd": 0.0
+   },
+   "tools": {
+    "distance_pct": 20.0,
+    "distance_n": 20,
+    "topology_pct": 50.0,
+    "topology_n": 18,
+    "api_errors": 0,
+    "used_tools_on": 0,
+    "cost_usd": 0.0
+   }
+  },
+  "qwen3.5-4b": {
+   "bare": {
+    "distance_pct": 90.0,
+    "distance_n": 20,
+    "topology_pct": 100.0,
+    "topology_n": 18,
+    "api_errors": 0,
+    "used_tools_on": null,
+    "cost_usd": 0.0
+   },
+   "tools": {
+    "distance_pct": 100.0,
+    "distance_n": 20,
+    "topology_pct": 100.0,
+    "topology_n": 18,
+    "api_errors": 0,
+    "used_tools_on": 38,
+    "cost_usd": 0.0
+   }
+  },
+  "qwen3.5-9b": {
+   "bare": {
+    "distance_pct": 0.0,
+    "distance_n": 20,
+    "topology_pct": 61.1,
+    "topology_n": 18,
+    "api_errors": 27,
+    "used_tools_on": null,
+    "cost_usd": 0.0
+   },
+   "tools": {
+    "distance_pct": 100.0,
+    "distance_n": 20,
+    "topology_pct": 94.4,
+    "topology_n": 18,
+    "api_errors": 0,
+    "used_tools_on": 38,
+    "cost_usd": 0.0
+   }
+  }
+ },
+ "datum_and_grids": {
+  "claude-opus-5-5": {
+   "bare": {
+    "datum_questions": {
+     "graded": {
+      "datum_B1": {
+       "grade": "survey-grade",
+       "error_m": 0.043
+      },
+      "datum_B2": {
+       "grade": "mapping-grade",
+       "error_m": 0.165
+      },
+      "datum_B3": {
+       "grade": "wrong",
+       "error_m": 1.75
+      },
+      "datum_B4": {
+       "grade": "mapping-grade",
+       "error_m": 0.362
+      },
+      "datum_B5": {
+       "grade": "wrong",
+       "error_m": 2.739
+      },
+      "datum_B6": {
+       "grade": "wrong",
+       "error_m": 5.314
+      },
+      "datum_C1": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_C2": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_C3": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_C4": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_A1": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_A2": {
+       "grade": "survey-grade",
+       "error_m": 0.003
+      },
+      "datum_A3": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "datum_A4": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_A5": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "datum_A6": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_A7": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_D2": {
+       "grade": "survey-grade",
+       "error_m": 0.006
+      },
+      "datum_E1": {
+       "grade": "mapping-grade",
+       "error_m": 0.069
+      },
+      "datum_E2": {
+       "grade": "mapping-grade",
+       "error_m": 0.433
+      },
+      "datum_D1": {
+       "grade": "survey-grade",
+       "error_m": 0.004
+      }
+     },
+     "cost_usd": 0.85
+    },
+    "grid_questions": {
+     "graded": {
+      "grid_UK1": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "grid_UK2": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "grid_UK3": {
+       "grade": "wrong",
+       "error_m": 4.231
+      },
+      "grid_UKH1": {
+       "grade": "mapping-grade",
+       "error_m": 0.35
+      },
+      "grid_UKH2": {
+       "grade": "wrong",
+       "error_m": 0.519
+      },
+      "grid_NZ1": {
+       "grade": "survey-grade",
+       "error_m": 0.009
+      },
+      "grid_NZ2": {
+       "grade": "wrong",
+       "error_m": 0.625
+      },
+      "grid_US1": {
+       "grade": "mapping-grade",
+       "error_m": 0.334
+      },
+      "grid_US2": {
+       "grade": "mapping-grade",
+       "error_m": 0.211
+      },
+      "grid_NAD1": {
+       "grade": "wrong",
+       "error_m": 3.731
+      },
+      "grid_NAD2": {
+       "grade": "wrong",
+       "error_m": 4.572
+      }
+     },
+     "cost_usd": 0.617
+    }
+   },
+   "tools": {
+    "datum_questions": {
+     "graded": {
+      "datum_A1": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_A2": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_A3": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "datum_A4": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_A5": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "datum_A6": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_A7": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_B1": {
+       "grade": "survey-grade",
+       "error_m": 0.003
+      },
+      "datum_B2": {
+       "grade": "survey-grade",
+       "error_m": 0.005
+      },
+      "datum_B3": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_B4": {
+       "grade": "survey-grade",
+       "error_m": 0.002
+      },
+      "datum_B5": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "datum_B6": {
+       "grade": "survey-grade",
+       "error_m": 0.004
+      },
+      "datum_C1": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_C2": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_C3": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_C4": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_D1": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_D2": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_E1": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "datum_E2": {
+       "grade": "survey-grade",
+       "error_m": 0.003
+      }
+     },
+     "cost_usd": 0.628
+    },
+    "grid_questions": {
+     "graded": {
+      "grid_UK1": {
+       "grade": "survey-grade",
+       "error_m": 0.002
+      },
+      "grid_UK2": {
+       "grade": "survey-grade",
+       "error_m": 0.002
+      },
+      "grid_UK3": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "grid_UKH1": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "grid_UKH2": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "grid_NZ1": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "grid_NZ2": {
+       "grade": "survey-grade",
+       "error_m": 0.005
+      },
+      "grid_US1": {
+       "grade": "survey-grade",
+       "error_m": 0.004
+      },
+      "grid_US2": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "grid_NAD1": {
+       "grade": "mapping-grade",
+       "error_m": 0.056
+      },
+      "grid_NAD2": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      }
+     },
+     "cost_usd": 0.299
+    }
+   }
+  },
+  "gpt-6.1-sol": {
+   "bare": {
+    "datum_questions": {
+     "graded": {
+      "datum_A1": {
+       "grade": "survey-grade",
+       "error_m": 0.004
+      },
+      "datum_A2": {
+       "grade": "survey-grade",
+       "error_m": 0.004
+      },
+      "datum_A3": {
+       "grade": "survey-grade",
+       "error_m": 0.005
+      },
+      "datum_A4": {
+       "grade": "survey-grade",
+       "error_m": 0.005
+      },
+      "datum_A5": {
+       "grade": "survey-grade",
+       "error_m": 0.004
+      },
+      "datum_A6": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_A7": {
+       "grade": "survey-grade",
+       "error_m": 0.005
+      },
+      "datum_B1": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "datum_B2": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "datum_B3": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "datum_B4": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "datum_B5": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "datum_B6": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "datum_C1": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_C2": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_C3": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_C4": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_D1": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "datum_D2": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_E2": {
+       "grade": "mapping-grade",
+       "error_m": 0.433
+      },
+      "datum_E1": {
+       "grade": "wrong",
+       "error_m": 1.652
+      }
+     },
+     "cost_usd": 0.2
+    },
+    "grid_questions": {
+     "graded": {
+      "grid_UK1": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "grid_UK2": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "grid_UK3": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "grid_UKH1": {
+       "grade": "mapping-grade",
+       "error_m": 0.45
+      },
+      "grid_UKH2": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "grid_NZ1": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "grid_NZ2": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "grid_US1": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "grid_US2": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "grid_NAD1": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      },
+      "grid_NAD2": {
+       "grade": "wrong zone / no answer",
+       "error_m": null
+      }
+     },
+     "cost_usd": 0.036
+    }
+   },
+   "tools": {
+    "datum_questions": {
+     "graded": {
+      "datum_A1": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_A2": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_A3": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "datum_A4": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_A5": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "datum_A6": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_A7": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_B1": {
+       "grade": "survey-grade",
+       "error_m": 0.003
+      },
+      "datum_B2": {
+       "grade": "survey-grade",
+       "error_m": 0.005
+      },
+      "datum_B3": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_B4": {
+       "grade": "survey-grade",
+       "error_m": 0.002
+      },
+      "datum_B5": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "datum_B6": {
+       "grade": "survey-grade",
+       "error_m": 0.004
+      },
+      "datum_C1": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_C2": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_C3": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_C4": {
+       "grade": "correct",
+       "error_m": null
+      },
+      "datum_D1": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_D2": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "datum_E1": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "datum_E2": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      }
+     },
+     "cost_usd": 0.115
+    },
+    "grid_questions": {
+     "graded": {
+      "grid_UK1": {
+       "grade": "survey-grade",
+       "error_m": 0.002
+      },
+      "grid_UK2": {
+       "grade": "survey-grade",
+       "error_m": 0.002
+      },
+      "grid_UK3": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "grid_UKH1": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      },
+      "grid_UKH2": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "grid_NZ1": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "grid_NZ2": {
+       "grade": "survey-grade",
+       "error_m": 0.005
+      },
+      "grid_US1": {
+       "grade": "survey-grade",
+       "error_m": 0.004
+      },
+      "grid_US2": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "grid_NAD1": {
+       "grade": "survey-grade",
+       "error_m": 0.001
+      },
+      "grid_NAD2": {
+       "grade": "survey-grade",
+       "error_m": 0.0
+      }
+     },
+     "cost_usd": 0.061
+    }
+   }
+  }
+ }
+}

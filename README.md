@@ -372,6 +372,52 @@ for provenance, and the
 [benchmark report](https://github.com/Maz2580/geospark/blob/main/docs/BENCHMARK_REPORT.md) for
 every table.
 
+### Re-check with current models (October 2026)
+
+We keep testing as models improve. In October 2026 we re-ran a sample of GeoSpark Bench on today's
+frontier models and on open models served from a local workstation, and added a new test of datum
+and height conversions, where we found the next gap. Everything needed to re-run it (questions,
+the scripts that compute the official answers, the harness and a scored summary) is in
+[docs/benchmarks/2026-10](https://github.com/Maz2580/geospark/tree/main/docs/benchmarks/2026-10).
+
+**GeoSpark Bench sample** (20 numeric-distance questions and 18 topology questions, 3 per predicate,
+coordinates given; distance correct within 10% of the `pyproj` geodesic, topology exact):
+
+| Model | Where it ran | Without tools: distance / topology | With GeoSpark tools |
+|---|---|:---:|:---:|
+| Claude Opus 5.5 | API | 100% / 100% | 100% / 100% |
+| GPT-6.1 | API | 95% ¹ / 100% | 100% / 100% |
+| gpt-oss 20B | local workstation | 95% / 100% | 100% / 100% |
+| Qwen 3.5 4B | local workstation | 90% / 100% | 100% / 100% |
+| Qwen 3.5 9B | local workstation | — ² | 100% / 94% |
+| Phi-4-mini 3.8B | local workstation | 15% / 50% | 20% / 50% ³ |
+
+¹ One reply ran out of length while reasoning and gave no number. ² Most replies timed out on a busy
+workstation, so the run is not a fair score. ³ It never called the tools. Gemma 4 12B timed out the
+same way and is left out.
+
+The finding has moved on since the first run: the newest frontier models now handle these questions
+on their own, and with tools a 4B model on a workstation answers them as well as they do.
+
+**Datum and height conversions** (new; 32 questions in Australia, the UK, New Zealand and the US,
+with official answers from PROJ's most accurate EPSG operations and the national grids: GDA94 to
+GDA2020, MGA zones, ITRF2014 to GDA2020 at an epoch, ellipsoidal heights to AHD, ODN, NZVD2016 and
+NAVD88, OSTN15, NAD27 to NAD83). Survey-grade means within 5 cm, or within the geoid model's stated
+accuracy for heights:
+
+| Model | Without tools: survey-grade | within 0.5 m | wrong | declined | With GeoSpark's geodesy tools |
+|---|:---:|:---:|:---:|:---:|:---:|
+| Claude Opus 5.5 | 15 | 7 | 8 (up to 5.3 m off) | 2 ⁴ | **31 survey-grade, 1 within 6 cm** |
+| GPT-6.1 | 13 | 2 | 1 (1.65 m off) | 16 | **32 survey-grade** |
+
+⁴ Two British National Grid answers ran past an 8,000-token reply limit while working by hand.
+
+Both models apply datum parameters, plate motion and map projections to the millimetre. What they
+can't do is read the national grids that heights and some datum conversions depend on: GPT-6.1
+declines ("I cannot access the AUSGeoid2020 grid"), and Opus 5.5 estimates from memory. That is the
+gap GeoSpark's [`transform_coordinates` and `convert_height`](#official-datum-and-height-conversions)
+close. The whole re-check cost about US$5 in API calls.
+
 ## Self-hosting
 
 ```bash

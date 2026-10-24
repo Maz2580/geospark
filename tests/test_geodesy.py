@@ -112,3 +112,95 @@ def test_with_the_official_grids_the_answers_match(monkeypatch) -> None:
     assert geodesy.convert_height(-37.8177, 144.9691, 40.0, "ellipsoidal", "AHD")["height_m"] == pytest.approx(35.257, abs=0.002)
     e, n = geodesy.transform("EPSG:4258", "EPSG:27700", [[-0.1281, 51.5080]]).coordinates[0]
     assert math.hypot(e - 530004.480, n - 180446.082) < 0.01
+
+
+def test_proj_never_downloads_by_itself() -> None:
+    """PROJ's own download works only on the thread that enabled it; GeoSpark fetches whole files."""
+    import os
+
+    assert os.environ["PROJ_NETWORK"] == "OFF"
+
+
+def test_grids_are_fetched_for_a_more_accurate_operation_only(monkeypatch, tmp_path) -> None:
+    from types import SimpleNamespace as Ns
+
+    monkeypatch.setenv("GEOSPARK_PROJ_NETWORK", "true")
+    monkeypatch.setenv("PROJ_USER_WRITABLE_DIRECTORY", str(tmp_path))
+    grid = Ns(short_name="au_ga_AUSGeoid2020_20180201.tif", url="https://cdn.proj.org/au_ga_AUSGeoid2020_20180201.tif",
+              available=False, direct_download=True, open_license=True)
+    worse = Ns(short_name="worse.tif", url="https://cdn.proj.org/worse.tif", available=False,
+               direct_download=True, open_license=True)
+    group = Ns(unavailable_operations=[Ns(accuracy=0.15, grids=[grid], area_of_use=None),
+                                       Ns(accuracy=2.0, grids=[worse], area_of_use=None)])
+    urls = []
+
+    class Stream:
+        def __init__(self, method, url, **kw):
+            urls.append(url)
+            self.headers = {"content-length": "4"}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def raise_for_status(self):
+            pass
+
+        def iter_bytes(self):
+            yield b"TIFF"
+
+    monkeypatch.setattr("httpx.stream", Stream)
+    assert geodesy._fetch_grids(group, best_available=1.0) == ["au_ga_AUSGeoid2020_20180201.tif"]
+    assert urls == [grid.url] and (tmp_path / grid.short_name).read_bytes() == b"TIFF"
+
+
+def test_no_grid_is_fetched_when_downloads_are_off(monkeypatch) -> None:
+    from types import SimpleNamespace as Ns
+
+    monkeypatch.setattr("httpx.stream", lambda *a, **k: (_ for _ in ()).throw(AssertionError("downloaded")))
+    group = Ns(unavailable_operations=[Ns(accuracy=0.15, area_of_use=None, grids=[Ns(
+        short_name="g.tif", url="u", available=False, direct_download=True, open_license=True)])])
+    assert geodesy._fetch_grids(group, None) == []
+
+
+def test_a_missing_grid_is_named_not_called_out_of_coverage() -> None:
+    if _grid_available("au_ga_AUSGeoid2020_20180201.tif"):
+        pytest.skip("AUSGeoid2020 is installed on this machine")
+    with pytest.raises(geodesy.GeodesyError) as raised:
+        geodesy.convert_height(-37.8177, 144.9691, 40.0, "ellipsoidal", "AHD")
+    assert "outside" not in str(raised.value)
+
+
+def test_only_a_grid_that_covers_the_point_is_fetched(monkeypatch, tmp_path) -> None:
+    from types import SimpleNamespace as Ns
+
+    monkeypatch.setenv("GEOSPARK_PROJ_NETWORK", "true")
+    monkeypatch.setenv("PROJ_USER_WRITABLE_DIRECTORY", str(tmp_path))
+    alaska = Ns(accuracy=0.01, area_of_use=Ns(west=-180, east=-129, south=51, north=72), grids=[Ns(
+        short_name="ak.tif", url="https://cdn.proj.org/ak.tif", available=False, direct_download=True, open_license=True)])
+    conus = Ns(accuracy=0.015, area_of_use=Ns(west=-125, east=-66, south=24, north=50), grids=[Ns(
+        short_name="conus.tif", url="https://cdn.proj.org/conus.tif", available=False, direct_download=True, open_license=True)])
+    got = []
+
+    class Stream:
+        def __init__(self, method, url, **kw):
+            got.append(url)
+            self.headers = {}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def raise_for_status(self):
+            pass
+
+        def iter_bytes(self):
+            yield b"x"
+
+    monkeypatch.setattr("httpx.stream", Stream)
+    geodesy._fetch_grids(Ns(unavailable_operations=[alaska, conus]), None, [(-122.42, 37.77)])
+    assert got == ["https://cdn.proj.org/conus.tif"]  # San Francisco: not the Alaska geoid

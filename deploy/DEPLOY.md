@@ -290,12 +290,17 @@ container.
 
 ## Official transformation grids (no setup needed)
 
-`transform_coordinates` and `convert_height` download each official grid (AUSGeoid2020, OSTN15,
-GEOID18...) from the PROJ CDN the first time it is needed and keep it in `$GEOSPARK_DATA_DIR/proj`.
-In the container that is `/app/data/proj`, which is the existing `./data` bind mount, so on the server
-the grids live in **`/mnt/geospark/data/proj`**: nothing is written outside `/mnt`, and no compose
-change is needed. Grids are fetched in pieces as points need them: 32 test points across Australia,
-the UK, NZ and the US used 384 KB; a whole national geoid is tens of MB.
+`transform_coordinates` and `convert_height` download each official grid file (AUSGeoid2020,
+OSTN15, GEOID18...) from the PROJ CDN the first time a point needs it, and keep it in
+`$GEOSPARK_DATA_DIR/proj`. In the container that is `/app/data/proj`, which is the existing `./data`
+bind mount, so on the server the grids live in **`/mnt/geospark/data/proj`**: nothing is written
+outside `/mnt`, and no compose change is needed. Only the grid of the most accurate operation that
+covers the point is fetched: AUSGeoid2020 5.8 MB, OSGM15 1.5 MB, OSTN15 3.0 MB, NZGeoid2016 5.2 MB,
+GEOID18 16.7 MB (the global EGM2008 is 81 MB).
+
+GeoSpark downloads whole files itself and keeps PROJ's own networking off (`PROJ_NETWORK=OFF`):
+PROJ's on-demand download only works on the thread that switched it on, and the API answers on
+worker threads.
 
 - `GEOSPARK_PROJ_NETWORK=false` never downloads: only grids already in that folder are used, and a
   conversion that needs a missing grid is refused (never approximated).

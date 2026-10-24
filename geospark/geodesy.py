@@ -14,13 +14,14 @@ the operation is stated to be.
 
 Configuration:
     GEOSPARK_PROJ_NETWORK   "false" to never download grids (results then need installed grids)
-    PROJ_USER_WRITABLE_DIRECTORY  where grids are cached (default ``$GEOSPARK_DATA_DIR/proj``)
+    PROJ_USER_WRITABLE_DIRECTORY  where grid files are kept (default ``$GEOSPARK_DATA_DIR/proj``)
 """
 from __future__ import annotations
 
 import math
 import os
 import re
+import threading
 import warnings
 from dataclasses import dataclass, field
 from typing import Any
@@ -87,13 +88,88 @@ def provenance(method: str, grids: list[str]) -> dict[str, Any]:
 
 
 def _configure_proj() -> None:
-    """Cache grids under GeoSpark's data directory and allow PROJ to fetch them (once)."""
-    os.environ.setdefault("PROJ_USER_WRITABLE_DIRECTORY", str(data_dir() / "proj"))
-    os.makedirs(os.environ["PROJ_USER_WRITABLE_DIRECTORY"], exist_ok=True)
+    """Grids live under GeoSpark's data directory; PROJ itself never downloads (see _fetch_grids)."""
+    os.makedirs(_grid_dir(), exist_ok=True)
+
+
+def _grid_dir() -> str:
+    return os.environ.get("PROJ_USER_WRITABLE_DIRECTORY") or str(data_dir() / "proj")
+
+
+def _downloads_allowed() -> bool:
+    return os.getenv("GEOSPARK_PROJ_NETWORK", "true").lower() not in ("0", "false", "no")
+
+
+def _rescan_grids() -> None:
+    """Make PROJ look again: it remembers a missing grid until its search path is set again."""
     import pyproj
 
-    enabled = os.getenv("GEOSPARK_PROJ_NETWORK", "true").lower() not in ("0", "false", "no")
-    pyproj.network.set_network_enabled(enabled)
+    current = pyproj.datadir.get_data_dir()
+    if _grid_dir() in current.split(os.pathsep):
+        pyproj.datadir.set_data_dir(current)
+    else:
+        pyproj.datadir.append_data_dir(_grid_dir())
+
+
+MAX_GRID_BYTES = 120_000_000  # the largest official grid GeoSpark uses (EGM2008, 2.5') is ~81 MB
+_fetch_lock = threading.Lock()
+
+
+def _covers(op: Any, lonlats: list[tuple[float, float]] | None) -> bool:
+    """Does the operation's area of use contain the points (when they are longitude/latitude)?"""
+    area = getattr(op, "area_of_use", None)
+    if not lonlats or area is None:
+        return True
+    return all(area.west <= lon <= area.east and area.south <= lat <= area.north for lon, lat in lonlats)
+
+
+def _fetch_grids(group: Any, best_available: float | None,
+                 lonlats: list[tuple[float, float]] | None = None) -> list[str]:
+    """Download the official grid files that a more accurate (or the only) operation needs.
+
+    PROJ's own on-demand download works only on the thread that enabled it, and the API answers on
+    worker threads (live, the first height conversion there found no grid). Whole grid files on disk
+    work from any thread. Only openly licensed, directly downloadable grids from the PROJ CDN are
+    fetched, each once, written atomically into the grid directory.
+    """
+    if not _downloads_allowed():
+        return []
+    import httpx
+
+    wanted: dict[str, str] = {}
+    for op in sorted(group.unavailable_operations, key=lambda o: o.accuracy if o.accuracy and o.accuracy > 0 else 1e9):
+        if best_available is not None and not (op.accuracy and 0 < op.accuracy < best_available):
+            continue
+        if not _covers(op, lonlats):
+            continue  # e.g. an Alaska geoid for a point in California
+        for g in op.grids:
+            if not g.available and g.direct_download and g.open_license and g.url:
+                wanted.setdefault(g.short_name, g.url)
+        if wanted:
+            break  # the most accurate operation that covers the points is enough
+    fetched = []
+    with _fetch_lock:
+        for name, url in wanted.items():
+            target = os.path.join(_grid_dir(), name)
+            if os.path.exists(target):
+                fetched.append(name)
+                continue
+            partial = f"{target}.part"
+            try:
+                with httpx.stream("GET", url, timeout=120, follow_redirects=True) as r:
+                    r.raise_for_status()
+                    size = int(r.headers.get("content-length") or 0)
+                    if size > MAX_GRID_BYTES:
+                        continue
+                    with open(partial, "wb") as f:
+                        for chunk in r.iter_bytes():
+                            f.write(chunk)
+                os.replace(partial, target)
+                fetched.append(name)
+            except (httpx.HTTPError, OSError):
+                if os.path.exists(partial):
+                    os.remove(partial)
+    return fetched
 
 
 def _crs(code: str) -> Any:
@@ -127,9 +203,19 @@ def transform(source_crs: str, target_crs: str, coordinates: list[list[float]],
     if not coordinates:
         raise GeodesyError("Give at least one coordinate.")
     src, dst = _crs(source_crs), _crs(target_crs)
-    with warnings.catch_warnings():  # a missing grid is reported below, in words, not as a library warning
-        warnings.simplefilter("ignore", UserWarning)
-        group = TransformerGroup(src, dst, always_xy=True)
+    def build() -> Any:
+        with warnings.catch_warnings():  # a missing grid is reported below, in words, not as a library warning
+            warnings.simplefilter("ignore", UserWarning)
+            return TransformerGroup(src, dst, always_xy=True)
+
+    group = build()
+    usable = [op.accuracy for op in group.transformers if not _is_ballpark(op) and op.accuracy and op.accuracy > 0]
+    exact = any(not _is_ballpark(op) and not (op.accuracy and op.accuracy > 0) and not _changes_datum(src, dst)
+                for op in group.transformers)
+    lonlats = [(float(p[0]), float(p[1])) for p in coordinates] if src.is_geographic else None
+    if not exact and group.unavailable_operations and _fetch_grids(group, min(usable) if usable else None, lonlats):
+        _rescan_grids()
+        group = build()
     candidates = [op for op in group.transformers if not _is_ballpark(op)]
     if not candidates:
         missing = sorted({g.short_name for u in group.unavailable_operations for g in u.grids})
@@ -168,8 +254,21 @@ def transform(source_crs: str, target_crs: str, coordinates: list[list[float]],
             method=op.description, accuracy_m=None if key(op) <= 0 else key(op), grids=_grids(op),
             area_of_use=op.area_of_use.name if op.area_of_use else None, warnings=notes,
         )
+    needed = sorted({g for op in candidates for g in _grids(op)})
+    if needed and not _grids_readable(needed):
+        raise GeodesyError(f"The official grid needed for {src.name} to {dst.name} ({', '.join(needed)}) could not "
+                           "be read or downloaded, so the conversion was refused rather than approximated.")
     raise GeodesyError(f"The points are outside the area where {src.name} to {dst.name} can be transformed "
-                       "accurately (or the grid needed there is unavailable).")
+                       "accurately.")
+
+
+def _grids_readable(names: list[str]) -> bool:
+    """Is every grid installed, cached, or downloadable from here?"""
+    import pyproj
+
+    dirs = [*pyproj.datadir.get_data_dir().split(os.pathsep), os.environ.get("PROJ_USER_WRITABLE_DIRECTORY", "")]
+    installed = all(any(d and os.path.exists(os.path.join(d, n)) for d in dirs) for n in names)
+    return installed
 
 
 def _changes_datum(src: Any, dst: Any) -> bool:
@@ -204,7 +303,7 @@ def convert_height(latitude: float, longitude: float, height: float, from_datum:
     try:
         result = transform(src, dst, [[longitude, latitude, height]])
     except GeodesyError as e:
-        if "outside" in str(e):
+        if "outside the area" in str(e):
             raise GeodesyError(f"{national} is the height datum of {region}; latitude {latitude}, longitude "
                                f"{longitude} is outside its {model} model.") from None
         raise

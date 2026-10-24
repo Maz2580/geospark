@@ -4,6 +4,14 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Fixed
+- **Height conversions failed on the live API** ("outside its AUSGeoid2020 model") while working in
+  a script: PROJ's on-demand grid download only works on the thread that enabled it, and the API
+  answers on worker threads. GeoSpark now downloads the whole official grid file itself (only the one
+  the most accurate covering operation needs), tells PROJ to rescan, and keeps PROJ's own networking
+  off. A grid that can't be read or downloaded is now named in the error instead of being reported as
+  "outside the model".
+
 ### Added
 - **Official datum and height conversions** (`geospark.geodesy`; `POST /api/v1/transform`,
   `POST /api/v1/height`; MCP and Ask tools `transform_coordinates` and `convert_height`). Coordinates
@@ -20,7 +28,7 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
     ellipsoidal height, 4.7 m off in Melbourne; British National Grid moves about 124 m).
     With the tools attached, 63 of the two models' 64 answers were survey-grade and the last within 6 cm.
 - GeoSpark sets `PROJ_USER_WRITABLE_DIRECTORY` to `$GEOSPARK_DATA_DIR/proj` when it is imported, so
-  PROJ's cache never lands in the user's system folders.
+  grid files never land in the user's system folders.
 
 ## [0.9.0] - 2026-10-24: tested from the outside
 

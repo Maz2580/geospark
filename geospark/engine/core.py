@@ -70,6 +70,35 @@ def _from_tool_reply(tool: str, body: Any) -> list[tuple[float, float]]:
     return out
 
 
+_ZONE = re.compile(r"\b(?:MGA|UTM)?\s*zone\s*(\d{1,2})\b", re.I)
+_DATUMS = ("GDA94", "GDA2020", "OSGB36", "NAD27", "NAD83", "ETRS89", "NZGD2000")
+
+
+def _crs_mismatches(question: str, calls: list[dict[str, Any]]) -> list[str]:
+    """Target systems of coordinate transformations that don't match what the question asks for.
+
+    Live: asked for GDA2020 / MGA zone 55, the model picked a Lambert projection's EPSG code and still
+    described the result as MGA zone 55. A target counts as matching when its zone (if the question
+    names zones) and its datum (if the question names datums) are among those the question names.
+    """
+    zones = set(_ZONE.findall(question))
+    datums = {d for d in _DATUMS if re.search(rf"\b{d}\b", question, re.I)}
+    out = []
+    for c in calls:
+        if c.get("tool") != "transform_coordinates" or _failed(c.get("result")):
+            continue
+        target = str(((c.get("result") or {}).get("result") or {}).get("target_crs") or "")
+        if not target:
+            continue
+        zone = _ZONE.search(target)
+        wrong_zone = bool(zones) and "/" in target and (zone is None or zone.group(1) not in zones)
+        datum = target.split("/")[0].strip()
+        wrong_datum = bool(datums) and datum.upper() in _DATUMS and datum.upper() not in {d.upper() for d in datums}
+        if (wrong_zone or wrong_datum) and target not in out:
+            out.append(target)
+    return out
+
+
 def _failed(reply: Any) -> bool:
     if not isinstance(reply, dict):
         return True
@@ -170,6 +199,11 @@ def answer_to_result(answer: Any, model_source: str, question: str = "") -> Spat
                             geometry={"type": "Point", "coordinates": item["coordinates"][:2]},
                             properties={"name": item.get("name"), "type": kind, "distance_m": item.get("distance_m")},
                         ))
+    mismatched = _crs_mismatches(question or "", calls)
+    if mismatched:
+        quality["crs_mismatch"] = mismatched
+        warnings.append(f"Coordinates were converted to {', '.join(mismatched)}, which is not the system the question "
+                        "asks for, so the answer may describe them as something they are not.")
     if failed_tools:
         quality["failed_tools"] = failed_tools
     if unverified:

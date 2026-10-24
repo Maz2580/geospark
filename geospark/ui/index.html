@@ -225,7 +225,7 @@
         <p class="lead">Most AI tools give you a number. GeoSpark gives you the number, the tools that produced it, the data and licence behind each step, and a run record anyone can replay.</p>
         <ol class="chain reveal" id="chain">
           <li><span class="n">STEP 1</span><h3>Question</h3><p>Plain words in. Places are geocoded — and when two places share a name, you're told.</p><code>"Federation Square" → −37.8180, 144.9691</code></li>
-          <li><span class="n">STEP 2</span><h3>Tools</h3><p>The agent calls real tools — routing, Overture places, terrain — never a guess from memory.</p><code>geocode → geocode → travel_time</code></li>
+          <li><span class="n">STEP 2</span><h3>Tools</h3><p>The agent calls real tools — routing, Overture places, terrain — and coordinates a model types from memory are flagged.</p><code>geocode → geocode → travel_time</code></li>
           <li><span class="n">STEP 3</span><h3>Geometry</h3><p>Measured on the WGS84 ellipsoid and validated; swapped lat/lon is caught before it misleads you.</p><code>geodesic · validated · RFC 7946</code></li>
           <li><span class="n">STEP 4</span><h3>Provenance</h3><p>Sources, licences, accuracy and caveats — plus a replay that says whether the data or the code changed.</p><code>geospark replay run.json → REPRODUCED</code></li>
         </ol>
@@ -257,14 +257,15 @@
     <section class="block" aria-labelledby="why-title">
       <div class="wrap">
         <span class="kicker">03 — Why it matters</span>
-        <h2 id="why-title">LLMs guess geography. GeoSpark computes it.</h2>
-        <p class="lead">From GeoSpark Bench: numeric distance questions put to 9 models, from 3.8B open-weight models to frontier APIs. An answer counts as correct within 10% of the geodesic distance.</p>
+        <h2 id="why-title">Models estimate geography. GeoSpark computes it.</h2>
+        <p class="lead">From GeoSpark Bench v2 (2026): numeric distance questions put to 9 models, from 3.8B open-weight models to frontier APIs of that time. An answer counts as correct within 10% of the geodesic distance.</p>
         <div class="bench reveal">
           <div><span class="v bad">1–95%</span><p>Correct for language models on their own, depending on the model. Small open models were wrong about 95% of the time.</p></div>
           <div><span class="v good">76–96%</span><p>Correct with GeoSpark's tools, for every model that made valid tool calls. Some small models did not use the tools properly.</p></div>
           <div><span class="v">5% → 76%</span><p>Qwen 2.5 7B, a model that runs on your own CPU: on its own, then with GeoSpark's tools.</p></div>
         </div>
         <p class="fine">Per-model results, intervals and caveats are in the <a href="https://github.com/Maz2580/geospark#benchmark-results" target="_blank" rel="noopener">README</a>. The full analysis is under peer review.</p>
+        <p class="fine"><strong>Re-checked in October 2026:</strong> the newest frontier models (Claude Opus 5.5, GPT-6.1) now answer these distance questions well on their own. The gap has moved to answers that need national data such as geoid grids: converting a GNSS height to AHD, GPT-6.1 declined and Opus 5.5 estimated up to 5.3 m off; with GeoSpark's tools both were within centimetres. <a href="https://github.com/Maz2580/geospark#re-check-with-current-models-october-2026" target="_blank" rel="noopener">Details</a>.</p>
       </div>
     </section>
 
@@ -276,7 +277,7 @@
         <div class="features">
           <article class="feature reveal">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>
-            <h3>Spatial engine</h3><p>Geodesic distance, topology, buffers, areas and CRS handling — correct on the ellipsoid, with invalid input refused.</p>
+            <h3>Spatial engine</h3><p>Geodesic distances, areas and buffers on the WGS84 ellipsoid; exact topology on the coordinates; official datum and height conversions. Invalid input is refused.</p>
             <a href="/playground">Measure something →</a>
           </article>
           <article class="feature reveal">
@@ -296,7 +297,7 @@
           </article>
           <article class="feature reveal">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>
-            <h3>Bring your own data</h3><p>GeoJSON, GeoPackage, Shapefile, GeoParquet or CSV. The CRS is read, never guessed.</p>
+            <h3>Bring your own data</h3><p>GeoJSON, GeoPackage, Shapefile, GeoParquet or CSV. The CRS is read from the file; a CSV's latitude/longitude is read as WGS 84 and says so.</p>
             <a href="/guide">How it works →</a>
           </article>
           <article class="feature reveal">

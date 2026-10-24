@@ -214,3 +214,59 @@ def test_an_area_across_the_antimeridian_covers_new_zealand() -> None:
     assert geodesy._covers(nz, [(174.7633, -36.8485)])  # Auckland
     assert geodesy._covers(nz, [(-176.5, -44.0)])  # Chatham Islands, east of 180
     assert not geodesy._covers(nz, [(144.97, -37.82)])  # Melbourne
+
+
+@pytest.mark.parametrize(("lat", "lon"), [(-10.49, 105.62), (-12.19, 96.83), (-29.04, 167.95), (-31.55, 159.08)])
+def test_ahd_is_refused_on_external_territories(lat, lon) -> None:
+    """Christmas, Cocos, Norfolk and Lord Howe Islands: the grid has values there, AHD doesn't apply."""
+    with pytest.raises(geodesy.GeodesyError, match="mainland Australia and Tasmania"):
+        geodesy.convert_height(lat, lon, 50.0, "ellipsoidal", "AHD")
+
+
+def test_swapped_latitude_and_longitude_are_named() -> None:
+    with pytest.raises(geodesy.GeodesyError, match=r"look like \[latitude, longitude\]"):
+        geodesy.transform("EPSG:7844", "EPSG:7855", [[-37.8177, 144.9691]])
+
+
+def test_an_epoch_that_does_nothing_is_reported() -> None:
+    done = geodesy.transform("EPSG:4283", "EPSG:7844", [[144.9691, -37.8177]], epoch=2026.8)
+    assert any("had no effect" in w for w in done.warnings)
+    moving = geodesy.transform("EPSG:7912", "EPSG:7843", [[144.9691, -37.8177, 50.0]], epoch=2026.8)
+    assert not any("had no effect" in w for w in moving.warnings)
+
+
+def test_a_point_far_outside_the_target_zone_is_flagged() -> None:
+    done = geodesy.transform("EPSG:7855", "EPSG:7854", [[600000, 5900000]])  # ~148.1 E, zone 54 ends at 144 E
+    assert any("outside the area of use" in w for w in done.warnings)
+    inside = geodesy.transform("EPSG:7844", "EPSG:7855", [[144.9691, -37.8177]])
+    assert not inside.warnings
+
+
+def test_no_grid_is_blamed_when_none_covers_the_point() -> None:
+    """Hawaii: NAD27 to NAD83 has no operation there; don't list nine US and Canadian grids."""
+    with pytest.raises(geodesy.GeodesyError) as raised:
+        geodesy.transform("EPSG:4267", "EPSG:4269", [[-157.85, 21.3]])
+    assert "could not be downloaded" not in str(raised.value)
+
+
+def test_ask_flags_a_conversion_to_a_different_system_than_the_question_names() -> None:
+    """Live: asked for GDA2020 / MGA zone 55, qwen2.5 used EPSG:7845 (GA Lambert) and called it MGA 55."""
+    from types import SimpleNamespace
+
+    from geospark.engine.core import answer_to_result
+
+    def call(target):
+        reply = MCPServerLauncher().handle_tool_call("transform_coordinates", {
+            "explanation": "t", "source_crs": "EPSG:28355", "target_crs": target, "coordinates": [FED_SQ_GDA94_MGA55]})
+        return {"tool": "transform_coordinates", "args": {}, "result": reply}
+
+    q = "Convert the GDA94 MGA zone 55 coordinates E 321242.045, N 5812466.767 to GDA2020 MGA zone 55."
+    wrong = answer_to_result(SimpleNamespace(answer="...", model="m", tool_calls=[call("EPSG:7845")]), "ollama:m", q)
+    assert wrong.quality["crs_mismatch"] == ["GDA2020 / GA LCC"]
+    right = answer_to_result(SimpleNamespace(answer="...", model="m", tool_calls=[call("GDA2020 / MGA zone 55")]), "ollama:m", q)
+    assert "crs_mismatch" not in right.quality
+
+
+def test_crs_can_be_given_by_name() -> None:
+    done = geodesy.transform("GDA94 / MGA zone 55", "GDA2020 / MGA zone 55", [FED_SQ_GDA94_MGA55])
+    assert done.target_crs == "GDA2020 / MGA zone 55"

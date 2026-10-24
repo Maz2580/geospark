@@ -6,8 +6,10 @@ from typing import Any, ClassVar
 from geospark import geodesy
 from geospark.mcp_servers.base import BaseMCPServer
 
-_CRS = {"type": "string", "description": "A CRS as 'EPSG:code', e.g. EPSG:28355 (GDA94 / MGA zone 55), "
-                                         "EPSG:7855 (GDA2020 / MGA zone 55), EPSG:4326 (WGS 84 lat/lon)."}
+_CRS = {"type": "string", "description": "The CRS by its exact NAME (preferred: no code to recall), e.g. "
+                                         "'GDA94 / MGA zone 55', 'GDA2020 / MGA zone 55', 'GDA2020', "
+                                         "'OSGB36 / British National Grid', or as 'EPSG:code'. The result names the "
+                                         "CRS actually used: check it matches the question."}
 
 
 class GeodesyServer(BaseMCPServer):

@@ -623,7 +623,7 @@ def ask(request: AskRequest, http: Request):
         tools_used=tools_used,
         tokens_used=0,
         # Not fully checked if a tool failed or was fed coordinates no lookup produced
-        status="partial" if result.quality.get("failed_tools") or result.quality.get("unverified_coordinates")
+        status="partial" if result.quality.get("failed_tools") or result.quality.get("unverified_coordinates") or result.quality.get("crs_mismatch")
         else result.status,
         provenance=[p.model_dump(mode="json", exclude_none=True) for p in result.provenance],
         units=result.spatial_context.units,

@@ -424,8 +424,8 @@ def create_server(local_files: bool = False) -> MCPServer:
 
     @mcp.tool(title="Transform coordinates (official datums)", annotations=READ_ONLY_WEB)
     async def transform_coordinates(
-        source_crs: Annotated[str, Field(max_length=100, description="e.g. EPSG:28355 (GDA94 / MGA zone 55)")],
-        target_crs: Annotated[str, Field(max_length=100, description="e.g. EPSG:7855 (GDA2020 / MGA zone 55)")],
+        source_crs: Annotated[str, Field(max_length=100, description="CRS name or EPSG code, e.g. 'GDA94 / MGA zone 55' or EPSG:28355")],
+        target_crs: Annotated[str, Field(max_length=100, description="CRS name or EPSG code, e.g. 'GDA2020 / MGA zone 55' or EPSG:7855")],
         coordinates: Annotated[list[list[float]], Field(min_length=1, max_length=1000,
                                                         description="[x, y] or [x, y, z]: [lon, lat] or [easting, northing]")],
         epoch: Annotated[float | None, Field(ge=1900, le=2100, description="Decimal year, for ITRF/ATRF frames")] = None,

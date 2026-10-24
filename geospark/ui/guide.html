@@ -112,7 +112,7 @@
           <div class="concept-card">
             <span class="concept-tag">New &middot; CLI</span>
             <h4>Your own data</h4>
-            <p>GeoJSON, GeoPackage, Shapefile, GeoParquet or CSV. The CRS is read from the file and never guessed; a Shapefile without a <code>.prj</code> is refused until you name its CRS.</p>
+            <p>GeoJSON, GeoPackage, Shapefile, GeoParquet or CSV. The CRS is read from the file; a Shapefile without a <code>.prj</code> is refused until you name its CRS, and a CSV's latitude/longitude columns are read as WGS 84 with a caveat.</p>
             <p class="cmd"><code>geospark layer count-within stops.csv suburbs.gpkg</code></p>
           </div>
           <div class="concept-card">
@@ -148,7 +148,7 @@
           <div class="concept-card">
             <span class="concept-tag">Playground</span>
             <h4>Run spatial computations</h4>
-            <p>Geocode, measure distances, check topology relationships, get elevations. All ground-truth, not LLM guesses.</p>
+            <p>Geocode, measure distances, check topology relationships, get elevations. Computed by tools, with their sources shown.</p>
             <a href="/playground" class="try-btn">Try it &rarr;</a>
           </div>
           <div class="concept-card">
@@ -450,7 +450,7 @@ uvicorn geospark.api:app --reload   # Serves the UI at http://localhost:8000</pr
           </div>
           <div class="concept-card">
             <h4>Spatial Reasoning Engine</h4>
-            <p>The core component that performs topology, distance, CRS transforms, and geometric operations &mdash; all computed on the WGS84 ellipsoid.</p>
+            <p>The core component that performs topology, distance, CRS transforms, and geometric operations. Distances, areas and buffers are geodesic on the WGS84 ellipsoid; topology is exact on the coordinates (straight edges in longitude/latitude).</p>
           </div>
           <div class="concept-card">
             <h4>Specialist Agent</h4>
@@ -498,7 +498,7 @@ uvicorn geospark.api:app --reload   # Serves the UI at http://localhost:8000</pr
       <div class="card mt-2">
         <div class="card-header"><div class="card-icon agent">&#128279;</div><h3>Further reading</h3></div>
         <ul class="text-sm" style="line-height:1.8;padding-left:1.2rem">
-          <li><a href="/docs" style="color:var(--color-primary)">Interactive API Docs</a> &mdash; Swagger UI with all 58 endpoints</li>
+          <li><a href="/docs" style="color:var(--color-primary)">Interactive API Docs</a> &mdash; Swagger UI with every endpoint</li>
           <li><a href="https://github.com/Maz2580/geospark" style="color:var(--color-primary)">GitHub repository</a> &mdash; source code, issues, contributing</li>
           <li><a href="https://pypi.org/project/geospark-ai/" style="color:var(--color-primary)">PyPI package</a> &mdash; <code>pip install geospark-ai</code></li>
           <li><a href="/status" style="color:var(--color-primary)">System Status</a> &mdash; server health, tools loaded, data channel keys configured</li>

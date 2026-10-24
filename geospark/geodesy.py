@@ -187,6 +187,29 @@ def _crs(code: str) -> Any:
         raise GeodesyError(f"Unknown coordinate reference system '{code}': {e}") from None
 
 
+def _lonlats(crs: Any, coordinates: list[list[float]]) -> list[tuple[float, float]] | None:
+    """The points as longitude/latitude on the CRS's own datum, when that can be worked out."""
+    if crs.is_geographic:
+        return [(float(p[0]), float(p[1])) for p in coordinates]
+    if crs.is_projected and crs.geodetic_crs is not None:
+        from pyproj import Transformer
+
+        to_geo = Transformer.from_crs(crs, crs.geodetic_crs, always_xy=True)
+        out = [to_geo.transform(float(p[0]), float(p[1])) for p in coordinates]
+        return [(lon, lat) for lon, lat in out if math.isfinite(lon) and math.isfinite(lat)] or None
+    return None
+
+
+def _looks_swapped(crs: Any, coordinates: list[list[float]]) -> bool:
+    """[latitude, longitude] given where [longitude, latitude] was expected."""
+    return bool(crs.is_geographic) and all(abs(p[0]) <= 90 < abs(p[1]) <= 180 for p in coordinates)
+
+
+def _outside_area(crs: Any, lonlats: list[tuple[float, float]] | None) -> bool:
+    area = getattr(crs, "area_of_use", None)
+    return bool(lonlats and area) and not _covers(type("Op", (), {"area_of_use": area})(), lonlats)
+
+
 def _grids(op: Any) -> list[str]:
     return sorted(set(re.findall(r"grids=@?([^\s]+)", op.definition or "")))
 
@@ -217,13 +240,20 @@ def transform(source_crs: str, target_crs: str, coordinates: list[list[float]],
     usable = [op.accuracy for op in group.transformers if not _is_ballpark(op) and op.accuracy and op.accuracy > 0]
     exact = any(not _is_ballpark(op) and not (op.accuracy and op.accuracy > 0) and not _changes_datum(src, dst)
                 for op in group.transformers)
-    lonlats = [(float(p[0]), float(p[1])) for p in coordinates] if src.is_geographic else None
+    lonlats = _lonlats(src, coordinates)
     if not exact and group.unavailable_operations and _fetch_grids(group, min(usable) if usable else None, lonlats):
         _rescan_grids()
         group = build()
     candidates = [op for op in group.transformers if not _is_ballpark(op)]
+    if not candidates and _looks_swapped(src, coordinates):
+        raise GeodesyError("The coordinates look like [latitude, longitude]; give [longitude, latitude].")
     if not candidates:
-        missing = sorted({g.short_name for u in group.unavailable_operations for g in u.grids})
+        # Only grids of operations that cover these points (a Hawaii point needs none of the US/Canada grids)
+        covering = [u for u in group.unavailable_operations if _covers(u, lonlats)]
+        if not covering:
+            raise GeodesyError(f"No transformation from {src.name} to {dst.name} covers these points accurately. "
+                               "GeoSpark won't use PROJ's ballpark approximation.")
+        missing = sorted({g.short_name for u in covering for g in u.grids})
         raise GeodesyError(
             f"No accurate transformation from {src.name} to {dst.name} is available"
             + (f": it needs the grid(s) {', '.join(missing)}, which could not be downloaded." if missing else ".")
@@ -250,6 +280,15 @@ def transform(source_crs: str, target_crs: str, coordinates: list[list[float]],
         if out is None:
             continue  # this operation's grid doesn't cover the points
         notes = []
+        if epoch is not None:
+            shifted = [[float(v) for v in op.transform(*(list(pt) + ([0.0] if len(pt) == 2 else [])), epoch + 10)][: len(pt)]
+                       for pt in coordinates[:1]]
+            if all(abs(a - b) < 1e-9 for a, b in zip(shifted[0], out[0], strict=True)):
+                notes.append(f"The epoch ({epoch}) had no effect: neither {src.name} nor {dst.name} changes over time.")
+        target_ll = _lonlats(src, coordinates)
+        if _outside_area(dst, target_ll):
+            notes.append(f"Some points are outside the area of use of {dst.name} "
+                         f"({dst.area_of_use.name if dst.area_of_use else 'unknown'}); distortion grows outside it.")
         better = [u for u in group.unavailable_operations if u.accuracy and 0 < u.accuracy < key(op)]
         if better:
             names = sorted({g.short_name for u in better for g in u.grids})
@@ -263,6 +302,8 @@ def transform(source_crs: str, target_crs: str, coordinates: list[list[float]],
     if needed and not _grids_readable(needed):
         raise GeodesyError(f"The official grid needed for {src.name} to {dst.name} ({', '.join(needed)}) could not "
                            "be read or downloaded, so the conversion was refused rather than approximated.")
+    if _looks_swapped(src, coordinates):
+        raise GeodesyError("The coordinates look like [latitude, longitude]; give [longitude, latitude].")
     raise GeodesyError(f"The points are outside the area where {src.name} to {dst.name} can be transformed "
                        "accurately.")
 
@@ -304,11 +345,17 @@ def convert_height(latitude: float, longitude: float, height: float, from_datum:
         raise GeodesyError("Convert through the ellipsoid: one side must be 'ellipsoidal' (e.g. AHD -> ellipsoidal).")
     national = b if a == "ELLIPSOIDAL" else a
     ellipsoidal, compound, model, region = HEIGHT_DATUMS[national]
+    if national == "AHD" and not (112.5 <= longitude <= 154.0 and -44.0 <= latitude <= -9.0):
+        # The AUSGeoid2020 grid extends over the sea to Christmas and Cocos Islands, but AHD is the datum of
+        # mainland Australia and Tasmania only; the external territories have their own height datums.
+        raise GeodesyError(f"AHD is the height datum of mainland Australia and Tasmania; latitude {latitude}, "
+                           f"longitude {longitude} is outside it (external territories such as Christmas Island "
+                           "have their own height datums).")
     src, dst = (ellipsoidal, compound) if a == "ELLIPSOIDAL" else (compound, ellipsoidal)
     try:
         result = transform(src, dst, [[longitude, latitude, height]])
     except GeodesyError as e:
-        if "outside the area" in str(e):
+        if "outside the area" in str(e) or "covers these points" in str(e):
             raise GeodesyError(f"{national} is the height datum of {region}; latitude {latitude}, longitude "
                                f"{longitude} is outside its {model} model.") from None
         raise
@@ -320,6 +367,13 @@ def convert_height(latitude: float, longitude: float, height: float, from_datum:
         "separation_m": round(separation, 4),
         "method": result.method, "accuracy_m": result.accuracy_m, "grids": result.grids,
         "provenance": [provenance(result.method, result.grids)],
-        "warnings": result.warnings + ([] if national != "EGM2008" else [
-            "EGM2008 is a global model, not a national height datum; it can differ from the local datum by decimetres."]),
+        "warnings": result.warnings + _height_caveats(national),
     }
+
+
+def _height_caveats(national: str) -> list[str]:
+    if national == "EGM2008":
+        return ["EGM2008 is a global model, not a national height datum; it can differ from the local datum by decimetres."]
+    if national == "AHD":
+        return ["AUSGeoid2020 gives AHD heights onshore; at sea the grid has values but they are not AHD heights."]
+    return []

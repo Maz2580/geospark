@@ -274,6 +274,25 @@ columns, FlatGeobuf, KML, GML, File Geodatabase. **The CRS comes from the file, 
   `--crs` for GDA94 or another datum); x/y columns are refused until you name the CRS;
 - invalid shapes are refused until you pass `--repair`.
 
+**Check a file before you use it**, or find out why two layers disagree:
+
+```bash
+geospark layer check pipes.csv --crs EPSG:7855                          # CRS, datum and height caveats
+geospark layer check pipes.csv --crs EPSG:7855 --against parcels.csv --against-crs EPSG:7855
+# problem: pipes.csv sits 1.55 m from parcels.csv, matching the official GDA94 to GDA2020 shift here.
+#          pipes.csv holds GDA94 coordinates but is treated as the same datum as parcels.csv.
+```
+
+`check` looks for the silent errors: no CRS declared, projected numbers labelled as degrees (or the
+reverse), swapped latitude/longitude, points outside the CRS's zone, Australian data labelled WGS 84,
+and heights that don't say whether they are ellipsoidal or AHD. With `--against` it measures the
+offset to a reference layer and names the cause only when the numbers match one: GDA94 data labelled
+GDA2020 (checked against the official shift at that place), the wrong MGA zone, feet instead of
+metres, swapped axes, a plate-motion epoch, or ellipsoidal against AHD heights. Anything else is
+reported as an unexplained offset. The exit code is 2 when it finds a problem, so it fits in a
+pipeline; in Python, `geospark.io.check.check_layer` and `compare_layers`; for Claude, the local MCP
+tool `check_dataset`.
+
 Results carry each file's SHA-256, so an analysis can be reproduced against exactly that data. In
 Python, use `geospark.io.layers` (`load_layer`, `count_within`, `nearest`, `intersect`). The local
 MCP server (`geospark-mcp`) offers the same as `layer_*` tools; the hosted `/mcp` endpoint never reads

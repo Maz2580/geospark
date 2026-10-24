@@ -612,6 +612,40 @@ def layer_info(path: str, crs: str | None, repair: bool) -> None:
     _print_caveats(result)
 
 
+@layer.command("check")
+@click.argument("path", type=click.Path(exists=True))
+@click.option("--against", "against", type=click.Path(exists=True), default=None,
+              help="A reference layer of the same features: measure and diagnose the offset between them")
+@_crs_option
+@click.option("--against-crs", default=None, help="The reference layer's CRS if it doesn't declare one")
+@click.option("--id-field", default=None, help="Field identifying the same feature in both files")
+@click.option("--json", "as_json", is_flag=True, help="Print the full report as JSON")
+def layer_check(path: str, against: str | None, crs: str | None, against_crs: str | None, id_field: str | None,
+                as_json: bool) -> None:
+    """Check a file's coordinates: CRS declared and consistent, datum and height caveats; with
+    --against, diagnose why two layers disagree (GDA94 labelled GDA2020, wrong zone, feet, epoch, AHD)."""
+    import json as _json
+
+    from geospark.io.check import check_layer, compare_layers
+
+    report = (compare_layers(against, path, crs_a=against_crs, crs_b=crs, id_field=id_field) if against
+              else check_layer(path, crs=crs))
+    if as_json:
+        click.echo(_json.dumps(report, indent=2, default=str))
+        return
+    colour = {"problem": "red", "check the caveats": "yellow"}.get(report["verdict"], "green")
+    console.print(f"[bold]{report.get('compared') or report.get('file')}[/bold]: [{colour}]{report['verdict']}[/{colour}]")
+    if report.get("offset"):
+        o = report["offset"]
+        console.print(f"[dim]offset {o['size_m']} m towards {o['bearing_deg']}° (scatter {o['spread_m']} m), "
+                      f"{report.get('pairs')} pairs by {report.get('paired_by')}[/dim]")
+    for f in report["findings"]:
+        tone = {"problem": "red", "caveat": "yellow"}.get(f["severity"], "cyan")
+        console.print(f"  [{tone}]{f['severity']}[/{tone}] {f['message']}")
+    if report["verdict"] == "problem":
+        raise SystemExit(2)
+
+
 @layer.command("count-within")
 @click.argument("points", type=click.Path(exists=True))
 @click.argument("polygons", type=click.Path(exists=True))

@@ -5,6 +5,13 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 ## [Unreleased]
 
 ### Added
+- **`geospark layer check`** (Python `geospark.io.check`, local MCP tool `check_dataset`): checks a
+  file's coordinates before analysis (CRS declared and consistent with the numbers, swapped axes, points
+  outside the CRS's zone, Australian data labelled WGS 84, height reference unstated) and, with
+  `--against`, diagnoses why two layers disagree: GDA94 data labelled GDA2020 (matched to the official
+  shift at that place), the wrong MGA zone, feet, swapped axes, a plate-motion epoch (with the number of
+  years), or ellipsoidal against AHD heights. Unknown offsets are reported as unexplained; nearest-
+  neighbour pairing warns when features are closer together than the offset. Exit code 2 on a problem.
 - **Fairness checks for the October 2026 re-check** (`docs/benchmarks/2026-10/fairness.md`): the
   datum and height gap holds with the providers' own code execution at high effort (sandboxes have PROJ
   but no internet) and across three repeated runs; it does not hold for frontier models writing a
@@ -14,6 +21,11 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
   `docs/benchmarks/2026-10/codegen/`. README claims are scoped to what was tested.
 
 ### Fixed
+- **GeoSpark's own layer analyses put GDA94 files 1.55 m off** (found while building the checker).
+  PROJ's default step from GDA94, and from GDA2020, to WGS 84 is a null transformation, so a correctly
+  labelled GDA94 file and a GDA2020 file of the same survey marks loaded 1.55 m apart in Melbourne, and
+  count-within, nearest and intersect inherited the error. Australian data now goes to GDA2020 with the
+  official transformation first; the same marks load to within 0.005 m.
 - The benchmark notes said Opus 5.5 ran without extended thinking; Opus 5.5 always thinks (adaptive,
   default effort "medium"), and that is how it ran.
 

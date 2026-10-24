@@ -10,6 +10,10 @@ README under "Re-check with current models (October 2026)".
 | `make_grid_set.py`, `grid_questions.json` | 11 questions that need national grids: OSTN15, OSGM15, NZGeoid2016, GEOID18, NADCON |
 | `datum_run.py` | Runs a question set on a model (bare, or `--tools` with `transform_coordinates` and `convert_height`) and scores the error in metres |
 | `results_summary.json` | Per-model scores, errors, tool use and cost (no model text) |
+| `agency_checks.md` | GeoSpark's answers compared with Geoscience Australia, Ordnance Survey, LINZ and NGS |
+| `fairness.md` | Whether the gap survives code execution, high effort and repeated runs; and AI-written GIS code |
+| `results_datum_all_runs.json` | Every datum run's grades and errors (bare, tools, code execution, repeats) |
+| `codegen/` | The eight scripting tasks, their answers (`make_tasks.py`), the runner and `scores.json` |
 
 ## Re-run
 
@@ -27,7 +31,7 @@ python datum_run.py report
 Any OpenAI-compatible server works with `--provider workstation` (set `WORKSTATION_LLM_URL` and
 `WORKSTATION_LLM_API_KEY`). Spending stops at `LIVEBENCH_BUDGET_USD` (default 8).
 
-Settings used: reasoning effort "low" for GPT-6.1, no extended thinking for Opus 5.5, reply limit
+Settings used: reasoning effort "low" for GPT-6.1; Opus 5.5 at its defaults (thinking is always on for Opus 5.5, adaptive, effort "medium"); reply limit
 2,000 tokens (8,000 for the datum sets), one run per question. To regenerate the official answers,
 run `make_datum_set.py` / `make_grid_set.py` with `PROJ_NETWORK=ON`; they stop rather than use a
 ballpark operation if a grid is missing.

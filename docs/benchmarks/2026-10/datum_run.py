@@ -17,7 +17,7 @@ import httpx
 from pyproj import Geod
 
 HERE = Path(__file__).parent
-sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE.parent))
 sys.argv, _argv = [sys.argv[0]], sys.argv  # livebench parses nothing at import, but keep argv clean
 import livebench as lb  # noqa: E402
 
@@ -81,6 +81,39 @@ def ask(client, prov, base, model, prompt) -> tuple[str, float]:
     return data["choices"][0]["message"].get("content") or "", cost
 
 
+def ask_code_execution(client, prov, base, model, prompt) -> tuple[str, float, list[str]]:
+    """The model's own code sandbox (PROJ installed, no internet), effort high: can it do this itself?"""
+    calls: list[str] = []
+    if prov == "anthropic":
+        messages: list = [{"role": "user", "content": prompt}]
+        cost, text = 0.0, ""
+        for _ in range(6):  # pause_turn: the server paused a long turn; send it back to continue
+            r = client.post(f"{base}/messages", timeout=900, json={
+                "model": model, "max_tokens": 16000, "system": SYSTEM, "messages": messages,
+                "tools": [{"type": "code_execution_20260521", "name": "code_execution"}],
+                "output_config": {"effort": "high"}})
+            r.raise_for_status()
+            data = r.json()
+            u = data.get("usage") or {}
+            cost += lb.token_cost(model, u.get("input_tokens", 0), u.get("output_tokens", 0))
+            calls += [b.get("name", b["type"]) for b in data["content"] if b["type"] == "server_tool_use"]
+            text = "".join(b.get("text", "") for b in data["content"] if b["type"] == "text")
+            if data.get("stop_reason") != "pause_turn":
+                return text, cost, calls
+            messages = [{"role": "user", "content": prompt}, {"role": "assistant", "content": data["content"]}]
+        return text, cost, calls
+    r = client.post(f"{base}/responses", timeout=900, json={
+        "model": model, "instructions": SYSTEM, "input": prompt, "max_output_tokens": 16000,
+        "reasoning": {"effort": "high"}, "tools": [{"type": "code_interpreter", "container": {"type": "auto"}}]})
+    r.raise_for_status()
+    data = r.json()
+    u = data.get("usage") or {}
+    out = data.get("output") or []
+    calls = [o["type"] for o in out if o.get("type") == "code_interpreter_call"]
+    text = "".join(c.get("text", "") for o in out if o.get("type") == "message" for c in o.get("content", []))
+    return text, lb.token_cost(model, u.get("input_tokens", 0), u.get("output_tokens", 0)), calls
+
+
 def ask_with_tools(client, prov, base, model, prompt) -> tuple[str, float, list[str]]:
     """The same question with GeoSpark's geodesy tools attached (transform_coordinates, convert_height)."""
     from geospark.mcp_servers.launcher import MCPServerLauncher
@@ -101,12 +134,15 @@ def ask_with_tools(client, prov, base, model, prompt) -> tuple[str, float, list[
 def run(args) -> None:
     OUT.mkdir(exist_ok=True)
     qs = json.loads((HERE / args.set).read_text())
-    suffix = "__tools" if args.tools else ""
+    suffix = ("__code" if args.code else "__tools" if args.tools else "") + (f"__rep{args.rep}" if args.rep else "")
     path = OUT / f"{Path(args.set).stem}__{args.model.replace('/', '_').replace(':', '-')}{suffix}.json"
     done = json.loads(path.read_text()) if path.exists() else {}
     base, headers = lb.provider(args.provider)
     with httpx.Client(headers=headers, timeout=300) as client:
+        only = [x for x in args.only.split(",") if x]
         for q in qs:
+            if only and not any(q["id"].startswith(o) for o in only):
+                continue
             if q["id"] in done:
                 continue
             if args.provider != "workstation" and lb.spent() >= lb.BUDGET_USD:
@@ -115,7 +151,9 @@ def run(args) -> None:
             t0 = time.time()
             try:
                 calls: list[str] = []
-                if args.tools:
+                if args.code:
+                    text, cost, calls = ask_code_execution(client, args.provider, base, args.model, q["prompt"])
+                elif args.tools:
                     text, cost, calls = ask_with_tools(client, args.provider, base, args.model, q["prompt"])
                 else:
                     text, cost = ask(client, args.provider, base, args.model, q["prompt"])
@@ -158,6 +196,9 @@ if __name__ == "__main__":
     r.add_argument("--model", required=True)
     r.add_argument("--set", default="datum_questions.json")
     r.add_argument("--tools", action="store_true", help="attach GeoSpark's geodesy tools")
+    r.add_argument("--code", action="store_true", help="the model's own code sandbox, effort high")
+    r.add_argument("--only", default="", help="comma-separated question id prefixes, e.g. datum_B,grid_")
+    r.add_argument("--rep", default="", help="label for a repeat run (kept in its own results file)")
     sub.add_parser("report")
     a = p.parse_args()
     run(a) if a.cmd == "run" else report()

@@ -1,0 +1,234 @@
+{
+ "claude-opus-5-5": {
+  "t1_area": {
+   "ok": true,
+   "error": 0.0,
+   "printed": "2086626.5950994492",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t2_buffer": {
+   "ok": true,
+   "error": 0.001605606964630464,
+   "printed": "784137.1226362893",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t3_distance": {
+   "ok": true,
+   "error": 0.0,
+   "printed": "64813.151474332066",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t4_length": {
+   "ok": true,
+   "error": 7.508180294770371e-10,
+   "printed": "4785.809",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t5_mercator_area": {
+   "ok": true,
+   "error": 0.0,
+   "printed": "781972.5972900391",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t6_within": {
+   "ok": true,
+   "error": 0.0,
+   "printed": "6",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t7_gda2020": {
+   "ok": true,
+   "error": 0.0004250280024772663,
+   "printed": "-37.81770000, 144.96910000",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t8_ahd": {
+   "ok": true,
+   "error": 0.00039999999999906777,
+   "printed": "35.257",
+   "exit_code": 0,
+   "failure": ""
+  }
+ },
+ "gpt-6.1-sol": {
+  "t1_area": {
+   "ok": true,
+   "error": 9.434414137827267e-06,
+   "printed": "2086606.909",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t2_buffer": {
+   "ok": true,
+   "error": 6.274913385265701e-06,
+   "printed": "785393.235092",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t3_distance": {
+   "ok": true,
+   "error": 7.3184540025381124e-09,
+   "printed": "64813.151",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t4_length": {
+   "ok": true,
+   "error": 0.0,
+   "printed": "4785.809003593272",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t5_mercator_area": {
+   "ok": true,
+   "error": 9.079102491541982e-10,
+   "printed": "781972.598",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t6_within": {
+   "ok": true,
+   "error": 0.0,
+   "printed": "6",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t7_gda2020": {
+   "ok": true,
+   "error": 8.803850122932636e-06,
+   "printed": "(-37.8177000030, 144.9690999971)",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t8_ahd": {
+   "ok": false,
+   "error": null,
+   "printed": "",
+   "exit_code": 1,
+   "failure": "RuntimeError: The required AUSGeoid2020 transformation grid is unavailable. Check internet access and the PROJ grid installation."
+  }
+ },
+ "gpt-oss-20b": {
+  "t1_area": {
+   "ok": true,
+   "error": 1.232363705103208e-06,
+   "printed": "2086624.0236165673",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t2_buffer": {
+   "ok": true,
+   "error": 0.001605606964630464,
+   "printed": "784137.1226362893",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t3_distance": {
+   "ok": true,
+   "error": 0.0,
+   "printed": "64813.151474332066",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t4_length": {
+   "ok": true,
+   "error": 0.0,
+   "printed": "4785.809003593272",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t5_mercator_area": {
+   "ok": true,
+   "error": 0.0,
+   "printed": "781972.5972900391",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t6_within": {
+   "ok": true,
+   "error": 0.0,
+   "printed": "6",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t7_gda2020": {
+   "ok": false,
+   "error": NaN,
+   "printed": "-4354007.83118207, 1498120.48707391",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t8_ahd": {
+   "ok": false,
+   "error": 4.742600000000003,
+   "printed": "40.0",
+   "exit_code": 0,
+   "failure": ""
+  }
+ },
+ "qwen3.5-4b": {
+  "t1_area": {
+   "ok": false,
+   "error": 0.011586904647478663,
+   "printed": "2110804.1384917595",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t2_buffer": {
+   "ok": true,
+   "error": 0.001605606964630464,
+   "printed": "784137.1226362893",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t3_distance": {
+   "ok": false,
+   "error": null,
+   "printed": "",
+   "exit_code": 1,
+   "failure": "AttributeError: 'Geod' object has no attribute 'inverse'"
+  },
+  "t4_length": {
+   "ok": false,
+   "error": 0.26651732453707583,
+   "printed": "6061.3100149763995",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t5_mercator_area": {
+   "ok": false,
+   "error": null,
+   "printed": "",
+   "exit_code": 1,
+   "failure": "pyproj.exceptions.CRSError: Invalid projection: EPSG:42718: (Internal Proj Error: proj_create: crs not found: EPSG:42718)"
+  },
+  "t6_within": {
+   "ok": false,
+   "error": 5.0,
+   "printed": "1",
+   "exit_code": 0,
+   "failure": ""
+  },
+  "t7_gda2020": {
+   "ok": false,
+   "error": null,
+   "printed": "",
+   "exit_code": 1,
+   "failure": "AttributeError: 'CRS' object has no attribute 'transform'"
+  },
+  "t8_ahd": {
+   "ok": false,
+   "error": null,
+   "printed": "",
+   "exit_code": 1,
+   "failure": "KeyError: 'height_m'"
+  }
+ }
+}

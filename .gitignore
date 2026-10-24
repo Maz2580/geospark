@@ -93,3 +93,5 @@ overpass/
 docs/benchmarks/*/results/
 docs/benchmarks/*/proj/
 docs/benchmarks/*/.data/
+docs/benchmarks/*/codegen/venv/
+docs/benchmarks/*/codegen/results_*.json

@@ -4,6 +4,19 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Added
+- **Fairness checks for the October 2026 re-check** (`docs/benchmarks/2026-10/fairness.md`): the
+  datum and height gap holds with the providers' own code execution at high effort (sandboxes have PROJ
+  but no internet) and across three repeated runs; it does not hold for frontier models writing a
+  script run with internet access (Opus 5.5 8/8, GPT-6.1 7/8 with a safe failure), while smaller local
+  models wrote silently wrong scripts (gpt-oss 20B returned the ellipsoidal height as AHD; Qwen 3.5 4B
+  1/8). The eight scripting tasks, their independently computed answers and the runner are in
+  `docs/benchmarks/2026-10/codegen/`. README claims are scoped to what was tested.
+
+### Fixed
+- The benchmark notes said Opus 5.5 ran without extended thinking; Opus 5.5 always thinks (adaptive,
+  default effort "medium"), and that is how it ran.
+
 ### Fixed: checked against the national agencies
 - GeoSpark's datum and height answers were compared with Geoscience Australia's calculators, Ordnance
   Survey's OSTN15/OSGM15 test points, LINZ's NZVD2016 examples and NGS's GEOID18 and NADCON 5

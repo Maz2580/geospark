@@ -7,7 +7,7 @@ packages = ["geospark"]
 
 [project]
 name = "geospark-ai"
-version = "0.9.0"
+version = "0.10.0"
 description = "Verifiable spatial reasoning for LLMs: geodesic distance, topology, isochrones and Overture Maps data computed by real tools, with sources and licences on every answer. MCP server, REST API and Python library."
 readme = "README.md"
 license = "Apache-2.0"

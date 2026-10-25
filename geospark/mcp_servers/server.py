@@ -35,9 +35,13 @@ from geospark.utils import concurrency
 INSTRUCTIONS = """\
 GeoSpark computes spatial answers instead of guessing them. Use it for distances, containment and
 other topology, buffers and areas, geocoding, elevation, routing, weather, air quality, active
-fires, location reports, site selection, and official datum and height conversions.
+fires, location reports, site selection, official datum and height conversions, sun position and
+shadows, and terrain horizons and lines of sight.
 - For datum shifts (GDA94/GDA2020, OSGB36, NAD27/NAD83) and heights (AHD, ODN, NZVD2016, NAVD88),
   call transform_coordinates / convert_height: they use the national grids. Don't estimate them.
+- For the Sun (elevation, azimuth, sunrise, shadow length) call sun_position / sun_times; for what
+  hills block (horizon, solar access, can A see B, radio Fresnel clearance) call terrain_horizon /
+  line_of_sight. They compute from the DEM; don't estimate from memory.
 - Coordinates are GeoJSON order: [longitude, latitude], WGS84.
 - For distances between named places, give calculate_distance the names (place_a, place_b): the
   server geocodes them. Never type coordinates for a place from memory.
@@ -130,6 +134,55 @@ class HeightResult(Checkable):
     method: str
     accuracy_m: float | None
     grids: list[str] = Field(default_factory=list)
+
+
+class SunResult(Checkable):
+    time: str
+    elevation_deg: float = Field(description="Apparent elevation above a flat horizon, refraction included")
+    azimuth_deg: float = Field(description="Clockwise from true north")
+    declination_deg: float
+    equation_of_time_min: float
+    above_horizon: bool
+    method: str
+    shadow_length_m: float | None = Field(None, description="On level ground, for object_height_m")
+    shadow_direction_deg: float | None = Field(None, description="Direction the shadow points, from true north")
+
+
+class SunTimesResult(Checkable):
+    date: str
+    time_zone: str
+    sunrise: str | None
+    solar_noon: str
+    sunset: str | None
+    day_length_h: float
+    solar_noon_elevation_deg: float
+    terrain_hours: float | None = Field(None, description="Hours of direct sun above the terrain horizon")
+    first_direct_sun: str | None = None
+    last_direct_sun: str | None = None
+    method: str
+
+
+class HorizonResult(Checkable):
+    latitude: float
+    longitude: float
+    ground_elevation_m: float
+    observer_height_m: float
+    max_distance_m: float
+    azimuths_deg: list[float]
+    horizon_elevation_deg: list[float] = Field(description="Skyline elevation angle at each azimuth")
+    obstruction_distance_m: list[float]
+    highest: dict[str, float]
+    method: str
+
+
+class LineOfSightResult(Checkable):
+    visible: bool
+    distance_m: float
+    bearing_deg: float
+    min_clearance_m: float = Field(description="Smallest gap between the sight line and the terrain; negative = blocked")
+    min_clearance_at: dict[str, float]
+    fresnel: dict[str, Any] | None = None
+    method: str
 
 
 class FeatureCollection(BaseModel):
@@ -472,6 +525,86 @@ def create_server(local_files: bool = False) -> MCPServer:
             separation_m=out["separation_m"], method=out["method"], accuracy_m=out["accuracy_m"], grids=out["grids"],
             warnings=out["warnings"], provenance=out["provenance"], units={"height_m": "metre", "separation_m": "metre"},
         )
+
+    @mcp.tool(title="Sun position and shadow", annotations=READ_ONLY_WEB)
+    async def sun_position(
+        latitude: Latitude,
+        longitude: Longitude,
+        time: Annotated[str, Field(max_length=40, description="ISO 8601, with a UTC offset (2026-12-21T12:00:00+11:00) "
+                                                              "or local with tz")],
+        tz: Annotated[str | None, Field(max_length=60, description="IANA time zone for a local time, "
+                                                                   "e.g. Australia/Melbourne")] = None,
+        object_height_m: Annotated[float | None, Field(gt=0, le=10_000, description="Height of a vertical object, "
+                                                                                    "for its shadow")] = None,
+    ) -> SunResult:
+        """The Sun's apparent elevation and azimuth (from true north) at a place and time, and the
+        shadow a vertical object casts on level ground (NOAA solar position, refraction included)."""
+        from geospark import sun
+
+        if object_height_m:
+            out = await _blocking(sun.shadow, latitude, longitude, time, object_height_m, tz)
+        else:
+            out = await _blocking(sun.sun_position, latitude, longitude, time, tz)
+        return SunResult(**{k: out.get(k) for k in SunResult.model_fields if k in out},
+                         units={"elevation_deg": "degree", "azimuth_deg": "degree", "shadow_length_m": "metre"})
+
+    @mcp.tool(title="Sunrise, sunset and hours of sun", annotations=READ_ONLY_WEB)
+    async def sun_times(
+        latitude: Latitude,
+        longitude: Longitude,
+        date: Annotated[str, Field(max_length=10, description="Local date, YYYY-MM-DD")],
+        tz: Annotated[str | None, Field(max_length=60, description="IANA time zone, e.g. Australia/Melbourne; "
+                                                                   "default UTC")] = None,
+        terrain: Annotated[bool, Field(description="Also count hours of direct sun above the terrain horizon "
+                                                   "(reads the DEM; ~10-60 s)")] = False,
+    ) -> SunTimesResult:
+        """Sunrise, solar noon, sunset and day length on a date for a flat horizon; with terrain=True,
+        also the hours of direct sun once hills are taken into account."""
+        from geospark import sun
+
+        times = await _blocking(sun.sun_times, latitude, longitude, date, tz)
+        extra: dict[str, Any] = {}
+        if terrain:
+            lit = await _heavy(sun.sunlight_hours, latitude, longitude, date, tz)
+            extra = {k: lit[k] for k in ("terrain_hours", "first_direct_sun", "last_direct_sun")}
+            times["provenance"] += lit["provenance"][1:]
+            times["warnings"] += lit["warnings"]
+        return SunTimesResult(**{k: times.get(k) for k in SunTimesResult.model_fields if k in times}, **extra,
+                              units={"day_length_h": "hour", "terrain_hours": "hour"})
+
+    @mcp.tool(title="Terrain horizon", annotations=READ_ONLY_WEB)
+    async def terrain_horizon(
+        latitude: Latitude,
+        longitude: Longitude,
+        observer_height_m: Annotated[float, Field(ge=0, le=500, description="Eye or sensor height above ground")] = 1.5,
+        max_distance_m: Annotated[float, Field(ge=500, le=50_000)] = 20_000,
+        step_deg: Annotated[float, Field(ge=0.5, le=10, description="Azimuth spacing; must divide 360")] = 5,
+    ) -> HorizonResult:
+        """The skyline the terrain makes around a point: for each azimuth, the elevation angle of the
+        horizon and how far away the blocking terrain is (Copernicus 30 m DEM, Earth curvature and
+        refraction). Use for solar-panel shading, valley sunlight, or what hills hide. ~10-60 s."""
+        from geospark import visibility
+
+        out = await _heavy(visibility.horizon, latitude, longitude, observer_height_m, max_distance_m, step_deg)
+        return HorizonResult(**{k: out[k] for k in HorizonResult.model_fields if k in out},
+                             units={"horizon_elevation_deg": "degree", "obstruction_distance_m": "metre"})
+
+    @mcp.tool(title="Line of sight", annotations=READ_ONLY_WEB)
+    async def line_of_sight(
+        lat_a: Latitude, lon_a: Longitude, lat_b: Latitude, lon_b: Longitude,
+        height_a_m: Annotated[float, Field(ge=0, le=1000, description="Height above ground at A (e.g. a mast)")] = 1.5,
+        height_b_m: Annotated[float, Field(ge=0, le=1000, description="Height above ground at B")] = 1.5,
+        frequency_mhz: Annotated[float | None, Field(ge=1, le=300_000, description="For a radio link: report "
+                                                                                    "first Fresnel zone clearance")] = None,
+    ) -> LineOfSightResult:
+        """Whether A and B can see each other over the terrain (Copernicus 30 m DEM, curvature and
+        refraction), the minimum clearance and where it occurs; with frequency_mhz, the first Fresnel
+        zone clearance of a radio link (60% clear is the usual rule)."""
+        from geospark import visibility
+
+        out = await _heavy(visibility.line_of_sight, lat_a, lon_a, lat_b, lon_b, height_a_m, height_b_m, frequency_mhz)
+        return LineOfSightResult(**{k: out[k] for k in LineOfSightResult.model_fields if k in out},
+                                 units={"distance_m": "metre", "min_clearance_m": "metre"})
 
     @mcp.tool(title="Location report", annotations=READ_ONLY_WEB)
     async def location_report(

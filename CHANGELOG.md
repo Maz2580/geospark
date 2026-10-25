@@ -4,6 +4,23 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Added: sun and terrain visibility (`docs/benchmarks/2026-10/sun_horizon.md`)
+- **Sun position, shadows, sunrise and sunset** (`geospark.sun`; `POST /api/v1/sun`, `/api/v1/sun/times`;
+  MCP and Ask tools `sun_position`, `sun_times`; `geospark sun`). NOAA solar position (Meeus) with
+  refraction. Against NREL's Solar Position Algorithm on 2,000 random cases: apparent elevation within
+  0.014° (Sun above 5°); sunrise and sunset within 4.7 s of NREL-based crossings on 899 events.
+- **Hours of direct sun allowing for terrain** (`sunlight_hours`; `/api/v1/sun/hours`; `sun_times` with
+  `terrain`): the Sun's upper limb against the terrain horizon, with Bennett refraction at the skyline.
+- **Terrain horizon** (`geospark.visibility.horizon`; `/api/v1/horizon`; `terrain_horizon`;
+  `geospark horizon`) on Copernicus GLO-30 with Earth curvature and refraction (k = 0.13); distant
+  terrain from the DEM's overviews. Against PVGIS 5.3 horizon profiles at 8 sites: mean absolute
+  difference 0.2–0.9° at six, 1.5° at an urban site and 3.1° in a sheer-walled valley.
+- **Line of sight** (`line_of_sight`; `/api/v1/line-of-sight`; `geospark los`): intervisibility, minimum
+  clearance and its location, and first Fresnel zone clearance for a radio link. Tested on synthetic
+  terrain.
+- The approach to terrain rays follows geo-sleuth (MIT); the implementation is GeoSpark's own. Its
+  photo-geolocation features were not adopted.
+
 ### Added
 - **Point clouds and rasters in `layer check`** (`pip install "geospark-ai[pointcloud]"`; Python
   `geospark.io.surface`; the local MCP tool `check_dataset`). LAS, LAZ, COPC, GeoTIFF and COG files,

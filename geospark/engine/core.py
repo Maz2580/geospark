@@ -42,12 +42,18 @@ def _coordinates_supplied_by_model(tool: str, args: dict[str, Any]) -> list[tupl
     elif tool == "check_spatial_relationship":
         out.extend(pt for side in ("a", "b") if not args.get(f"place_{side}")
                    and (pt := _point_coords(args.get(f"geometry_{side}"))))
-    elif tool in ("get_elevation", "spatial_operation", "reverse_geocode", "find_nearby_places", "get_weather"):
+    elif tool in ("get_elevation", "spatial_operation", "reverse_geocode", "find_nearby_places", "get_weather",
+                  "sun_position", "sun_times", "terrain_horizon"):
         if args.get("place"):
             return out  # looked up by the server
         lat, lon = args.get("latitude"), args.get("longitude")
         if isinstance(lat, (int, float)) and isinstance(lon, (int, float)):
             out.append((float(lon), float(lat)))
+    elif tool == "line_of_sight":
+        for side in ("_a", "_b"):
+            lat, lon = args.get(f"latitude{side}"), args.get(f"longitude{side}")
+            if not args.get(f"place{side}") and isinstance(lat, (int, float)) and isinstance(lon, (int, float)):
+                out.append((float(lon), float(lat)))
     return out
 
 

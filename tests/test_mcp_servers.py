@@ -125,7 +125,7 @@ class TestMCPServerLauncher:
 
     def test_launch_all(self) -> None:
         launcher = MCPServerLauncher()
-        assert len(launcher.active_servers) == 5
+        assert len(launcher.active_servers) == 6
         tools = launcher.get_all_tools()
         assert len(tools) >= 6  # 3 + 2 + 1
 

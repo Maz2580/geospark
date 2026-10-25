@@ -8,6 +8,7 @@ from geospark.mcp_servers.geocoding import GeocodingServer
 from geospark.mcp_servers.geodesy import GeodesyServer
 from geospark.mcp_servers.places import PlacesServer
 from geospark.mcp_servers.spatial_reasoning import SpatialReasoningServer
+from geospark.mcp_servers.sun_terrain import SunTerrainServer
 from geospark.mcp_servers.terrain import TerrainServer
 
 # Registry of available MCP servers
@@ -17,6 +18,7 @@ SERVERS: dict[str, type[BaseMCPServer]] = {
     "terrain": TerrainServer,
     "places": PlacesServer,
     "geodesy": GeodesyServer,
+    "sun_terrain": SunTerrainServer,
 }
 
 

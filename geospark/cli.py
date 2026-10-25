@@ -737,6 +737,116 @@ def isochrone(lat: float, lon: float, minutes: str, mode: str, geojson_path: str
     _save_geojson(geojson_path, result.to_geojson())
 
 
+def _print_warnings(out: dict) -> None:
+    for w in out.get("warnings", []):
+        console.print(f"[yellow]caveat[/yellow] {w}")
+
+
+@main.command(context_settings={"ignore_unknown_options": True})
+@click.argument("lat", type=float)
+@click.argument("lon", type=float)
+@click.option("--time", "when", default=None, help="ISO time with offset, or local with --tz: sun position")
+@click.option("--date", "day", default=None, help="YYYY-MM-DD: sunrise, sunset and day length")
+@click.option("--tz", default=None, help="IANA time zone, e.g. Australia/Melbourne")
+@click.option("--height", "object_height", type=float, default=None, help="Object height (m), for its shadow")
+@click.option("--terrain", is_flag=True, help="With --date: hours of direct sun above the terrain horizon")
+@click.option("--json", "as_json", is_flag=True, help="Print the full result as JSON")
+def sun(lat: float, lon: float, when: str | None, day: str | None, tz: str | None, object_height: float | None,
+        terrain: bool, as_json: bool) -> None:
+    """Sun position and shadow (--time) or sunrise and sunset (--date) at LAT LON."""
+    from geospark import sun as solar
+    from geospark import visibility
+
+    if bool(when) == bool(day):
+        console.print("[red]Error:[/red] give either --time or --date")
+        raise SystemExit(1)
+    try:
+        if when:
+            out = (solar.shadow(lat, lon, when, object_height, tz) if object_height
+                   else solar.sun_position(lat, lon, when, tz))
+        else:
+            assert day is not None  # one of --time and --date, checked above
+            out = solar.sun_times(lat, lon, day, tz)
+            if terrain:
+                lit = solar.sunlight_hours(lat, lon, day, tz)
+                out.update({k: lit[k] for k in ("terrain_hours", "first_direct_sun", "last_direct_sun")})
+                out["warnings"] += lit["warnings"]
+    except (solar.SunError, visibility.VisibilityError) as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise SystemExit(1) from None
+    if as_json:
+        click.echo(json.dumps(out, indent=2, default=str))
+        return
+    table = Table(title="Sun")
+    table.add_column("Quantity", style="cyan")
+    table.add_column("Value", style="green")
+    for key in ("time", "elevation_deg", "azimuth_deg", "shadow_length_m", "shadow_direction_deg", "date", "sunrise",
+                "solar_noon", "sunset", "day_length_h", "terrain_hours", "first_direct_sun", "last_direct_sun", "note"):
+        if out.get(key) is not None:
+            table.add_row(key, str(out[key]))
+    console.print(table)
+    _print_warnings(out)
+
+
+@main.command(context_settings={"ignore_unknown_options": True})
+@click.argument("lat", type=float)
+@click.argument("lon", type=float)
+@click.option("--height", "observer_height", type=float, default=1.5, help="Observer height above ground (m)")
+@click.option("--distance", "max_distance", type=float, default=20_000, help="How far to look (m, max 50000)")
+@click.option("--step", type=float, default=10, help="Azimuth step in degrees (divides 360)")
+@click.option("--json", "as_json", is_flag=True, help="Print the full result as JSON")
+def horizon(lat: float, lon: float, observer_height: float, max_distance: float, step: float, as_json: bool) -> None:
+    """The terrain horizon around LAT LON (Copernicus 30 m DEM, curvature and refraction)."""
+    from geospark import visibility
+
+    try:
+        out = visibility.horizon(lat, lon, observer_height, max_distance, step)
+    except visibility.VisibilityError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise SystemExit(1) from None
+    if as_json:
+        click.echo(json.dumps(out, indent=2, default=str))
+        return
+    table = Table(title=f"Horizon from ({lat}, {lon}), ground {out['ground_elevation_m']} m")
+    for column in ("Azimuth (°)", "Horizon (°)", "At (m)"):
+        table.add_column(column)
+    for az, el, d in zip(out["azimuths_deg"], out["horizon_elevation_deg"], out["obstruction_distance_m"], strict=True):
+        table.add_row(f"{az:g}", f"{el:.2f}", f"{d:,}")
+    console.print(table)
+    _print_warnings(out)
+
+
+@main.command("los", context_settings={"ignore_unknown_options": True})
+@click.argument("coords", nargs=4, type=float)
+@click.option("--height-a", type=float, default=1.5, help="Height above ground at A (m)")
+@click.option("--height-b", type=float, default=1.5, help="Height above ground at B (m)")
+@click.option("--frequency", type=float, default=None, help="Radio frequency (MHz): Fresnel clearance")
+@click.option("--json", "as_json", is_flag=True, help="Print the full result as JSON")
+def line_of_sight_cmd(coords: tuple[float, ...], height_a: float, height_b: float, frequency: float | None,
+                      as_json: bool) -> None:
+    """Line of sight between LAT_A LON_A LAT_B LON_B over the terrain."""
+    from geospark import visibility
+
+    try:
+        lat_a, lon_a, lat_b, lon_b = coords
+        out = visibility.line_of_sight(lat_a, lon_a, lat_b, lon_b, height_a, height_b, frequency)
+    except visibility.VisibilityError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise SystemExit(1) from None
+    if as_json:
+        click.echo(json.dumps(out, indent=2, default=str))
+        return
+    colour = "green" if out["visible"] else "red"
+    console.print(f"[{colour}]{'visible' if out['visible'] else 'blocked'}[/{colour}] over {out['distance_m'] / 1000:.2f} km; "
+                  f"minimum clearance {out['min_clearance_m']} m at {out['min_clearance_at']['distance_from_a_m']:,} m "
+                  "from A")
+    if out.get("fresnel"):
+        f = out["fresnel"]
+        console.print(f"first Fresnel zone: {f['min_clearance_fraction_of_f1']:.0%} clear at worst "
+                      f"({'meets' if f['sixty_percent_clear'] else 'fails'} the 60% rule)")
+    _print_warnings(out)
+
+
 # Negative coordinates (southern/western hemispheres) must parse as values, not options
 @main.command(context_settings={"ignore_unknown_options": True})
 @click.argument("theme", type=click.Choice(["places", "buildings", "transportation", "divisions"]))

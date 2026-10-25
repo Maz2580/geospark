@@ -163,6 +163,7 @@ OPENAPI_TAGS = [
     {"name": "Spatial", "description": "Geocoding, geodesic distance, elevation, topology and engine operations."},
     {"name": "Ask", "description": "Natural-language questions answered with GeoSpark's tools, with provenance."},
     {"name": "Geodesy", "description": "Official datum, projection and height conversions with national grids."},
+    {"name": "Sun and terrain", "description": "Sun position, sunrise and shadows; terrain horizons and lines of sight."},
     {"name": "Routing", "description": "Reachable areas (isochrones) and travel times from Valhalla."},
     {"name": "Open map data", "description": "Overture Maps places, buildings, roads and boundaries near a point."},
     {"name": "Live data", "description": "Weather, air quality and active fires."},
@@ -177,6 +178,8 @@ _TAG_BY_PREFIX = [  # longest prefix first
     ("/api/v1/check-relationship", "Spatial"), ("/api/v1/geocode", "Spatial"), ("/api/v1/query", "Spatial"),
     ("/api/v1/distance", "Spatial"), ("/api/v1/elevation", "Spatial"),
     ("/api/v1/transform", "Geodesy"), ("/api/v1/height", "Geodesy"),
+    ("/api/v1/sun", "Sun and terrain"), ("/api/v1/horizon", "Sun and terrain"),
+    ("/api/v1/line-of-sight", "Sun and terrain"),
     ("/api/v1/ask", "Ask"),
     ("/api/v1/isochrone", "Routing"), ("/api/v1/travel-time", "Routing"),
     ("/api/v1/overture", "Open map data"),
@@ -213,6 +216,9 @@ for _prefix in (
     "/api/v1/overture/",
     "/api/v1/isochrone",
     "/api/v1/travel-time",
+    "/api/v1/horizon",
+    "/api/v1/line-of-sight",
+    "/api/v1/sun/hours",
 ):
     set_route_limit(_prefix, int(os.getenv("GEOSPARK_RATE_LIMIT_EXPENSIVE_RPM", "12")))
 # Cheap listings under those prefixes keep the normal limit (longest prefix wins)
@@ -1122,6 +1128,108 @@ def convert_height(request: HeightRequest):
                                       request.from_reference, request.to_reference)
     except geodesy.GeodesyError as e:
         raise HTTPException(status_code=400, detail=str(e)) from None
+
+
+# --- Sun and terrain (geospark.sun, geospark.visibility) ---
+
+
+class SunRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"latitude": -37.818, "longitude": 144.969, "time": "2026-06-21T12:00:00+10:00", "object_height_m": 10}, "examples": [{"latitude": -37.818, "longitude": 144.969, "time": "2026-06-21T12:00:00+10:00", "object_height_m": 10}]}}
+
+    latitude: float = Field(..., ge=-90, le=90)
+    longitude: float = Field(..., ge=-180, le=180)
+    time: str = Field(..., max_length=40, description="ISO 8601 with a UTC offset, or local with tz")
+    tz: str | None = Field(None, max_length=60, description="IANA time zone for a local time, e.g. Australia/Melbourne")
+    object_height_m: float | None = Field(None, gt=0, le=10_000, description="For the shadow of a vertical object")
+
+
+class SunDayRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"latitude": -36.7297, "longitude": 146.9608, "date": "2026-06-21", "tz": "Australia/Melbourne"}, "examples": [{"latitude": -36.7297, "longitude": 146.9608, "date": "2026-06-21", "tz": "Australia/Melbourne"}]}}
+
+    latitude: float = Field(..., ge=-90, le=90)
+    longitude: float = Field(..., ge=-180, le=180)
+    date: str = Field(..., max_length=10, description="Local date, YYYY-MM-DD")
+    tz: str | None = Field(None, max_length=60, description="IANA time zone; default UTC")
+
+
+class HorizonRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"latitude": -36.7297, "longitude": 146.9608, "step_deg": 5}, "examples": [{"latitude": -36.7297, "longitude": 146.9608, "step_deg": 5}]}}
+
+    latitude: float = Field(..., ge=-90, le=90)
+    longitude: float = Field(..., ge=-180, le=180)
+    observer_height_m: float = Field(1.5, ge=0, le=500)
+    max_distance_m: float = Field(20_000, ge=500, le=50_000)
+    step_deg: float = Field(5, ge=0.5, le=10, description="Azimuth spacing; must divide 360")
+    ground_elevation_m: float | None = Field(None, ge=-500, le=9000, description="True ground height, if known")
+
+
+class LineOfSightRequest(BaseModel):
+    model_config = {"json_schema_extra": {"example": {"lat_a": -37.8333, "lon_a": 145.35, "lat_b": -37.70, "lon_b": 145.10, "height_a_m": 100, "height_b_m": 10, "frequency_mhz": 900}, "examples": [{"lat_a": -37.8333, "lon_a": 145.35, "lat_b": -37.70, "lon_b": 145.10, "height_a_m": 100, "height_b_m": 10, "frequency_mhz": 900}]}}
+
+    lat_a: float = Field(..., ge=-90, le=90)
+    lon_a: float = Field(..., ge=-180, le=180)
+    lat_b: float = Field(..., ge=-90, le=90)
+    lon_b: float = Field(..., ge=-180, le=180)
+    height_a_m: float = Field(1.5, ge=0, le=1000, description="Height above the ground at A")
+    height_b_m: float = Field(1.5, ge=0, le=1000, description="Height above the ground at B")
+    frequency_mhz: float | None = Field(None, ge=1, le=300_000, description="Report first Fresnel zone clearance")
+
+
+def _sun_call(fn: Any, *args: Any) -> dict[str, Any]:
+    from geospark import sun, visibility
+
+    try:
+        out: dict[str, Any] = fn(*args)
+        return out
+    except (sun.SunError, visibility.VisibilityError) as e:
+        raise HTTPException(status_code=400, detail=str(e)) from None
+
+
+@app.post("/api/v1/sun", dependencies=[Depends(verify_api_key)])
+def sun_position(request: SunRequest) -> dict[str, Any]:
+    """The Sun's apparent elevation and azimuth (true north) at a place and time; with object_height_m,
+    the length and direction of its shadow on level ground (NOAA solar position)."""
+    from geospark import sun
+
+    if request.object_height_m:
+        return _sun_call(sun.shadow, request.latitude, request.longitude, request.time, request.object_height_m, request.tz)
+    return _sun_call(sun.sun_position, request.latitude, request.longitude, request.time, request.tz)
+
+
+@app.post("/api/v1/sun/times", dependencies=[Depends(verify_api_key)])
+def sun_times(request: SunDayRequest) -> dict[str, Any]:
+    """Sunrise, solar noon, sunset and day length on a local date, for a flat horizon."""
+    from geospark import sun
+
+    return _sun_call(sun.sun_times, request.latitude, request.longitude, request.date, request.tz)
+
+
+@app.post("/api/v1/sun/hours", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
+def sunlight_hours(request: SunDayRequest) -> dict[str, Any]:
+    """Hours of direct sun on a date, above a flat horizon and above the terrain horizon (Copernicus DEM)."""
+    from geospark import sun
+
+    return _sun_call(sun.sunlight_hours, request.latitude, request.longitude, request.date, request.tz)
+
+
+@app.post("/api/v1/horizon", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
+def terrain_horizon(request: HorizonRequest) -> dict[str, Any]:
+    """The terrain skyline around a point: horizon elevation angle and obstruction distance per azimuth
+    (Copernicus GLO-30, Earth curvature and refraction)."""
+    from geospark import visibility
+
+    return _sun_call(visibility.horizon, request.latitude, request.longitude, request.observer_height_m,
+                     request.max_distance_m, request.step_deg, request.ground_elevation_m)
+
+
+@app.post("/api/v1/line-of-sight", dependencies=[Depends(verify_api_key), Depends(llm_slot)])
+def line_of_sight(request: LineOfSightRequest) -> dict[str, Any]:
+    """Whether two points see each other over the terrain, the minimum clearance and where it is; with
+    frequency_mhz, the first Fresnel zone clearance of a radio link."""
+    from geospark import visibility
+
+    return _sun_call(visibility.line_of_sight, request.lat_a, request.lon_a, request.lat_b, request.lon_b,
+                     request.height_a_m, request.height_b_m, request.frequency_mhz)
 
 
 # --- Agent Endpoints ---

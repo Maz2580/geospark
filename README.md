@@ -88,10 +88,11 @@ repository and can be re-run ([evaluation](#evaluation),
 | **Spatial engine** | Geodesic distance, area and length (pyproj on WGS 84); topology predicates (contains, within, intersects, touches, crosses, overlaps, disjoint) via Shapely; shape-preserving buffers; union, intersection, difference, centroid and convex hull; CRS transformation of every input geometry |
 | **Places and terrain** | Geocoding and reverse geocoding (OpenStreetMap Nominatim, within its usage policy: at most one request per second, cached); elevation from Copernicus GLO-30 with an Open Elevation fallback and vertical-datum awareness (NAVD88, EGM96, WGS 84); routing (OSRM); isochrones on foot, by bicycle or by car, and travel-time matrices (Valhalla) |
 | **Official datums and heights** | Coordinate conversions with the published transformations and grids as implemented in PROJ (GDA94 to GDA2020, MGA zones, British National Grid via OSTN15, NAD27 to NAD83 via NADCON, ITRF at an epoch) and heights between the ellipsoid and AHD, ODN, NZVD2016 or NAVD88 with the official geoid models. Grids are downloaded once; PROJ's silent ballpark fallbacks are refused; every result states the operation used and its accuracy |
+| **Sun and terrain** | Sun position and shadows (NOAA solar position, refraction included), sunrise and sunset, and hours of direct sun allowing for the terrain horizon; terrain horizon profiles and line of sight on the Copernicus DEM with Earth curvature and refraction, including first Fresnel zone clearance for radio links |
 | **Dataset checks** | Vector files (GeoJSON, GeoPackage, Shapefile, GeoParquet, CSV and others), LiDAR (LAS, LAZ, COPC) and elevation models (GeoTIFF, COG): CRS consistency, axis order, zone, datum, units and height reference, and diagnosis of the offset between two datasets or between a surface and survey marks |
 | **Live data** | Overture Maps places, buildings, roads and administrative areas (no key, via DuckDB); weather and forecasts (Open-Meteo, no key); air quality (OpenAQ v3, free key); active fires (NASA FIRMS, free key); satellite scene search (STAC) |
 | **Agents** | `GeoAgent` (multi-step analysis from a plain-language goal), `SpatialReport` (a location dossier: amenities, accessibility, elevation, weather), `SiteSelector` (multi-criteria site ranking), and a coordinator that routes a goal to the appropriate agent |
-| **Interfaces** | Python library, command-line interface (`geospark …`), REST API (54 documented operations, reference at `/docs`), MCP server (`geospark-mcp`), web interface |
+| **Interfaces** | Python library, command-line interface (`geospark …`), REST API (59 documented operations, reference at `/docs`), MCP server (`geospark-mcp`), web interface |
 | **Memory and workflows** | Spatial memory with facts, episodes and contradiction detection; a tiered context store; Flows (directed acyclic workflows, constructible from a natural-language goal) |
 | **GeoSpark Bench** | 535 reproducible questions across topology, distance, multi-step reasoning, change and multimodal tasks, with computed ground truth |
 
@@ -117,7 +118,7 @@ curl -X POST https://geospark.terrascout.app/api/v1/distance \
 https://geospark.terrascout.app/mcp
 ```
 
-The hosted server is open, requires no key, offers 17 tools and applies the same rate limits as the
+The hosted server is open, requires no key, offers 21 tools and applies the same rate limits as the
 hosted API. It does not read files; tools for local files are available only from a locally run
 server.
 
@@ -135,13 +136,14 @@ Register the server in the MCP client's configuration. For Claude Desktop, the f
 { "mcpServers": { "geospark": { "command": "geospark-mcp" } } }
 ```
 
-The local server provides 21 read-only tools:
+The local server provides 25 read-only tools:
 
 - **Computation:** `calculate_distance` (between place names, geocoded by the server, or
   coordinates), `check_spatial_relationship`, `spatial_operation` (buffer, area, length, centroid,
   convex hull), `transform_coordinates` and `convert_height`.
 - **Places and data:** `geocode`, `reverse_geocode`, `get_elevation`, `route`, `get_weather`,
   `get_air_quality`, `get_active_fires` and `overture_features`.
+- **Sun and terrain:** `sun_position`, `sun_times`, `terrain_horizon` and `line_of_sight`.
 - **Analysis:** `isochrone`, `travel_time_matrix`, `location_report` and `select_site`.
 - **Local files (local server only):** `check_dataset`, `layer_info`, `layer_count_within` and
   `layer_nearest`.
@@ -265,6 +267,34 @@ the required grid or refuses the conversion. The conversions are also available 
 `convert_height`. Grids are cached in `$GEOSPARK_DATA_DIR/proj`; `GEOSPARK_PROJ_NETWORK=false`
 disables downloads. Agreement with the national agencies' own results is reported under
 [Validation against authoritative sources](#validation-against-authoritative-sources).
+
+### Sun, shadows and terrain visibility
+
+```python
+from geospark import sun, visibility
+
+sun.shadow(-37.818, 144.969, "2026-06-21T12:00:00", object_height_m=10, tz="Australia/Melbourne")
+# {'elevation_deg': 28.5587, 'azimuth_deg': 5.7072, 'shadow_length_m': 18.373, 'shadow_direction_deg': 185.7072, ...}
+
+sun.sunlight_hours(-36.7297, 146.9608, "2026-06-21", tz="Australia/Melbourne")   # Bright, Victoria, midwinter
+# {'flat_horizon_hours': 9.63, 'terrain_hours': 8.83, 'first_direct_sun': '2026-06-21T08:02+10:00', ...}
+
+visibility.horizon(-36.7297, 146.9608, step_deg=5)            # skyline angle and obstruction distance per azimuth
+visibility.line_of_sight(-37.8333, 145.35, -37.70, 145.10, height_a_m=100, height_b_m=10, frequency_mhz=900)
+```
+
+The Sun's position follows NOAA's solar calculator (after Meeus) and agrees with NREL's Solar
+Position Algorithm to 0.014° in elevation (Sun above 5°); sunrise and sunset agree with NREL-based crossings to
+within 5 s. Horizons are traced across the Copernicus GLO-30 DEM with Earth curvature and standard
+refraction (k = 0.13) and agree with the European Commission's PVGIS horizon profiles to a mean of
+0.2–0.9° at six of eight test sites (details under
+[Validation against authoritative sources](#validation-against-authoritative-sources)). A line of
+sight reports whether two points are intervisible, the minimum clearance and its location, and,
+with `frequency_mhz`, the first Fresnel zone clearance. The same functions are available as
+`POST /api/v1/sun`, `/api/v1/sun/times`, `/api/v1/sun/hours`, `/api/v1/horizon` and
+`/api/v1/line-of-sight`, the CLI commands `geospark sun`, `geospark horizon` and `geospark los`, and
+the MCP tools listed above. The approach to terrain rays follows
+[geo-sleuth](https://github.com/Oldcircle/geo-sleuth) (MIT); the implementation is GeoSpark's own.
 
 ### Users' own data
 
@@ -570,9 +600,13 @@ not only with PROJ
 | NGS GEOID18 service | ellipsoidal to NAVD88 | 1 mm |
 | Victorian surveyed marks | GDA94 to GDA2020, 416 marks | within 7 mm |
 | Victorian spirit-levelled marks | AUSGeoid2020 against levelled AHD, 99 marks | 6 mm median |
+| NREL Solar Position Algorithm (pvlib) | apparent Sun elevation, 903 random cases above 5° | 0.014° maximum |
+| NREL SPA, crossings sampled each second | sunrise and sunset, 899 events | 4.7 s maximum, 1.1 s median |
+| PVGIS 5.3 horizon profiles | terrain horizon at 8 mountain and valley sites | 0.2–0.9° mean at 6 sites; 1.5° (urban) and 3.1° (sheer valley) at 2 |
 
-The accuracy reported with each result is the accuracy EPSG states for the operation, not a
-measurement.
+The accuracy reported with each geodetic result is the accuracy EPSG states for the operation, not
+a measurement. The sun and horizon comparisons are reported in full in
+[docs/benchmarks/2026-10/sun_horizon.md](https://github.com/Maz2580/geospark/blob/main/docs/benchmarks/2026-10/sun_horizon.md).
 
 ## Limitations
 
@@ -584,7 +618,11 @@ measurement.
 - **LiDAR and DEM checks** have been tested on synthetic tiles and elevation models containing each
   error, and on reading the header of a public 10.6-million-point COPC file by URL (horizontal and
   vertical CRS in about 2 s). They have not yet been validated on a real delivery with known errors.
-- **Planned, not yet implemented:** slope, viewshed, raster band mathematics and change detection.
+- **Terrain horizons and lines of sight** use a ~30 m surface model, which includes canopy and large
+  buildings coarsely and nothing narrower than a cell; in sheer-walled valleys the horizon can differ
+  from other DEMs by several degrees. Line of sight has been tested on synthetic terrain only.
+- **Planned, not yet implemented:** slope, full viewshed maps, raster band mathematics and change
+  detection.
   These operations are defined in the protocol but currently return an explicit "not implemented"
   error rather than a result.
 - **Evaluation scope:** the October 2026 re-evaluation used samples (38 GeoSpark Bench questions,
@@ -617,8 +655,9 @@ All state is stored under `GEOSPARK_DATA_DIR`. To lift Nominatim's public limits
 
 ## Release history
 
-- **Unreleased:** LiDAR and DEM dataset checks (`pointcloud` extra); compound-CRS area checks;
-  national geoid selection for height comparisons.
+- **Unreleased:** sun position, sunrise, shadows and terrain-aware hours of sun; terrain horizons
+  and lines of sight with Fresnel clearance; LiDAR and DEM dataset checks (`pointcloud` extra);
+  compound-CRS area checks; national geoid selection for height comparisons.
 - **0.10.0:** official datum and height conversions with national grids; `geospark layer check`
   for vector datasets; answer checks for small models; validation against national agencies.
 - **0.9.0:** testing of every agent, tool and flow template on the live site; place-name inputs

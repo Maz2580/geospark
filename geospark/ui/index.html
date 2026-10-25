@@ -264,8 +264,8 @@
           <div><span class="v good">76–96%</span><p>Correct with GeoSpark's tools, for every model that made valid tool calls. Some small models did not use the tools properly.</p></div>
           <div><span class="v">5% → 76%</span><p>Qwen 2.5 7B, a model that runs on your own CPU: on its own, then with GeoSpark's tools.</p></div>
         </div>
-        <p class="fine">Per-model results, intervals and caveats are in the <a href="https://github.com/Maz2580/geospark#benchmark-results" target="_blank" rel="noopener">README</a>. The full analysis is under peer review.</p>
-        <p class="fine"><strong>Re-checked in October 2026:</strong> the newest frontier models (Claude Opus 5.5, GPT-6.1) now answer these distance questions well on their own. The gap has moved to answers that need national data such as geoid grids: converting a GNSS height to AHD, GPT-6.1 declined and Opus 5.5 estimated up to 5.3 m off; with GeoSpark's tools both were within centimetres. <a href="https://github.com/Maz2580/geospark#re-check-with-current-models-october-2026" target="_blank" rel="noopener">Details</a>.</p>
+        <p class="fine">Per-model results, intervals and caveats are in the <a href="https://github.com/Maz2580/geospark#geospark-bench-v2" target="_blank" rel="noopener">README</a>. The full analysis is under peer review.</p>
+        <p class="fine"><strong>Re-checked in October 2026:</strong> the newest frontier models (Claude Opus 5.5, GPT-6.1) now answer these distance questions well on their own. The gap has moved to answers that need national data such as geoid grids: converting a GNSS height to AHD, GPT-6.1 declined and Opus 5.5 estimated up to 5.3 m off; with GeoSpark's tools both were within centimetres. <a href="https://github.com/Maz2580/geospark#re-evaluation-with-current-models-october-2026" target="_blank" rel="noopener">Details</a>.</p>
       </div>
     </section>
 
@@ -297,7 +297,7 @@
           </article>
           <article class="feature reveal">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>
-            <h3>Bring your own data</h3><p>GeoJSON, GeoPackage, Shapefile, GeoParquet or CSV. The CRS is read from the file; a CSV's latitude/longitude is read as WGS 84 and says so.</p>
+            <h3>Bring your own data</h3><p>GeoJSON, GeoPackage, Shapefile, GeoParquet or CSV. The CRS is read from the file; a CSV's latitude/longitude is read as WGS 84 and says so. <code>geospark layer check</code> finds datum, zone, unit and height-reference mistakes.</p>
             <a href="/guide">How it works →</a>
           </article>
           <article class="feature reveal">

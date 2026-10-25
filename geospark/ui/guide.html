@@ -86,10 +86,10 @@
       <div class="card">
         <div class="card-header"><div class="card-icon geo">&#127758;</div><h3>What is GeoSpark?</h3></div>
         <p class="text-sm">
-          GeoSpark is an open-source <strong>geospatial intelligence engine</strong> that gives AI models real spatial reasoning. On their own, language models often get spatial questions wrong: in our benchmark, small open models got numeric distances wrong about 95% of the time. GeoSpark gives them tools that compute the answer, and every model that made valid tool calls then answered 76&ndash;96% correctly.
+          GeoSpark is an open-source <strong>geospatial intelligence engine</strong> that gives AI models real spatial reasoning. On their own, language models often get spatial questions wrong: in GeoSpark Bench v2, small open models got numeric distances wrong about 95% of the time. GeoSpark gives them tools that compute the answer, and every model that made valid tool calls then answered 76&ndash;96% correctly.
         </p>
         <p class="text-sm mt-1">
-          Beyond the spatial engine, GeoSpark is also a <strong>multi-agent platform</strong> with persistent memory, a tiered context database, and live data channels. Everything runs on your hardware at $0 cost.
+          Beyond the spatial engine, GeoSpark is also a <strong>multi-agent platform</strong> with persistent memory, a tiered context database, and live data channels. Everything can also run on your own hardware with a local model, at no API cost.
         </p>
       </div>
 
@@ -114,6 +114,12 @@
             <h4>Your own data</h4>
             <p>GeoJSON, GeoPackage, Shapefile, GeoParquet or CSV. The CRS is read from the file; a Shapefile without a <code>.prj</code> is refused until you name its CRS, and a CSV's latitude/longitude columns are read as WGS 84 with a caveat.</p>
             <p class="cmd"><code>geospark layer count-within stops.csv suburbs.gpkg</code></p>
+          </div>
+          <div class="concept-card">
+            <span class="concept-tag">New &middot; CLI</span>
+            <h4>Check a dataset</h4>
+            <p>Find the mistakes that fail silently: GDA94 data labelled GDA2020, the wrong MGA zone, feet instead of metres, swapped axes, or ellipsoidal heights treated as AHD. A cause is named only when the measured offset matches it. LiDAR (LAS, LAZ, COPC) and elevation models (GeoTIFF) too, with the <code>pointcloud</code> extra.</p>
+            <p class="cmd"><code>geospark layer check pipes.csv --against parcels.csv</code></p>
           </div>
           <div class="concept-card">
             <span class="concept-tag">New &middot; CLI</span>
@@ -490,7 +496,7 @@ uvicorn geospark.api:app --reload   # Serves the UI at http://localhost:8000</pr
           </div>
           <div class="concept-card">
             <h4>MCP Server</h4>
-            <p>Model Context Protocol server. GeoSpark exposes 6 spatial tools over MCP so Claude Desktop and other MCP clients can use them natively.</p>
+            <p>Model Context Protocol server. GeoSpark exposes 17 tools over MCP at <code>https://geospark.terrascout.app/mcp</code>, and 21 from a local <code>geospark-mcp</code> (which adds tools for your own files, such as <code>check_dataset</code>), so Claude and other MCP clients can use them directly.</p>
           </div>
         </div>
       </div>

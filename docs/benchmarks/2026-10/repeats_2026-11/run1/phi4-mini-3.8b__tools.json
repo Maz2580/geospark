@@ -1,0 +1,382 @@
+{
+ "geodistance_042": {
+  "text": "The distance from the Musee d'Orsay to the Christ Church Cathedral is 8912.34 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.6,
+  "ground_truth": 19060595.8
+ },
+ "geodistance_020": {
+  "text": "The geodesic distance from Big Ben to the Taj Mahal is 8728.2 kilometers.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 6895562.0
+ },
+ "geodistance_051": {
+  "text": "The geodesic distance from the Eiffel Tower to Bondi Beach is approximately 11118.4 kilometers. However, since the instruction requires the answer in meters, we convert kilometers to meters:\n\n11118.4 km * 1000 m/km = 11118400 m\n\nThe distance is 11118400 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 16967514.3
+ },
+ "geodistance_007": {
+  "text": "The distance from the Empire State Building to the Blue Mosque is 7787633 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": 8086381.7
+ },
+ "geodistance_010": {
+  "text": "The distance from the Louvre Museum to Robben Island is 11,527 meters. True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 9293748.7
+ },
+ "geodistance_069": {
+  "text": "The distance in meters from the Angkor Wat to the Niagara Falls is 9153.49.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 13740038.7
+ },
+ "geodistance_013": {
+  "text": "The distance from the Brandenburg Gate to the Acropolis is 1151.89 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 1804895.1
+ },
+ "geodistance_047": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 11356235.3
+ },
+ "geodistance_008": {
+  "text": "The distance from the Sacre-Coeur to the Khan el-Khalili is 4,032,789 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 3216152.3
+ },
+ "geodistance_065": {
+  "text": "The distance from the Meiji Shrine to the CN Tower is approximately 11354 kilometers.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": 10374218.1
+ },
+ "geodistance_028": {
+  "text": "The geodesic distance from the Arc de Triomphe to the Chichen Itza is approximately 9144.3 kilometers or 9143000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.2,
+  "ground_truth": 8365771.6
+ },
+ "geodistance_005": {
+  "text": "The calculated distance from the Meiji Shrine to the Space Needle is 10321.2 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 7713767.6
+ },
+ "geodistance_012": {
+  "text": "The distance from the Space Needle to the Chichen Itza is 2,503,962 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 4255631.7
+ },
+ "geodistance_056": {
+  "text": "The distance from the St Paul's Cathedral to the Trevi Fountain is 8679.2 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 1433922.1
+ },
+ "geodistance_054": {
+  "text": "The distance between the Brooklyn Bridge and the Sydney Harbour Bridge is 12,881,019 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 15987862.9
+ },
+ "geodistance_009": {
+  "text": "The calculated distance from Big Ben to the Christ Church Cathedral is 8725.34 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 18968664.1
+ },
+ "geodistance_031": {
+  "text": "To find the geodesic distance in meters between the Sydney Opera House and the Brandenburg Gate using the provided coordinates, we would use the calculate_distance GeoSpark function as follows:\n\n```json\n{\n  \"type\": \"calculate_distance\",\n  \"parameters\": {\n    \"explanation\": \"What is the distance in meters from the Sydney Opera House to the Brandenburg Gate?\",\n    \"place_a\": \"Sydney Opera House\",\n    \"place_b\": \"Brandenburg Gate\",\n    \"point_a\": {\"type\": \"Point\", \"coordinates\": [151.2153, -33.8568]},\n    \"point_b\": {\"type\": \"Point\", \"coordinates\": [13.3777, 52.5163]}\n  }\n}\n```\n\nAfter executing this function with GeoSpark, we would get the final answer as a number in meters. Since I cannot execute the actual function, I can't provide the real numerical result, but the process above will yield the correct answer.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.6,
+  "ground_truth": 16089764.7
+ },
+ "geodistance_006": {
+  "text": "The distance from the Tokyo Tower to the Khan el-Khalili is 10954.8 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 9587315.6
+ },
+ "geodistance_036": {
+  "text": "The distance in meters from the London Eye to the Kremlin is 3,919,000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 2508285.5
+ },
+ "geodistance_070": {
+  "text": "The distance from the Empire State Building to the Pyramids of Giza is approximately 9,200 kilometers.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": 9035043.5
+ },
+ "geotopo_004": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_053": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_037": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_163": {
+  "text": "True. The provided GeoJSON Geometry A represents the boundary of Paris with an exclusion zone, which contains the specified point Geometry B at (48.8480N, 2.3192E). Therefore, the boundary does contain the point.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": true
+ },
+ "geotopo_167": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_180": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_105": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_103": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_086": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_073": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_067": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_056": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_191": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_185": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_201": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_123": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_133": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_141": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ }
+}

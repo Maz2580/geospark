@@ -11,6 +11,7 @@ README under "Re-evaluation with current models (October 2026)".
 | `datum_run.py` | Runs a question set on a model (bare, or `--tools` with `transform_coordinates` and `convert_height`) and scores the error in metres |
 | `results_summary.json` | Per-model scores, errors, tool use and cost (no model text) |
 | `rerun_streaming.py`, `reruns_2026-11/` | Qwen 3.5 9B (bare) and Gemma 4 12B (bare and tools) again, in November 2026, after their October attempts hit Cloudflare HTTP 524 timeouts. The script reuses `livebench.py` as is, except that replies are streamed. Every question's answer is included, and `results_summary.json` takes these three runs from here |
+| `repeat_streaming.py`, `repeats_2026-11/` | Qwen 3.5 4B and Phi-4-mini 3.8B run three more times on 9 November 2026 (without and with tools), because only the scores of their October runs were saved, not the answers. All three runs are kept, with every answer; `results_summary.json` still holds the October scores |
 | `agency_checks.md` | GeoSpark's answers compared with Geoscience Australia, Ordnance Survey, LINZ, NGS and 2,000 Victorian survey marks; and `layer check` on real data |
 | `fairness.md` | Whether the gap survives code execution, high effort and repeated runs; and AI-written GIS code |
 | `results_datum_all_runs.json` | Every datum run's grades and errors (bare, tools, code execution, repeats) |

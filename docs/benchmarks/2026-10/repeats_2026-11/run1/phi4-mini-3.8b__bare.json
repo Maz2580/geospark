@@ -1,0 +1,382 @@
+{
+ "geodistance_042": {
+  "text": "The distance between the Musee d'Orsay and the Christ Church Cathedral is approximately 13,500.4 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 7.3,
+  "ground_truth": 19060595.8
+ },
+ "geodistance_020": {
+  "text": "The distance between Big Ben (Point A) and the Taj Mahal (Point B) is approximately 7800 kilometers. To convert this to meters: 7800 kilometers = 7,800,000 meters. \n\nFinal answer: 7,800,000 meters",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 6895562.0
+ },
+ "geodistance_051": {
+  "text": "The distance between the Eiffel Tower in Paris, France, and Bondi Beach in Australia is approximately 12,000 kilometers or 12,000,000 meters. \n\nFinal answer: 12,000,000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 16967514.3
+ },
+ "geodistance_007": {
+  "text": "To find the distance between the Empire State Building and the Blue Mosque using their coordinates in decimal degrees, you would typically use a distance formula that accounts for the curvature of the Earth. However, for a simplified answer, we can use an approximation that takes into account the distance along the surface of the Earth, like a straight line on a globe:\n\nThe distance from New York City (where the Empire State Building is located) to Istanbul (where the Blue Mosque is located) is approximately 5,450 kilometers (3,430 miles). Since the question asks for the distance in meters:\n\n5,450 kilometers = 5,450,000 meters\n\nThus, the approximate straight-line distance from the Empire State Building to the Blue Mosque is 5,450,000 meters.\n\nFinal answer: 5,450,000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.5,
+  "ground_truth": 8086381.7
+ },
+ "geodistance_010": {
+  "text": "Using the Haversine formula to calculate the great-circle distance between the two points, the result is approximately 12844.4 kilometers. Converting this to meters gives us 12844.4 * 1000 = 12844400 meters.\n\nFinal answer: 12844400 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 9293748.7
+ },
+ "geodistance_069": {
+  "text": "False. Angkor Wat in Cambodia and Niagara Falls in Canada are extremely far apart, and the distance between them cannot be covered in a practical sense. Angkor Wat is in the northern hemisphere, while Niagara Falls is in the western hemisphere, making it impossible to directly measure the distance between them as if they were points on a straight line path. Angkor Wat is in Southeast Asia, while Niagara Falls is in North America.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.3,
+  "ground_truth": 13740038.7
+ },
+ "geodistance_013": {
+  "text": "True/False. False. The given coordinates are for different locations; Brandenburg Gate is in Berlin, Germany, and the Acropolis is in Athens, Greece. There is no direct distance between them.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 1804895.1
+ },
+ "geodistance_047": {
+  "text": "To calculate the distance between the Dubai Mall and the Lincoln Memorial, we use the Haversine formula which takes into account the spherical shape of the Earth. The coordinates given are in decimal degrees:\n\nDubai Mall coordinates: Latitude 25.1985, Longitude 55.2796\nLincoln Memorial coordinates: Latitude 38.8893, Longitude -77.0502\n\nUsing the Haversine formula, the distance is approximately 11,100 kilometers, which is equal to 11,100,000 meters.\n\nFinal answer: 11,100,000 meters",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.4,
+  "ground_truth": 11356235.3
+ },
+ "geodistance_008": {
+  "text": "To find the distance between Sacre-Coeur and Khan el-Khalili, we can use the Haversine formula or any other appropriate distance formula that accounts for the curvature of the Earth. Assuming we are using such a formula, the result is approximately 4715.47 kilometers. Converted to meters, that would be 4715470 meters. Therefore, the final answer is:\n\n4715470 meters",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.3,
+  "ground_truth": 3216152.3
+ },
+ "geodistance_065": {
+  "text": "True. The question is unanswerable because the Meiji Shrine is in Tokyo, Japan, and the CN Tower is in Toronto, Canada, so they are not geographically related. No distance between them in meters can be calculated.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 10374218.1
+ },
+ "geodistance_028": {
+  "text": "The distance between the Arc de Triomphe in Paris, France, and Chichen Itza in Mexico is approximately 9,375,000 meters or 9,375 kilometers. \n\nFinal answer: 9,375,000 meters",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 8365771.6
+ },
+ "geodistance_005": {
+  "text": "True/False.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 7713767.6
+ },
+ "geodistance_012": {
+  "text": "The distance between the Space Needle in Seattle, Washington, and Chichen Itza in Mexico is approximately 7,050 kilometers, which translates to 7,050,000 meters. The answer is: 7050000.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 4255631.7
+ },
+ "geodistance_056": {
+  "text": "The distance between the St Paul's Cathedral and the Trevi Fountain is approximately 2,023 kilometers or 2,023,187 meters. True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 1433922.1
+ },
+ "geodistance_054": {
+  "text": "The distance from the Brooklyn Bridge to the Sydney Harbour Bridge is approximately 12,742,000 meters. \n\nFinal answer: 12,742,000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 15987862.9
+ },
+ "geodistance_009": {
+  "text": "To find the distance in meters between Big Ben and the Christ Church Cathedral, we can use the Haversine formula or any other appropriate distance formula for points on a sphere. However, since we don't have the exact formula implemented here, the distance between the two given points with their latitude and longitude coordinates cannot be accurately calculated within this environment.\n\nFinal answer: To obtain an accurate result, please use an appropriate distance calculation method with the given coordinates.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.3,
+  "ground_truth": 18968664.1
+ },
+ "geodistance_031": {
+  "text": "False. The two locations are separated by a vast distance, and calculating the exact distance in meters between them would not yield a practical or meaningful result in this context.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 16089764.7
+ },
+ "geodistance_006": {
+  "text": "True/False. The question asks for a numerical distance, but this calculation cannot be completed accurately without performing an actual distance calculation between the two points given in decimal degrees, which would then need to be converted to meters. A direct calculation is not possible in this format.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 9587315.6
+ },
+ "geodistance_036": {
+  "text": "The distance from the London Eye to the Kremlin is approximately 3,750,000 meters or 3,750 kilometers.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 2508285.5
+ },
+ "geodistance_070": {
+  "text": "The distance from the Empire State Building to the Pyramids of Giza is approximately 9,000,000 meters or 9,000 kilometers. \n\nTrue",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.2,
+  "ground_truth": 9035043.5
+ },
+ "geotopo_004": {
+  "text": "True.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_053": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_037": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_163": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_167": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_180": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_105": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_103": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_086": {
+  "text": "False.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_073": {
+  "text": "False.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_067": {
+  "text": "False.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_056": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_191": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_185": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_201": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_123": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_133": {
+  "text": "True.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_141": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ }
+}

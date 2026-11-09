@@ -1,0 +1,472 @@
+{
+ "geodistance_042": {
+  "text": "19060596",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 3.5,
+  "ground_truth": 19060595.8
+ },
+ "geodistance_020": {
+  "text": "6895562",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.6,
+  "ground_truth": 6895562.0
+ },
+ "geodistance_051": {
+  "text": "16967514.3",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.7,
+  "ground_truth": 16967514.3
+ },
+ "geodistance_007": {
+  "text": "8086382",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 2.0,
+  "ground_truth": 8086381.7
+ },
+ "geodistance_010": {
+  "text": "9293748.69238815",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.5,
+  "ground_truth": 9293748.7
+ },
+ "geodistance_069": {
+  "text": "13740038.7",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.5,
+  "ground_truth": 13740038.7
+ },
+ "geodistance_013": {
+  "text": "1804895",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 2.3,
+  "ground_truth": 1804895.1
+ },
+ "geodistance_047": {
+  "text": "11356235.32",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.8,
+  "ground_truth": 11356235.3
+ },
+ "geodistance_008": {
+  "text": "3216152",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 2.4,
+  "ground_truth": 3216152.3
+ },
+ "geodistance_065": {
+  "text": "10374218",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.7,
+  "ground_truth": 10374218.1
+ },
+ "geodistance_028": {
+  "text": "8365899",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.9,
+  "ground_truth": 8365771.6
+ },
+ "geodistance_005": {
+  "text": "7713767.6",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.6,
+  "ground_truth": 7713767.6
+ },
+ "geodistance_012": {
+  "text": "4255632",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 2.1,
+  "ground_truth": 4255631.7
+ },
+ "geodistance_056": {
+  "text": "1433922",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 2.0,
+  "ground_truth": 1433922.1
+ },
+ "geodistance_054": {
+  "text": "15987862.94",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.7,
+  "ground_truth": 15987862.9
+ },
+ "geodistance_009": {
+  "text": "18968664.09291976",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 3.5,
+  "ground_truth": 18968664.1
+ },
+ "geodistance_031": {
+  "text": "16089785",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 4.0,
+  "ground_truth": 16089764.7
+ },
+ "geodistance_006": {
+  "text": "9587316",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.7,
+  "ground_truth": 9587315.6
+ },
+ "geodistance_036": {
+  "text": "2508285.53",
+  "cost": 0.0,
+  "calls": 4,
+  "tool_calls": [
+   "calculate_distance",
+   "calculate_distance",
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 8.8,
+  "ground_truth": 2508285.5
+ },
+ "geodistance_070": {
+  "text": "9035043",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.5,
+  "ground_truth": 9035043.5
+ },
+ "geotopo_004": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 4,
+  "tool_calls": [
+   "check_spatial_relationship",
+   "check_spatial_relationship",
+   "calculate_distance"
+  ],
+  "category": "contains",
+  "correct": true,
+  "seconds": 9.7,
+  "ground_truth": false
+ },
+ "geotopo_053": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "contains",
+  "correct": true,
+  "seconds": 4.0,
+  "ground_truth": false
+ },
+ "geotopo_037": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "contains",
+  "correct": true,
+  "seconds": 2.1,
+  "ground_truth": true
+ },
+ "geotopo_163": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 4,
+  "tool_calls": [
+   "check_spatial_relationship",
+   "check_spatial_relationship",
+   "check_spatial_relationship"
+  ],
+  "category": "contains_with_hole",
+  "correct": true,
+  "seconds": 10.5,
+  "ground_truth": true
+ },
+ "geotopo_167": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 3,
+  "tool_calls": [
+   "check_spatial_relationship",
+   "check_spatial_relationship"
+  ],
+  "category": "contains_with_hole",
+  "correct": true,
+  "seconds": 8.9,
+  "ground_truth": true
+ },
+ "geotopo_180": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 5,
+  "tool_calls": [
+   "check_spatial_relationship",
+   "check_spatial_relationship",
+   "check_spatial_relationship",
+   "check_spatial_relationship"
+  ],
+  "category": "contains_with_hole",
+  "correct": true,
+  "seconds": 22.6,
+  "ground_truth": false
+ },
+ "geotopo_105": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "disjoint",
+  "correct": true,
+  "seconds": 6.9,
+  "ground_truth": true
+ },
+ "geotopo_103": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "disjoint",
+  "correct": true,
+  "seconds": 1.9,
+  "ground_truth": true
+ },
+ "geotopo_086": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "disjoint",
+  "correct": true,
+  "seconds": 2.7,
+  "ground_truth": true
+ },
+ "geotopo_073": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "intersects",
+  "correct": true,
+  "seconds": 2.7,
+  "ground_truth": false
+ },
+ "geotopo_067": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "intersects",
+  "correct": true,
+  "seconds": 2.4,
+  "ground_truth": false
+ },
+ "geotopo_056": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "intersects",
+  "correct": true,
+  "seconds": 4.2,
+  "ground_truth": true
+ },
+ "geotopo_191": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 3,
+  "tool_calls": [
+   "calculate_distance",
+   "check_spatial_relationship"
+  ],
+  "category": "touches",
+  "correct": false,
+  "seconds": 13.5,
+  "ground_truth": true
+ },
+ "geotopo_185": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 3,
+  "tool_calls": [
+   "check_spatial_relationship",
+   "check_spatial_relationship"
+  ],
+  "category": "touches",
+  "correct": true,
+  "seconds": 11.1,
+  "ground_truth": true
+ },
+ "geotopo_201": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 3,
+  "tool_calls": [
+   "check_spatial_relationship",
+   "check_spatial_relationship"
+  ],
+  "category": "touches",
+  "correct": true,
+  "seconds": 5.4,
+  "ground_truth": true
+ },
+ "geotopo_123": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 3,
+  "tool_calls": [
+   "check_spatial_relationship",
+   "check_spatial_relationship"
+  ],
+  "category": "within",
+  "correct": true,
+  "seconds": 5.8,
+  "ground_truth": true
+ },
+ "geotopo_133": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "within",
+  "correct": true,
+  "seconds": 2.7,
+  "ground_truth": true
+ },
+ "geotopo_141": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "within",
+  "correct": true,
+  "seconds": 1.7,
+  "ground_truth": true
+ }
+}

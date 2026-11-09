@@ -1,0 +1,382 @@
+{
+ "geodistance_042": {
+  "text": "The distance from the Musee d'Orsay to the Christ Church Cathedral is approximately 13,400 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 1.6,
+  "ground_truth": 19060595.8
+ },
+ "geodistance_020": {
+  "text": "The distance from the Big Ben to the Taj Mahal is approximately 7500 kilometers.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": 6895562.0
+ },
+ "geodistance_051": {
+  "text": "The distance between the Eiffel Tower and Bondi Beach is approximately 12344.2 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 16967514.3
+ },
+ "geodistance_007": {
+  "text": "The distance between the Empire State Building and the Blue Mosque is approximately 7973.23 kilometers, which is 7972300.76 meters. True.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.2,
+  "ground_truth": 8086381.7
+ },
+ "geodistance_010": {
+  "text": "The distance from the Louvre Museum to Robben Island is 12,763.47 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 9293748.7
+ },
+ "geodistance_069": {
+  "text": "True/False is not a valid numerical answer. To calculate the distance between Angkor Wat and Niagara Falls, we need to convert the latitude and longitude of both locations into a numerical value in meters, and then use the Haversine formula or another appropriate method to find the distance. The provided coordinates are in decimal degrees, which must be converted into a distance. However, without performing the actual calculation, we cannot provide the numerical answer.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.3,
+  "ground_truth": 13740038.7
+ },
+ "geodistance_013": {
+  "text": "The distance in meters from the Brandenburg Gate to the Acropolis is approximately 1759.2 kilometers. Converting to meters: 1759.2 km * 1000 = 1,759,200 meters. So the final answer is 1,759,200 meters. True.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.2,
+  "ground_truth": 1804895.1
+ },
+ "geodistance_047": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 11356235.3
+ },
+ "geodistance_008": {
+  "text": "To calculate the distance between the Sacr\u00e9-C\u0153ur and Khan el-Khalili, we can use the Haversine formula which takes into account the spherical shape of the Earth. The calculation is as follows:\n\n```python\nfrom math import radians, sin, cos, sqrt, atan2\n\n# Coordinates\nlat1, lon1 = radians(2.3431), radians(48.8867)\nlat2, lon2 = radians(31.2625), radians(30.0478)\n\n# Earth radius\nr = 6371 # in km\n\n# Differences\ndiff_lat = lat2 - lat1\ndiff_lon = lon2 - lon1\n\n# Haversine formula\na = sin(diff_lat / 2)**2 + cos(lat1) * cos(lat2) * sin(diff_lon / 2)**2\nc = 2 * atan2(sqrt(a), sqrt(1 - a))\n\n# Distance in km\ndistance_km = r * c\n\n# Distance in meters\ndistance_m = distance_km * 1000\n```\n\nExecuting this calculation yields a distance of approximately 5,937.94 meters.\n\nFinal answer: 5937.94 meters",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.7,
+  "ground_truth": 3216152.3
+ },
+ "geodistance_065": {
+  "text": "True/False. The question cannot be answered as it implies calculating the distance between two points on Earth using their latitude and longitude coordinates. A calculator that converts these coordinates into a distance in meters would need to be used. However, I am unable to perform such calculations or access external tools at this moment.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 10374218.1
+ },
+ "geodistance_028": {
+  "text": "The distance between the Arc de Triomphe and Chichen Itza is approximately 11,000 kilometers (11,000,000 meters). True.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 8365771.6
+ },
+ "geodistance_005": {
+  "text": "False. The Meiji Shrine and the Space Needle are located in different cities and countries (Tokyo, Japan, and Seattle, USA, respectively). Calculating the distance between these two points is not feasible as they are not in the same location.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 7713767.6
+ },
+ "geodistance_012": {
+  "text": "The distance between the Space Needle in Seattle, Washington, USA, and the Chichen Itza in Mexico is approximately 9,050 kilometers or 9,058,000 meters. \n\nFinal answer: 9050000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 4255631.7
+ },
+ "geodistance_056": {
+  "text": "False. The points provided are not in the same location; one is in London, England, and the other is in Rome, Italy. Therefore, it is not possible to calculate a distance between them.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 1433922.1
+ },
+ "geodistance_054": {
+  "text": "The distance from the Brooklyn Bridge to the Sydney Harbour Bridge is approximately 12,750,000 meters. True.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 15987862.9
+ },
+ "geodistance_009": {
+  "text": "To calculate the distance in meters between Big Ben and the Christ Church Cathedral, we'll use the Haversine formula, which accounts for the spherical shape of the Earth. The coordinates for Big Ben are approximately 51.5007\u00b0 N latitude and -0.1246\u00b0 W longitude, while the coordinates for Christ Church Cathedral are approximately 172.6328\u00b0 S latitude and -43.5314\u00b0 W longitude.\n\n1. Convert the coordinates from degrees to radians:\n```python\nlat1 = 51.5007 * pi / 180\nlon1 = -0.1246 * pi / 180\nlat2 = -43.5314 * pi / 180\nlon2 = -43.5314 * pi / 180\n```\n\n2. Apply the Haversine formula:\n```python\nimport math\n\ndef haversine(lat1, lon1, lat2, lon2):\n    R = 6371e3  # Earth radius in meters\n    phi1 = lat1 * pi / 180\n    phi2 = lat2 * pi / 180\n    delta_phi = (lat2 - lat1) * pi / 180\n    delta_lambda = (lon2 - lon1) * pi / 180\n\n    a = math.sin(delta_phi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2) ** 2\n    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))\n    d = R * c\n    return d\n\ndistance = haversine(51.5007, -0.1246, -43.5314, -43.5314)\n```\n\nAfter performing these calculations, we find that the distance between Big Ben and the Christ Church Cathedral is approximately 17,150 meters.\n\nThe final answer is: 17,150 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 1.1,
+  "ground_truth": 18968664.1
+ },
+ "geodistance_031": {
+  "text": "The distance from the Sydney Opera House to the Brandenburg Gate is approximately 12,742,000 meters or 12,742 kilometers. So, the answer is 12742000.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 16089764.7
+ },
+ "geodistance_006": {
+  "text": "The distance from Tokyo Tower to Khan el-Khalili is approximately 10,700 meters.\n\nFinal answer: 10,700 meters",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 9587315.6
+ },
+ "geodistance_036": {
+  "text": "Using the Haversine formula to calculate the great-circle distance between two points on a sphere given their longitudes and latitudes:\n\nThe distance between the London Eye and the Kremlin is approximately 2865.7 kilometers. Converting this to meters:\n\n2865.7 kilometers = 2865700 meters.\n\nThe final answer is: 2865700 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 2508285.5
+ },
+ "geodistance_070": {
+  "text": "The distance in meters from the Empire State Building to the Pyramids of Giza is approximately 9,200,000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": 9035043.5
+ },
+ "geotopo_004": {
+  "text": "False.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_053": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_037": {
+  "text": "False.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_163": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_167": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_180": {
+  "text": "True.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_105": {
+  "text": "False.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_103": {
+  "text": "True. The bounding boxes of London and Barcelona are disjoint (non-overlapping).",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_086": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_073": {
+  "text": "False.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_067": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_056": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_191": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_185": {
+  "text": "False.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_201": {
+  "text": "False.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_123": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_133": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_141": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ }
+}

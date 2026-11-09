@@ -7,8 +7,8 @@ They were run on 5 and 6 May 2026 against the code at commit
 | File | What it is |
 |---|---|
 | `run_multimodel.py` | Shared harness: the three conditions (direct answer, step-by-step prompt, GeoSpark tools through the MCP servers), the Ollama client and the scorer (`score_answer`) |
-| `run_open_full.py` | Runs the six open-weight models through Ollama with its default sampling; tools only for the models whose Ollama build supports tool calling |
-| `run_frontier.py` | Runs GPT-5.4, Claude Sonnet 4.5 and Gemini 2.5 Pro through their own SDKs; Gemini is called at temperature 0, the other two with the providers' default sampling |
+| `run_open_full.py` | Runs the six open-weight models through Ollama; tools only for the models whose Ollama build supports tool calling |
+| `run_frontier.py` | Runs GPT-5.4, Claude Sonnet 4.5 and Gemini 2.5 Pro through their own SDKs |
 | `open_checkpoints/`, `frontier_checkpoints/` | One file per model, condition and benchmark: every question as sent, the expected answer, the model's answer, whether it was scored correct, and the tools it called |
 | `frontier_cost_ledger.jsonl` | One line per frontier API call (6,400 calls; tokens and US$, about US$41 in total). One line is truncated and is skipped when totalling |
 | `tables_from_records.py` | Rebuilds the result counts from the files above, with no model calls |

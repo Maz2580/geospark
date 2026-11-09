@@ -1,0 +1,2830 @@
+{
+  "evaluated": 210,
+  "correct": 149,
+  "accuracy": 71.0,
+  "details": [
+    {
+      "question": "What is the distance in meters from the Central Park to the Sagrada Familia? Give your answer as a number in meters.",
+      "expected": "6174357.5",
+      "answer": "6184267.784759833",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 10.46
+    },
+    {
+      "question": "What is the distance in meters from the Trevi Fountain to the Brandenburg Gate? Give your answer as a number in meters.",
+      "expected": "1182082.3",
+      "answer": "1182271.3090851952",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.16
+    },
+    {
+      "question": "What is the distance in meters from the One World Trade Center to the Sydney Harbour Bridge? Give your answer as a number in meters.",
+      "expected": "15986519.3",
+      "answer": "15984413.084159998",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.93
+    },
+    {
+      "question": "What is the distance in meters from the Tower Bridge to the Sydney Opera House? Give your answer as a number in meters.",
+      "expected": "16985590.6",
+      "answer": "",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 4.06
+    },
+    {
+      "question": "What is the distance in meters from the Meiji Shrine to the Space Needle? Give your answer as a number in meters.",
+      "expected": "7713767.6",
+      "answer": "Now that we have the correct coordinates, let's calculate the distance between Meiji Shrine (139.6996266, 35.6748417) and Space Needle (-122.3493036, 47.6205131).",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance",
+        "geocode",
+        "geocode"
+      ],
+      "extraction": null,
+      "latency_s": 31.95
+    },
+    {
+      "question": "What is the distance in meters from the Tokyo Tower to the Khan el-Khalili? Give your answer as a number in meters.",
+      "expected": "9587315.6",
+      "answer": "9528750.559926253",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 9.53
+    },
+    {
+      "question": "What is the distance in meters from the Empire State Building to the Blue Mosque? Give your answer as a number in meters.",
+      "expected": "8086381.7",
+      "answer": "8150055.966609244",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.07
+    },
+    {
+      "question": "What is the distance in meters from the Sacre-Coeur to the Khan el-Khalili? Give your answer as a number in meters.",
+      "expected": "3216152.3",
+      "answer": "3080727.4843196925",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.41
+    },
+    {
+      "question": "What is the distance in meters from the Big Ben to the Christ Church Cathedral? Give your answer as a number in meters.",
+      "expected": "18968664.1",
+      "answer": "",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 4.34
+    },
+    {
+      "question": "What is the distance in meters from the Louvre Museum to the Robben Island? Give your answer as a number in meters.",
+      "expected": "9293748.7",
+      "answer": "9135681.749556677",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.14
+    },
+    {
+      "question": "What is the distance in meters from the Vatican City to the Table Mountain? Give your answer as a number in meters.",
+      "expected": "8422391.3",
+      "answer": "8405459.241404913",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.86
+    },
+    {
+      "question": "What is the distance in meters from the Space Needle to the Chichen Itza? Give your answer as a number in meters.",
+      "expected": "4255631.7",
+      "answer": "4230803.944046949",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.08
+    },
+    {
+      "question": "What is the distance in meters from the Brandenburg Gate to the Acropolis? Give your answer as a number in meters.",
+      "expected": "1804895.1",
+      "answer": "1806213.4784074347",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.76
+    },
+    {
+      "question": "What is the distance in meters from the Khan el-Khalili to the Sagrada Familia? Give your answer as a number in meters.",
+      "expected": "2898967.0",
+      "answer": "2804446.61661477",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.47
+    },
+    {
+      "question": "What is the distance in meters from the Christ Church Cathedral to the Angkor Wat? Give your answer as a number in meters.",
+      "expected": "9386951.3",
+      "answer": "9794332.002729865",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.32
+    },
+    {
+      "question": "What is the distance in meters from the Brandenburg Gate to the Christ Church Cathedral? Give your answer as a number in meters.",
+      "expected": "18182558.2",
+      "answer": "932776.9189412225",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.25
+    },
+    {
+      "question": "What is the distance in meters from the Palm Jumeirah to the Space Needle? Give your answer as a number in meters.",
+      "expected": "11945260.8",
+      "answer": "8205895.206955988",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.0
+    },
+    {
+      "question": "What is the distance in meters from the Tokyo Tower to the Sagrada Familia? Give your answer as a number in meters.",
+      "expected": "10440963.9",
+      "answer": "10509045.45340289",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.05
+    },
+    {
+      "question": "What is the distance in meters from the Sydney Harbour Bridge to the Khan el-Khalili? Give your answer as a number in meters.",
+      "expected": "14413470.3",
+      "answer": "14418398.528671928",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.35
+    },
+    {
+      "question": "What is the distance in meters from the Big Ben to the Taj Mahal? Give your answer as a number in meters.",
+      "expected": "6895562.0",
+      "answer": "6553277.192694543",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.81
+    },
+    {
+      "question": "What is the distance in meters from the Louvre Museum to the Bondi Beach? Give your answer as a number in meters.",
+      "expected": "16964488.3",
+      "answer": "16963288.29936082",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.15
+    },
+    {
+      "question": "What is the distance in meters from the Burj Khalifa to the Robben Island? Give your answer as a number in meters.",
+      "expected": "7608271.7",
+      "answer": "6803910.235784937",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.9
+    },
+    {
+      "question": "What is the distance in meters from the Acropolis to the Niagara Falls? Give your answer as a number in meters.",
+      "expected": "8134272.4",
+      "answer": "6501969.488739244",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.48
+    },
+    {
+      "question": "What is the distance in meters from the Meiji Shrine to the Machu Picchu? Give your answer as a number in meters.",
+      "expected": "15941617.6",
+      "answer": "The distance from Meiji Shrine to Machu Picchu is approximately 15941772.30 meters.",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance",
+        "geocode",
+        "geocode",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 23.42
+    },
+    {
+      "question": "What is the distance in meters from the Tokyo Tower to the Sydney Opera House? Give your answer as a number in meters.",
+      "expected": "7787515.0",
+      "answer": "7791318.1869934015",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.35
+    },
+    {
+      "question": "What is the distance in meters from the Central Park to the Lincoln Memorial? Give your answer as a number in meters.",
+      "expected": "337493.0",
+      "answer": "336462.860516414",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.92
+    },
+    {
+      "question": "What is the distance in meters from the Bondi Beach to the Golden Gate Bridge? Give your answer as a number in meters.",
+      "expected": "11928854.0",
+      "answer": "11932740.55599765",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.11
+    },
+    {
+      "question": "What is the distance in meters from the Arc de Triomphe to the Chichen Itza? Give your answer as a number in meters.",
+      "expected": "8365771.6",
+      "answer": "",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 4.1
+    },
+    {
+      "question": "What is the distance in meters from the Robben Island to the Acropolis? Give your answer as a number in meters.",
+      "expected": "7965993.0",
+      "answer": "9231164.578494547",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.92
+    },
+    {
+      "question": "What is the distance in meters from the Arc de Triomphe to the St Paul's Cathedral? Give your answer as a number in meters.",
+      "expected": "339726.6",
+      "answer": "340169.78209741355",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.9
+    },
+    {
+      "question": "What is the distance in meters from the Sydney Opera House to the Brandenburg Gate? Give your answer as a number in meters.",
+      "expected": "16089764.7",
+      "answer": "16087986.417441377",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.43
+    },
+    {
+      "question": "What is the distance in meters from the Great Wall (Badaling) to the Hollywood Sign? Give your answer as a number in meters.",
+      "expected": "10058123.5",
+      "answer": "10052265.175976612",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.78
+    },
+    {
+      "question": "What is the distance in meters from the Tower of London to the Brandenburg Gate? Give your answer as a number in meters.",
+      "expected": "929135.0",
+      "answer": "932164.9932994642",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.66
+    },
+    {
+      "question": "What is the distance in meters from the Sensoji Temple to the Sagrada Familia? Give your answer as a number in meters.",
+      "expected": "10437934.4",
+      "answer": "The distance between Sensoji Temple and Sagrada Familia is approximately 10458832 meters.",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.32
+    },
+    {
+      "question": "What is the distance in meters from the Sydney Harbour Bridge to the CN Tower? Give your answer as a number in meters.",
+      "expected": "15562907.5",
+      "answer": "15564202.408743503",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.81
+    },
+    {
+      "question": "What is the distance in meters from the London Eye to the Kremlin? Give your answer as a number in meters.",
+      "expected": "2508285.5",
+      "answer": "2508884.831077389",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.94
+    },
+    {
+      "question": "What is the distance in meters from the Buckingham Palace to the CN Tower? Give your answer as a number in meters.",
+      "expected": "5729195.1",
+      "answer": "5722450.504274006",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.95
+    },
+    {
+      "question": "What is the distance in meters from the Dubai Mall to the Angkor Wat? Give your answer as a number in meters.",
+      "expected": "5241035.5",
+      "answer": "",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 4.21
+    },
+    {
+      "question": "What is the distance in meters from the London Eye to the Lincoln Memorial? Give your answer as a number in meters.",
+      "expected": "5915804.9",
+      "answer": "5914563.9065883085",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.17
+    },
+    {
+      "question": "What is the distance in meters from the Sagrada Familia to the Brandenburg Gate? Give your answer as a number in meters.",
+      "expected": "1497307.7",
+      "answer": "1498677.4515314146",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.15
+    },
+    {
+      "question": "What is the distance in meters from the Musee d'Orsay to the Burj Khalifa? Give your answer as a number in meters.",
+      "expected": "5256053.5",
+      "answer": "6245463.864711908",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.91
+    },
+    {
+      "question": "What is the distance in meters from the Musee d'Orsay to the Christ Church Cathedral? Give your answer as a number in meters.",
+      "expected": "19060595.8",
+      "answer": "",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 4.93
+    },
+    {
+      "question": "What is the distance in meters from the Robben Island to the Hollywood Sign? Give your answer as a number in meters.",
+      "expected": "16054014.6",
+      "answer": "16068703.399096653",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.43
+    },
+    {
+      "question": "What is the distance in meters from the Colosseum to the Sydney Harbour Bridge? Give your answer as a number in meters.",
+      "expected": "16320314.1",
+      "answer": "16320826.729599586",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.38
+    },
+    {
+      "question": "What is the distance in meters from the Brooklyn Bridge to the Forbidden City? Give your answer as a number in meters.",
+      "expected": "11014133.1",
+      "answer": "11014153.5828793",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.67
+    },
+    {
+      "question": "What is the distance in meters from the Musee d'Orsay to the Palm Jumeirah? Give your answer as a number in meters.",
+      "expected": "5252370.7",
+      "answer": "11023206.880448628",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.12
+    },
+    {
+      "question": "What is the distance in meters from the Dubai Mall to the Lincoln Memorial? Give your answer as a number in meters.",
+      "expected": "11356235.3",
+      "answer": "11354557.152618475",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.09
+    },
+    {
+      "question": "What is the distance in meters from the Arc de Triomphe to the Sydney Harbour Bridge? Give your answer as a number in meters.",
+      "expected": "16959560.5",
+      "answer": "The distance in meters from the Arc de Triomphe to the Sydney Harbour Bridge is approximately 16960578 meters.",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.31
+    },
+    {
+      "question": "What is the distance in meters from the Forbidden City to the Angkor Wat? Give your answer as a number in meters.",
+      "expected": "3182880.6",
+      "answer": "",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 4.37
+    },
+    {
+      "question": "What is the distance in meters from the Trevi Fountain to the Christ the Redeemer? Give your answer as a number in meters.",
+      "expected": "9184249.8",
+      "answer": "9177881.867143774",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.0
+    },
+    {
+      "question": "What is the distance in meters from the Eiffel Tower to the Bondi Beach? Give your answer as a number in meters.",
+      "expected": "16967514.3",
+      "answer": "16966149.711190946",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.84
+    },
+    {
+      "question": "What is the distance in meters from the Arc de Triomphe to the Machu Picchu? Give your answer as a number in meters.",
+      "expected": "10023314.3",
+      "answer": "10022865.10359489",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.68
+    },
+    {
+      "question": "What is the distance in meters from the Meiji Shrine to the Christ Church Cathedral? Give your answer as a number in meters.",
+      "expected": "9384797.0",
+      "answer": "26559.65394926164",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.58
+    },
+    {
+      "question": "What is the distance in meters from the Brooklyn Bridge to the Sydney Harbour Bridge? Give your answer as a number in meters.",
+      "expected": "15987862.9",
+      "answer": "The distance in meters from the Brooklyn Bridge to the Sydney Harbour Bridge is approximately 15988588.79 meters.",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.14
+    },
+    {
+      "question": "What is the distance in meters from the Sensoji Temple to the Cairo Tower? Give your answer as a number in meters.",
+      "expected": "9590546.8",
+      "answer": "9580908.971190885",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.16
+    },
+    {
+      "question": "What is the distance in meters from the St Paul's Cathedral to the Trevi Fountain? Give your answer as a number in meters.",
+      "expected": "1433922.1",
+      "answer": "1436506.1743240189",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.82
+    },
+    {
+      "question": "What is the distance in meters from the Tokyo Skytree to the Space Needle? Give your answer as a number in meters.",
+      "expected": "7703946.9",
+      "answer": "7715302.011115755",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.36
+    },
+    {
+      "question": "What is the distance in meters from the Musee d'Orsay to the Times Square? Give your answer as a number in meters.",
+      "expected": "5846686.1",
+      "answer": "5844646.202115792",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.05
+    },
+    {
+      "question": "What is the distance in meters from the Brandenburg Gate to the Chichen Itza? Give your answer as a number in meters.",
+      "expected": "8982041.9",
+      "answer": "9003592.655588793",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.98
+    },
+    {
+      "question": "What is the distance in meters from the Golden Gate Bridge to the Petronas Towers? Give your answer as a number in meters.",
+      "expected": "13591953.1",
+      "answer": "13565378.145298686",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.85
+    },
+    {
+      "question": "What is the distance in meters from the Trevi Fountain to the Chichen Itza? Give your answer as a number in meters.",
+      "expected": "9369456.5",
+      "answer": "9392296.994838944",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.07
+    },
+    {
+      "question": "What is the distance in meters from the Louvre Museum to the Petronas Towers? Give your answer as a number in meters.",
+      "expected": "10430662.6",
+      "answer": "10310705.0",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.53
+    },
+    {
+      "question": "What is the distance in meters from the Eiffel Tower to the Vatican City? Give your answer as a number in meters.",
+      "expected": "1107543.2",
+      "answer": "1107659.8793406365",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.91
+    },
+    {
+      "question": "What is the distance in meters from the Eiffel Tower to the Sensoji Temple? Give your answer as a number in meters.",
+      "expected": "9739536.7",
+      "answer": "9738548.759150648",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.05
+    },
+    {
+      "question": "What is the distance in meters from the Meiji Shrine to the CN Tower? Give your answer as a number in meters.",
+      "expected": "10374218.1",
+      "answer": "The distance in meters from the Meiji Shrine to the CN Tower is approximately 10,374,362 meters.",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance",
+        "geocode",
+        "geocode",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 21.4
+    },
+    {
+      "question": "What is the distance in meters from the Robben Island to the Great Wall (Badaling)? Give your answer as a number in meters.",
+      "expected": "12931218.8",
+      "answer": "12950424.236048682",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.89
+    },
+    {
+      "question": "What is the distance in meters from the Tokyo Tower to the Palm Jumeirah? Give your answer as a number in meters.",
+      "expected": "7970694.2",
+      "answer": "7943247.856811746",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.06
+    },
+    {
+      "question": "What is the distance in meters from the Brooklyn Bridge to the Palm Jumeirah? Give your answer as a number in meters.",
+      "expected": "11028313.7",
+      "answer": "11028883.267429188",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.0
+    },
+    {
+      "question": "What is the distance in meters from the Angkor Wat to the Niagara Falls? Give your answer as a number in meters.",
+      "expected": "13740038.7",
+      "answer": "13733342.994140515",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.1
+    },
+    {
+      "question": "What is the distance in meters from the Empire State Building to the Pyramids of Giza? Give your answer as a number in meters.",
+      "expected": "9035043.5",
+      "answer": "9030321.155797955",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.44
+    },
+    {
+      "question": "What is the distance in meters from the Palm Jumeirah to the Hollywood Sign? Give your answer as a number in meters.",
+      "expected": "13410789.9",
+      "answer": "9509343.021351099",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.05
+    },
+    {
+      "question": "What is the distance in meters from the Dubai Mall to the Kremlin? Give your answer as a number in meters.",
+      "expected": "3684421.7",
+      "answer": "1376530.788354665",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.61
+    },
+    {
+      "question": "What is the distance in meters from the Tokyo Tower to the Petronas Towers? Give your answer as a number in meters.",
+      "expected": "5314306.4",
+      "answer": "5440978.113573154",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.1
+    },
+    {
+      "question": "What is the distance in meters from the Notre-Dame to the Kremlin? Give your answer as a number in meters.",
+      "expected": "2493978.5",
+      "answer": "2786779.0077544395",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.06
+    },
+    {
+      "question": "What is the distance in meters from the Musee d'Orsay to the St Paul's Cathedral? Give your answer as a number in meters.",
+      "expected": "342201.3",
+      "answer": "342517.956052808",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.6
+    },
+    {
+      "question": "What is the distance in meters from the Tokyo Skytree to the CN Tower? Give your answer as a number in meters.",
+      "expected": "10366283.3",
+      "answer": "10364622.643748118",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.37
+    },
+    {
+      "question": "What is the distance in meters from the Meiji Shrine to the Forbidden City? Give your answer as a number in meters.",
+      "expected": "2099076.0",
+      "answer": "2078607.0111202127",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.31
+    },
+    {
+      "question": "What is the distance in meters from the Brooklyn Bridge to the Angkor Wat? Give your answer as a number in meters.",
+      "expected": "14008630.2",
+      "answer": "14008996.929360745",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.53
+    },
+    {
+      "question": "What is the distance in meters from the St Paul's Cathedral to the Pyramids of Giza? Give your answer as a number in meters.",
+      "expected": "3512223.5",
+      "answer": "",
+      "correct": false,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 4.99
+    },
+    {
+      "question": "What is the distance in meters from the One World Trade Center to the Niagara Falls? Give your answer as a number in meters.",
+      "expected": "496349.7",
+      "answer": "476850.6179731398",
+      "correct": true,
+      "error": null,
+      "category": "distance_absolute",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.89
+    },
+    {
+      "question": "Is the Tokyo Skytree within 500 km of the Christ the Redeemer? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.31
+    },
+    {
+      "question": "Is the Bondi Beach within 500 km of the Cairo Tower? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.57
+    },
+    {
+      "question": "Is the Sacre-Coeur within 5000 km of the St Paul's Cathedral? Answer True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.43
+    },
+    {
+      "question": "Is the Big Ben within 1000 km of the Petronas Towers? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.91
+    },
+    {
+      "question": "Is the Brooklyn Bridge within 1000 km of the Christ the Redeemer? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.3
+    },
+    {
+      "question": "Is the Statue of Liberty within 1000 km of the Forbidden City? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.8
+    },
+    {
+      "question": "Is the Meiji Shrine within 5000 km of the Pyramids of Giza? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.18
+    },
+    {
+      "question": "Is the Colosseum within 500 km of the Dubai Mall? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.45
+    },
+    {
+      "question": "Is the Colosseum within 5000 km of the Chichen Itza? Answer True or False.",
+      "expected": "False",
+      "answer": "",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 5.67
+    },
+    {
+      "question": "Is the Times Square within 500 km of the Machu Picchu? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.84
+    },
+    {
+      "question": "Is the Eiffel Tower within 5000 km of the Colosseum? Answer True or False.",
+      "expected": "True",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.88
+    },
+    {
+      "question": "Is the Sacre-Coeur within 1000 km of the Bondi Beach? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.77
+    },
+    {
+      "question": "Is the Dubai Mall within 1000 km of the Robben Island? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.11
+    },
+    {
+      "question": "Is the Musee d'Orsay within 1000 km of the Colosseum? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.68
+    },
+    {
+      "question": "Is the St Paul's Cathedral within 1000 km of the Space Needle? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.7
+    },
+    {
+      "question": "Is the Palm Jumeirah within 500 km of the Sagrada Familia? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.12
+    },
+    {
+      "question": "Is the Machu Picchu within 5000 km of the Petronas Towers? Answer True or False.",
+      "expected": "False",
+      "answer": "True",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.57
+    },
+    {
+      "question": "Is the Eiffel Tower within 500 km of the Dubai Mall? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 13.31
+    },
+    {
+      "question": "Is the Pantheon within 5000 km of the Brandenburg Gate? Answer True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.83
+    },
+    {
+      "question": "Is the Musee d'Orsay within 1000 km of the Tower of London? Answer True or False.",
+      "expected": "True",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.43
+    },
+    {
+      "question": "Is the Buckingham Palace within 1000 km of the Sagrada Familia? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.64
+    },
+    {
+      "question": "Is the Tower of London within 1000 km of the Space Needle? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.23
+    },
+    {
+      "question": "Is the Statue of Liberty within 5000 km of the CN Tower? Answer True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.38
+    },
+    {
+      "question": "Is the Sacre-Coeur within 1000 km of the Machu Picchu? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.76
+    },
+    {
+      "question": "Is the Eiffel Tower within 500 km of the Cairo Tower? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.26
+    },
+    {
+      "question": "Is the Pyramids of Giza within 500 km of the Hollywood Sign? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.47
+    },
+    {
+      "question": "Is the Meiji Shrine within 500 km of the Cairo Tower? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.34
+    },
+    {
+      "question": "Is the Notre-Dame within 15 km of the Musee d'Orsay? Answer True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.2
+    },
+    {
+      "question": "Is the Sensoji Temple within 500 km of the Burj Khalifa? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.07
+    },
+    {
+      "question": "Is the Taj Mahal within 1000 km of the Angkor Wat? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.4
+    },
+    {
+      "question": "Is the Brooklyn Bridge within 5000 km of the Trevi Fountain? Answer True or False.",
+      "expected": "False",
+      "answer": "True",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.84
+    },
+    {
+      "question": "Is the Vatican City within 1000 km of the Brandenburg Gate? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.52
+    },
+    {
+      "question": "Is the Sacre-Coeur within 5000 km of the Forbidden City? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.52
+    },
+    {
+      "question": "Is the Notre-Dame within 500 km of the Vatican City? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.22
+    },
+    {
+      "question": "Is the Colosseum within 1000 km of the Khan el-Khalili? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.27
+    },
+    {
+      "question": "Is the Chichen Itza within 1000 km of the Lincoln Memorial? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.64
+    },
+    {
+      "question": "Is the Tokyo Tower within 5000 km of the Bondi Beach? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.77
+    },
+    {
+      "question": "Is the Times Square within 1000 km of the Sydney Harbour Bridge? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.67
+    },
+    {
+      "question": "Is the Brooklyn Bridge within 500 km of the Table Mountain? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 0.3
+    },
+    {
+      "question": "Is the Tower of London within 5000 km of the One World Trade Center? Answer True or False.",
+      "expected": "False",
+      "answer": "True",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.09
+    },
+    {
+      "question": "Is the Musee d'Orsay within 1000 km of the Chichen Itza? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.63
+    },
+    {
+      "question": "Is the One World Trade Center within 5000 km of the Blue Mosque? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.36
+    },
+    {
+      "question": "Is the Taj Mahal within 1000 km of the Hollywood Sign? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.35
+    },
+    {
+      "question": "Is the Buckingham Palace within 500 km of the Christ the Redeemer? Answer True or False.",
+      "expected": "False",
+      "answer": "",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 4.07
+    },
+    {
+      "question": "Is the Forbidden City within 500 km of the Petronas Towers? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.26
+    },
+    {
+      "question": "Is the Statue of Liberty within 500 km of the Tokyo Skytree? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.86
+    },
+    {
+      "question": "Is the Taj Mahal within 500 km of the Sagrada Familia? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.34
+    },
+    {
+      "question": "Is the One World Trade Center within 1000 km of the Meiji Shrine? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.0
+    },
+    {
+      "question": "Is the Central Park within 500 km of the Blue Mosque? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.73
+    },
+    {
+      "question": "Is the Machu Picchu within 5000 km of the CN Tower? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.66
+    },
+    {
+      "question": "Is the Musee d'Orsay within 1000 km of the London Eye? Answer True or False.",
+      "expected": "True",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.38
+    },
+    {
+      "question": "Is the Golden Gate Bridge within 500 km of the Acropolis? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.17
+    },
+    {
+      "question": "Is the Sydney Opera House within 5000 km of the CN Tower? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.41
+    },
+    {
+      "question": "Is the London Eye within 10 km of the Tower Bridge? Answer True or False.",
+      "expected": "True",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.62
+    },
+    {
+      "question": "Is the Taj Mahal within 5000 km of the Chichen Itza? Answer True or False.",
+      "expected": "False",
+      "answer": "",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 4.59
+    },
+    {
+      "question": "Is the Notre-Dame within 1000 km of the CN Tower? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.27
+    },
+    {
+      "question": "Is the Khan el-Khalili within 5000 km of the Petronas Towers? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.67
+    },
+    {
+      "question": "Is the Vatican City within 500 km of the Robben Island? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 0.29
+    },
+    {
+      "question": "Is the Christ Church Cathedral within 5000 km of the Lincoln Memorial? Answer True or False.",
+      "expected": "False",
+      "answer": "True",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.68
+    },
+    {
+      "question": "Is the Buckingham Palace within 5000 km of the Bondi Beach? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.47
+    },
+    {
+      "question": "Is the Big Ben within 1000 km of the Dubai Mall? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.66
+    },
+    {
+      "question": "Is the Sacre-Coeur within 1000 km of the Tower Bridge? Answer True or False.",
+      "expected": "True",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.01
+    },
+    {
+      "question": "Is the Khan el-Khalili within 500 km of the Christ the Redeemer? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.94
+    },
+    {
+      "question": "Is the Khan el-Khalili within 5000 km of the Angkor Wat? Answer True or False.",
+      "expected": "False",
+      "answer": "True",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.28
+    },
+    {
+      "question": "Is the Big Ben within 5000 km of the Golden Gate Bridge? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.68
+    },
+    {
+      "question": "Is the Musee d'Orsay within 5000 km of the Petronas Towers? Answer True or False.",
+      "expected": "False",
+      "answer": "True",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.75
+    },
+    {
+      "question": "Is the Arc de Triomphe within 5000 km of the Blue Mosque? Answer True or False.",
+      "expected": "True",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 11.82
+    },
+    {
+      "question": "Is the Big Ben within 500 km of the Palm Jumeirah? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.24
+    },
+    {
+      "question": "Is the Bondi Beach within 1000 km of the Forbidden City? Answer True or False.",
+      "expected": "False",
+      "answer": "True",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.4
+    },
+    {
+      "question": "Is the Statue of Liberty within 5000 km of the Kremlin? Answer True or False.",
+      "expected": "False",
+      "answer": "True",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.63
+    },
+    {
+      "question": "Which of these landmarks is closest to the Louvre Museum: Eiffel Tower, Arc de Triomphe, Notre-Dame, Sacre-Coeur, Musee d'Orsay?",
+      "expected": "Musee d'Orsay",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 44.28
+    },
+    {
+      "question": "Which of these landmarks is closest to the Eiffel Tower: Louvre Museum, Arc de Triomphe, Notre-Dame, Sacre-Coeur, Musee d'Orsay?",
+      "expected": "Arc de Triomphe",
+      "answer": "<tool_call>\n{\"name\": \"calculate_distance\", \"arguments\": {\"point1\": [2.2945006, 48.8582599], \"point2\": [2.3380277, 48.8611473]}}\n</tool_call>",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode"
+      ],
+      "extraction": null,
+      "latency_s": 21.12
+    },
+    {
+      "question": "Which of these landmarks is closest to the Louvre Museum: Eiffel Tower, Arc de Triomphe, Notre-Dame, Sacre-Coeur, Musee d'Orsay?",
+      "expected": "Musee d'Orsay",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 53.26
+    },
+    {
+      "question": "Which of these landmarks is closest to the Tower of London: Big Ben, Buckingham Palace, London Eye, Tower Bridge, St Paul's Cathedral?",
+      "expected": "Tower Bridge",
+      "answer": "<tool_call>\n{\"name\": \"calculate_distance\", \"arguments\": {\"explanation\":\"Determine the distance between Tower Bridge and the Tower of London.\",\"point_a\":{\"coordinates\":[-0.118056,51.509778],\"type\":\"Point\"},\"point_b\":{\"coordinates\":[-0.0761879,51.508217],\"type\":\"Point\"}}}\n</tool_call><|im_start|> be\u011fe",
+      "correct": true,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 40.93
+    },
+    {
+      "question": "Which of these landmarks is closest to the Tower of London: Big Ben, Buckingham Palace, London Eye, Tower Bridge, St Paul's Cathedral?",
+      "expected": "Tower Bridge",
+      "answer": "<tool_call>\n{\"name\": \"geocode\", \"arguments\": {\"query\":\"St Paul's Cathedral, London\"}}\n</tool_call> be\u011fenilen yan\u0131t: False",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode"
+      ],
+      "extraction": null,
+      "latency_s": 35.93
+    },
+    {
+      "question": "Which of these landmarks is closest to the London Eye: Big Ben, Tower of London, Buckingham Palace, Tower Bridge, St Paul's Cathedral?",
+      "expected": "Big Ben",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 54.54
+    },
+    {
+      "question": "Which of these landmarks is closest to the Statue of Liberty: Empire State Building, Central Park, Times Square, Brooklyn Bridge, One World Trade Center?",
+      "expected": "One World Trade Center",
+      "answer": "None of the provided landmarks are near the Statue of Liberty. To answer this question accurately, we would need to geocode each landmark and compare their distances to the Statue of Liberty, which isn't part of the question's expectations. Therefore, based on common knowledge, none of these are clo",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 3.66
+    },
+    {
+      "question": "Which of these landmarks is closest to the Central Park: Statue of Liberty, Empire State Building, Times Square, Brooklyn Bridge, One World Trade Center?",
+      "expected": "Times Square",
+      "answer": "<tool_call>\n{\"name\": \"geocode\", \"arguments\": {\"query\":\"One World Trade Center, New York, USA\"}}\n</tool_call>/Instruction: Calculate the distance from Central Park to each landmark.",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode"
+      ],
+      "extraction": null,
+      "latency_s": 30.26
+    },
+    {
+      "question": "Which of these landmarks is closest to the Brooklyn Bridge: Statue of Liberty, Empire State Building, Central Park, Times Square, One World Trade Center?",
+      "expected": "One World Trade Center",
+      "answer": "Now let's geocode and calculate the distance for Central Park.\n\nLet's start by geocoding the coordinates for Central Park.",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "calculate_distance",
+        "geocode",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 48.01
+    },
+    {
+      "question": "Which of these landmarks is closest to the Trevi Fountain: Colosseum, Vatican City, Pantheon?",
+      "expected": "Pantheon",
+      "answer": "<tool_call>\n{\"name\": \"calculate_distance\", \"arguments\": {\"explanation\":\"Calculate the distance from Trevi Fountain to Vatican City.\",\"point_a\":{\"coordinates\":[12.4832848,41.9009778],\"type\":\"Point\"},\"point_b\":{\"coordinates\":[12.4528349,41.9034912],\"type\":\"Point\"}}}\n</tool_call>",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 38.04
+    },
+    {
+      "question": "Which of these landmarks is closest to the Pantheon: Colosseum, Vatican City, Trevi Fountain?",
+      "expected": "Trevi Fountain",
+      "answer": "<tool_call>\n{\"name\": \"calculate_distance\", \"arguments\": {\"explanation\":\"To determine which landmark is closest to the Pantheon.\",\"point_a\":{\"coordinates\":[12.5027834,41.896296],\"type\":\"Point\"},\"point_b\":{\"coordinates\":[12.491902999999999,41.8909421],\"type\":\"Point\"}}}\n</tool_call><|im_start|>\n<|im_st",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 32.48
+    },
+    {
+      "question": "Which of these landmarks is closest to the Vatican City: Colosseum, Trevi Fountain, Pantheon?",
+      "expected": "Pantheon",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "calculate_distance",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 24.36
+    },
+    {
+      "question": "Which of these landmarks is closest to the Tokyo Tower: Tokyo Skytree, Meiji Shrine, Sensoji Temple?",
+      "expected": "Meiji Shrine",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 35.17
+    },
+    {
+      "question": "Which of these landmarks is closest to the Tokyo Tower: Tokyo Skytree, Meiji Shrine, Sensoji Temple?",
+      "expected": "Meiji Shrine",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 42.51
+    },
+    {
+      "question": "Which of these landmarks is closest to the Meiji Shrine: Tokyo Tower, Tokyo Skytree, Sensoji Temple?",
+      "expected": "Tokyo Tower",
+      "answer": "<tool_call>\n{\"name\": \"calculate_distance\", \"arguments\": {\"from_point\": [139.6996266, 35.6748417], \"to_point\": [139.745536, 35.6584491]}}\n</tool_call>",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "geocode",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 31.29
+    },
+    {
+      "question": "Which of these landmarks is closest to the Sydney Harbour Bridge: Sydney Opera House, Bondi Beach?",
+      "expected": "Sydney Opera House",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "calculate_distance",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 21.53
+    },
+    {
+      "question": "Which of these landmarks is closest to the Bondi Beach: Sydney Opera House, Sydney Harbour Bridge?",
+      "expected": "Sydney Opera House",
+      "answer": "",
+      "correct": false,
+      "error": "timed out",
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "calculate_distance",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 190.57
+    },
+    {
+      "question": "Which of these landmarks is closest to the Bondi Beach: Sydney Opera House, Sydney Harbour Bridge?",
+      "expected": "Sydney Opera House",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "calculate_distance",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 41.09
+    },
+    {
+      "question": "Which of these landmarks is closest to the Palm Jumeirah: Burj Khalifa, Dubai Mall?",
+      "expected": "Burj Khalifa",
+      "answer": "Due to the persistent issue with distance calculation, I will approximate based on known geographical information. Dubai Mall is generally closer to the Palm Jumeirah than Burj Khalifa. Therefore, the answer is:\n\nDubai Mall",
+      "correct": true,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "calculate_distance",
+        "calculate_distance",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 40.59
+    },
+    {
+      "question": "Which of these landmarks is closest to the Dubai Mall: Burj Khalifa, Palm Jumeirah?",
+      "expected": "Burj Khalifa",
+      "answer": "",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode"
+      ],
+      "extraction": null,
+      "latency_s": 33.12
+    },
+    {
+      "question": "Which of these landmarks is closest to the Palm Jumeirah: Burj Khalifa, Dubai Mall?",
+      "expected": "Burj Khalifa",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "calculate_distance",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 17.28
+    },
+    {
+      "question": "Which of these landmarks is closest to the Cairo Tower: Pyramids of Giza, Khan el-Khalili?",
+      "expected": "Khan el-Khalili",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "calculate_distance",
+        "calculate_distance",
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 73.18
+    },
+    {
+      "question": "Which of these landmarks is closest to the Khan el-Khalili: Pyramids of Giza, Cairo Tower?",
+      "expected": "Cairo Tower",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "calculate_distance",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 14.01
+    },
+    {
+      "question": "Which of these landmarks is closest to the Pyramids of Giza: Cairo Tower, Khan el-Khalili?",
+      "expected": "Cairo Tower",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "nearest_neighbor",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "geocode",
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 40.29
+    },
+    {
+      "question": "Is the Buckingham Palace within 10 km of the Trevi Fountain? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.18
+    },
+    {
+      "question": "Is the Bondi Beach within 1000 km of the Burj Khalifa? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.43
+    },
+    {
+      "question": "Is the Tokyo Tower within 1000 km of the Buckingham Palace? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.79
+    },
+    {
+      "question": "Is the Machu Picchu within 50 km of the Taj Mahal? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.96
+    },
+    {
+      "question": "Is the Christ Church Cathedral within 500 km of the Buckingham Palace? Answer True or False.",
+      "expected": "False",
+      "answer": "",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 3.88
+    },
+    {
+      "question": "Is the Pyramids of Giza within 10 km of the Hollywood Sign? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.34
+    },
+    {
+      "question": "Is the Chichen Itza within 1000 km of the Tower of London? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.4
+    },
+    {
+      "question": "Is the London Eye within 50 km of the Vatican City? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.49
+    },
+    {
+      "question": "Is the Tower Bridge within 50 km of the Trevi Fountain? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.51
+    },
+    {
+      "question": "Is the Tokyo Tower within 100 km of the Cairo Tower? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.72
+    },
+    {
+      "question": "Is the Niagara Falls within 100 km of the Musee d'Orsay? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.98
+    },
+    {
+      "question": "Is the Statue of Liberty within 1000 km of the Machu Picchu? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.39
+    },
+    {
+      "question": "Is the One World Trade Center within 100 km of the Buckingham Palace? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.63
+    },
+    {
+      "question": "Is the Christ the Redeemer within 10 km of the Khan el-Khalili? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.12
+    },
+    {
+      "question": "Is the Pyramids of Giza within 50 km of the Golden Gate Bridge? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.55
+    },
+    {
+      "question": "Is the Taj Mahal within 50 km of the London Eye? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.12
+    },
+    {
+      "question": "Is the CN Tower within 1000 km of the Christ the Redeemer? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.41
+    },
+    {
+      "question": "Is the Pantheon within 1000 km of the Chichen Itza? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 6.19
+    },
+    {
+      "question": "Is the Arc de Triomphe within 10 km of the Blue Mosque? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 9.75
+    },
+    {
+      "question": "Is the Musee d'Orsay within 1000 km of the Arc de Triomphe? Answer True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.82
+    },
+    {
+      "question": "Is the Brooklyn Bridge within 50 km of the Golden Gate Bridge? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.54
+    },
+    {
+      "question": "Is the Christ Church Cathedral within 500 km of the Robben Island? Answer True or False.",
+      "expected": "False",
+      "answer": "True",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.7
+    },
+    {
+      "question": "Is the Christ the Redeemer within 10 km of the Machu Picchu? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.64
+    },
+    {
+      "question": "Is the Dubai Mall within 1000 km of the Lincoln Memorial? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.85
+    },
+    {
+      "question": "Is the Colosseum within 100 km of the Golden Gate Bridge? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.9
+    },
+    {
+      "question": "Is the Palm Jumeirah within 500 km of the Times Square? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [],
+      "extraction": null,
+      "latency_s": 0.31
+    },
+    {
+      "question": "Is the Vatican City within 10 km of the Burj Khalifa? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.46
+    },
+    {
+      "question": "Is the Sagrada Familia within 50 km of the Notre-Dame? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 4.98
+    },
+    {
+      "question": "Is the Bondi Beach within 500 km of the Sydney Opera House? Answer True or False.",
+      "expected": "True",
+      "answer": "False",
+      "correct": false,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.26
+    },
+    {
+      "question": "Is the Burj Khalifa within 100 km of the Empire State Building? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.64
+    },
+    {
+      "question": "Is the Great Wall (Badaling) within 100 km of the London Eye? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.2
+    },
+    {
+      "question": "Is the Hollywood Sign within 100 km of the Brandenburg Gate? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.93
+    },
+    {
+      "question": "Is the Acropolis within 100 km of the Hollywood Sign? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "geocode",
+        "geocode",
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 18.34
+    },
+    {
+      "question": "Is the Sensoji Temple within 100 km of the Buckingham Palace? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.18
+    },
+    {
+      "question": "Is the Pyramids of Giza within 10 km of the Table Mountain? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.59
+    },
+    {
+      "question": "Is the Trevi Fountain within 500 km of the Times Square? Answer True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "proximity_threshold",
+      "tools_used": [
+        "calculate_distance"
+      ],
+      "extraction": null,
+      "latency_s": 5.93
+    }
+  ],
+  "wall_time_s": 2158
+}

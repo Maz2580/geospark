@@ -508,8 +508,8 @@ well-known long-distance pairs, indicating recall of training data rather than c
   between 2015 and 2023?" are answered well at every model scale without them.
 
 Any model can be scored on the benchmark with `python -m geospark.bench run`, and the datasets regenerate
-identically with `python -m geospark.bench.generate_datasets`. The nine-model results above came from
-separate evaluation scripts that are not yet in this repository. Provenance is documented in the
+identically with `python -m geospark.bench.generate_datasets`. The scripts behind the nine-model results above, every answer they recorded and the per-call cost
+ledger are in [docs/benchmarks/2026-05](https://github.com/Maz2580/geospark/tree/main/docs/benchmarks/2026-05). Provenance is documented in the
 [datasets README](https://github.com/Maz2580/geospark/blob/main/geospark/bench/datasets/README.md);
 [docs/BENCHMARK_REPORT.md](https://github.com/Maz2580/geospark/blob/main/docs/BENCHMARK_REPORT.md) is an
 earlier single-model report (Qwen 2.5 7B, March 2026).

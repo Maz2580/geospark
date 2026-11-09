@@ -1,0 +1,2738 @@
+{
+  "evaluated": 210,
+  "correct": 210,
+  "accuracy": 100.0,
+  "details": [
+    {
+      "question": "Does the bounding box of Paris contain the Eiffel Tower? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Paris contain the Louvre Museum? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Paris contain the point at coordinates (49.0448N, 2.2250E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Paris contain the point at coordinates (48.7598N, 2.2479E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of London contain the Big Ben? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of London contain the Tower of London? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of London contain the point at coordinates (51.6256N, -0.0638E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of London contain the point at coordinates (51.8576N, -0.2125E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of New York contain the Statue of Liberty? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of New York contain the Empire State Building? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of New York contain the point at coordinates (41.2109N, -73.9658E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of New York contain the point at coordinates (40.7679N, -74.1680E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Rome contain the Colosseum? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Rome contain the Vatican City? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Rome contain the point at coordinates (42.0382N, 12.5138E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Rome contain the point at coordinates (41.8655N, 12.2233E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Tokyo contain the Tokyo Tower? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Tokyo contain the Tokyo Skytree? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Tokyo contain the point at coordinates (35.6570N, 139.9101E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Tokyo contain the point at coordinates (35.6906N, 140.2753E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Sydney contain the Sydney Opera House? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Sydney contain the Sydney Harbour Bridge? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Sydney contain the point at coordinates (-33.5272N, 151.2595E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Sydney contain the point at coordinates (-33.8707N, 151.1014E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Dubai contain the Burj Khalifa? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Dubai contain the Palm Jumeirah? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Dubai contain the point at coordinates (25.2261N, 55.6429E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Dubai contain the point at coordinates (25.6888N, 55.2484E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Cairo contain the Pyramids of Giza? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Cairo contain the Cairo Tower? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Cairo contain the point at coordinates (30.5346N, 31.3138E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Cairo contain the point at coordinates (30.0454N, 30.9538E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Cape Town contain the Table Mountain? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Cape Town contain the Robben Island? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Cape Town contain the point at coordinates (-33.9645N, 18.6397E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Cape Town contain the point at coordinates (-33.9316N, 18.9039E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Barcelona contain the Sagrada Familia? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Barcelona contain the point at coordinates (41.5639N, 2.1596E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Barcelona contain the point at coordinates (41.1341N, 2.0794E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Berlin contain the Brandenburg Gate? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Berlin contain the point at coordinates (51.9970N, 13.4554E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Berlin contain the point at coordinates (52.6057N, 13.3187E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Moscow contain the Kremlin? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Moscow contain the point at coordinates (55.6632N, 38.0066E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Moscow contain the point at coordinates (55.7498N, 37.9142E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Istanbul contain the Blue Mosque? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Istanbul contain the point at coordinates (40.9709N, 28.7700E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Istanbul contain the point at coordinates (41.0143N, 29.4760E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Los Angeles contain the Hollywood Sign? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Los Angeles contain the point at coordinates (34.1495N, -118.6874E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Los Angeles contain the point at coordinates (33.8955N, -118.3471E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Washington DC contain the Lincoln Memorial? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Washington DC contain the point at coordinates (39.0349N, -76.9306E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Washington DC contain the point at coordinates (38.5831N, -76.9457E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Paris intersect with the bounding box of London? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in Paris intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of London intersect with the bounding box of New York? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in London intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of New York intersect with the bounding box of Rome? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in New York intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Rome intersect with the bounding box of Tokyo? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in Rome intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Tokyo intersect with the bounding box of Sydney? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in Tokyo intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Sydney intersect with the bounding box of Dubai? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in Sydney intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Dubai intersect with the bounding box of Cairo? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in Dubai intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Cairo intersect with the bounding box of Cape Town? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in Cairo intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Cape Town intersect with the bounding box of Barcelona? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in Cape Town intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Barcelona intersect with the bounding box of Berlin? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in Barcelona intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Berlin intersect with the bounding box of Moscow? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in Berlin intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Moscow intersect with the bounding box of Istanbul? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in Moscow intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Istanbul intersect with the bounding box of Los Angeles? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in Istanbul intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Los Angeles intersect with the bounding box of Washington DC? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in Los Angeles intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the bounding box of Washington DC intersect with the bounding box of Paris? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Do these two overlapping rectangles in Washington DC intersect? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "intersects",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Tokyo and Cairo disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Paris and Cairo disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Paris and Berlin disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Rome and Barcelona disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Sydney and Istanbul disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Dubai and Barcelona disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Tokyo and Sydney disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Cape Town and Moscow disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Sydney and Cairo disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Cape Town and Los Angeles disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Berlin and Istanbul disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Rome and Tokyo disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of New York and Sydney disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Berlin and Washington DC disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Paris and Istanbul disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of London and Istanbul disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Cairo and Berlin disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Cape Town and Berlin disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of London and Barcelona disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Rome and Sydney disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of London and Sydney disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of London and Dubai disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Barcelona and Moscow disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Rome and Berlin disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Sydney and Moscow disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of London and Washington DC disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Paris and Cape Town disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Tokyo and Istanbul disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Dubai and Los Angeles disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Are the bounding boxes of Berlin and Los Angeles disjoint (non-overlapping)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "disjoint",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of Paris entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of Paris? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (48.8722N, 2.3379E) within the boundary of Paris? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of London entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of London? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (51.4794N, -0.0878E) within the boundary of London? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of New York entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of New York? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (40.7426N, -73.9766E) within the boundary of New York? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of Rome entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of Rome? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (41.9064N, 12.4507E) within the boundary of Rome? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of Tokyo entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of Tokyo? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (35.6697N, 139.7383E) within the boundary of Tokyo? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of Sydney entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of Sydney? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (-33.8678N, 151.2468E) within the boundary of Sydney? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of Dubai entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of Dubai? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (25.1896N, 55.2184E) within the boundary of Dubai? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of Cairo entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of Cairo? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (30.0387N, 31.1811E) within the boundary of Cairo? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of Cape Town entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of Cape Town? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (-33.9656N, 18.4740E) within the boundary of Cape Town? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of Barcelona entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of Barcelona? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (41.4020N, 2.1178E) within the boundary of Barcelona? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of Berlin entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of Berlin? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (52.4797N, 13.3568E) within the boundary of Berlin? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of Moscow entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of Moscow? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (55.7800N, 37.6198E) within the boundary of Moscow? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of Istanbul entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of Istanbul? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (41.0435N, 28.9325E) within the boundary of Istanbul? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of Los Angeles entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of Los Angeles? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (34.0178N, -118.3073E) within the boundary of Los Angeles? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the inner district of Washington DC entirely within the city boundary? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is this extended area entirely within the boundary of Washington DC? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Is the point at (38.8774N, -76.9966E) within the boundary of Washington DC? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "within",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8555N, 2.3403E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8347N, 2.3103E)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8574N, 2.3481E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8480N, 2.3192E)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8550N, 2.3433E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8485N, 2.2812E)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Paris has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (48.8564N, 2.3557E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Paris has a defined boundary with an exclusion zone. Does this boundary contain the point at (48.8446N, 2.3057E)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "London has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (51.5132N, -0.0843E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "London has a defined boundary with an exclusion zone. Does this boundary contain the point at (51.4314N, -0.2013E)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "London has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (51.5012N, -0.0956E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "London has a defined boundary with an exclusion zone. Does this boundary contain the point at (51.4237N, -0.1764E)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "London has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (51.5010N, -0.0937E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "London has a defined boundary with an exclusion zone. Does this boundary contain the point at (51.4752N, -0.2023E)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "London has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (51.5011N, -0.0894E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "London has a defined boundary with an exclusion zone. Does this boundary contain the point at (51.4711N, -0.1992E)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Tokyo has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (35.6614N, 139.7414E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Tokyo has a defined boundary with an exclusion zone. Does this boundary contain the point at (35.6281N, 139.7131E)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Tokyo has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (35.6714N, 139.7588E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Tokyo has a defined boundary with an exclusion zone. Does this boundary contain the point at (35.6208N, 139.6989E)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Tokyo has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (35.6731N, 139.7416E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Tokyo has a defined boundary with an exclusion zone. Does this boundary contain the point at (35.6263N, 139.6983E)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Tokyo has a defined boundary with an exclusion zone (hole). Does this boundary contain the point at (35.6734N, 139.7452E)? Answer with True or False.",
+      "expected": "False",
+      "answer": "False",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Tokyo has a defined boundary with an exclusion zone. Does this boundary contain the point at (35.6253N, 139.6857E)? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "contains_with_hole",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (40.7843N, -74.0500E) touch (lie exactly on the boundary of) the New York bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (35.6686N, 139.6500E) touch (lie exactly on the boundary of) the Tokyo bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (38.9128N, -77.1200E) touch (lie exactly on the boundary of) the Washington DC bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (51.4019N, -0.3000E) touch (lie exactly on the boundary of) the London bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (41.4698N, 2.0500E) touch (lie exactly on the boundary of) the Barcelona bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (51.4147N, -0.3000E) touch (lie exactly on the boundary of) the London bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (41.9006N, 12.4000E) touch (lie exactly on the boundary of) the Rome bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (40.8367N, -74.0500E) touch (lie exactly on the boundary of) the New York bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (38.8103N, -77.1200E) touch (lie exactly on the boundary of) the Washington DC bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (41.8870N, 12.4000E) touch (lie exactly on the boundary of) the Rome bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (40.7376N, -74.0500E) touch (lie exactly on the boundary of) the New York bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (-33.9296N, 18.3500E) touch (lie exactly on the boundary of) the Cape Town bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (41.4677N, 2.0500E) touch (lie exactly on the boundary of) the Barcelona bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (41.0481N, 28.8500E) touch (lie exactly on the boundary of) the Istanbul bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (48.8734N, 2.2200E) touch (lie exactly on the boundary of) the Paris bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (-33.9701N, 18.3500E) touch (lie exactly on the boundary of) the Cape Town bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (52.4366N, 13.2500E) touch (lie exactly on the boundary of) the Berlin bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (38.8201N, -77.1200E) touch (lie exactly on the boundary of) the Washington DC bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (51.5779N, -0.3000E) touch (lie exactly on the boundary of) the London bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.01
+    },
+    {
+      "question": "Does the point at (55.7606N, 37.4500E) touch (lie exactly on the boundary of) the Moscow bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (35.6423N, 139.6500E) touch (lie exactly on the boundary of) the Tokyo bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (41.9218N, 12.4000E) touch (lie exactly on the boundary of) the Rome bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (41.9187N, 12.4000E) touch (lie exactly on the boundary of) the Rome bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (34.0028N, -118.5000E) touch (lie exactly on the boundary of) the Los Angeles bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (29.9877N, 31.1000E) touch (lie exactly on the boundary of) the Cairo bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (38.9269N, -77.1200E) touch (lie exactly on the boundary of) the Washington DC bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    },
+    {
+      "question": "Does the point at (51.5269N, -0.3000E) touch (lie exactly on the boundary of) the London bounding box? Answer with True or False.",
+      "expected": "True",
+      "answer": "True",
+      "correct": true,
+      "error": null,
+      "category": "touches",
+      "tools_used": [
+        "check_spatial_relationship"
+      ],
+      "extraction": null,
+      "latency_s": 0.0
+    }
+  ],
+  "wall_time_s": 0
+}

@@ -1,0 +1,382 @@
+{
+ "geodistance_042": {
+  "text": "The distance from the Musee d'Orsay to the Christ Church Cathedral is 7335.78 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 19060595.8
+ },
+ "geodistance_020": {
+  "text": "The geodesic distance between Big Ben and the Taj Mahal is approximately 4,749,366 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 6895562.0
+ },
+ "geodistance_051": {
+  "text": "The distance from the Eiffel Tower to Bondi Beach is 12104.6 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 16967514.3
+ },
+ "geodistance_007": {
+  "text": "The distance from the Empire State Building to the Blue Mosque is 7,843,981,885 meters. True.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 8086381.7
+ },
+ "geodistance_010": {
+  "text": "The distance from the Louvre Museum to Robben Island is approximately 9780.7 kilometers or 9780707 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": 9293748.7
+ },
+ "geodistance_069": {
+  "text": "The geodesic distance from Angkor Wat to Niagara Falls is approximately 7336 kilometers or 7336000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 13740038.7
+ },
+ "geodistance_013": {
+  "text": "The distance from the Brandenburg Gate to the Acropolis is 8656.12 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 1804895.1
+ },
+ "geodistance_047": {
+  "text": "The distance in meters from the Dubai Mall to the Lincoln Memorial is 9738.76 kilometers.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 11356235.3
+ },
+ "geodistance_008": {
+  "text": "The distance from the Sacre-Coeur to the Khan el-Khalili is 4,135,000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 3216152.3
+ },
+ "geodistance_065": {
+  "text": "The distance from the Meiji Shrine to the CN Tower is approximately 11357 kilometers. Since the answer is requested in meters, we convert it:\n\n11357 km * 1000 m/km = 11357000 meters.\n\nFinal answer: 11357000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.2,
+  "ground_truth": 10374218.1
+ },
+ "geodistance_028": {
+  "text": "The geodesic distance between the Arc de Triomphe and Chichen Itza is approximately 9173.4 kilometers or 917340 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 8365771.6
+ },
+ "geodistance_005": {
+  "text": "The geodesic distance between the Meiji Shrine and the Space Needle is approximately 11757 kilometers.\n\nTrue/False: The answer is False as it is not a number in meters. The requested format is not adhered to.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 7713767.6
+ },
+ "geodistance_012": {
+  "text": "The distance from the Space Needle to the Chichen Itza is 2,263,000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 4255631.7
+ },
+ "geodistance_056": {
+  "text": "The distance in meters from the St Paul's Cathedral to the Trevi Fountain is 8765.23 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 1433922.1
+ },
+ "geodistance_054": {
+  "text": "The distance from the Brooklyn Bridge to the Sydney Harbour Bridge is 12,540,000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 15987862.9
+ },
+ "geodistance_009": {
+  "text": "The distance in meters from Big Ben to the Christ Church Cathedral is 3627.54 km.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 18968664.1
+ },
+ "geodistance_031": {
+  "text": "The distance in meters from the Sydney Opera House to the Brandenburg Gate is 8750.123.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 16089764.7
+ },
+ "geodistance_006": {
+  "text": "The distance from the Tokyo Tower to Khan el-Khalili is 11156.7 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 9587315.6
+ },
+ "geodistance_036": {
+  "text": "The distance from the London Eye to the Kremlin is 3,845,000 meters. True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 2508285.5
+ },
+ "geodistance_070": {
+  "text": "The distance from the Empire State Building to the Pyramids of Giza is approximately 9,200 kilometers (5,800 miles). Please note that this is the shortest distance over the Earth's surface and does not represent a direct flight distance due to the curvature of the Earth and possible flight paths.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.2,
+  "ground_truth": 9035043.5
+ },
+ "geotopo_004": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_053": {
+  "text": "True. The given point at coordinates (39.0349N, -76.9306E) is contained within the bounding box of Washington DC as defined by the provided GeoJSON coordinates.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": false
+ },
+ "geotopo_037": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_163": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_167": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_180": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_105": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_103": {
+  "text": "False. The bounding boxes of London and Barcelona are not disjoint; they are overlapping since Barcelona is geographically located to the south of London.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": true
+ },
+ "geotopo_086": {
+  "text": "False. Paris and Cairo are not disjoint; they are separated by large distances and there is no overlap between the bounding boxes provided. However, since the task is to use GeoSpark tools to determine the spatial relationship, the exact answer should come from the tool's computation. The provided answer is based on a general understanding of the two cities' locations and does not use the GeoSpark tools as instructed.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": false,
+  "seconds": 0.3,
+  "ground_truth": true
+ },
+ "geotopo_073": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_067": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_056": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_191": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_185": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_201": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_123": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_133": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_141": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ }
+}

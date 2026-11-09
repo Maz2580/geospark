@@ -1,0 +1,382 @@
+{
+ "geodistance_042": {
+  "text": "The distance from the Musee d'Orsay to the Christ Church Cathedral is 5786.92 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 19060595.8
+ },
+ "geodistance_020": {
+  "text": "The distance from Big Ben to the Taj Mahal is 8739.0 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 6895562.0
+ },
+ "geodistance_051": {
+  "text": "The calculated distance from the Eiffel Tower to Bondi Beach is 12421.4 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 16967514.3
+ },
+ "geodistance_007": {
+  "text": "The distance from the Empire State Building to the Blue Mosque is approximately 7833 kilometers.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": 8086381.7
+ },
+ "geodistance_010": {
+  "text": "The calculated geodesic distance from the Louvre Museum to Robben Island is 12,890.56 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 9293748.7
+ },
+ "geodistance_069": {
+  "text": "The geodesic distance between Angkor Wat, Cambodia and Niagara Falls, USA is approximately 10,151,000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 13740038.7
+ },
+ "geodistance_013": {
+  "text": "The distance from the Brandenburg Gate to the Acropolis is approximately 1875 kilometers or 1875000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": 1804895.1
+ },
+ "geodistance_047": {
+  "text": "The distance from the Dubai Mall to the Lincoln Memorial is 11154.7 kilometers.\n\n(Note: The answer provided is incorrect as it is given in kilometers instead of meters. The correct distance is 11154707 meters.)\n\nAnswer: 11154707",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.2,
+  "ground_truth": 11356235.3
+ },
+ "geodistance_008": {
+  "text": "The distance from the Sacre-Coeur to the Khan el-Khalili is approximately 8379.34 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 3216152.3
+ },
+ "geodistance_065": {
+  "text": "The geodesic distance between Meiji Shrine, Tokyo, Japan, and the CN Tower, Toronto, Canada is approximately 11363 kilometers.\n\nNote: The provided coordinates are for illustrative purposes only. In reality, these two places are nearly 11,000 kilometers apart, and therefore the distance would be well over 11 million meters. If you need the accurate distance, please provide the correct coordinates or use an appropriate mapping service.\n\nFinal answer: 11,063,000 meters (since 1 kilometer = 1,000 meters)",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.3,
+  "ground_truth": 10374218.1
+ },
+ "geodistance_028": {
+  "text": "The distance from the Arc de Triomphe to the Chichen Itza is 9184.7 kilometers.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": 8365771.6
+ },
+ "geodistance_005": {
+  "text": "The distance in meters from the Meiji Shrine to the Space Needle is 9729.34 km. \n\nFalse.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 7713767.6
+ },
+ "geodistance_012": {
+  "text": "The geodesic distance from the Space Needle to the Chichen Itza is 15579254.87 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 4255631.7
+ },
+ "geodistance_056": {
+  "text": "The distance from the St Paul's Cathedral to the Trevi Fountain is 8671.5 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 1433922.1
+ },
+ "geodistance_054": {
+  "text": "To calculate the geodesic distance between the Brooklyn Bridge and the Sydney Harbour Bridge using the provided coordinates, we will use the `calculate_distance` tool.\n\nThe calculation is as follows:\n\n```json\n{\n  \"type\": \"calculate_distance\",\n  \"parameters\": {\n    \"explanation\": \"Find the distance in meters from the Brooklyn Bridge to the Sydney Harbour Bridge.\",\n    \"place_a\": \"Brooklyn Bridge\",\n    \"place_b\": \"Sydney Harbour Bridge\",\n    \"point_a\": {\"type\": \"Point\", \"coordinates\": [-73.9969, 40.7061]},\n    \"point_b\": {\"type\": \"Point\", \"coordinates\": [151.2106, -33.8523]}\n  }\n}\n```\n\nUpon executing the above function, the result would be the distance in meters between the two points. However, as an AI model, I don't have the capability to execute code or access external databases directly. You would need to use a geospatial tool like GeoSpark or any other service that can calculate the distance between two points based on their coordinates to get the final answer.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.6,
+  "ground_truth": 15987862.9
+ },
+ "geodistance_009": {
+  "text": "The distance from Big Ben to the Christ Church Cathedral is approximately 5859.5 kilometers.\n\nAnswer: 5859500 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.2,
+  "ground_truth": 18968664.1
+ },
+ "geodistance_031": {
+  "text": "The distance in meters from the Sydney Opera House to the Brandenburg Gate is 9,877,536.2 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 16089764.7
+ },
+ "geodistance_006": {
+  "text": "The distance from the Tokyo Tower to the Khan el-Khalili is approximately 9783.4 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 9587315.6
+ },
+ "geodistance_036": {
+  "text": "The distance from the London Eye to the Kremlin is approximately 2,873,000 meters.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 2508285.5
+ },
+ "geodistance_070": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": 9035043.5
+ },
+ "geotopo_004": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_053": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_037": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_163": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_167": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_180": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "contains_with_hole",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_105": {
+  "text": "False.",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_103": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_086": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "disjoint",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_073": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_067": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": false
+ },
+ "geotopo_056": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "intersects",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_191": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_185": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_201": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "touches",
+  "correct": false,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_123": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_133": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ },
+ "geotopo_141": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 1,
+  "tool_calls": [],
+  "category": "within",
+  "correct": true,
+  "seconds": 0.1,
+  "ground_truth": true
+ }
+}

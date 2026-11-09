@@ -1,0 +1,467 @@
+{
+ "geodistance_042": {
+  "text": "The distance from the Mus\u00e9e d'Orsay to Christ Church Cathedral is approximately **19,060,596 meters**.\n\n*Note: There appears to be an error in the coordinates for Christ Church Cathedral provided (longitude 172.6328, latitude -43.5314), as this places it far south of Antarctica rather than in Dublin, Ireland where Christ Church Cathedral is actually located.*",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": false,
+  "seconds": 3.8,
+  "ground_truth": 19060595.8
+ },
+ "geodistance_020": {
+  "text": "6895562",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.7,
+  "ground_truth": 6895562.0
+ },
+ "geodistance_051": {
+  "text": "16967514.336114656",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.9,
+  "ground_truth": 16967514.3
+ },
+ "geodistance_007": {
+  "text": "8086381.72717165",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.4,
+  "ground_truth": 8086381.7
+ },
+ "geodistance_010": {
+  "text": "9293748.69",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.8,
+  "ground_truth": 9293748.7
+ },
+ "geodistance_069": {
+  "text": "13740039",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.5,
+  "ground_truth": 13740038.7
+ },
+ "geodistance_013": {
+  "text": "1804895",
+  "cost": 0.0,
+  "calls": 3,
+  "tool_calls": [
+   "calculate_distance",
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 6.5,
+  "ground_truth": 1804895.1
+ },
+ "geodistance_047": {
+  "text": "11356235.32",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 2.5,
+  "ground_truth": 11356235.3
+ },
+ "geodistance_008": {
+  "text": "3216152.29",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.8,
+  "ground_truth": 3216152.3
+ },
+ "geodistance_065": {
+  "text": "10374219",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.5,
+  "ground_truth": 10374218.1
+ },
+ "geodistance_028": {
+  "text": "8365771.64",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.8,
+  "ground_truth": 8365771.6
+ },
+ "geodistance_005": {
+  "text": "7713866.52",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 4.4,
+  "ground_truth": 7713767.6
+ },
+ "geodistance_012": {
+  "text": "4255631.69",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 2.0,
+  "ground_truth": 4255631.7
+ },
+ "geodistance_056": {
+  "text": "1433922",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 2.0,
+  "ground_truth": 1433922.1
+ },
+ "geodistance_054": {
+  "text": "15987863",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.7,
+  "ground_truth": 15987862.9
+ },
+ "geodistance_009": {
+  "text": "18968664.09",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 3.6,
+  "ground_truth": 18968664.1
+ },
+ "geodistance_031": {
+  "text": "16089764.7",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 2.1,
+  "ground_truth": 16089764.7
+ },
+ "geodistance_006": {
+  "text": "9587315.588488119",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.8,
+  "ground_truth": 9587315.6
+ },
+ "geodistance_036": {
+  "text": "2508286",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.7,
+  "ground_truth": 2508285.5
+ },
+ "geodistance_070": {
+  "text": "9035043",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "calculate_distance"
+  ],
+  "category": "distance_absolute",
+  "correct": true,
+  "seconds": 1.4,
+  "ground_truth": 9035043.5
+ },
+ "geotopo_004": {
+  "text": "Looking at the coordinates:\n\n- The polygon represents Paris with:\n  - Longitude range: 2.22\u00b0 to 2.42\u00b0\n  - Latitude range: 48.82\u00b0 to 48.9\u00b0 (south to north)\n\n- The point is at: longitude 2.2479\u00b0, latitude 48.7598\u00b0\n\nThe point's latitude (48.7598\u00b0) is BELOW the polygon's southern boundary (48.82\u00b0), meaning it is outside the bounding box of Paris.\n\n**False**",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "contains",
+  "correct": true,
+  "seconds": 5.1,
+  "ground_truth": false
+ },
+ "geotopo_053": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 3,
+  "tool_calls": [
+   "check_spatial_relationship",
+   "check_spatial_relationship"
+  ],
+  "category": "contains",
+  "correct": true,
+  "seconds": 14.3,
+  "ground_truth": false
+ },
+ "geotopo_037": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "contains",
+  "correct": true,
+  "seconds": 2.4,
+  "ground_truth": true
+ },
+ "geotopo_163": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "contains_with_hole",
+  "correct": true,
+  "seconds": 4.1,
+  "ground_truth": true
+ },
+ "geotopo_167": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "contains_with_hole",
+  "correct": true,
+  "seconds": 3.1,
+  "ground_truth": true
+ },
+ "geotopo_180": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 6,
+  "tool_calls": [
+   "check_spatial_relationship",
+   "check_spatial_relationship",
+   "check_spatial_relationship",
+   "check_spatial_relationship",
+   "check_spatial_relationship"
+  ],
+  "category": "contains_with_hole",
+  "correct": true,
+  "seconds": 17.0,
+  "ground_truth": false
+ },
+ "geotopo_105": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "disjoint",
+  "correct": true,
+  "seconds": 2.1,
+  "ground_truth": true
+ },
+ "geotopo_103": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "disjoint",
+  "correct": true,
+  "seconds": 2.2,
+  "ground_truth": true
+ },
+ "geotopo_086": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "disjoint",
+  "correct": true,
+  "seconds": 2.7,
+  "ground_truth": true
+ },
+ "geotopo_073": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "intersects",
+  "correct": true,
+  "seconds": 3.6,
+  "ground_truth": false
+ },
+ "geotopo_067": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "intersects",
+  "correct": true,
+  "seconds": 2.5,
+  "ground_truth": false
+ },
+ "geotopo_056": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "intersects",
+  "correct": true,
+  "seconds": 2.7,
+  "ground_truth": true
+ },
+ "geotopo_191": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "touches",
+  "correct": true,
+  "seconds": 4.4,
+  "ground_truth": true
+ },
+ "geotopo_185": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 4,
+  "tool_calls": [
+   "check_spatial_relationship",
+   "calculate_distance",
+   "calculate_distance"
+  ],
+  "category": "touches",
+  "correct": true,
+  "seconds": 20.7,
+  "ground_truth": true
+ },
+ "geotopo_201": {
+  "text": "False",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "touches",
+  "correct": false,
+  "seconds": 17.0,
+  "ground_truth": true
+ },
+ "geotopo_123": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "within",
+  "correct": true,
+  "seconds": 3.3,
+  "ground_truth": true
+ },
+ "geotopo_133": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 2,
+  "tool_calls": [
+   "check_spatial_relationship"
+  ],
+  "category": "within",
+  "correct": true,
+  "seconds": 2.1,
+  "ground_truth": true
+ },
+ "geotopo_141": {
+  "text": "True",
+  "cost": 0.0,
+  "calls": 3,
+  "tool_calls": [
+   "check_spatial_relationship",
+   "check_spatial_relationship"
+  ],
+  "category": "within",
+  "correct": true,
+  "seconds": 3.4,
+  "ground_truth": true
+ }
+}

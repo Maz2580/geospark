@@ -37,6 +37,9 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
     GeoSpark's own conversions refuse that.
 
 ### Fixed
+- Installing the `pointcloud` or `dev` extra failed: terrio withdrew 0.5 and every earlier release from
+  PyPI, so `terrio>=0.5,<0.6` no longer resolved (CI stopped at dependency install). The pin is now
+  `terrio>=0.8,<0.9`; the full test suite passes with terrio 0.8.0 on Python 3.10 and 3.13.
 - A file labelled with a compound CRS (horizontal + vertical, e.g. `EPSG:7855+5711`) was never checked
   for points outside the CRS's area: pyproj gives a compound CRS no area of use. The horizontal part's
   area is used now.

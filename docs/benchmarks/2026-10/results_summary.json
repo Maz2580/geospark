@@ -23,22 +23,24 @@
   },
   "gemma4-12b": {
    "bare": {
-    "distance_pct": 5.0,
+    "distance_pct": 35.0,
     "distance_n": 20,
-    "topology_pct": 0.0,
+    "topology_pct": 100.0,
     "topology_n": 18,
-    "api_errors": 37,
+    "api_errors": 0,
     "used_tools_on": null,
-    "cost_usd": 0.0
+    "cost_usd": 0.0,
+    "source": "reruns_2026-11 (November 2026, streaming client; the October attempt hit Cloudflare HTTP 524 timeouts)"
    },
    "tools": {
-    "distance_pct": 0.0,
-    "distance_n": 8,
-    "topology_pct": null,
-    "topology_n": 0,
-    "api_errors": 8,
-    "used_tools_on": 0,
-    "cost_usd": 0.0
+    "distance_pct": 95.0,
+    "distance_n": 20,
+    "topology_pct": 88.9,
+    "topology_n": 18,
+    "api_errors": 0,
+    "used_tools_on": 36,
+    "cost_usd": 0.0,
+    "source": "reruns_2026-11 (November 2026, streaming client; the October attempt hit Cloudflare HTTP 524 timeouts)"
    }
   },
   "gpt-6.1-sol": {
@@ -123,13 +125,14 @@
   },
   "qwen3.5-9b": {
    "bare": {
-    "distance_pct": 0.0,
+    "distance_pct": 60.0,
     "distance_n": 20,
-    "topology_pct": 61.1,
+    "topology_pct": 100.0,
     "topology_n": 18,
-    "api_errors": 27,
+    "api_errors": 0,
     "used_tools_on": null,
-    "cost_usd": 0.0
+    "cost_usd": 0.0,
+    "source": "reruns_2026-11 (November 2026, streaming client; the October attempt hit Cloudflare HTTP 524 timeouts)"
    },
    "tools": {
     "distance_pct": 100.0,

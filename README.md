@@ -35,22 +35,21 @@ spatial analyses.
 GeoSpark is evaluated against the models in current use, and its scope follows the gaps that those
 evaluations reveal.
 
-- **GeoSpark Bench v2.** Across nine models of the time, small open-weight models (3.8B–9B
-  parameters) answered numeric distance questions incorrectly about 95% of the time, and frontier
+- **GeoSpark Bench v2.** Across nine models of the time, four of the five small open-weight models (3.8B–9B parameters) got at most one numeric distance question in
+  twenty right, and frontier
   APIs ranged from 25% to 95% correct. With GeoSpark's tools, every model that issued valid tool
   calls answered 76–96% correctly; a 7B model running on a CPU improved from 5% to 76%.
-- **Re-evaluation with current models (October 2026).** Claude Opus 5.5 and GPT-6.1 now answer the
-  same distance and topology questions correctly without tools, and with GeoSpark's tools a 4B open
-  model on a workstation matches them. Distances between given points are no longer the limiting
-  problem.
-- **Identification of the next gap.** Both frontier models apply datum parameters, plate motion and
-  map projections to the millimetre, but fail on conversions that require a national grid file:
+- **Re-evaluation with current models (October 2026).** On a 38-question sample of the same benchmark, this time with the
+  coordinates written into each question, Claude Opus 5.5 and GPT-6.1 answer without tools and miss one
+  question between them; with GeoSpark's tools a 4B open model on a workstation matches them. Once the
+  coordinates are supplied, distances are no longer the limiting problem.
+- **Identification of the next gap.** Both frontier models get datum shifts, plate motion and map projections right to the
+  millimetre, yet fail on conversions that require a national grid file:
   ellipsoidal (GNSS) heights to AHD, ODN, NZVD2016 or NAVD88, and British National Grid through
   OSTN15. Answering directly, including within the providers' own code sandboxes (which have no
   internet access), GPT-6.1 declined and Opus 5.5 estimated, with errors of up to 9.9 m. GeoSpark
-  now performs these conversions with the official grids. When asked instead to write a script
-  executed with internet access, both frontier models produced correct results; smaller local
-  models did not.
+  now performs these conversions with the official grids. When asked instead to write a script that runs with internet access, Opus 5.5 solved all eight tasks and
+  GPT-6.1 seven, stopping safely on the eighth; the smaller local models did not.
 - **Independent verification.** Agreement with PROJ demonstrates only that a model used the tool
   correctly. GeoSpark's own results were therefore compared with the published calculators and test
   data of Geoscience Australia, Ordnance Survey, LINZ and the US National Geodetic Survey, agreeing
@@ -471,8 +470,8 @@ GeoSpark Bench v2 evaluated nine models under three protocols: the bare question
 reasoning (chain of thought), and the question with GeoSpark's MCP tools attached. The models were
 five open-weight models of at most 9B parameters (Qwen 2.5 7B, Llama 3.1 8B, Gemma 2 9B, Mistral
 7B, Phi-3.5 3.8B), gpt-oss 20B, and three frontier APIs (GPT-5.4, Claude Sonnet 4.5, Gemini 2.5
-Pro). Intervals are Wilson 95% intervals, and the per-call cost ledger (about US$41) is included in
-the repository. The full analysis is in a manuscript under peer review.
+Pro). Intervals are Wilson 95% intervals. The frontier API calls for this evaluation cost about
+US$41 in total. The full analysis is in a manuscript under peer review.
 
 **Numeric distance** (`distance_absolute`, n = 80 per model; correct = within 10% of the
 `pyproj.Geod.inv()` geodesic):
@@ -499,19 +498,21 @@ well-known long-distance pairs, indicating recall of training data rather than c
 - **Tools act as a leveller.** Bare-model accuracy ranges from 1% to 95%; with tools, every model
   that issues valid tool calls reaches 76–96%. Qwen gained 71 percentage points; GPT-5.4 gained
   none, having already reached 95%.
-- **Aggregate scores conceal bias.** Qwen's 56% on topology results from a tendency to answer
-  "yes": it scores 93% on `intersects` (where the data skews true) and 3% on `disjoint`. GPT-5.4
+- **Aggregate scores hide weak spots.** Qwen's overall 56% on topology mixes 93% on `intersects` (an even
+  split of true and false items) with 3% on `disjoint`, where it answered "not disjoint" for 29 of 30 city
+  pairs lying on different continents. GPT-5.4
   scores 0% on `touches`. With GeoSpark, every predicate is answered correctly, because the engine
   computes it.
 - **Step-by-step prompting is not a general remedy.** It improves some models and degrades others.
 - **Knowledge questions do not require tools.** Questions such as "Did the Amazon lose forest
   between 2015 and 2023?" are answered well at every model scale without them.
 
-The benchmark is re-run with `python -m geospark.bench run`, and the datasets regenerate
-identically with `python -m geospark.bench.generate_datasets`. Provenance is documented in the
-[datasets README](https://github.com/Maz2580/geospark/blob/main/geospark/bench/datasets/README.md)
-and every table in the
-[benchmark report](https://github.com/Maz2580/geospark/blob/main/docs/BENCHMARK_REPORT.md).
+Any model can be scored on the benchmark with `python -m geospark.bench run`, and the datasets regenerate
+identically with `python -m geospark.bench.generate_datasets`. The nine-model results above came from
+separate evaluation scripts that are not yet in this repository. Provenance is documented in the
+[datasets README](https://github.com/Maz2580/geospark/blob/main/geospark/bench/datasets/README.md);
+[docs/BENCHMARK_REPORT.md](https://github.com/Maz2580/geospark/blob/main/docs/BENCHMARK_REPORT.md) is an
+earlier single-model report (Qwen 2.5 7B, March 2026).
 
 ### Re-evaluation with current models (October 2026)
 
@@ -529,22 +530,24 @@ predicate, coordinates given; distance correct within 10% of the `pyproj` geodes
 | GPT-6.1 | API | 95% ¹ / 100% | 100% / 100% |
 | gpt-oss 20B | local workstation | 95% / 100% | 100% / 100% |
 | Qwen 3.5 4B | local workstation | 90% / 100% | 100% / 100% |
-| Qwen 3.5 9B | local workstation | — ² | 100% / 94% |
+| Qwen 3.5 9B | local workstation | 60% ² / 100% | 100% / 94% |
+| Gemma 4 12B | local workstation | 35% ² / 100% | 95% / 89% |
 | Phi-4-mini 3.8B | local workstation | 15% / 50% | 20% / 50% ³ |
 
-¹ One reply exhausted its length limit while reasoning and gave no number. ² Most replies timed
-out on a heavily loaded workstation, so the run does not constitute a fair score. ³ The model never
-called the tools. Gemma 4 12B timed out in the same way and is omitted.
+¹ One reply exhausted its length limit while reasoning and gave no number. ² All of these misses are long reasoning that hit the 2,000-token
+reply cap before a final figure was given, so none ended in a wrong answer. The October attempts at
+these two models broke on Cloudflare HTTP 524 timeouts, so both were repeated in November 2026 using a
+streaming client (`reruns_2026-11`). ³ Phi-4-mini did not call any tool.
 
-Current frontier models answer these questions correctly without tools, and with tools a 4B model
-on a workstation matches them.
+Given the coordinates, the current frontier models need no tools for these questions, and with tools a
+4B model on a workstation reaches the same scores.
 
-**Datum and height conversions** (32 questions in Australia, the United Kingdom, New Zealand and
-the United States; reference answers computed with PROJ's most accurate EPSG operations and the
-national grids, and checked against the agencies' own services where available: GDA94 to GDA2020,
-MGA zones, ITRF2014 to GDA2020 at an epoch, ellipsoidal heights to AHD, ODN, NZVD2016 and NAVD88,
-OSTN15, NAD27 to NAD83). Survey-grade denotes agreement within 5 cm, or within the geoid model's
-stated accuracy for heights:
+**Datum and height conversions**: 32 questions covering Australia, the UK, New Zealand and the US. They
+include GDA94→GDA2020 and MGA zones, an epoch-based ITRF2014→GDA2020 conversion, NAD27→NAD83, OSTN15
+grid coordinates, and heights from the ellipsoid to AHD, ODN, NZVD2016 and NAVD88. Each reference answer
+comes from the best-accuracy EPSG operation PROJ offers, using the national grid files, and was compared
+with the agency's own service where one exists. "Survey-grade" here means within 5 cm of the reference
+(for heights, within the stated accuracy of the geoid model):
 
 | Model | Without tools: survey-grade | within 0.5 m | wrong | declined | With GeoSpark's geodesy tools |
 |---|:---:|:---:|:---:|:---:|:---:|
@@ -559,20 +562,20 @@ correctly; the correctness of PROJ's answers is established separately (see
 NAD27 questions, the reference is itself accurate only to about 0.27 m (NGS's stated uncertainty),
 so "survey-grade" there denotes agreement with PROJ's NADCON rather than centimetre-level truth.
 
-Both models apply datum parameters, plate motion and map projections to the millimetre. Answering
-directly, neither can read the national grids on which heights and some datum conversions depend:
-GPT-6.1 declines ("I cannot access the AUSGeoid2020 grid") and Opus 5.5 estimates from memory.
+Datum shifts, plate-motion corrections and map projections come out right to the millimetre from both
+models. What they cannot do on their own is look up the national grid files that heights and some
+datum conversions need: GPT-6.1 refuses ("I cannot access the AUSGeoid2020 grid") and Opus 5.5 estimates from memory.
 GeoSpark's [`transform_coordinates` and `convert_height`](#datum-and-height-conversions) close this
 gap.
 
 **Fairness checks** ([details](https://github.com/Maz2580/geospark/blob/main/docs/benchmarks/2026-10/fairness.md)).
-The gap persists with the providers' own code execution at high effort (their sandboxes include
-PROJ but no internet access; GPT-6.1 declined all 17 grid questions, and Opus 5.5 estimated with
-errors of up to 9.9 m) and across three repeated runs. It does **not** persist when these frontier
+Letting the models run code in the providers' own sandboxes, at high effort, does not close the gap:
+the sandboxes have PROJ but cannot download grids, so GPT-6.1 declined all 17 grid questions and
+Opus 5.5's estimates were off by as much as 9.9 m. Three repeat runs gave the same picture. It does **not** persist when these frontier
 models write a script that is executed with internet access: Opus 5.5 completed all eight everyday
 GIS scripting tasks correctly, AHD included, and GPT-6.1 completed seven and failed safely on the
-eighth. The silently incorrect scripts came from the smaller local models: gpt-oss 20B reported the
-ellipsoidal height unchanged as "AHD", and Qwen 3.5 4B completed one of eight tasks. Web browsing
+eighth. The silently incorrect scripts came from the smaller local models: gpt-oss 20B passed the ellipsoidal height through
+untouched and labelled it "AHD", and Qwen 3.5 4B finished one task of eight. Web browsing
 was not tested. The API cost of the October 2026 re-evaluation was US$8.46.
 
 **Small local models with GeoSpark's tools**

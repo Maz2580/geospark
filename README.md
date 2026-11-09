@@ -537,7 +537,8 @@ predicate, coordinates given; distance correct within 10% of the `pyproj` geodes
 ¹ One reply exhausted its length limit while reasoning and gave no number. ² All of these misses are long reasoning that hit the 2,000-token
 reply cap before a final figure was given, so none ended in a wrong answer. The October attempts at
 these two models broke on Cloudflare HTTP 524 timeouts, so both were repeated in November 2026 using a
-streaming client (`reruns_2026-11`). ³ Phi-4-mini did not call any tool.
+streaming client; their answers are in
+[docs/benchmarks/2026-10/reruns_2026-11](https://github.com/Maz2580/geospark/tree/main/docs/benchmarks/2026-10/reruns_2026-11). ³ Phi-4-mini did not call any tool.
 
 Given the coordinates, the current frontier models need no tools for these questions, and with tools a
 4B model on a workstation reaches the same scores.

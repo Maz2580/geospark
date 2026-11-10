@@ -11,6 +11,7 @@
   <a href="https://pypi.org/project/geospark-ai/"><img src="https://img.shields.io/pypi/pyversions/geospark-ai" alt="Python"></a>
   <a href="https://github.com/Maz2580/geospark/pkgs/container/geospark"><img src="https://img.shields.io/badge/docker-ghcr.io-2496ED?logo=docker&logoColor=white" alt="Docker"></a>
   <a href="https://github.com/Maz2580/geospark/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
+  <a href="https://mcptry.com/servers/io.github.Maz2580/geospark"><img src="https://mcptry.com/badge/io.github.Maz2580/geospark" alt="mcptry"></a>
 </p>
 
 ---

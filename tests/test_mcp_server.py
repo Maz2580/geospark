@@ -249,3 +249,23 @@ def test_stdio_server_has_local_file_tools() -> None:
 
     names = {t.name for t in asyncio.run(create_server(local_files=True).list_tools())}
     assert {"layer_info", "layer_count_within", "layer_nearest"} <= names
+
+
+@pytest.mark.parametrize("local_files", [False, True])
+def test_every_tool_argument_is_described(local_files: bool) -> None:
+    """Agents choose tools and fill arguments from these descriptions, so none may be missing."""
+    import asyncio
+
+    from geospark.mcp_servers.server import create_server
+
+    missing = []
+    for tool in asyncio.run(create_server(local_files=local_files).list_tools()):
+        schema = tool.input_schema
+        defs = schema.get("$defs", {})
+        for name, prop in schema.get("properties", {}).items():
+            refs = [prop, *prop.get("anyOf", [])]
+            described = prop.get("description") or any(
+                defs.get(r["$ref"].split("/")[-1], {}).get("description") for r in refs if "$ref" in r)
+            if not described:
+                missing.append(f"{tool.name}.{name}")
+    assert not missing, f"arguments without a description: {missing}"

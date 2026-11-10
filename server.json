@@ -8,6 +8,15 @@
     "source": "github"
   },
   "websiteUrl": "https://geospark.terrascout.app",
+  "icons": [
+    {
+      "src": "https://geospark.terrascout.app/assets/logo.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": [
+        "any"
+      ]
+    }
+  ],
   "version": "0.10.0",
   "remotes": [
     {

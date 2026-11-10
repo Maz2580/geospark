@@ -71,6 +71,7 @@ Longitude = Annotated[float, Field(ge=-180, le=180, description="Longitude in de
 FilePath = Annotated[str, Field(min_length=1, max_length=1000,
                                 description="Path to a GeoJSON/GeoPackage/Shapefile/GeoParquet/CSV file")]
 CrsArg = Annotated[str | None, Field(description="The file's CRS if it doesn't declare one, e.g. EPSG:28355")]
+RepairArg = Annotated[bool, Field(description="Fix invalid geometries (with a warning) instead of refusing the file")]
 
 READ_ONLY_LOCAL = ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True,
                                   open_world_hint=False)
@@ -312,7 +313,8 @@ def create_server(local_files: bool = False) -> MCPServer:
     async def check_spatial_relationship(
         geometry_a: GeoJSONGeometry,
         geometry_b: GeoJSONGeometry,
-        relationship: Literal["contains", "intersects", "within", "touches", "crosses", "overlaps", "disjoint"],
+        relationship: Annotated[Literal["contains", "intersects", "within", "touches", "crosses", "overlaps", "disjoint"],
+                                Field(description="The relationship to test: does geometry_a <relationship> geometry_b")],
     ) -> RelationshipResult:
         """Ground-truth topology: does geometry_a <relationship> geometry_b?
 
@@ -325,7 +327,8 @@ def create_server(local_files: bool = False) -> MCPServer:
 
     @mcp.tool(title="Geometry operation", annotations=READ_ONLY_LOCAL)
     async def spatial_operation(
-        operation: Literal["buffer", "area", "length", "centroid", "convex_hull"],
+        operation: Annotated[Literal["buffer", "area", "length", "centroid", "convex_hull"],
+                             Field(description="What to compute; buffer also needs radius_m")],
         geometry: GeoJSONGeometry,
         radius_m: Annotated[float | None, Field(ge=0, le=100_000, description="Buffer radius in metres")] = None,
     ) -> FeatureCollection:
@@ -339,7 +342,7 @@ def create_server(local_files: bool = False) -> MCPServer:
     @mcp.tool(title="Geocode a place", annotations=READ_ONLY_WEB)
     async def geocode(
         query: Annotated[str, Field(min_length=1, max_length=500, description="Address or place name")],
-        limit: Annotated[int, Field(ge=1, le=10)] = 5,
+        limit: Annotated[int, Field(ge=1, le=10, description="Maximum number of matches to return")] = 5,
     ) -> FeatureCollection:
         """Find coordinates for an address or place name (OpenStreetMap Nominatim).
 
@@ -400,7 +403,7 @@ def create_server(local_files: bool = False) -> MCPServer:
     @mcp.tool(title="Weather", annotations=READ_ONLY_WEB)
     async def get_weather(
         latitude: Latitude, longitude: Longitude,
-        forecast_days: Annotated[int, Field(ge=1, le=16)] = 3,
+        forecast_days: Annotated[int, Field(ge=1, le=16, description="Number of days of daily forecast")] = 3,
     ) -> DataResult:
         """Current weather and a daily forecast for a point (Open-Meteo, no key needed)."""
         return await _channel("weather", lat=latitude, lon=longitude, filters={"forecast_days": forecast_days})
@@ -413,7 +416,7 @@ def create_server(local_files: bool = False) -> MCPServer:
 
     @mcp.tool(title="Active fires", annotations=READ_ONLY_WEB)
     async def get_active_fires(
-        latitude: Latitude, longitude: Longitude, days: Annotated[int, Field(ge=1, le=2)] = 1,
+        latitude: Latitude, longitude: Longitude, days: Annotated[int, Field(ge=1, le=2, description="How many days back to look for detections")] = 1,
     ) -> DataResult:
         """Satellite active-fire detections near a point (NASA FIRMS; the server needs a FIRMS_MAP_KEY)."""
         return await _channel("fires", lat=latitude, lon=longitude, filters={"days": days})
@@ -431,7 +434,7 @@ def create_server(local_files: bool = False) -> MCPServer:
         latitude: Latitude,
         longitude: Longitude,
         minutes: Annotated[list[int], Field(min_length=1, max_length=4, description="Contour times, 1-60")] = [10],  # noqa: B006
-        mode: Literal["walk", "bike", "drive"] = "walk",
+        mode: Annotated[Literal["walk", "bike", "drive"], Field(description="Travel mode: walk, bike or drive")] = "walk",
     ) -> FeatureCollection:
         """Where can you get to from a point within N minutes on foot, by bike or by car?
         Returns one polygon per contour with its geodesic area (Valhalla over OpenStreetMap)."""
@@ -443,7 +446,7 @@ def create_server(local_files: bool = False) -> MCPServer:
     async def travel_time_matrix(
         origins: Annotated[list[tuple[float, float]], Field(min_length=1, max_length=5, description="[[lat, lon], ...]")],
         destinations: Annotated[list[tuple[float, float]], Field(min_length=1, max_length=5, description="[[lat, lon], ...]")],
-        mode: Literal["walk", "bike", "drive"] = "walk",
+        mode: Annotated[Literal["walk", "bike", "drive"], Field(description="Travel mode: walk, bike or drive")] = "walk",
     ) -> FeatureCollection:
         """Network travel time (minutes) and distance (metres) from each origin to each destination.
         Note: points here are [latitude, longitude] pairs."""
@@ -453,12 +456,15 @@ def create_server(local_files: bool = False) -> MCPServer:
 
     @mcp.tool(title="Overture Maps features", annotations=READ_ONLY_WEB)
     async def overture_features(
-        theme: Literal["places", "buildings", "transportation", "divisions"],
+        theme: Annotated[Literal["places", "buildings", "transportation", "divisions"],
+                         Field(description="Which data: places (points of interest), buildings, transportation "
+                                           "(road and path segments) or divisions (areas containing the point)")],
         latitude: Latitude,
         longitude: Longitude,
         radius_m: Annotated[float, Field(gt=0, le=2000, description="Search radius in metres")] = 300,
         category: Annotated[str | None, Field(max_length=100, description="Places only, e.g. 'cafe'")] = None,
-        limit: Annotated[int | None, Field(ge=1, le=2000)] = None,
+        limit: Annotated[int | None, Field(ge=1, le=2000, description="Maximum number of features to return, "
+                                                                    "nearest first")] = None,
     ) -> FeatureCollection:
         """Open global map data from Overture Maps, no API key: points of interest (with
         categories), building footprints (height, floors, geodesic footprint area), road and path
@@ -577,7 +583,8 @@ def create_server(local_files: bool = False) -> MCPServer:
         latitude: Latitude,
         longitude: Longitude,
         observer_height_m: Annotated[float, Field(ge=0, le=500, description="Eye or sensor height above ground")] = 1.5,
-        max_distance_m: Annotated[float, Field(ge=500, le=50_000)] = 20_000,
+        max_distance_m: Annotated[float, Field(ge=500, le=50_000, description="How far out to look for "
+                                                                           "blocking terrain, in metres")] = 20_000,
         step_deg: Annotated[float, Field(ge=0.5, le=10, description="Azimuth spacing; must divide 360")] = 5,
     ) -> HorizonResult:
         """The skyline the terrain makes around a point: for each azimuth, the elevation angle of the
@@ -609,7 +616,8 @@ def create_server(local_files: bool = False) -> MCPServer:
     @mcp.tool(title="Location report", annotations=READ_ONLY_WEB)
     async def location_report(
         location: Annotated[str, Field(min_length=1, max_length=500, description="Place to analyse")],
-        radius_m: Annotated[float, Field(gt=0, le=10_000)] = 1000,
+        radius_m: Annotated[float, Field(gt=0, le=10_000, description="Search radius for nearby amenities, "
+                                                                  "in metres")] = 1000,
     ) -> FeatureCollection:
         """A dossier for a place: address, elevation, weather, and nearby amenities with exact
         distances, as a GeoJSON map layer listing every data source used. Takes ~10-30 s."""
@@ -625,8 +633,10 @@ def create_server(local_files: bool = False) -> MCPServer:
         within: Annotated[str, Field(min_length=1, max_length=500, description="City or neighbourhood")],
         near: Annotated[list[str], Field(max_length=10, description="Amenity types to be close to")] = [],  # noqa: B006
         avoid: Annotated[list[str], Field(max_length=10, description="Amenity types to stay away from")] = [],  # noqa: B006
-        facility_type: Annotated[str, Field(max_length=100)] = "restaurant",
-        radius_m: Annotated[float, Field(gt=0, le=10_000)] = 3000,
+        facility_type: Annotated[str, Field(max_length=100, description="What the site is for, e.g. 'pharmacy'; "
+                                                                       "labels the result, does not change the ranking")] = "restaurant",
+        radius_m: Annotated[float, Field(gt=0, le=10_000, description="Search radius in metres from the centre "
+                                                                  "of the area")] = 3000,
     ) -> FeatureCollection:
         """Rank candidate sites in an area by geodesic distance to amenities you want nearby and
         away from ones to avoid (OpenStreetMap data). Takes ~10-30 s."""
@@ -660,7 +670,7 @@ def _add_local_file_tools(mcp: MCPServer) -> None:
             raise ToolError(str(e)) from e
 
     @mcp.tool(title="Describe a local data file", annotations=READ_ONLY_LOCAL)
-    async def layer_info(path: FilePath, crs: CrsArg = None, repair: bool = False) -> FeatureCollection:
+    async def layer_info(path: FilePath, crs: CrsArg = None, repair: RepairArg = False) -> FeatureCollection:
         """Read one of the user's vector files and report features, fields, geometry types, its CRS
         (never guessed), bbox and total geodesic area/length."""
         layer = await _blocking(load, path, crs, repair)
@@ -668,7 +678,7 @@ def _add_local_file_tools(mcp: MCPServer) -> None:
 
     @mcp.tool(title="Count points in polygons (local files)", annotations=READ_ONLY_LOCAL)
     async def layer_count_within(points_path: FilePath, polygons_path: FilePath, crs: CrsArg = None,
-                                 repair: bool = False) -> FeatureCollection:
+                                 repair: RepairArg = False) -> FeatureCollection:
         """For each polygon in one file, count the points from another file inside it (exact), with
         density per km²."""
         pts = await _blocking(load, points_path, crs, repair)
@@ -697,7 +707,7 @@ def _add_local_file_tools(mcp: MCPServer) -> None:
 
     @mcp.tool(title="Nearest feature (local files)", annotations=READ_ONLY_LOCAL)
     async def layer_nearest(sources_path: FilePath, targets_path: FilePath, crs: CrsArg = None,
-                            repair: bool = False) -> FeatureCollection:
+                            repair: RepairArg = False) -> FeatureCollection:
         """For each feature in one file, the nearest feature in another and the geodesic distance."""
         src = await _blocking(load, sources_path, crs, repair)
         dst = await _blocking(load, targets_path, crs, repair)

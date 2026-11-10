@@ -4,6 +4,11 @@ All notable changes to GeoSpark (`geospark-ai` on PyPI).
 
 ## [Unreleased]
 
+### Changed: tool documentation and registry listing
+- Every MCP tool argument now has a description (16 had none, e.g. `mode`, `limit`, `theme`, `repair`);
+  agents use these to choose and fill in tools. A test keeps it that way.
+- `server.json` lists the GeoSpark logo as the server's icon for the MCP Registry.
+
 ### Added: sun and terrain visibility (`docs/benchmarks/2026-10/sun_horizon.md`)
 - **Sun position, shadows, sunrise and sunset** (`geospark.sun`; `POST /api/v1/sun`, `/api/v1/sun/times`;
   MCP and Ask tools `sun_position`, `sun_times`; `geospark sun`). NOAA solar position (Meeus) with

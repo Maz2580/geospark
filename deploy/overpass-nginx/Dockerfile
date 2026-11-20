@@ -12,7 +12,10 @@
 # Move to an upstream build once one ships nginx >= 1.31.9 (test it: it also moves to Debian 13).
 FROM wiktorn/overpass-api:v0.7.62.11@sha256:5f643f2aa500333f19458fe8be14457215d6e0b9f891ca5c5ed452b1f8882c47
 
-ARG NGINX_VERSION=1.31.9
+# ENV, not ARG: the base image sets NGINX_VERSION=1.29.1 and NJS_VERSION=0.9.1, and with the classic builder
+# (the server's) an inherited ENV overrides an ARG of the same name. Setting them here also keeps the image's
+# own metadata right (a scanner reading NGINX_VERSION sees the installed version).
+ENV NGINX_VERSION=1.31.9 NJS_VERSION=1.0.2 NJS_RELEASE=1~bookworm
 RUN set -eux; \
     echo "deb [signed-by=/etc/apt/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/mainline/debian/ bookworm nginx" \
         > /etc/apt/sources.list.d/nginx.list; \
@@ -21,7 +24,7 @@ RUN set -eux; \
         "nginx=${NGINX_VERSION}-1~bookworm" \
         "nginx-module-geoip=${NGINX_VERSION}-1~bookworm" \
         "nginx-module-image-filter=${NGINX_VERSION}-1~bookworm" \
-        "nginx-module-njs=${NGINX_VERSION}+1.0.2-1~bookworm" \
+        "nginx-module-njs=${NGINX_VERSION}+${NJS_VERSION}-1~bookworm" \
         "nginx-module-otel=${NGINX_VERSION}+0.1.2-1~bookworm" \
         "nginx-module-xslt=${NGINX_VERSION}-1~bookworm"; \
     rm -f /etc/apt/sources.list.d/nginx.list; \

@@ -15,6 +15,19 @@ jobs:
           cd /mnt/geospark
           git pull origin main
 
+      - name: Build the Overpass image if it is missing
+        # Overpass with nginx 1.31.9 (deploy/overpass-nginx/Dockerfile), used by the server's
+        # docker-compose.override.yml. Built only when the tag is absent, so deploys never rebuild or
+        # restart Overpass, which UrbanMind also uses. Keep the tag in step with the override.
+        run: |
+          cd /mnt/geospark
+          TAG=geospark-overpass:0.7.62.11-nginx-1.31.9
+          if sudo docker image inspect "$TAG" > /dev/null 2>&1; then
+            echo "$TAG present"
+          else
+            sudo env BUILDX_CONFIG=/mnt/geospark/.buildx docker build -t "$TAG" deploy/overpass-nginx
+          fi
+
       - name: Rebuild and restart containers
         run: |
           cd /mnt/geospark

@@ -93,8 +93,11 @@ services:
   # For a region other than Australia, also set GEOSPARK_OVERPASS_POLY to its Geofabrik .poly file.
   # Full plan and measurements: deploy/OVERPASS_SELFHOST_PLAN.md
   overpass:
-    # Upstream rebuilt this tag on 2026-11-09 (nginx 1.31.8, Debian 13); the digest keeps the tested build.
-    image: wiktorn/overpass-api:v0.7.62.11@sha256:5f643f2aa500333f19458fe8be14457215d6e0b9f891ca5c5ed452b1f8882c47
+    # The pinned upstream build (v0.7.62.11 of 2026-08-01) with nginx upgraded to 1.31.9; build it once:
+    #   docker build -t geospark-overpass:0.7.62.11-nginx-1.31.9 deploy/overpass-nginx
+    # (deploy/overpass-nginx/Dockerfile). Without the nginx upgrade, use the base it names instead.
+    image: geospark-overpass:0.7.62.11-nginx-1.31.9
+    pull_policy: never                   # built locally; never pulled
     container_name: geospark-overpass
     # No `user:`: supervisord must start as root; the database runs as the image's `overpass`
     # user, which is uid/gid 1000, and owns everything in /db.

@@ -36,7 +36,8 @@ services:
   # Local language model for /ask and the agents. Pull the model once after starting:
   #   docker exec geospark-ollama ollama pull qwen2.5:7b
   ollama:
-    image: ollama/ollama:latest          # pin a version tag for reproducible deploys
+    # Pinned to the version the live server runs; `latest` would move on any pull. Change it on purpose.
+    image: ollama/ollama:0.30.10@sha256:bfc9c6d53cc6989aa5131a6fde6b162b2802d4d337657f3253b5f69579bddeee
     container_name: geospark-ollama
     ports:
       - "127.0.0.1:11434:11434"          # local only, for maintenance; GeoSpark uses the network
@@ -92,12 +93,15 @@ services:
   # For a region other than Australia, also set GEOSPARK_OVERPASS_POLY to its Geofabrik .poly file.
   # Full plan and measurements: deploy/OVERPASS_SELFHOST_PLAN.md
   overpass:
-    image: wiktorn/overpass-api:v0.7.62.11
+    # Upstream rebuilt this tag on 2026-11-09 (nginx 1.31.8, Debian 13); the digest keeps the tested build.
+    image: wiktorn/overpass-api:v0.7.62.11@sha256:5f643f2aa500333f19458fe8be14457215d6e0b9f891ca5c5ed452b1f8882c47
     container_name: geospark-overpass
     # No `user:`: supervisord must start as root; the database runs as the image's `overpass`
     # user, which is uid/gid 1000, and owns everything in /db.
     volumes:
       - /mnt/geospark/overpass:/db
+      # The first update after a start waits for the query service (deploy/overpass_update_loop.sh)
+      - ./deploy/overpass_update_loop.sh:/app/bin/update_overpass_loop.sh:ro
     environment:
       - OVERPASS_MODE=init
       - OVERPASS_META=no
